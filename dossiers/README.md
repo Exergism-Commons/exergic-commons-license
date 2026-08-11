@@ -35,6 +35,7 @@ The following scoped reviews are also normalized:
 
 - high-impact scope review: United Kingdom, Morocco and Ukraine;
 - scoped tranche 1: Denmark, France, Netherlands and Serbia;
-- scoped tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon.
+- scoped tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
+- scoped tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia.
 
-That makes **61 State dossiers with completed detailed normalization** at the 2026-08-11 cutoff. Remaining State dossiers retain canonical metadata and review links and will be expanded as their scoped/under-review/no-current-basis reviews are completed.
+That makes **69 State dossiers with completed detailed normalization** at the 2026-08-11 cutoff. Remaining State dossiers retain canonical metadata and review links and will be expanded as their scoped/under-review/no-current-basis reviews are completed.
