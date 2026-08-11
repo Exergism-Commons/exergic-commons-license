@@ -17,6 +17,10 @@ Possible reasoned outcomes are:
 
 Opening a dossier has **no licensing effect**. Only a specific `RESTRICTED-PARTIES.md` Schedule incorporated by a software release can create an operative restriction. State findings concern institutional/governmental apparatuses, never populations or nationalities.
 
+## 2026 complete adjudication
+
+The first full 195-State evidence review is recorded in **[`STATE-ADJUDICATION-2026.md`](STATE-ADJUDICATION-2026.md)** (research cutoff 2026-08-11). It contains the provisional outcome, exact scope, confidence, reasoned finding, and evidence baseline for every dossier. Result counts: **46 R / 64 S / 41 U / 44 N**. The adjudication is a governance record and does not itself modify the operative Restricted Parties Schedule.
+
 ## Complete index
 
 - **1. Afghanistan** — #1
