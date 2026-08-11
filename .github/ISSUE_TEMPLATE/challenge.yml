@@ -1,0 +1,30 @@
+name: Designation challenge or removal request
+description: Challenge, narrow or seek removal of an ECL governance finding/designation
+title: "Challenge: "
+body:
+  - type: input
+    id: target
+    attributes:
+      label: Dossier, actor, project or Schedule entry
+    validations:
+      required: true
+  - type: textarea
+    id: grounds
+    attributes:
+      label: Grounds for challenge
+      description: Identify factual error, changed conduct, remediation, attribution error, overbreadth or new counter-evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+    validations:
+      required: true
+  - type: textarea
+    id: remedy
+    attributes:
+      label: Requested result
+      description: Uphold, narrow, downgrade or remove.
+    validations:
+      required: true

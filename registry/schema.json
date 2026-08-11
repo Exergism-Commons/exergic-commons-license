@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ECL State Governance Registry",
+  "type": "object",
+  "required": ["version", "evidence_cutoff", "status", "operative", "counts", "outcomes"],
+  "properties": {
+    "version": {"type": "string"},
+    "evidence_cutoff": {"type": "string", "format": "date"},
+    "status": {"const": "provisional-governance"},
+    "operative": {"const": false},
+    "dossier_pattern": {"type": "string"},
+    "counts": {
+      "type": "object",
+      "required": ["R", "S", "U", "N"],
+      "properties": {
+        "R": {"type": "integer", "minimum": 0},
+        "S": {"type": "integer", "minimum": 0},
+        "U": {"type": "integer", "minimum": 0},
+        "N": {"type": "integer", "minimum": 0}
+      }
+    },
+    "outcomes": {
+      "type": "object",
+      "required": ["R", "S", "U", "N"],
+      "properties": {
+        "R": {"$ref": "#/$defs/iso3Array"},
+        "S": {"$ref": "#/$defs/iso3Array"},
+        "U": {"$ref": "#/$defs/iso3Array"},
+        "N": {"$ref": "#/$defs/iso3Array"}
+      }
+    }
+  },
+  "$defs": {
+    "iso3Array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z]{3}$"}
+    }
+  }
+}

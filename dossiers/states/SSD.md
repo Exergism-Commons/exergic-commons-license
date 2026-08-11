@@ -1,0 +1,15 @@
+---
+id: ECL-STATE-SSD
+entity: "South Sudan"
+iso3: SSD
+issue: 164
+provisional_outcome: S
+evidence_cutoff: 2026-08-11
+review_stage: whole-state-adversarial-reviewed
+operative: false
+---
+# South Sudan
+
+Current governance outcome: **S** after whole-State adversarial review. See issue `#164`, `../../reviews/2026/initial-adjudication.md`, and `../../reviews/2026/adversarial/summary.md`.
+
+This is the canonical State entry point. Detailed 2026 evidence remains preserved in linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.

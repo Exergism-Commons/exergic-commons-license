@@ -1,56 +1,79 @@
 # Exergic Commons License (ECL)
 
-> **Status: Draft 0.1 — not yet recommended for production licensing.**
+> **Status: Draft 0.1 — experimental source-available ethical software license.**
 
-The **Exergic Commons License (ECL)** is an experimental **source-available ethical software license** grounded in exergist principles: preserving and expanding human agency, truthful understanding, reversibility, distributed capacity, and the ability of people and communities to shape their own futures.
+The **Exergic Commons License (ECL)** is a source-available software license designed to preserve and expand human agency, truthful understanding, reversibility, distributed capacity, and the ability of people and communities to shape their own futures.
 
-ECL is designed for authors who want to publish source code broadly while withholding permission for uses, projects, or actors that materially contribute to coercive capture, systemic domination, deceptive manipulation, repressive surveillance, or comparable reductions of human agency.
+ECL grants broad software rights while withholding permission from defined prohibited uses, Restricted Parties and Restricted Projects that materially contribute to coercive capture, systemic domination, deceptive population manipulation, repressive surveillance, unlawful coercive targeting or comparable destruction of meaningful agency.
 
-## Important classification
+ECL is **not OSI-approved Open Source** and is not intended to satisfy the Open Source Definition.
 
-ECL is **not an Open Source Initiative (OSI) approved license and is not intended to satisfy the Open Source Definition**. Its ethical restrictions discriminate between uses and, in some cases, actors or projects. Projects using ECL should describe themselves as **source-available**, not OSI open source.
-
-## Repository structure
+## Start here
 
 - [`LICENSE`](LICENSE) — current working license text.
-- [`versions/ECL-0.1.md`](versions/ECL-0.1.md) — immutable draft snapshot of version 0.1.
-- [`EXERGIC-PRINCIPLES.md`](EXERGIC-PRINCIPLES.md) — philosophical principles that inform the license.
-- [`EXERGIC-GOVERNANCE.md`](EXERGIC-GOVERNANCE.md) — procedure for evaluating prohibited uses, restricted parties, associates, and projects.
-- [`RESTRICTED-PARTIES.md`](RESTRICTED-PARTIES.md) — versioned schedule of specifically designated parties.
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to propose changes to the license and governance documents.
+- [`schedules/`](schedules/) — versioned Restricted Parties Schedules. A schedule has licensing effect only when a software release expressly incorporates that exact schedule.
+- [`spec/`](spec/) — principles, governance, terminology and designation standards.
+- [`dossiers/`](dossiers/) — per-entity evidence records. Dossiers do not create licensing restrictions by themselves.
+- [`reviews/`](reviews/) — adjudication and adversarial-review history.
+- [`registry/`](registry/) — machine-readable governance registry.
+- [`versions/`](versions/) — immutable historical license/version snapshots.
 
-## Design goals
+## Normative hierarchy
 
-ECL aims to make restrictions **specific, knowable, reviewable, and non-retroactive**. The license therefore separates:
+ECL deliberately separates law-like terms from research and governance records:
 
-1. **Prohibited Uses** — conduct that is incompatible with the license regardless of who performs it.
-2. **Restricted Parties** — specifically designated entities or individuals.
-3. **Covered Associates** — persons or entities materially acting for, controlled by, or providing material support to a Restricted Party in the relevant project or use.
-4. **Restricted Projects** — projects materially involving, serving, or benefiting a Restricted Party or Covered Associate.
+1. **`LICENSE`** defines the operative license terms.
+2. **The exact Schedule incorporated by a software release** defines its Restricted Parties.
+3. **`spec/`** governs how future designations are reasoned, reviewed and interpreted, but does not silently create restrictions.
+4. **`dossiers/`, `reviews/` and `registry/`** are evidence and governance records. They have no licensing effect unless a later Schedule expressly adopts a designation.
 
-Designation of a Restricted Party is governed by a documented process. A later schedule does not retroactively change the rights attached to a previously released software version unless that software version expressly incorporated the later schedule.
+No later Schedule silently or retroactively changes rights attached to an earlier software release.
+
+## Designation lifecycle
+
+```text
+proposal / evidence
+        ↓
+entity dossier
+        ↓
+adversarial review
+        ↓
+reasoned governance determination
+        ↓
+versioned Restricted Parties Schedule
+        ↓
+explicit incorporation by a software release
+        ↓
+licensing effect
+```
+
+A designation concerns an institutional actor, project or materially participating entity. It does **not** impose guilt by nationality, ethnicity, religion, residence or remote association.
+
+## 2026 State review
+
+The repository contains an ECL-native review of 195 State entities. The current governance status is provisional and remains subject to adversarial review. See [`reviews/2026/`](reviews/2026/) and the per-State records in [`dossiers/states/`](dossiers/states/).
+
+These findings are **not** the operative Restricted Parties Schedule.
 
 ## Why exergism?
 
-In this project, *exergy* is used as a normative analogy for effective capacity: not merely stored potential, but potential that can actually be converted into meaningful, autonomous action. Exergist software ethics therefore focuses on whether technology expands or captures the capacity of people and communities to understand reality, coordinate, choose, dissent, exit, and create alternatives.
+ECL uses *exergy* as a normative analogy for effective capacity: capacity that can actually be converted into meaningful, autonomous transformation. The project asks whether technology leaves people able to understand reality, coordinate, choose, dissent, contest decisions, exit systems and create alternatives — or whether those capacities are captured by opaque or coercive structures.
 
-See [`EXERGIC-PRINCIPLES.md`](EXERGIC-PRINCIPLES.md) for the working philosophical model.
+See [`spec/PRINCIPLES.md`](spec/PRINCIPLES.md).
 
 ## Legal status
 
-This repository contains an experimental license draft, not legal advice. Software licensing and enforceability vary by jurisdiction, and ethical-use restrictions create questions that conventional permissive and copyleft licenses do not. Before relying on ECL for consequential software, obtain review from a qualified intellectual-property lawyer in the relevant jurisdictions.
+This project is experimental and has not yet received formal legal review sufficient for production use. Ethical-use and actor-based restrictions raise enforceability and compatibility questions that conventional permissive and copyleft licenses do not. Obtain qualified intellectual-property advice before relying on ECL for consequential deployments.
 
 ## Versioning
 
-The intended format is:
-
 ```text
-Exergic Commons License 0.x   -> experimental drafts
-Exergic Commons License 1.0   -> first stable text after legal/community review
+ECL 0.x  → experimental drafts
+ECL 1.0  → first stable text after legal and governance review
 ```
 
-License text already attached to a software release should remain immutable. Substantive changes produce a new ECL version.
+Published license snapshots are immutable. Substantive legal changes require a new ECL version. Schedule changes are separately versioned and non-retroactive.
 
-## Contributions
+## Contributing
 
-Discussion, legal criticism, adversarial review, examples, and proposed wording are welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Legal criticism, contrary evidence, designation challenges, removal requests, adversarial examples and governance improvements are welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md).

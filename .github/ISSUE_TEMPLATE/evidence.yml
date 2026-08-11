@@ -1,0 +1,32 @@
+name: Evidence submission
+description: Submit new evidence or counter-evidence for an existing dossier
+title: "Evidence: "
+body:
+  - type: input
+    id: dossier
+    attributes:
+      label: Dossier / issue
+    validations:
+      required: true
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Evidence type
+      options:
+        - Supports restriction
+        - Supports narrowing/removal
+        - Neutral/contextual
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source and material facts
+    validations:
+      required: true
+  - type: textarea
+    id: uncertainty
+    attributes:
+      label: Known uncertainty or limitations
+    validations:
+      required: true
