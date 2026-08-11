@@ -1,6 +1,6 @@
 # Restricted Parties Schedule
 
-Schedule ID: **ECL-RP-0.3-DRAFT**  
+Schedule ID: **ECL-RP-0.4-DRAFT**  
 Status: **Draft / experimental**  
 Evidence cutoff: **2026-08-11**  
 Applies only to software releases that expressly incorporate this exact Schedule ID.
@@ -9,7 +9,7 @@ Applies only to software releases that expressly incorporate this exact Schedule
 
 ## 0. General scope
 
-ECL-RP-0.3-DRAFT is an evidence-backed baseline. It does not claim that every qualifying actor worldwide has been identified.
+ECL-RP-0.4-DRAFT is an evidence-backed baseline. It does not claim that every qualifying actor worldwide has been identified.
 
 No person is Restricted merely because of nationality, ethnicity, religion, citizenship, residence, political opinion, passive investment, incidental contact or remote association.
 
@@ -116,37 +116,55 @@ Evidence:
 
 ---
 
-## 6. United States immigration-enforcement and military targeting apparatus — RESTRICTED WITH DEFINED SCOPE
+## 6. United States of America federal governmental apparatus — RESTRICTED
 
-### 6.1 U.S. Immigration and Customs Enforcement (ICE)
+**Restricted Party:** the **United States of America as a federal governmental/legal apparatus**, including all federal branches, executive departments, federal agencies, the Department of Defense and Armed Forces, intelligence agencies, federal law-enforcement bodies, immigration-enforcement and detention bodies, federal prison and detention structures, and federally controlled entities when acting for or materially supporting the Federal Government.
 
-**Restricted Party in its immigration-enforcement, detention, investigation and removal capacity:** U.S. Immigration and Customs Enforcement, including components and contractors materially operating detention, coercive investigation, removal or data-analysis projects for ICE.
+The designation applies to use of ECL-covered Software **by, for, on behalf of, under contract with, or for the material benefit of the United States Federal Government**. A project materially involving a federal Restricted Party is a Restricted Project under `LICENSE`.
 
-The designation is based on the scale and coercive character of the detention system together with documented oversight failures that have created serious risks to life, health and due process. In June 2026 the U.S. Government Accountability Office found that ICE's Camp East Montana opened without meeting key detention standards, with medical-service gaps and unsanitary conditions; GAO also documented a January 2026 detainee death classified by the coroner as homicide by asphyxia and missing or destroyed evidence associated with the incident.
+This designation does **not** restrict United States citizens or residents, Native nations, state or local governments solely because they are within the United States, universities, researchers, civil-society organisations, independent private businesses, journalists, humanitarian organisations or other persons merely because of nationality, residence, tax status or geographic location. A non-federal actor becomes a Covered Associate only where the relevant activity materially supports the federal Restricted Party or a Restricted Project.
 
-Palantir is additionally a material technology supplier to ICE. A January 2026 federal procurement notice describes a sole-source procurement to Palantir for ICE's Investigative Case Management and Investigative Analytics modernization, systems described as integral to ICE investigative operations.
+### 6.1 ECL basis: institutional attribution rather than collective guilt
+
+ECL evaluates the Federal Government as an institutional actor. The designation does not assert that every federal employee, office or public function independently satisfies an ECL prohibited-use criterion. It rests on repeated conduct attributable to multiple core organs of the same federal State across military targeting, detention, coercive immigration enforcement, intelligence operations and population-scale surveillance.
+
+The evidentiary record currently includes, among other matters:
+
+- the CIA post-9/11 detention and interrogation programme documented by the U.S. Senate Select Committee on Intelligence;
+- the NSA Section 215 bulk telephone-records programme, which the U.S. Privacy and Civil Liberties Oversight Board concluded lacked a viable legal foundation, raised constitutional concerns and posed serious threats to privacy and civil liberties;
+- current federal immigration detention and enforcement systems, including serious detention-standard, medical-care, use-of-force and oversight failures documented by the U.S. Government Accountability Office in 2026; and
+- the 28 February 2026 U.S. strike on Shajareh Tayyebeh Elementary School in Minab, Iran, which Amnesty International concluded violated international humanitarian law through failure to take all feasible precautions to protect civilians and which killed 156 people, including 120 children.
+
+For ECL purposes, the recurrence of qualifying conduct through multiple independent federal organs is sufficient in Draft 0.4 to classify the Federal Government itself as a Restricted Party. The designation remains reviewable under `EXERGIC-GOVERNANCE.md` and may be narrowed or removed if the evidentiary basis materially changes.
+
+### 6.2 U.S. Immigration and Customs Enforcement (ICE)
+
+ICE is independently included within the federal Restricted Party and is specifically identified because its detention, investigation, removal and data-analysis functions directly engage ECL coercion, detention, surveillance and agency criteria.
+
+In June 2026 the U.S. Government Accountability Office found that ICE's Camp East Montana opened without meeting key detention standards, with gaps in medical services and unsanitary conditions. GAO documented a January 2026 detainee death classified by the coroner as homicide by asphyxia, missing or destroyed evidence associated with the incident, a separate suicide after suicide-prevention safeguards were not followed, and other serious oversight failures.
+
+Palantir is additionally a material technology supplier to ICE. A January 2026 federal procurement notice describes a sole-source procurement to Palantir for ICE's Investigative Case Management and Investigative Analytics modernization.
 
 Evidence:
 - https://www.gao.gov/products/gao-26-108886
 - https://sam.gov/opp/5477991867424397affe85e2fad8b5fc/view
 
-### 6.2 Operation Epic Fury / Minab targeting chain
+### 6.3 Operation Epic Fury / Minab targeting chain
 
-**Restricted Project:** Operation Epic Fury targeting activities and the U.S. military/intelligence units, targeting cells, command structures, contractors and technical systems materially involved in the 28 February 2026 strike on Shajareh Tayyebeh Elementary School in Minab, Iran, and in any continuation of the same targeting process where the identified defects remain unremediated.
+**Restricted Project independently and as part of the federal designation:** Operation Epic Fury targeting activities and the U.S. military/intelligence units, targeting cells, command structures, contractors and technical systems materially involved in the 28 February 2026 strike on Shajareh Tayyebeh Elementary School in Minab, Iran, and any continuation of the same targeting process where identified defects remain unremediated.
 
-Amnesty International concluded after investigation that the United States was responsible for the strike, which killed **156 people, including 120 children**, and that U.S. forces violated international humanitarian law by failing to take all feasible precautions to avoid civilian harm. Public reporting indicates that obsolete target intelligence was a central failure and that Palantir's Maven system formed part of the targeting infrastructure. ECL does not assert, absent conclusive evidence, that a software defect in Maven alone selected the school or caused the strike.
+Amnesty International concluded that the United States was responsible for the strike, which killed **156 people, including 120 children**, and that U.S. forces violated international humanitarian law by failing to take all feasible precautions to avoid civilian harm. Public reporting indicates that Palantir's Maven system formed part of the targeting infrastructure. ECL does not assert, absent conclusive evidence, that a software defect in Maven alone selected the school or caused the strike.
 
 Evidence:
 - https://www.amnesty.org/en/latest/news/2026/03/usa-iran-those-responsible-for-deadly-and-unlawful-us-strike-on-school-that-killed-over-100-children-must-be-held-accountable/
 
-### 6.3 Historical U.S. coercive programmes
+### 6.4 Historical coercive programmes
 
-The following are Historical Restricted Projects:
+The CIA post-9/11 detention/interrogation programme and NSA Section 215 bulk telephone-records programme remain specifically identified as Historical Restricted Projects. Their historical status is part of the evidentiary basis for restricting the federal institutional actor; it does not permanently attach personal Restricted status to every former federal employee.
 
-- the CIA post-9/11 detention and interrogation programme insofar as it involved torture, cruel treatment, secret detention or rendition; and
-- the NSA Section 215 bulk telephone-records programme in the form found legally and constitutionally defective by the U.S. Privacy and Civil Liberties Oversight Board.
-
-Historical classification does not automatically Restrict unrelated present-day activity of every employee who once belonged to the relevant agency.
+Evidence:
+- https://www.intelligence.senate.gov/2014/12/09/press-committee-releases-study-cias-detention-and-interrogation-program/
+- https://www.pclob.gov/Oversight
 
 ---
 
@@ -317,4 +335,4 @@ Every designation must remain eligible for narrowing, removal or reclassificatio
 
 Before ECL 1.0, each stable designation should receive its own public evidence/decision record with primary sources, counter-evidence, scope, conflicts of interest and a reasoned decision.
 
-ECL-RP-0.3-DRAFT applies only to software releases expressly identifying this Schedule ID. Later additions, removals, judicial outcomes, changes to sanctions lists, organisational restructurings or new factual findings do not retroactively alter rights attached to an earlier release.
+ECL-RP-0.4-DRAFT applies only to software releases expressly identifying this Schedule ID. Later additions, removals, judicial outcomes, changes to sanctions lists, organisational restructurings or new factual findings do not retroactively alter rights attached to an earlier release.
