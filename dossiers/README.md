@@ -13,29 +13,18 @@ GitHub issues are discussion/submission threads; review tranche files are proced
 
 ## Normalization rule
 
-A normalized dossier should be understandable without reconstructing its conclusion from historical review files. It records:
-
-1. current outcome and exact scope;
-2. ECL criteria engaged;
-3. supporting evidence and attribution;
-4. counter-evidence / exergic institutions;
-5. exclusions and attribution boundaries;
-6. adversarial outcome;
-7. objective review/removal triggers;
-8. principal sources; and
-9. procedural history.
-
-The schema is in `states/_TEMPLATE.md`.
+A normalized dossier should be understandable without reconstructing its conclusion from historical review files. It records current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, sources and procedural history. The schema is in `states/_TEMPLATE.md`.
 
 ## 2026 normalization status
 
 The complete first-pass State adjudication remains preserved under `../reviews/2026/`. All **46 States initially classified `R`** have been normalized after whole-State adversarial review, including the 11 cases subsequently downgraded to `S`.
 
-The following scoped reviews are also normalized:
+Scoped reviews normalized so far:
 
-- high-impact scope review: United Kingdom, Morocco and Ukraine;
-- scoped tranche 1: Denmark, France, Netherlands and Serbia;
-- scoped tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
-- scoped tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia.
+- high-impact review: United Kingdom, Morocco and Ukraine;
+- tranche 1: Denmark, France, Netherlands and Serbia;
+- tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
+- tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia;
+- tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia.
 
-That makes **69 State dossiers with completed detailed normalization** at the 2026-08-11 cutoff. Remaining State dossiers retain canonical metadata and review links and will be expanded as their scoped/under-review/no-current-basis reviews are completed.
+That makes **77 State dossiers with completed detailed normalization** at the 2026-08-11 cutoff. Remaining State dossiers retain canonical metadata and review links and will be expanded as their reviews are completed.

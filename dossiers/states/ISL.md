@@ -4,12 +4,42 @@ entity: "Iceland"
 iso3: ISL
 issue: 76
 provisional_outcome: S
+provisional_scope: "prosecutorial/police requests, judicial orders and detention practices imposing pretrial solitary confinement beyond strict necessity/proportionality, especially for children/vulnerable persons"
+confidence: high
 evidence_cutoff: 2026-08-11
-review_stage: initial-adjudication
+last_reviewed: 2026-08-11
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD / NARROW S"
 operative: false
 ---
 # Iceland
 
-Current governance outcome: **S**. See issue `#76` and `../../reviews/2026/initial-adjudication.md`.
+> Governance record only; no licensing effect by itself.
 
-This is the canonical State entry point. Detailed 2026 evidence remains preserved in linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.
+## 1. Current determination
+
+**S — Restricted with very narrow scope.**
+
+## 2. Evidence supporting the determination
+
+Amnesty's July 2026 UPR submission identifies widespread pretrial solitary confinement as a continuing concern; earlier detailed evidence documented disproportionate use and insufficient safeguards, including for children/vulnerable people.
+
+## 3. Counter-evidence and exergic institutions
+
+Orders are formally subject to judicial authorization and Iceland retains strong courts/oversight. The justice/prison system generally is not shown to constitute an ECL-prohibited project.
+
+## 4. Attribution and exclusions
+
+Scope follows only detention requests/orders/practices imposing pretrial isolation beyond necessity/proportionality. Courts, prosecutors, police and prisons are not restricted generically.
+
+## 5. Adversarial determination
+
+**UPHOLD / NARROW S.**
+
+## 6. Review triggers
+
+Legislative/procedural reform, verified substantial reduction, stronger safeguards and next UPR/CPT findings.
+
+## 7. Procedural history
+
+Issue #76 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
