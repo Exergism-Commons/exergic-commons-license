@@ -4,12 +4,55 @@ entity: "China"
 iso3: CHN
 issue: 36
 provisional_outcome: R
+provisional_scope: "State coercive-security, judicial, surveillance and assimilation apparatus"
+confidence: high
 evidence_cutoff: 2026-08-11
+last_reviewed: 2026-08-11
 review_stage: whole-state-adversarial-reviewed
+adversarial_result: "UPHOLD R"
 operative: false
 ---
 # China
 
-Current governance outcome: **R**. See issue `#36`, `../../reviews/2026/initial-adjudication.md`, and `../../reviews/2026/adversarial/summary.md`.
+> **Governance record only.** This dossier does not itself create licensing restrictions.
 
-This is the canonical State entry point. Detailed 2026 evidence remains preserved in the linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.
+## 1. Current determination
+
+**R — State apparatus Restricted** for the coercive-security, judicial, surveillance and assimilation systems materially implementing the conduct below. The finding does not extend to Chinese people or unrelated private activity.
+
+## 2. ECL criteria engaged
+
+Repressive surveillance, political repression, coercive assimilation, arbitrary detention, censorship/information control and irreversible coercive capture.
+
+## 3. Evidence supporting the determination
+
+The OHCHR Xinjiang assessment remains a central evidentiary basis for large-scale arbitrary detention and coercive systems affecting Uyghurs and other predominantly Muslim minorities. UN Special Procedures material in 2026 continued to document prolonged national-security detention and allegedly retaliatory solitary confinement involving Hong Kong democracy/human-rights defenders. The relevant conduct spans central and regional security, judicial, detention and information-control systems.
+
+## 4. Counter-evidence and exergic institutions
+
+China published a National Human Rights Action Plan 2026–2030, adopted a revised Prison Law strengthening formal supervision and inmate protections, and the Supreme People's Court reported acquittals, withdrawn prosecutions, compensation cases and defence-rights measures. These are meaningful reform signals but had not yet demonstrated cessation or effective remediation of the systems supporting the ECL finding at the cutoff.
+
+## 5. Attribution and exclusions
+
+The finding concerns State apparatuses and materially connected projects. Nationality, ethnicity, residence, ordinary employment or unrelated commercial activity does not create Restricted status.
+
+## 6. Adversarial determination
+
+**UPHOLD R.** Reform evidence is retained for future review but does not currently rebut the systematic cross-institutional record.
+
+## 7. Review / removal triggers
+
+Review after measurable implementation of the 2026–2030 action plan and revised Prison Law, release/remedy for political/national-security detainees, independent verification of Xinjiang/Hong Kong reforms, and demonstrable reduction of coercive surveillance and assimilation systems.
+
+## 8. Sources
+
+- https://digitallibrary.un.org/record/3985699
+- https://spcommreports.ohchr.org/TmSearch/RelCom?code=CHN+23%2F2025
+- https://english.scio.gov.cn/m/chinavoices/2026-06/12/content_118545634.html
+- https://en.moj.gov.cn/2026-05/06/c_1184021.htm
+- https://www.court.gov.cn/zixun/xiangqing/492671.html
+
+## 9. Procedural history
+
+- Discussion: issue #36
+- Adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
