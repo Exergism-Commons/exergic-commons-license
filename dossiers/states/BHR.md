@@ -4,12 +4,46 @@ entity: "Bahrain"
 iso3: BHR
 issue: 13
 provisional_outcome: S
+provisional_scope: "security/intelligence/law-enforcement and detention systems materially involved in torture, incommunicado/unofficial detention, political retaliation or coercive interrogation, plus materially enabling justice projects in substantiated cases"
+confidence: high
 evidence_cutoff: 2026-08-11
-review_stage: initial-adjudication
+last_reviewed: 2026-08-11
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD / DEFINE S; CAT follow-up review due after 2026-11-28"
 operative: false
 ---
 # Bahrain
 
-Current governance outcome: **S**. See issue `#13` and `../../reviews/2026/initial-adjudication.md`.
+> Governance record only; no licensing effect by itself.
 
-This is the canonical State entry point. Detailed 2026 evidence remains preserved in the linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.
+## 1. Current determination
+
+**S — Restricted with defined scope.**
+
+## 2. Evidence supporting the determination
+
+The UN Committee against Torture's January 2026 concluding observations describe consistent reports of torture/ill-treatment involving law enforcement, prison, military and intelligence personnel, including political/terrorism cases, serious safeguards failures, unofficial/incommunicado detention concerns, deaths in custody, retaliation and lack of accountability. The Committee also raises concerns about practical judicial independence and existing complaint bodies' independence/effectiveness.
+
+## 3. Counter-evidence and exergic institutions
+
+The CAT welcomed prison-health transfer reforms, alternative sentencing, restorative juvenile justice and specialized juvenile institutions. Bahrain maintains Ombudsman, Prisoners' and Detainees' Rights Commission, NIHR, prosecution/judicial monitoring and victim-compensation mechanisms. These functions are meaningful and must be excluded where genuinely remedial.
+
+## 4. Attribution and exclusions
+
+Scope follows security/intelligence/law-enforcement/detention systems materially involved in torture, unofficial/incommunicado detention, political retaliation or coercive interrogation and any prosecution/judicial project materially enabling such conduct in substantiated cases. Restorative justice, prison-health reform, compensation and independent oversight are excluded.
+
+## 5. Adversarial determination
+
+**UPHOLD / DEFINE S.**
+
+## 6. Review triggers
+
+Mandatory review after Bahrain's CAT follow-up due 28 November 2026; independently demonstrated torture accountability, effective detention monitoring, closure of unofficial detention and improved deaths-in-custody investigation.
+
+## 7. Sources
+
+- https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=%2F0aLqb%2BD86wFVEqMSMj7marJZz7q6eZ6uue7ppBVcvL3oDOFbTK%2F91v4HcvhDP%2FDvPnT%2BfyBG2imgEaPIfezcQ%3D%3D
+
+## 8. Procedural history
+
+Issue #13 · `../../reviews/2026/adversarial/scoped/tranche-02.md`

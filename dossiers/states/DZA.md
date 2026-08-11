@@ -4,12 +4,49 @@ entity: "Algeria"
 iso3: DZA
 issue: 3
 provisional_outcome: S
+provisional_scope: "security/prosecutorial/judicial and administrative projects materially used to criminalize or suppress protected journalism, human-rights defence, disappearance advocacy, peaceful assembly or political expression"
+confidence: high
 evidence_cutoff: 2026-08-11
-review_stage: initial-adjudication
+last_reviewed: 2026-08-11
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD / NARROW S"
 operative: false
 ---
 # Algeria
 
-Current governance outcome: **S**. See issue `#3` and `../../reviews/2026/initial-adjudication.md`.
+> Governance record only; no licensing effect by itself.
 
-This is the canonical State entry point. Detailed 2026 evidence remains preserved in the linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.
+## 1. Current determination
+
+**S — Restricted with defined scope.** It follows specific political-repression and rights-defender enforcement systems, not Algeria's State apparatus generally.
+
+## 2. Evidence supporting the determination
+
+Multiple 2026 UN Special Procedures communications concern alleged arbitrary detention of journalist/defender Hassan Bouras, harassment of human-rights lawyers, and arbitrary/incommunicado detention and intimidation of CFDA/SOS Disparus members and families of disappeared persons. Other current records concern prosecution/detention of journalists and activists under terrorism, national-security and expression-related offences.
+
+## 3. Counter-evidence and exergic institutions
+
+Algeria has replied to multiple UN communications. Presidential clemency has produced individual remediation, including the November 2025 pardon of writer Boualem Sansal. Clemency does not itself dismantle the enforcement architecture, but must be credited.
+
+## 4. Attribution and exclusions
+
+Scope is limited to projects materially using security/prosecution/judicial/administrative power to suppress protected journalism, human-rights work, disappearance advocacy, peaceful assembly or political expression. Ordinary unrelated courts/public services are excluded.
+
+## 5. Adversarial determination
+
+**UPHOLD / NARROW S.** The current evidence is persistent and multi-case but does not justify a generic restriction of the justice/security sector.
+
+## 6. Review triggers
+
+Reform of abusive terrorism/expression offences; release/remedy; independent review; end to retaliation against journalists, lawyers and disappearance advocates.
+
+## 7. Sources
+
+- https://spcommreports.ohchr.org/TmSearch/RelCom?code=DZA+1%2F2026
+- https://spcommreports.ohchr.org/TmSearch/SearchCode?code=DZA+6%2F2025%3B+DZA+2%2F2026
+- https://spcommreports.ohchr.org/TmSearch/SearchCode?code=DZA+7%2F2025%3B+DZA+5%2F2025
+- https://www.amnesty.org/en/latest/news/2026/05/algeria-authorities-must-release-arbitrarily-detained-journalists-and-uphold-press-freedom/
+
+## 8. Procedural history
+
+Issue #3 · `../../reviews/2026/adversarial/scoped/tranche-02.md`

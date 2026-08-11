@@ -4,12 +4,48 @@ entity: "Angola"
 iso3: AGO
 issue: 5
 provisional_outcome: S
+provisional_scope: "identified Rapid Intervention Police/National Police units, commanders and operations materially connected to substantiated unlawful protest repression, political/defender detention, lethal-force incidents or coercive land-rights enforcement"
+confidence: high
 evidence_cutoff: 2026-08-11
-review_stage: initial-adjudication
+last_reviewed: 2026-08-11
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "NARROW S to identified operations/units"
 operative: false
 ---
 # Angola
 
-Current governance outcome: **S**. See issue `#5` and `../../reviews/2026/initial-adjudication.md`.
+> Governance record only; no licensing effect by itself.
 
-This is the canonical State entry point. Detailed 2026 evidence remains preserved in the linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.
+## 1. Current determination
+
+**S — Restricted with defined scope.** Angola's police/security apparatus is not restricted generically.
+
+## 2. Evidence supporting the determination
+
+UN Special Procedures documented allegations of lethal/excessive force, injuries, arbitrary detention of peaceful protesters, journalists and bystanders, and harassment of defenders during the July 2025 unrest. Current reporting also documents repeated protest and land-rights repression by identifiable police structures.
+
+## 3. Counter-evidence and exergic institutions
+
+Courts acquitted several movement leaders for insufficient evidence; many protesters were released without charge. Police announced an investigation into protest deaths and Angola replied to the UN communication. These are meaningful accountability signals but did not yet establish completed remediation.
+
+## 4. Attribution and exclusions
+
+Scope follows identified Rapid Intervention Police/National Police units, commanders and operations materially connected to substantiated unlawful protest repression, arbitrary political/defender detention, lethal-force incidents or coercive land-rights enforcement. Unrelated policing/public services and independent judicial remediation are excluded.
+
+## 5. Adversarial determination
+
+**NARROW S.**
+
+## 6. Review triggers
+
+Independent investigation outcomes, prosecution/remedy where warranted, use-of-force reform, facilitation of peaceful assembly and demonstrated non-recurrence.
+
+## 7. Sources
+
+- https://spcommreports.ohchr.org/TmSearch/RelCom?code=AGO+2%2F2025
+- https://www.amnesty.org/en/location/africa/southern-africa/angola/report-angola/
+- https://www.hrw.org/world-report/2026/country-chapters/angola
+
+## 8. Procedural history
+
+Issue #5 · `../../reviews/2026/adversarial/scoped/tranche-02.md`

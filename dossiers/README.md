@@ -29,6 +29,12 @@ The schema is in `states/_TEMPLATE.md`.
 
 ## 2026 normalization status
 
-The complete first-pass State adjudication remains preserved under `../reviews/2026/`. All **46 States initially classified `R`** have now been normalized after whole-State adversarial review, including the 11 cases subsequently downgraded to `S`. The high-impact scoped dossiers for the United Kingdom, Morocco and Ukraine and the first scoped algorithm/surveillance tranche (Denmark, France, Netherlands and Serbia) are also normalized.
+The complete first-pass State adjudication remains preserved under `../reviews/2026/`. All **46 States initially classified `R`** have been normalized after whole-State adversarial review, including the 11 cases subsequently downgraded to `S`.
 
-Remaining State dossiers retain their canonical metadata and review links and will be expanded as their scoped/under-review/no-current-basis reviews are completed.
+The following scoped reviews are also normalized:
+
+- high-impact scope review: United Kingdom, Morocco and Ukraine;
+- scoped tranche 1: Denmark, France, Netherlands and Serbia;
+- scoped tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon.
+
+That makes **61 State dossiers with completed detailed normalization** at the 2026-08-11 cutoff. Remaining State dossiers retain canonical metadata and review links and will be expanded as their scoped/under-review/no-current-basis reviews are completed.
