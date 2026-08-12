@@ -13,7 +13,7 @@ GitHub issues are discussion/submission threads; review tranche files are proced
 
 ## Normalization rule
 
-A normalized dossier should be understandable without reconstructing its conclusion from historical review files. It records current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, sources and procedural history. The schema is in `states/_TEMPLATE.md`.
+A normalized dossier must be understandable and auditable without reconstructing its conclusion from historical review files. It records current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, stable sources where possible and procedural history. Historical tranches may explain how a conclusion was reached, but they must not be required to understand the current dossier. The schema is in `states/_TEMPLATE.md`.
 
 ## 2026 normalization status
 
@@ -25,6 +25,9 @@ Scoped reviews normalized so far:
 - tranche 1: Denmark, France, Netherlands and Serbia;
 - tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
 - tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia;
-- tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia.
+- tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia;
+- tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon.
 
-That makes **77 State dossiers with completed detailed normalization** at the 2026-08-11 cutoff. Remaining State dossiers retain canonical metadata and review links and will be expanded as their reviews are completed.
+That makes **83 unique State dossiers with completed detailed normalization** at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted among the 46 initially-`R` dossiers normalized during whole-State adversarial review, so tranche 5 adds six new unique normalized dossiers rather than eight.
+
+Remaining State dossiers retain canonical metadata and review links and will be expanded as their reviews are completed.
