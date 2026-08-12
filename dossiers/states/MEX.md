@@ -30,7 +30,7 @@ operative: false
 
 On 17 April 2026 the UN Committee on Enforced Disappearances decided, under article 34 of the Convention, to bring Mexico's situation to the attention of the UN General Assembly after reviewing information concerning widespread/systematic enforced disappearance, persistent impunity, alleged involvement or acquiescence of public officials and serious deficiencies in search and investigation. The Committee's record also documents the coexistence of direct State involvement, alleged official-criminal collusion and large volumes of disappearances attributable to non-State actors.
 
-Mexican human-rights bodies continue issuing grave-violation recommendations attributing enforced disappearance and torture to identified security or military personnel. Separately, Mexico is expanding national biometric identity/data infrastructure; that fact creates a reviewable capability but does not itself prove an ECL-prohibited use.
+Mexican human-rights bodies continue issuing grave-violation recommendations attributing enforced disappearance and torture to identified security or military personnel. CNDH Recommendation 206VG/2026, for example, attributes forced disappearance, torture and deprivation of life to Navy personnel in Guasave, Sinaloa. Separately, Mexico is expanding national biometric identity/data infrastructure; that fact creates a reviewable capability but does not itself prove an ECL-prohibited use.
 
 ## 4. Counter-evidence and exergic institutions
 
@@ -51,8 +51,8 @@ Review on measurable reduction and effective prosecution of attributable enforce
 ## 8. Sources
 
 - https://docs.un.org/en/CED/C/MEX/A.34/D/1
-- https://www.cndh.org.mx/
-- https://www.gob.mx/segob
+- https://hist.cndh.org.mx/index.php/documento/recomendacion-206vg2026
+- https://www.gob.mx/segob/prensa/curp-biometrica-derecho-y-herramienta-de-justicia-social?idiom=es
 
 ## 9. Procedural history
 
