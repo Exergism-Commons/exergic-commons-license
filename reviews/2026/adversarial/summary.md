@@ -92,24 +92,25 @@ Those counts describe that completed phase. They are not the current registry co
 
 Scoped review tests the current `S` cohort against the same falsification-first principles: whether scope is too broad, whether a project has ceased or been remediated, whether attribution belongs to a narrower organ/project, and whether counter-institutions defeat broader restriction.
 
-Completed scoped work through tranche 5 includes:
+Completed scoped work through tranche 6 includes:
 
 - high-impact review: United Kingdom, Morocco and Ukraine;
 - tranche 1: Denmark, France, Netherlands and Serbia;
 - tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
 - tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia;
 - tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia;
-- tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon.
+- tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon;
+- tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal.
 
-The current audited provisional distribution after scoped tranche 5 is:
+The current audited provisional distribution after scoped tranche 6 is:
 
 - `R` — **36**
-- `S` — **72**
-- `U` — **43**
+- `S` — **71**
+- `U` — **44**
 - `N` — **44**
 - **Total — 195**
 
-Notable reversibility/precision outcomes include escalation where the coercive apparatus itself became the governing authority, and downgrade where the active project ended or current persistence no longer supported a stable restriction. The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
+Notable reversibility/precision outcomes include escalation where the coercive apparatus itself became the governing authority, downgrade where an active project ended or current persistence no longer supported a stable restriction, and systematic narrowing where generic agency/capability labels would capture rights-protective or non-coercive functions. The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
 
 ## 4. Dossier-normalization invariant
 
@@ -127,7 +128,7 @@ The target architecture for ECL 1.0 is that every completed `dossiers/states/*.m
 
 Review tranche files remain immutable history and should not be required to reconstruct the current determination.
 
-After scoped tranche 5, **83 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted in the initially-`R` normalized cohort, so tranche 5 adds six new unique normalized dossiers.
+After scoped tranche 6, **91 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted in the initially-`R` normalized cohort, so tranche 5 added six new unique dossiers; tranche 6 adds eight.
 
 ## 5. Architectural conclusion
 
