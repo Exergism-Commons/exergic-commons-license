@@ -52,7 +52,7 @@ Review on replacement of automatic detention with individualized necessity/revie
 ## 8. Sources
 
 - https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/malta/report-malta/
-- https://www.coe.int/en/web/execution/malta
+- https://www.coe.int/en/web/execution/-/malta-meeting-with-the-state-advocate-and-the-permanent-representative-of-malta-to-the-council-of-europe
 
 ## 9. Procedural history
 
