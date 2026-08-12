@@ -4,12 +4,56 @@ entity: "Malaysia"
 iso3: MYS
 issue: 103
 provisional_outcome: S
+provisional_scope: "specific police/speech/public-order enforcement materially criminalizing protected expression or peaceful assembly, and immigration-detention systems producing arbitrary/prolonged detention, serious conditions or custody-death risks"
+confidence: high
 evidence_cutoff: 2026-08-11
-review_stage: initial-adjudication
+last_reviewed: 2026-08-11
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD / NARROW S; remove unsupported LGBTI-raid component from current scope"
 operative: false
 ---
 # Malaysia
 
-Current governance outcome: **S**. See issue `#103` and `../../reviews/2026/initial-adjudication.md`.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
 
-This is the canonical State entry point. Detailed 2026 evidence remains preserved in linked review records pending normalization here. This dossier has no licensing effect; only an incorporated Schedule does.
+## 1. Current determination
+
+**S — Restricted with defined scope.** Current restriction is limited to attributable speech/public-order enforcement and immigration-detention projects for which there is current evidence.
+
+## 2. ECL criteria engaged
+
+- political repression and coercive suppression of protected expression/assembly;
+- arbitrary or seriously harmful detention;
+- accountability and contestability failures affecting persons deprived of liberty.
+
+## 3. Evidence supporting the determination
+
+In April 2026 SUHAKAM criticized police arrest/detention of three people after a peaceful placard display and separately described arrest and custodial remand for non-violent online criticism of the Prime Minister as a disproportionate use of broad speech laws. These incidents show that speech-related coercive enforcement remains current rather than merely statutory.
+
+In July 2026 SUHAKAM reported the Home Affairs Ministry's parliamentary disclosure that **465 deaths occurred in immigration detention depots between 2021 and 2025**, calling for urgent systemic reform, transparency and independent accountability.
+
+## 4. Counter-evidence and exergic institutions
+
+SUHAKAM is an active national human-rights counter-institution, the placard detainees were released, Parliament publicly receives and debates rights findings, and government reform commitments provide meaningful avenues for remediation. These factors materially weigh against whole-State restriction.
+
+## 5. Attribution and exclusions
+
+Scope follows **specific police, communications/sedition and public-order enforcement materially criminalizing protected non-violent expression or peaceful assembly**, and **immigration-detention systems producing arbitrary/prolonged detention, serious conditions, preventable custody-death risk or obstruction of independent accountability**. The earlier generic `LGBTI raid` component is removed from current scope absent sufficiently current project-specific evidence. SUHAKAM, courts/remedial functions and unrelated State activity are excluded.
+
+## 6. Adversarial determination
+
+**UPHOLD / NARROW S.** Current 2026 evidence supports an active scoped restriction but not every component of the first-pass scope. ECL attribution requires removing unsupported scope rather than preserving it by inertia.
+
+## 7. Review / removal triggers
+
+Review on durable narrowing/non-use of vague speech offences against protected expression, proportionate assembly policing, effective independent detention oversight, credible investigation/remedy for custody deaths and measurable improvement in immigration-detention conditions.
+
+## 8. Sources
+
+- https://suhakam.org.my/2026/04/media-statement-no-17-2026_suhakam-raises-concern-over-arrests-calls-for-rights-based-approach-to-freedom-of-expression/
+- https://suhakam.org.my/2026/04/media-statement-no-19-2026_suhakam-calls-for-restraint-and-review-of-laws-following-arrest-of-social-media-user/
+- https://suhakam.org.my/2026/07/media-statement-no-38-2026_suhakam-calls-for-urgent-reforms-to-immigration-detention-centres/
+
+## 9. Procedural history
+
+Issue #103 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
