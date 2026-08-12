@@ -26,8 +26,9 @@ Scoped reviews normalized so far:
 - tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
 - tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia;
 - tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia;
-- tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon.
+- tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon;
+- tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal.
 
-That makes **83 unique State dossiers with completed detailed normalization** at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted among the 46 initially-`R` dossiers normalized during whole-State adversarial review, so tranche 5 adds six new unique normalized dossiers rather than eight.
+That makes **91 unique State dossiers with completed detailed normalization** at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted among the 46 initially-`R` dossiers normalized during whole-State adversarial review, so tranche 5 added six new unique normalized dossiers; tranche 6 adds eight.
 
 Remaining State dossiers retain canonical metadata and review links and will be expanded as their reviews are completed.
