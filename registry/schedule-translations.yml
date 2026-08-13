@@ -11,10 +11,10 @@ state_translation:
     S_candidates: 86
     S_translated: 86
     S_fully_frozen: 19
-    S_renderable_subset_only: 3
+    S_renderable_subset_only: 8
     S_current_status_blocked: 1
-    S_identity_or_project_freeze_pending: 63
-    S_schedule_renderable_states: 22
+    S_identity_or_project_freeze_pending: 58
+    S_schedule_renderable_states: 27
     total_candidates: 120
     total_translated_or_frozen: 120
   R_status: frozen-candidate
@@ -31,107 +31,32 @@ state_translation:
     - "schedule-state-s-batches/batch-09-final.yml"
   S_freeze_sources:
     - "schedule-state-s-freezes/batch-01-identity.yml"
-  S_batch_counts:
-    base_batches_01_02: {translated: 20, initially_ready: 7, initially_blocked_or_partial: 13}
-    batch_03: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
-    batch_04: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
-    batch_05: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
-    batch_06: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
-    batch_07: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
-    batch_08: {translated: 10, initially_ready: 1, initially_blocked_or_partial: 9}
-    batch_09: {translated: 6, initially_ready: 0, initially_blocked_or_partial: 6}
+    - "schedule-state-s-freezes/batch-02-statutory-agency.yml"
+    - "schedule-state-s-freezes/batch-03a-usa.yml"
   freeze_progress:
     newly_fully_frozen: [HRV]
-    newly_renderable_subset: [MDV, MLT, MKD]
+    newly_renderable_subset: [MDV, MLT, MKD, GBR, LKA, SOM, ZMB, USA]
     identity_resolved_current_status_pending: [NLD]
-  R:
-    [AFG, AZE, BLR, BFA, BDI, KHM, CHN, CUB, EGY, SLV, ERI, SWZ, GIN, IRN, KWT, MDG, MLI, MMR, NIC, NER, PRK, OMN, RUS, RWA, SAU, TJK, TZA, TGO, TUN, TKM, ARE, VEN, VNM, GNB]
-  S:
-    [DZA, AGO, ARG, ARM, BHR, BGD, BEN, BTN, BOL, BIH, BRA, BGR, CMR, CAF, TCD, COL, CIV, HRV, CYP, COD, DNK, DOM, ECU, GNQ, ETH, FJI, FRA, GAB, GEO, DEU, GRC, GTM, HTI, HUN, ISL, IND, IDN, IRQ, ISR, ITA, JOR, KAZ, KEN, KGZ, LAO, LSO, LBY, LTU, MYS, MDV, MLT, MEX, MDA, MAR, MOZ, NLD, NGA, MKD, PAK, PSE, PAN, PRY, PER, PHL, POL, QAT, COG, SRB, SGP, SVK, SVN, SOM, SSD, LKA, SDN, SYR, THA, TUR, UGA, UKR, GBR, USA, UZB, YEM, ZMB, ZWE]
+    attempted_but_not_persisted: [UKR]
 
-organization_candidates:
-  - id: AL-QAIDA
-    outcome: R
-    dossier: "../dossiers/organizations/AL-QAIDA.md"
-    readiness: identity-substantially-knowable
-  - id: ISIL-DAESH
-    outcome: R
-    dossier: "../dossiers/organizations/ISIL-DAESH.md"
-    readiness: identity-substantially-knowable
-  - id: IZZ-AL-DIN-AL-QASSAM-BRIGADES
-    outcome: R
-    dossier: "../dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md"
-    readiness: needs-alias-freeze
-  - id: RAPID-SUPPORT-FORCES
-    outcome: R
-    dossier: "../dossiers/organizations/RAPID-SUPPORT-FORCES.md"
-    readiness: needs-alias-control-freeze
-  - id: NSO-GROUP
-    outcome: S
-    dossier: "../dossiers/organizations/NSO-GROUP.md"
-    readiness: needs-legal-entity-freeze
-  - id: CANDIRU
-    outcome: S
-    dossier: "../dossiers/organizations/CANDIRU.md"
-    readiness: needs-legal-entity-freeze
-  - id: INTELLEXA-PREDATOR-NETWORK
-    outcome: S
-    dossier: "../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md"
-    readiness: needs-exact-entity-list
-  - id: HAMAS
-    outcome: S
-    dossier: "../dossiers/organizations/HAMAS.md"
-    readiness: needs-organizational-scope-freeze
-  - id: SUDANESE-ARMED-FORCES
-    outcome: S
-    dossier: "../dossiers/organizations/SUDANESE-ARMED-FORCES.md"
-    readiness: must-sync-with-SDN
-  - id: SDF-RADA
-    outcome: S
-    dossier: "../dossiers/organizations/SDF-RADA.md"
-    readiness: needs-alias-scope-freeze
-
-organization_not_schedule_eligible:
-  - id: PALANTIR-TECHNOLOGIES
-    outcome: U
-    dossier: "../dossiers/organizations/PALANTIR-TECHNOLOGIES.md"
-
-project_candidates:
-  - id: MITIGA-DETENTION-APPARATUS
-    outcome: R
-    dossier: "../dossiers/projects/MITIGA-DETENTION-APPARATUS.md"
-    readiness: identity-substantially-knowable
-  - id: OPERATION-EPIC-FURY-MINAB-TARGETING
-    outcome: S
-    dossier: "../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md"
-    readiness: needs-time-and-participant-freeze
-
-project_not_schedule_eligible:
-  - id: ICE-ICM-INVESTIGATIVE-ANALYTICS
-    outcome: U
-    dossier: "../dossiers/projects/ICE-ICM-INVESTIGATIVE-ANALYTICS.md"
-  - id: MAVEN-SMART-SYSTEM
-    outcome: U
-    dossier: "../dossiers/projects/MAVEN-SMART-SYSTEM.md"
-
-person_candidates: []
-person_not_schedule_eligible:
-  - id: OSAMA-ELMASRY-NJEEM
-    outcome: U
-    dossier: "../dossiers/persons/OSAMA-ELMASRY-NJEEM.md"
-
-external_list_policy:
-  un_isil_alqaida: evidence-and-identity-anchor-only
-  icc_warrants: evidence-and-identity-anchor-only
-  auto_import: false
+cross_entity_sources:
+  organization_registry: "organizations.yml"
+  project_registry: "projects.yml"
+  person_registry: "persons.yml"
+  project_freeze_registry: "schedule-project-freezes.yml"
+  external_list_policy:
+    role: evidence-and-identity-anchor-only
+    auto_import: false
 
 schedule_gate:
   state_r_identity_freeze_complete: true
   state_s_translation_complete: true
   state_s_full_identity_project_freeze_complete: false
   state_s_renderable_subset_policy: "A precise frozen subset may be rendered without making unfrozen residual dossier scope operative."
+  direct_project_designation_supported: true
   render_adoptable_schedule: false
-  reason: "19 State S records are fully frozen, 3 additional States have a renderable narrowed subset, 1 has identity resolved but current deployment/remediation status unresolved, and 63 still require exact identity/project-boundary work."
+  reason: "19 State S records are fully frozen; 8 additional States have a renderable narrowed subset; 1 has identity resolved but current deployment/remediation status unresolved; 58 still require exact identity/project-boundary work."
 
-# Translation/freeze status is a work queue, not a licensing designation.
-# A future Schedule may be narrower than a governance dossier, but every included entry must itself have a frozen knowable identity/project boundary.
+# This file is an index/work queue only. Canonical outcomes live in the entity registries;
+# detailed State translations and freezes live in the referenced files.
+# No entry here has licensing effect by itself.
