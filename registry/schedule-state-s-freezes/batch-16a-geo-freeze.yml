@@ -1,0 +1,17 @@
+state: GEO
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Venice Commission Opinion 1291/2026 statutory implementation project"
+project_boundary: "implementation of the 4 March 2026 amendments identified in Venice Commission Opinion 1291/2026"
+capacity_limit: "only implementation materially burdening protected association, independent civic activity, media activity or peaceful political participation"
+exclusions:
+  - "Georgian public institutions generally"
+  - "Constitutional Court and Public Defender"
+  - "independent remediation"
+  - "implementation that does not independently satisfy an ECL criterion"
+identity_sources:
+  - "https://www.coe.int/en/web/venice-commission/georgia"
+residual_scope: "other protest, prosecution and media-control scope remains governance-only until separately frozen"
+schedule_status: ready-statutory-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
