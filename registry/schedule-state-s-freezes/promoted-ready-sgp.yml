@@ -1,0 +1,10 @@
+state: SGP
+entity: Singapore
+outcome: S
+schedule_identity: "POFMA direction/prosecution and qualifying public-order project class"
+project_boundary: "POFMA direction/prosecution processes materially burdening protected political, journalistic or rights expression, plus separately frozen public-order operations"
+capacity_limit: "issuing authority only in the exact qualifying order/prosecution/operation; capital punishment is excluded as a standalone ECL basis"
+exclusions: ["High Court/Court of Appeal POFMA review", "independent legal defence", "unrelated public administration", "capital punishment absent independent ECL criterion"]
+schedule_status: ready-promoted-project-class
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
