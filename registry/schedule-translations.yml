@@ -10,8 +10,11 @@ state_translation:
     R_frozen: 34
     S_candidates: 86
     S_translated: 86
-    S_schedule_ready: 18
-    S_needs_identity_or_project_freeze: 68
+    S_fully_frozen: 19
+    S_renderable_subset_only: 3
+    S_current_status_blocked: 1
+    S_identity_or_project_freeze_pending: 63
+    S_schedule_renderable_states: 22
     total_candidates: 120
     total_translated_or_frozen: 120
   R_status: frozen-candidate
@@ -26,15 +29,21 @@ state_translation:
     - "schedule-state-s-batches/batch-07-security-civic.yml"
     - "schedule-state-s-batches/batch-08-conflict-detention.yml"
     - "schedule-state-s-batches/batch-09-final.yml"
+  S_freeze_sources:
+    - "schedule-state-s-freezes/batch-01-identity.yml"
   S_batch_counts:
-    base_batches_01_02: {translated: 20, ready: 7, blocked_or_partial: 13}
-    batch_03: {translated: 10, ready: 2, blocked_or_partial: 8}
-    batch_04: {translated: 10, ready: 2, blocked_or_partial: 8}
-    batch_05: {translated: 10, ready: 2, blocked_or_partial: 8}
-    batch_06: {translated: 10, ready: 2, blocked_or_partial: 8}
-    batch_07: {translated: 10, ready: 2, blocked_or_partial: 8}
-    batch_08: {translated: 10, ready: 1, blocked_or_partial: 9}
-    batch_09: {translated: 6, ready: 0, blocked_or_partial: 6}
+    base_batches_01_02: {translated: 20, initially_ready: 7, initially_blocked_or_partial: 13}
+    batch_03: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
+    batch_04: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
+    batch_05: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
+    batch_06: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
+    batch_07: {translated: 10, initially_ready: 2, initially_blocked_or_partial: 8}
+    batch_08: {translated: 10, initially_ready: 1, initially_blocked_or_partial: 9}
+    batch_09: {translated: 6, initially_ready: 0, initially_blocked_or_partial: 6}
+  freeze_progress:
+    newly_fully_frozen: [HRV]
+    newly_renderable_subset: [MDV, MLT, MKD]
+    identity_resolved_current_status_pending: [NLD]
   R:
     [AFG, AZE, BLR, BFA, BDI, KHM, CHN, CUB, EGY, SLV, ERI, SWZ, GIN, IRN, KWT, MDG, MLI, MMR, NIC, NER, PRK, OMN, RUS, RWA, SAU, TJK, TZA, TGO, TUN, TKM, ARE, VEN, VNM, GNB]
   S:
@@ -119,9 +128,10 @@ external_list_policy:
 schedule_gate:
   state_r_identity_freeze_complete: true
   state_s_translation_complete: true
-  state_s_identity_project_freeze_complete: false
+  state_s_full_identity_project_freeze_complete: false
+  state_s_renderable_subset_policy: "A precise frozen subset may be rendered without making unfrozen residual dossier scope operative."
   render_adoptable_schedule: false
-  reason: "68 State S translations still require exact identity, unit, case, facility, order or project-boundary freeze before contract-readable Schedule use."
+  reason: "19 State S records are fully frozen, 3 additional States have a renderable narrowed subset, 1 has identity resolved but current deployment/remediation status unresolved, and 63 still require exact identity/project-boundary work."
 
-# Translation status is a work queue, not a licensing designation.
-# No Schedule should be rendered as adoptable until every included entry has a frozen knowable identity/project boundary.
+# Translation/freeze status is a work queue, not a licensing designation.
+# A future Schedule may be narrower than a governance dossier, but every included entry must itself have a frozen knowable identity/project boundary.
