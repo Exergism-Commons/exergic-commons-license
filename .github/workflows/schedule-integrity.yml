@@ -1,0 +1,49 @@
+name: Schedule integrity
+
+on:
+  push:
+    paths:
+      - "registry/**"
+      - "tools/render_schedule.py"
+      - ".github/workflows/schedule-integrity.yml"
+  pull_request:
+    paths:
+      - "registry/**"
+      - "tools/render_schedule.py"
+      - ".github/workflows/schedule-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install renderer dependency
+        run: python -m pip install --disable-pip-version-check PyYAML
+
+      - name: Validate frozen Schedule inputs
+        run: python tools/render_schedule.py --validate-only
+
+      - name: Render generated candidate
+        run: python tools/render_schedule.py --output build/ECL-RP-0.5-GENERATED-DRAFT.md
+
+      - name: Basic generated-artifact checks
+        run: |
+          test -s build/ECL-RP-0.5-GENERATED-DRAFT.md
+          grep -q "NON-OPERATIVE GENERATED CANDIDATE" build/ECL-RP-0.5-GENERATED-DRAFT.md
+          grep -q "State apparatus entries — R" build/ECL-RP-0.5-GENERATED-DRAFT.md
+          grep -q "Direct Restricted Projects" build/ECL-RP-0.5-GENERATED-DRAFT.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ecl-schedule-generated-draft
+          path: build/ECL-RP-0.5-GENERATED-DRAFT.md
+          if-no-files-found: error
