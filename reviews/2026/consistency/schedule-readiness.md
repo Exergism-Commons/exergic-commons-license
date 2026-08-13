@@ -33,11 +33,11 @@ Source: `registry/schedule-state-r-freeze.yml`.
 Current freeze status:
 
 - **19** fully frozen;
-- **15** additional records with at least one precise renderable subset;
+- **18** additional records with at least one precise renderable subset;
 - **3** pending current-status/remediation review rather than identity work;
-- **49** still requiring an exact identity or project-boundary freeze.
+- **46** still requiring an exact identity or project-boundary freeze.
 
-Therefore **34 / 86 State `S` dossiers have at least one Schedule-renderable entry**.
+Therefore **37 / 86 State `S` dossiers have at least one Schedule-renderable entry**.
 
 Live counts are maintained in `registry/schedule-translations.yml`.
 
@@ -84,6 +84,6 @@ It is not adoption-ready until every included entry passes:
 
 ## Current queue
 
-Immediate State work: **49 identity/project freezes + 3 current-status/remediation reviews**.
+Immediate State work: **46 identity/project freezes + 3 current-status/remediation reviews**.
 
 A previously attempted write that was rejected by the repository connector is not included in completed counts.
