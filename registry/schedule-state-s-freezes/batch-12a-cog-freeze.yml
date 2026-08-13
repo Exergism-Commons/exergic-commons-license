@@ -1,0 +1,16 @@
+state: COG
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "continued detention of Jean-Marie Michel Mokoko and André Okombi Salissa"
+project_boundary: "the continued detention/enforcement processes concerning the two former presidential candidates identified in the current canonical evidence record and prior UN arbitrary-detention finding"
+capacity_limit: "these named detention projects only, while the underlying detention remains materially unremediated"
+exclusions:
+  - "Republic of Congo detention/security institutions generally"
+  - "other political cases absent separate freeze"
+  - "release, independent review or remediation"
+identity_sources:
+  - "https://www.amnesty.org/en/location/africa/west-and-central-africa/congo/report-congo/"
+residual_scope: "other public-assembly and detention-condition scope remains governance-only until separately frozen"
+schedule_status: ready-named-detention-projects
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
