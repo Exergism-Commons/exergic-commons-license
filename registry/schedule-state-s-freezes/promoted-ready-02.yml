@@ -1,0 +1,58 @@
+batch: promoted-ready-02
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+records:
+  - state: POL
+    entity: Poland
+    outcome: S
+    schedule_identity: "Polish Border Guard / Interior Belarus-border asylum-suspension and pushback project"
+    project_boundary: "Belarus-border restriction on lodging international-protection applications and related pushback/access-exclusion measures as extended in 2026"
+    capacity_limit: "summary return, denial/bypass of individualized protection or material obstruction of independent monitoring"
+    exclusions: ["courts/prosecutorial remediation", "humanitarian assistance", "unrelated migration/public-order functions"]
+    schedule_status: ready-promoted-capacity-limited-parties
+
+  - state: AGO
+    entity: Angola
+    outcome: S
+    schedule_identity: "Rapid Intervention Police / National Police qualifying protest and land-rights operations"
+    project_boundary: "July 2025 protest repression and materially continuous operations, plus separately evidenced coercive land-rights enforcement"
+    capacity_limit: "identified units/commands/operations only where lethal/excessive force, arbitrary detention or qualifying coercion is established"
+    exclusions: ["independent judicial remediation", "ordinary policing", "released/acquitted cases as such"]
+    schedule_status: ready-promoted-capacity-limited-units
+
+  - state: BEN
+    entity: Benin
+    outcome: S
+    schedule_identity: "HAAC / CRIET protected-expression enforcement projects"
+    project_boundary: "specific Digital Code prosecutions, media-control actions and detention/prosecution processes identified by the canonical dossier"
+    capacity_limit: "only materially coercive suppression of protected journalism, political expression or rights-defence activity"
+    exclusions: ["lifted/remediated actions", "unrelated public functions", "independent judicial remedy"]
+    schedule_status: ready-promoted-capacity-limited-parties
+
+  - state: COD
+    entity: Democratic Republic of the Congo
+    outcome: S
+    schedule_identity: "FARDC-backed CMC-FDP / Wazalendo proxy project class"
+    project_boundary: "specific FARDC-backed proxy operation involving qualifying violence or comparable prohibited conduct"
+    capacity_limit: "named FARDC unit/proxy/project only where support, command, collaboration or knowledge establishes the State-support nexus"
+    exclusions: ["independent civilian-protection/accountability work", "M23/ADF conduct absent DRC attribution", "FARDC activity generally"]
+    schedule_status: ready-promoted-controlled-project-class
+
+  - state: ECU
+    entity: Ecuador
+    outcome: S
+    schedule_identity: "Exterminio Total / San Martin qualifying deployment"
+    project_boundary: "Exterminio Total only to the extent the San Martin/related deployment satisfies the canonical coercive-project finding"
+    capacity_limit: "materially participating military/public-security units only in the frozen qualifying deployment"
+    exclusions: ["constitutional/electoral judicial institutions", "unrelated military/civil activity", "lawful intelligence/emergency activity"]
+    schedule_status: ready-promoted-named-operation
+
+  - state: GTM
+    entity: Guatemala
+    outcome: S
+    schedule_identity: "Ministerio Publico / FECI qualifying criminalization projects"
+    project_boundary: "specific prosecution/detention cases involving protected anti-corruption justice workers, defenders, journalists or peaceful Indigenous-protest leaders"
+    capacity_limit: "only exact arbitrary or unfounded criminalization projects; not ordinary prosecution"
+    exclusions: ["Constitutional Court", "independent judicial/remediation functions", "ordinary prosecution"]
+    schedule_status: ready-promoted-capacity-limited-party
