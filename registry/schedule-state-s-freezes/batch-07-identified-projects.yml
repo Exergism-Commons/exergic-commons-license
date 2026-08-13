@@ -1,0 +1,61 @@
+version: "2026-08-13-ecl-0.2-s-freeze-07"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+records:
+  - state: HUN
+    entity: Hungary
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "National Directorate-General for Aliens Policing (Országos Idegenrendészeti Főigazgatóság), only in the qualifying asylum/protection workflow described below"
+      - "Hungarian border-police functions, only where materially participating in the same qualifying workflow"
+    candidate_projects:
+      - "mass-migration state-of-crisis asylum/border workflow under Government Decree 41/2016 (III. 9), as extended by Government Decree 41/2026 (III. 5), only where implementation materially bypasses individualized protection/non-refoulement review and independently satisfies ECL §5.6"
+    temporal_boundary: "current extension through 7 September 2026, subject to earlier amendment/termination"
+    capacity_limit: "qualifying asylum-access/pushback implementation only; not immigration or border administration generally"
+    exclusions:
+      - "ordinary asylum processing and reception/support functions"
+      - "temporary-protection support"
+      - "courts, legal remedy and qualifying Independent Remediation Activity"
+    residual_unfrozen_scope:
+      - "any other border/public-order project not within the frozen emergency-migration workflow"
+    identity_sources:
+      - "https://njt.jog.gov.hu/jogszabaly/2016-41-20-22"
+      - "https://njt.jog.gov.hu/jogszabaly/2026-41-20-22"
+      - "https://oif.gov.hu/index.php/general-information"
+    dossier: "../../dossiers/states/HUN.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: KAZ
+    entity: Kazakhstan
+    freeze_status: renderable-subset
+    candidate_projects:
+      - "Atajurt activist arrest/detention/prosecution project identified in UN Special Procedures communication KAZ 2/2026, limited to the 20 alleged victims and materially participating authorities/functions in that exact matter"
+    capacity_limit: "the exact KAZ 2/2026 project where protected peaceful assembly, association or expression is materially criminalized; no generic Kazakhstan security/prosecution class"
+    exclusions:
+      - "Constitutional Court and rights-protective judicial/remedial functions"
+      - "unrelated criminal/security enforcement"
+      - "other media/religious/professional-sanction projects pending separate freeze"
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=KAZ+2%2F2026"
+    dossier: "../../dossiers/states/KAZ.md"
+    schedule_status: ready-direct-case-project
+
+  - state: MEX
+    entity: Mexico
+    freeze_status: renderable-subset
+    candidate_projects:
+      - "CNDH Recommendation 206VG/2026 Guasave, Sinaloa case, limited to the conduct and materially participating Secretaría de Marina elements identified by the authoritative recommendation"
+    capacity_limit: "the exact 206VG/2026 project/case only; no generic Secretaría de Marina, armed-forces, police or biometric-infrastructure class"
+    exclusions:
+      - "CNDH and victim/search/remediation functions"
+      - "ordinary naval/public-security activity"
+      - "other disappearance/torture cases and biometric/data projects pending separate project freeze"
+    identity_sources:
+      - "https://www.cndh.org.mx/index.php/tema/3654/desaparicion-forzada"
+      - "https://www.cndh.org.mx/index.php/palabras-clave/128/secretaria-de-marina"
+    dossier: "../../dossiers/states/MEX.md"
+    schedule_status: ready-direct-case-project
+
+# Governance work product only; no licensing effect.
