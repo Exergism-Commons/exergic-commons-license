@@ -1,0 +1,29 @@
+version: "2026-08-13-ecl-0.2-s-freeze-03a"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+records:
+  - state: USA
+    entity: United States
+    source_translation_status: needs-federal-detention-immigration-and-surveillance-project-agency-freeze
+    freeze_status: renderable-subset
+    candidate_projects:
+      - "Operation Epic Fury — 28 February 2026 Minab targeting chain, exactly as frozen in registry/schedule-project-freezes.yml"
+    capacity_limit: "direct Restricted Project only; no blanket federal, military, contractor or supplier class is created beyond Material Participation in the exact frozen project"
+    exclusions:
+      - "unrelated Operation Epic Fury activity"
+      - "Palantir/Maven absent project-specific proof"
+      - "Federal Judiciary, GAO, inspectors general, legal defence and qualifying Independent Remediation Activity"
+      - "State/local governments and unrelated federal activity"
+    residual_unfrozen_scope:
+      - "specific federal immigration/detention projects"
+      - "specific federal surveillance/security projects"
+    identity_sources:
+      - "../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md"
+      - "../schedule-project-freezes.yml"
+      - "https://www.centcom.mil/OPERATIONS-AND-EXERCISES/EPIC-FURY/"
+    dossier: "../../dossiers/states/USA.md"
+    schedule_status: ready-narrowed-subset-via-direct-project
+
+# Governance work product only; no licensing effect.
