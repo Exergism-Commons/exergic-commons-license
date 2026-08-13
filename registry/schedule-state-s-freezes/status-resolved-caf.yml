@@ -1,0 +1,12 @@
+state: CAF
+entity: Central African Republic
+outcome: S
+freeze_status: status-resolved-renderable
+schedule_identity: "27 February 2026 Ouanda-Djale FACA incident"
+project_boundary: "the Ouanda-Djale incident documented by MINUSCA, limited to materially participating FACA personnel/functions in the events causing three deaths and approximately ten gunshot injuries"
+capacity_limit: "this frozen incident only; no generic FACA or State-security class"
+exclusions: ["Special Criminal Court", "independent investigation/remediation", "unrelated FACA/security functions", "non-State armed actors"]
+identity_sources: ["https://minusca.unmissions.org/fr/node/134381"]
+schedule_status: ready-status-revalidated-incident
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
