@@ -1,0 +1,23 @@
+version: "2026-08-13-status-revalidation-02"
+status: provisional-governance
+operative: false
+base_registry: "states.yml"
+apply_after: "state-outcome-overrides.yml"
+counts_after_overrides:
+  R: 34
+  S: 83
+  U: 31
+  N: 47
+overrides:
+  FJI:
+    from: S
+    to: U
+    dossier: "../dossiers/states/FJI.md"
+    reviewed: "2026-08-13"
+  DEU:
+    from: S
+    to: U
+    dossier: "../dossiers/states/DEU.md"
+    reviewed: "2026-08-13"
+
+# Governance overlay only; no licensing effect.
