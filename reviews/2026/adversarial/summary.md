@@ -2,7 +2,8 @@
 
 > **Status: PROVISIONAL GOVERNANCE RECORD — NO LICENSING EFFECT BY ITSELF.**
 
-Evidence cutoff: **2026-08-11**
+State evidence cutoff: **2026-08-11**  
+Normative delta date: **2026-08-13**
 
 This document distinguishes immutable historical review phases from the canonical current per-entity state in `../../dossiers/` and machine-readable distribution in `../../registry/states.yml`.
 
@@ -12,13 +13,13 @@ The first adjudication in `../initial-adjudication.md` contained exactly `R 46 /
 
 ## 2. Whole-State `R` adversarial review — complete
 
-All 46 initial `R` findings received falsification-first review. Eleven were downgraded `R → S` for attribution precision: Georgia, India, Kazakhstan, Kyrgyzstan, Pakistan, Singapore, South Sudan, Türkiye, Uganda, Uzbekistan and Zimbabwe. Courts, ombuds institutions, federal/fragmented structures or other rights-protective functions made whole-State attribution overbroad.
+All 46 initial `R` findings received falsification-first review. Eleven were downgraded `R → S` for attribution precision: Georgia, India, Kazakhstan, Kyrgyzstan, Pakistan, Singapore, South Sudan, Türkiye, Uganda, Uzbekistan and Zimbabwe.
 
 Historical post-whole-State distribution: `R 35 / S 75 / U 41 / N 44 = 195`.
 
 ## 3. Scoped `S` adversarial review — complete
 
-High-impact review plus scoped tranches 1–10 tested every scoped/current `S` at project/apparatus level, including second falsification passes for former `R → S` cases. The cycle produced narrowing, reversibility downgrades and actor-fragmentation rules rather than treating a country as a unitary moral category.
+High-impact review plus scoped tranches 1–10 tested every scoped/current `S` at project/apparatus level, including second falsification passes for former `R → S` cases. The cycle produced narrowing, reversibility downgrades and actor-fragmentation rules.
 
 Before the full `U` phase, the distribution stood at `R 36 / S 70 / U 45 / N 44 = 195`.
 
@@ -28,12 +29,12 @@ All 45 dossiers entering the `U` phase were reviewed in `under-review/full-cohor
 
 Results:
 
-- **14 `U → S`**: Argentina, Armenia, Bangladesh, Bolivia, Bulgaria, Chad, Croatia, Cyprus, Fiji, Gabon, Germany, Lithuania, Maldives and Slovenia.
-- **9 `U → N`**: Botswana, Brunei, Czechia, Malawi, Montenegro, Namibia, New Zealand, Portugal and South Korea.
-- **22 retained `U`** after explicit review.
+- **14 `U → S`**;
+- **9 `U → N`**;
+- **22 retained `U`**;
 - **0 `U → R`**.
 
-Retained `U` therefore means genuine unresolved uncertainty about deployment, attribution, persistence or ECL-project fit, not an unprocessed queue.
+Retained `U` means genuine unresolved uncertainty about deployment, attribution, persistence or ECL-project fit, not an unprocessed queue.
 
 ## 5. Original `N` adversarial review — complete
 
@@ -43,71 +44,74 @@ Results:
 
 - **38 retained `N`**;
 - **6 `N → U`**: Austria, Costa Rica, Japan, Nauru, Samoa and South Africa;
-- **0 `N → S`**;
-- **0 `N → R`**.
+- **0 `N → S/R`**.
 
-Those six moved to `U` because current developments defeated a confident no-basis finding while attribution or the precise ECL nexus remained insufficient for a stable restriction.
+## 6. Detailed State normalization — complete
 
-## 6. Current audited governance state
+**195 / 195 State dossiers have detailed factual/adversarial normalization at the 2026-08-11 evidence cutoff.** Historical review files remain procedural history and are not required to reconstruct a current dossier.
 
-Current provisional distribution:
+## 7. Global license-fit audit — complete
 
-- `R` — **36**
-- `S` — **84**
-- `U` — **28**
-- `N` — **47**
-- **Total — 195**
+`../consistency/global-license-fit-audit.md` found a drafting mismatch rather than a mass factual failure. `spec/PRINCIPLES.md` and the governance standard already treated persecution, unlawful political repression, torture, collective punishment and arbitrary detention as forms of coercive non-domination relevant to ECL, while ECL 0.1 expressed much of that conduct only through narrower surveillance, targeting, automated-discrimination and technological-capture language.
 
-The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
+The root working license therefore advanced to **ECL 0.2-DRAFT**, while the immutable `../../versions/licenses/ECL-0.1.md` snapshot remained unchanged.
 
-## 7. State dossier normalization — complete
+ECL 0.2-DRAFT:
 
-A completed `dossiers/states/*.md` record is intended to be understandable and auditable by itself: current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, sources and procedural history.
-
-Historical review files remain immutable procedural history and are not required to reconstruct a current determination.
-
-**All 195 / 195 State dossiers have detailed normalization at the 2026-08-11 evidence cutoff.**
-
-## 8. Global license-fit consistency audit — first pass complete
-
-The first cross-dossier normative audit is recorded in `../consistency/global-license-fit-audit.md`.
-
-Its central finding is a drafting mismatch rather than a mass factual failure. `spec/PRINCIPLES.md` §2.5 and the governance standard already treated persecution, unlawful political repression, torture, collective punishment and arbitrary detention as forms of coercive non-domination relevant to ECL. ECL 0.1, however, expressed much of that conduct only through narrower surveillance, targeting, automated-discrimination and technological-capture clauses.
-
-Mass-downgrading factually supported dossiers to fit that under-specified text would therefore have aligned the evidence to a drafting omission rather than resolved the underlying inconsistency.
-
-The root working license has consequently advanced to **ECL 0.2-DRAFT**, while the immutable `../../versions/licenses/ECL-0.1.md` snapshot remains unchanged. The 0.2 draft:
-
-- adds an operative systematic-coercive-domination / unlawful-political-repression criterion;
+- adds §5.6 systematic coercive domination / unlawful political repression;
 - makes exact Scheduled Restricted Projects independently expressible;
 - adds a tightly bounded `Independent Remediation Activity` exception;
-- makes the substantive designation threshold and narrowest-scope rule visible in the operative text; and
-- preserves licensee knowability by making the exact incorporated Schedule controlling for applicability.
+- surfaces the substantive designation threshold and narrowest-accurate-scope rule; and
+- preserves licensee knowability through reliance on the exact incorporated Schedule.
 
-The audit also establishes an explicit guardrail: capital punishment, detention, deportation, conscription, protest regulation and similar exercises of State power are **not standalone ECL categories**. A Software-enabled use must independently satisfy an operative criterion.
+It also states explicitly that capital punishment, detention, deportation, conscription, protest regulation and comparable State powers are **not standalone ECL categories**.
 
-## 9. Immediate consistency cases
+## 8. ECL 0.2 State delta audit — complete
 
-Several current scopes require a delta check under that exact 0.2 language rather than another general human-rights review.
+The full 195-dossier normative delta is recorded in `../consistency/ecl-0.2-state-delta.md`.
 
-**Singapore** is the clearest cleanup case: POFMA/information-control and qualifying public-order repression may independently support `S`, but `capital-punishment/execution` should not remain a standalone ECL basis merely because an execution occurs.
+Coverage reconciliation:
 
-**Ukraine** is already substantially aligned because ordinary conscription/recruitment is expressly excluded and the scope follows substantiated unlawful violence, torture/ill-treatment, arbitrary confinement or independently qualifying security/prosecution projects.
+- 34 existing `R` upheld;
+- **United States `R → S`**;
+- **Israel `R → S`**;
+- 83 existing `S` upheld without tier change;
+- **Singapore `S` upheld / narrowed**, removing capital punishment/execution as a standalone ECL basis;
+- all 28 current `U` retained after explicit 0.2 re-read; and
+- all 47 current `N` retained.
 
-**Migration/border dossiers** must distinguish ordinary/restrictive immigration administration from projects that materially implement arbitrary detention, severe persecution, collective/summary forced transfer without meaningful individualized protection, discriminatory domination, unlawful violence or another operative criterion.
+The United States and Israel changes are scope corrections, not findings that underlying qualifying conduct disappeared. Their whole-government classes were inconsistent with ECL 0.2's narrowest-accurate-attribution rule because their own dossiers recognize materially independent judicial/audit/remedial functions. The restriction therefore follows identified coercive projects and materially participating organs instead of every federal/state function.
 
-Current `U` cases such as Australia, Austria, Japan, Nauru, Samoa and South Africa also require rechecking because some earlier uncertainty arose from the narrower 0.1 wording. A broader 0.2 criterion does **not** automatically escalate them; evidence, attribution, persistence, counter-institutions and narrow scope still control.
+Singapore remains `S` because qualifying POFMA/information-control and public-order repression can independently fit §5.6. Its execution component was removed for cross-dossier consistency with the new guardrail.
 
-## 10. Remaining work before a new Schedule
+The 28 `U` cases did not automatically escalate after §5.6. Their residual uncertainty remains factual: missing deployment, current recurrence, actor attribution, systematicity, or the presence of material counter-institutions/remediation.
 
-The next governance step is a **195-dossier ECL 0.2 delta audit**. It will test the current outcome/scope against the exact new draft, not re-run every factual investigation from zero.
+## 9. Current audited governance state
 
-After that:
+Current provisional post-0.2-delta distribution:
 
-1. normalize exact criterion mapping and scope vocabulary across all surviving `R`/`S` dossiers;
-2. reconcile State, organization, person and project overlap;
-3. generate a new Schedule from the post-delta determinations rather than patching `ECL-RP-0.4-DRAFT` ad hoc;
-4. define the stable governance decision mechanism, conflict-of-interest rules and dissent process; and
-5. obtain specialist legal review before proposing stable ECL 1.0.
+- **`R` — 34**
+- **`S` — 86**
+- **`U` — 28**
+- **`N` — 47**
+- **Total — 195**
 
-Until that cycle is complete, the current `R 36 / S 84 / U 28 / N 47` registry remains provisional governance state and no new operative Schedule should be inferred from it.
+The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from older review files.
+
+## 10. Schedule consequence
+
+`../../schedules/ECL-RP-0.4-DRAFT.md` predates the completed State review, the ECL 0.2 drafting correction and the State delta audit. It is **not a synchronized Schedule for ECL 0.2-DRAFT**.
+
+In particular, its blanket U.S. federal-government and State-of-Israel classes no longer match the canonical State scopes. A new Schedule should be regenerated from reconciled post-delta records rather than obtained by silently patching Draft 0.4.
+
+## 11. Next governance layer
+
+State-by-State empirical review, dossier normalization and the ECL 0.2 normative delta are complete. Remaining work is now cross-entity and legal rather than another State tranche:
+
+1. reconcile State ↔ organization ↔ person ↔ project overlaps;
+2. resolve exact legal identities, controlled-entity classes, Covered-Associate boundaries and duplicate project designations;
+3. generate a fresh post-0.2 Schedule candidate with explicit exclusions and version compatibility;
+4. define stable governance decision mechanics, conflicts-of-interest, minimum review requirements and dissent records; and
+5. obtain specialist legal review before proposing stable ECL 1.0 or an operative production Schedule.
+
+No item in this summary itself changes licensing rights; only an exact ECL version and exact incorporated Schedule can do so for a software release.
