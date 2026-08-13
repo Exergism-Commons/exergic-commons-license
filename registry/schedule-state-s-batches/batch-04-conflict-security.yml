@@ -1,0 +1,130 @@
+batch: 4
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 10
+schedule_ready_count: 2
+blocked_or_partial_count: 8
+
+records:
+  - state: CAF
+    entity: Central African Republic
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific government/State-aligned security operation materially connected to unlawful attack, killing, disappearance, torture or coercive repression"]
+    capacity_limit: "operation/unit/contractor-specific; no generic government-forces or allied-actor class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Special Criminal Court", "independent investigators/prosecutors", "victim remediation", "non-State armed groups absent State control/support evidence"]
+    identity_sources: ["https://www.amnesty.org/en/location/africa/west-and-central-africa/central-african-republic/report-central-african-republic/"]
+    dossier: "../dossiers/states/CAF.md"
+    status: needs-government-unit-allied-actor-operation-freeze
+
+  - state: TCD
+    entity: Chad
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific security/public-order or administrative enforcement suppressing journalism, protected civil society or peaceful political activity"]
+    capacity_limit: "case/agency-specific censorship, dissolution or arbitrary political detention; no generic security/administrative class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["independent courts/remediation", "ordinary public services"]
+    identity_sources: ["https://www.amnesty.org/en/location/africa/west-and-central-africa/chad/report-chad/"]
+    dossier: "../dossiers/states/TCD.md"
+    status: needs-security-administrative-body-case-freeze
+
+  - state: COL
+    entity: Colombia
+    outcome: S
+    candidate_parties: ["specific Military Criminal Justice authority/process only where it materially obstructs ordinary accountability for an identified State-force abuse case"]
+    candidate_projects: ["identified military-jurisdiction intervention obstructing investigation of alleged police/armed-forces abuse", "specific security-force operation involving substantiated unlawful force, torture or disappearance"]
+    capacity_limit: "case/jurisdiction-conflict/unit-specific; not Colombia's military justice or security sector generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["ordinary prosecutors/courts", "OPCAT/NPM and transitional-justice/remediation", "non-State conflict violence"]
+    identity_sources: ["https://www.amnesty.org/en/documents/amr23/0356/2025/en/"]
+    dossier: "../dossiers/states/COL.md"
+    status: needs-exact-military-justice-case-and-unit-freeze
+
+  - state: CIV
+    entity: Côte d'Ivoire
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["October 2025 election/protest crackdown and continuing detention/prosecution processes where arbitrary arrest, excessive force or unfair political prosecution remains active"]
+    capacity_limit: "responsible unit/case-specific; no generic police/judiciary class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["ordinary courts", "peaceful/non-coercive assembly policing", "released/remediated cases"]
+    identity_sources: ["https://www.amnesty.org/en/latest/news/2026/03/cote-divoire-women-detained-without-cause/"]
+    dossier: "../dossiers/states/CIV.md"
+    status: needs-responsible-unit-and-detention-prosecution-case-freeze
+
+  - state: COD
+    entity: Democratic Republic of the Congo
+    outcome: S
+    candidate_parties: ["FARDC units only where support/command/collaboration/knowledge materially connects the unit to the qualifying operation", "CMC-FDP or other Wazalendo/proxy group only where current State backing and Material Participation are frozen"]
+    candidate_projects: ["specific FARDC-backed proxy operation involving killings, torture, sexual violence, looting, child recruitment or comparable ECL conduct"]
+    capacity_limit: "named unit/proxy/project and evidenced State-support nexus only; no attribution of M23/ADF conduct to DRC absent separate evidence"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["independent civilian-protection/accountability work", "M23 and ADF conduct absent DRC attribution", "FARDC activity generally"]
+    identity_sources: ["https://www.amnesty.org/en/latest/news/2026/06/drc-authorities-must-end-support-for-armed-group-suspected-of-war-crimes/"]
+    dossier: "../dossiers/states/COD.md"
+    status: ready-controlled-project-class
+
+  - state: ECU
+    entity: Ecuador
+    outcome: S
+    candidate_parties: ["military/public-security units materially participating in the frozen qualifying operation", "intelligence/surveillance authority only for a specifically identified inadequately safeguarded deployment"]
+    candidate_projects: ["Exterminio Total operation only to the extent the specific San Martín/related deployment is shown to involve arbitrary detention, torture, disappearance or coercive repression", "specific emergency/counterterrorism or intelligence deployment independently satisfying ECL criteria"]
+    capacity_limit: "named operation/deployment/unit only; no generic Ecuador military/intelligence class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["constitutional/electoral judicial institutions", "unrelated military/civil activity", "lawful intelligence/emergency activity"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/SummaryPrint?id=30708"]
+    dossier: "../dossiers/states/ECU.md"
+    status: ready-named-operation-needs-unit-on-render
+
+  - state: GNQ
+    entity: Equatorial Guinea
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific arbitrary/incommunicado detention or disappearance/torture case involving named defender/prison transfer", "specific 2026 third-country migrant detention/transfer/refoulement project in Malabo"]
+    capacity_limit: "named case/facility/transfer-operation-specific; no generic Equatorial Guinea detention/security class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["pardoned/released persons", "ordinary migration/detention functions"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=GNQ+1%2F2026"]
+    dossier: "../dossiers/states/GNQ.md"
+    status: needs-facility-security-unit-transfer-authority-freeze
+
+  - state: ETH
+    entity: Ethiopia
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["unremediated local implementation of Corridor Development forced-eviction project", "specific security/media-regulatory/surveillance project involving arbitrary journalist/defender detention, disappearance, unlawful surveillance or coercive media closure"]
+    capacity_limit: "city/project/agency-specific; suspended/remediated Corridor segments excluded"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["suspended/remediated project segments", "released/remedied cases", "unrelated State functions"]
+    identity_sources: ["https://www.amnesty.org/en/location/africa/east-africa-the-horn-and-great-lakes/ethiopia/report-ethiopia/"]
+    dossier: "../dossiers/states/ETH.md"
+    status: needs-city-project-and-security-media-unit-freeze
+
+  - state: FJI
+    entity: Fiji
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific military-custody/detention operation connected to the Jone Vakarisi case and any materially continuous concealment/obstruction project", "specific national-security/public-order enforcement suppressing protected expression"]
+    capacity_limit: "facility/unit/case-specific; no generic Fiji military/police class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["courts", "civilian oversight", "media", "ordinary military/police activity"]
+    identity_sources: ["https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/fiji/report-fiji/"]
+    dossier: "../dossiers/states/FJI.md"
+    status: needs-custody-unit-facility-and-security-measure-freeze
+
+  - state: GAB
+    entity: Gabon
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["2026 nationwide social-media suspension and associated device-confiscation/VPN-monitoring enforcement against protected dissent"]
+    capacity_limit: "exact telecommunications/security operators and orders materially blocking communications or inspecting devices for repression; no ordinary telecom administration"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.5", "ECL-0.2 §5.6"]
+    exclusions: ["courts", "ordinary communications administration", "non-repressive network management"]
+    identity_sources: ["https://www.amnesty.org/en/location/africa/west-and-central-africa/gabon/"]
+    dossier: "../dossiers/states/GAB.md"
+    status: needs-telecom-security-operator-and-order-freeze
+
+# Batch-level translation records are governance work products only; no licensing effect.
