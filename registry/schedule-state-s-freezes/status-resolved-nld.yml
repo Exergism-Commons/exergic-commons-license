@@ -1,0 +1,12 @@
+state: NLD
+entity: Netherlands
+outcome: S
+freeze_status: status-resolved-renderable
+schedule_identity: "STATIC-99R, STABLE-2007 and ACUTE-2007 probation risk-assessment workflows"
+project_boundary: "use of the three named risk tools by the Dutch probation organizations while the February 2026 Inspectorate finding of non-demonstrably-responsible use remains unremediated"
+capacity_limit: "only data-driven risk assessment materially influencing criminal-justice recommendations without adequate validation, safeguards or contestability"
+exclusions: ["OXREC while suspended", "withdrawn/corrected and independently validated systems", "courts exercising independent judgment", "oversight/remediation"]
+identity_sources: ["https://www.inspectie-jenv.nl/actueel/nieuws/2026/02/12/risicovol-algoritmegebruik-door-reclassering"]
+schedule_status: ready-status-revalidated-project-class
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
