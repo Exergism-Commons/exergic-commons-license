@@ -1,0 +1,18 @@
+state: TCD
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Ministry of Territorial Administration orders 011 and 012 of 26 June 2025"
+project_boundary: "the administrative prohibition and dissolution measures created by the two 26 June 2025 ministerial orders concerning the named civic organizations"
+capacity_limit: "continued implementation of the frozen measures only"
+exclusions:
+  - "other public administration or security activity"
+  - "unrelated association regulation"
+  - "judicial review, rescission or remedial activity"
+identity_sources:
+  - "https://www.amnesty.org/en/location/africa/central-africa/chad/report-chad/"
+  - "https://tchadinfos.com/2025/06/26/tchad-le-gouvernement-interdit-les-activites-de-wakit-tama-section-politique-et-du-mouvement-le-temps/"
+  - "https://tchadinfos.com/2025/06/26/tchad-deux-associations-de-jeunes-sont-dissoutes/"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-frozen-administrative-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
