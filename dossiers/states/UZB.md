@@ -4,49 +4,60 @@ entity: "Uzbekistan"
 iso3: UZB
 issue: 189
 provisional_outcome: S
-provisional_scope: "politically motivated prosecution/detention, abusive prison/police units, coercive eviction, anti-LGBTI enforcement, coercive agricultural quota systems and rights-suppressing surveillance/travel control"
+provisional_scope: "politically motivated prosecution/detention, forced psychiatric detention, torture/ill-treatment and Karakalpakstan repression, discriminatory LGBTI enforcement, coercive eviction and coercive agricultural quota/production systems"
 confidence: high
 evidence_cutoff: 2026-08-11
 last_reviewed: 2026-08-11
-review_stage: whole-state-adversarial-reviewed
-adversarial_result: "DOWNGRADE R -> S"
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD S after prior R -> S; current evidence preserves political, detention, discriminatory and agricultural-coercion scopes"
 operative: false
 ---
 # Uzbekistan
 
-> Governance record only; no licensing effect by itself.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.**
+**S — Restricted with defined scope.** Current evidence preserves serious project-specific coercion, while the Ombudsman/NPM and other remedial functions continue to make whole-State attribution too broad.
 
-## 2. Evidence preserving scoped restriction
+## 2. ECL criteria engaged
 
-Current records document politically motivated prosecutions/travel restrictions, continuing torture-impunity concerns, forced evictions/demolitions, systemic law-enforcement abuse against LGBTI people and coercive cotton-production mandates. Karakalpakstan remains particularly serious, with mass-detention/excessive-force and torture allegations and calls for independent investigation. A June 2026 activist case adds current alleged fabricated prosecution/custody abuse.
+- political repression and arbitrary/forced psychiatric detention;
+- torture and serious ill-treatment;
+- discriminatory law-enforcement targeting of LGBTI people;
+- coercive eviction/displacement;
+- coercive agricultural production mandates enforced through threats, extortion or land loss.
 
-## 3. Counter-evidence and exergic institutions
+## 3. Evidence supporting the determination
 
-The Parliamentary Ombudsman operates a National Preventive Mechanism with large-scale monitoring of closed institutions, reports material facility improvements resulting from its interventions and used legislative initiative to expand protections for pre-trial detainees. In 2025 police officers were convicted for torturing suspects. Constitutional detention/torture safeguards also exist.
+Current records continue to document politically motivated prosecutions, restrictions on expression, torture/ill-treatment, unresolved Karakalpakstan accountability, discriminatory enforcement against LGBTI people and forced psychiatric detention. A February 2026 Human Rights Watch/Uzbek Forum investigation found that coercive State production mandates and quota-linked penalties continue to violate cotton/wheat farmers' rights despite reforms.
 
-## 4. Attribution and exclusions
+## 4. Counter-evidence and exergic institutions
 
-The Ombudsman/NPM, independent prosecution of official abuse, judicial remediation and human-rights reform projects are excluded from the scoped Restricted Party.
+The Parliamentary Ombudsman/NPM continues detention monitoring and legislative advocacy. Police officers have been convicted for torture, and recent laws/decrees purport to strengthen farmer and detainee protections. These developments are material counter-evidence and prevent recapture of the whole State.
 
-## 5. Adversarial determination
+## 5. Attribution and exclusions
 
-**DOWNGRADE R → S.** Verifiable rights-protective intervention makes whole-State attribution overbroad.
+Scope covers **security/prosecutorial/prison projects materially involved in fabricated or politically motivated prosecution, forced psychiatric detention, torture/ill-treatment or Karakalpakstan repression; law-enforcement projects using discriminatory criminalisation/blackmail against LGBTI people; coercive eviction projects; and agricultural production systems materially enforcing crop quotas/mandates through threats of land loss, violence, extortion or comparable coercion**.
 
-## 6. Review triggers
+Ombudsman/NPM, independent torture prosecution, unrelated reform/remedial projects and the population/nationality are excluded.
 
-Independent Karakalpakstan accountability, effective torture prosecution, end to politically fabricated cases, coercive quota/eviction reform and continued strengthening of NPM/judicial remedies.
+## 6. Adversarial determination
 
-## 7. Sources
+**UPHOLD S after prior R → S.** Current 2026 evidence preserves the scoped finding and does not justify return to whole-State `R`.
 
-- https://ombudsman.uz/en/news/2026/05/18/tergov-hibsxonalarida-saqlanayotgan-shaxslar-uchun-moddiy-va-huquqiy-kafolatlar-kengaytirilmoqda
-- https://ombudsman.uz/en/news/2026/03/04/inson-huquqlarini-taminlashga-oid-masalalar-muhokama-qilindi
-- https://www.amnesty.org/en/location/europe-and-central-asia/eastern-europe-and-central-asia/uzbekistan/report-uzbekistan/
+## 7. Review / removal triggers
+
+Independent Karakalpakstan accountability, effective torture remediation, cessation of fabricated/political cases and discriminatory enforcement, and verified elimination of coercive agricultural mandates/evictions.
+
+## 8. Sources
+
+- https://www.hrw.org/world-report/2026/country-chapters/uzbekistan
+- https://www.hrw.org/news/2026/02/16/uzbekistan-cotton-wheat-farmers-exploited-abused
 - https://www.hrw.org/news/2026/06/18/uzbekistan-activist-held-in-trumped-up-case
+- https://www.amnesty.org/en/location/europe-and-central-asia/eastern-europe-and-central-asia/uzbekistan/report-uzbekistan/
+- https://ombudsman.uz/en/news/2026/05/18/tergov-hibsxonalarida-saqlanayotgan-shaxslar-uchun-moddiy-va-huquqiy-kafolatlar-kengaytirilmoqda
 
-## 8. Procedural history
+## 9. Procedural history
 
-Issue #189 · `../../reviews/2026/adversarial/state-level/tranche-10.md`
+Issue #189 · `../../reviews/2026/adversarial/state-level/tranche-10.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
