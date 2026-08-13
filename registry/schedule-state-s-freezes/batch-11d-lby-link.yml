@@ -1,0 +1,10 @@
+state: LBY
+outcome: S
+freeze_status: renderable-subset-via-cross-entity
+linked_project_id: MITIGA-DETENTION-APPARATUS
+linked_organization_id: SDF-RADA
+boundary_rule: "Use only the exact canonical project and organization boundaries referenced by these IDs. No additional State-level class is created by this link."
+residual_scope: "All other LBY dossier scope remains governance-only until separately frozen."
+schedule_status: ready-by-cross-entity-reference
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
