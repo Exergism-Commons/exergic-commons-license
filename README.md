@@ -10,7 +10,7 @@ ECL is **not OSI-approved Open Source** and is not intended to satisfy the Open 
 
 ## Current working draft
 
-`LICENSE` is now **ECL 0.2-DRAFT**. It was created after the 2026 State-review consistency audit identified a mismatch between the broader non-domination rule in `spec/PRINCIPLES.md` / `spec/GOVERNANCE.md` and the narrower operative wording of ECL 0.1.
+`LICENSE` is **ECL 0.2-DRAFT**. It was created after the 2026 State-review consistency audit identified a mismatch between the broader non-domination rule in `spec/PRINCIPLES.md` / `spec/GOVERNANCE.md` and the narrower operative wording of ECL 0.1.
 
 The immutable ECL 0.1 snapshot remains at [`versions/licenses/ECL-0.1.md`](versions/licenses/ECL-0.1.md). It has not been rewritten.
 
@@ -22,12 +22,12 @@ ECL 0.2-DRAFT adds or clarifies:
 - a more explicit designation standard and Schedule-knowability rule; and
 - current repository paths and terminology.
 
-The global drafting audit is recorded in [`reviews/2026/consistency/global-license-fit-audit.md`](reviews/2026/consistency/global-license-fit-audit.md).
+The global drafting audit is recorded in [`reviews/2026/consistency/global-license-fit-audit.md`](reviews/2026/consistency/global-license-fit-audit.md), followed by the complete [`ECL 0.2 State delta audit`](reviews/2026/consistency/ecl-0.2-state-delta.md).
 
 ## Start here
 
 - [`LICENSE`](LICENSE) — current working license text (ECL 0.2-DRAFT).
-- [`schedules/`](schedules/) — versioned Restricted Parties Schedules. A schedule has licensing effect only when a software release expressly incorporates that exact schedule.
+- [`schedules/`](schedules/) — versioned Restricted Parties Schedules. A schedule has licensing effect only when a software release expressly incorporates that exact schedule with the exact ECL version.
 - [`spec/`](spec/) — principles, governance, terminology and designation standards.
 - [`dossiers/`](dossiers/) — per-entity evidence records. Dossiers do not create licensing restrictions by themselves.
 - [`reviews/`](reviews/) — adjudication, adversarial-review and consistency-audit history.
@@ -69,13 +69,27 @@ A designation concerns an institutional actor, project or materially participati
 
 ## 2026 State review
 
-The repository contains an ECL-native review of **195 State entities**. Initial adjudication, whole-State adversarial review, scoped `S` review, full `U` review, original-`N` review and detailed dossier normalization are complete.
+The repository contains an ECL-native review of **195 State entities**. Initial adjudication, whole-State adversarial review, scoped `S` review, full `U` review, original-`N` review, detailed dossier normalization and the ECL 0.2 State delta audit are complete.
 
 **195 / 195 State dossiers are self-contained at the 2026-08-11 evidence cutoff.**
 
-The current governance distribution remains provisional and is recorded in [`registry/states.yml`](registry/states.yml). These findings are **not** an operative Restricted Parties Schedule.
+After the ECL 0.2 normative delta, the current provisional governance distribution is:
 
-The next evidence/governance step is a delta review of State determinations against the exact ECL 0.2-DRAFT language before a new Schedule is generated.
+- **34 `R`**
+- **86 `S`**
+- **28 `U`**
+- **47 `N`**
+- **195 total**
+
+The delta narrowed the United States and Israel from whole-apparatus `R` to scoped `S` under the narrowest-accurate-attribution rule, and narrowed Singapore's `S` by removing capital punishment/execution as a standalone ECL basis. The 28 `U` cases were all re-read and remained unresolved for factual/attribution reasons rather than merely because ECL 0.1 had narrower wording.
+
+The canonical governance state is [`registry/states.yml`](registry/states.yml). These findings are **not** an operative Restricted Parties Schedule.
+
+## Schedule status
+
+[`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) predates the completed State cycle and ECL 0.2 consistency work. It is historical/pre-0.2 draft material and should **not** be adopted with ECL 0.2-DRAFT.
+
+The next Schedule candidate should be regenerated from the post-delta dossiers after State/organization/person/project reconciliation.
 
 ## Why exergism?
 
