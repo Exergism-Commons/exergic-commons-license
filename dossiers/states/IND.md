@@ -4,46 +4,66 @@ entity: "India"
 iso3: IND
 issue: 77
 provisional_outcome: S
-provisional_scope: "specified Union/state security, counterterrorism, detention, censorship, punitive-demolition and discriminatory-enforcement projects"
+provisional_scope: "specified Union/state counterterrorism, detention, public-order, digital-censorship and coercive-surveillance projects"
 confidence: high
 evidence_cutoff: 2026-08-11
 last_reviewed: 2026-08-11
-review_stage: whole-state-adversarial-reviewed
-adversarial_result: "DOWNGRADE R -> S"
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD and narrow S after prior R -> S; remove punitive-demolition component absent sufficiently current recurrence"
 operative: false
 ---
 # India
 
-> Governance record only; no licensing effect by itself.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.** Whole-State attribution was rejected on adversarial review.
+**S — Restricted with defined scope.** Whole-State attribution remains too broad, but several current Union/state security, detention, public-order and digital-control projects continue to meet the ECL threshold.
 
-## 2. Evidence preserving scoped restriction
+## 2. ECL criteria engaged
 
-UN Special Procedures in March–April 2026 continued to raise concerns about prolonged UAPA detention without trial, compatibility of UAPA with human-rights obligations, AFSPA and other security-law practices. These concerns attach more accurately to identified Union/state security, counterterrorism, detention, digital-censorship, punitive-demolition and discriminatory-enforcement projects.
+Current review concerns:
 
-## 3. Counter-evidence and exclusions
+- arbitrary or prolonged counterterrorism detention and associated coercive targeting;
+- torture, disappearance or serious due-process failures in attributable security projects;
+- unlawful public-order force or communications restrictions against protected peaceful assembly;
+- digital censorship/takedown or surveillance systems materially coercing protected expression without meaningful safeguards.
 
-India's federal constitutional structure and Supreme Court have real rights-protective jurisdiction. Article 32 provides direct enforcement of Fundamental Rights, and the Court may invalidate unconstitutional legislation/government action. Unrelated courts, health/scientific agencies, municipalities and public services therefore cannot responsibly be collapsed into one Restricted Party.
+## 3. Evidence supporting `S`
 
-## 4. Adversarial determination
+UN Special Procedures in March-April 2026 again raised concerns regarding prolonged UAPA detention, the compatibility of UAPA and AFSPA with international human-rights obligations and continuing detention of individual defenders. In July 2026 peaceful protesters in New Delhi were reportedly subjected to unnecessary/excessive police force and restrictions including mobile-internet disruption. Current digital-control rules and takedown practices also materially expand executive control over online content.
 
-**DOWNGRADE R → S** for attribution precision.
+## 4. Counter-evidence and exergic institutions
 
-## 5. Review triggers
+India's federal constitutional structure and Supreme Court/High Courts retain substantial review powers. Article 32 gives the Supreme Court direct jurisdiction to enforce Fundamental Rights through habeas corpus and other writs. Judicial safeguards against arbitrary punitive demolition also remain material counter-evidence.
 
-Reform/cessation of the identified security-law projects, release/remedy for unlawfully detained persons, stronger due-process safeguards, and case-specific review of any new coercive project.
+The present review did not identify sufficiently current project-specific evidence to retain `punitive demolition` as an independent active 2026 scope merely from the older pattern. It remains a re-expansion trigger if attributable authorities materially evade judicial safeguards.
 
-## 6. Sources
+## 5. Attribution and exclusions
 
-- https://www.sci.gov.in/jurisdiction/
-- https://www.sci.gov.in/constitution/
+The active scope covers **identified Union/state counterterrorism/security projects materially producing arbitrary or prolonged detention, disappearance, torture/ill-treatment or repression of protected civic activity; police/public-order operations materially using unlawful force or communications shutdowns against peaceful assembly; and digital censorship/takedown or surveillance projects materially coercing protected expression without meaningful safeguards**.
+
+Courts, independent remedies, unrelated state governments/agencies and ordinary public services are excluded absent separate evidence.
+
+## 6. Adversarial determination
+
+**UPHOLD AND NARROW `S` after prior `R → S`.** Federalism and functioning judicial review continue to defeat whole-State attribution. The punitive-demolition component is removed from active scope at this cutoff absent sufficiently fresh recurrence.
+
+## 7. Review / removal triggers
+
+**Move toward `U/N`** on rights-compliant reform/non-use of UAPA/AFSPA and coercive digital powers against protected activity, release/remedy for unlawful prolonged detention, effective investigation of protest-policing abuse and durable judicially enforceable due-process safeguards.
+
+**Re-expand scope** if attributable punitive demolition recurs in material defiance/evasion of judicial safeguards or another specifically evidenced coercive project crosses ECL's threshold.
+
+## 8. Sources
+
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=IND+5%2F2026
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=IND+3%2F2026
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=IND+6%2F2026
+- https://www.sci.gov.in/jurisdiction/
+- https://www.amnesty.org/en/latest/news/2026/07/india-crackdown-on-peaceful-protesters-in-new-delhi-raises-serious-human-rights-concerns/
+- https://www.amnesty.org/en/latest/news/2026/04/india-proposed-changes-to-digital-media-regulation-would-facilitate-abusive-powers-over-users-content-new-amnesty-legal-analysis/
 
-## 7. Procedural history
+## 9. Procedural history
 
-Issue #77 · `../../reviews/2026/adversarial/state-level/tranche-02.md`
+Issue #77 · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md`
