@@ -19,7 +19,7 @@ A normalized dossier must be understandable and auditable without reconstructing
 
 The complete first-pass State adjudication remains preserved under `../reviews/2026/`. All **46 States initially classified `R`** have been normalized after whole-State adversarial review, including the 11 cases subsequently downgraded to `S`.
 
-Scoped reviews normalized so far:
+Scoped reviews completed:
 
 - high-impact review: United Kingdom, Morocco and Ukraine;
 - tranche 1: Denmark, France, Netherlands and Serbia;
@@ -30,8 +30,11 @@ Scoped reviews normalized so far:
 - tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal;
 - tranche 7: Nigeria, North Macedonia, Pakistan, Palestine, Panama, Paraguay, Peru and Philippines;
 - tranche 8: Poland, Qatar, Republic of the Congo, Slovakia, Somalia, Sri Lanka, Sudan and Syria;
-- tranche 9: Thailand, Trinidad and Tobago, Türkiye, Uganda, Uzbekistan, Yemen, Zambia and Zimbabwe.
+- tranche 9: Thailand, Trinidad and Tobago, Türkiye, Uganda, Uzbekistan, Yemen, Zambia and Zimbabwe;
+- tranche 10: Georgia, India, Singapore and South Sudan — the remaining current `S` cases originating from the earlier whole-State `R → S` review.
 
-That makes **110 unique State dossiers with completed detailed normalization** at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted among the 46 initially-`R` dossiers normalized during whole-State adversarial review, so tranche 5 added six new unique normalized dossiers. Pakistan was likewise already counted in that initially-`R` cohort, so tranche 7 added seven new unique dossiers. Tranche 8 added eight. Türkiye, Uganda, Uzbekistan and Zimbabwe were already normalized in the initially-`R` cohort, so tranche 9 adds four new unique dossiers.
+The **current `S` cohort has completed scoped adversarial review**. Every current `S` has been tested at scoped/project level, including a second falsification pass for the former whole-State `R → S` cases.
 
-Remaining State dossiers retain canonical metadata and review links and will be expanded as their reviews are completed.
+There are **110 unique State dossiers with completed detailed normalization** at the 2026-08-11 evidence cutoff. Tranche 10 adds no new unique dossiers because Georgia, India, Singapore and South Sudan were already included among the 46 initially-`R` dossiers normalized during whole-State adversarial review; it upgrades their review stage and completes the scoped `S` cycle.
+
+The remaining normalization workload is now concentrated in the `U` and `N` cohorts. Those dossiers retain canonical metadata and review links and will be expanded as their reviews are completed.
