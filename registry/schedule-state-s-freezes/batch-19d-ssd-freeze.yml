@@ -1,0 +1,18 @@
+state: SSD
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "South Sudan National Security Service, only in qualifying arrest/surveillance activity"
+project_boundary: "NSS exercise of arrest, detention, surveillance, search or intimidation powers under the current national-security framework against protected critics, opposition, journalists, lawyers or civic actors"
+capacity_limit: "only conduct independently satisfying ECL 0.2 political-repression, arbitrary-detention or repressive-surveillance criteria"
+exclusions:
+  - "South Sudan government or security services generally"
+  - "lawful intelligence activity unrelated to protected civic/political activity"
+  - "Judiciary, mobile courts, independent prosecutors/investigators and remediation"
+  - "other military/conflict projects absent separate freeze"
+identity_sources:
+  - "https://www.hrw.org/news/2026/02/19/south-sudan-extend-un-investigations-stand-ready-to-respond-to-any-further"
+  - "https://www.hrw.org/news/2026/07/03/south-sudan-grave-rights-violations-amid-deteriorating-political-and-security"
+residual_scope: "other military, police and State-aligned conflict scope remains governance-only until separately frozen"
+schedule_status: ready-capacity-limited-party
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
