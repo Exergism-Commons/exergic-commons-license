@@ -1,0 +1,186 @@
+version: "2026-08-13-ecl-0.2-r-identity-freeze"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+count: 34
+
+common_exclusions:
+  - population-and-nationality
+  - independent-private-actors
+  - unrelated-noncontrolled-entities
+  - qualifying-independent-remediation-activity
+
+entries:
+  - iso3: AFG
+    entity: Afghanistan
+    candidate_class: "Taliban de facto governing and enforcement apparatus in Afghanistan"
+    source_dossier: "../dossiers/states/AFG.md"
+    readiness: frozen-candidate
+  - iso3: AZE
+    entity: Azerbaijan
+    candidate_class: "central governmental, security, judicial and administrative apparatus of Azerbaijan"
+    source_dossier: "../dossiers/states/AZE.md"
+    readiness: frozen-candidate
+  - iso3: BLR
+    entity: Belarus
+    candidate_class: "central governmental, security, judicial and administrative apparatus of Belarus"
+    source_dossier: "../dossiers/states/BLR.md"
+    readiness: frozen-candidate
+  - iso3: BFA
+    entity: Burkina Faso
+    candidate_class: "current military governing apparatus of Burkina Faso"
+    source_dossier: "../dossiers/states/BFA.md"
+    readiness: frozen-candidate
+  - iso3: BDI
+    entity: Burundi
+    candidate_class: "central governmental, security, judicial and administrative apparatus of Burundi"
+    source_dossier: "../dossiers/states/BDI.md"
+    readiness: frozen-candidate
+  - iso3: KHM
+    entity: Cambodia
+    candidate_class: "central governmental, security, judicial and administrative apparatus of Cambodia"
+    source_dossier: "../dossiers/states/KHM.md"
+    readiness: frozen-candidate
+  - iso3: CHN
+    entity: China
+    candidate_class: "central and materially controlled regional coercive-security, judicial, surveillance and assimilation apparatus of the People's Republic of China"
+    source_dossier: "../dossiers/states/CHN.md"
+    readiness: frozen-candidate
+  - iso3: CUB
+    entity: Cuba
+    candidate_class: "central governmental, security, judicial, detention and information-control apparatus of Cuba"
+    source_dossier: "../dossiers/states/CUB.md"
+    readiness: frozen-candidate
+  - iso3: EGY
+    entity: Egypt
+    candidate_class: "central governmental, security, prosecution, judicial, detention and administrative apparatus of Egypt"
+    source_dossier: "../dossiers/states/EGY.md"
+    readiness: frozen-candidate
+  - iso3: SLV
+    entity: El Salvador
+    candidate_class: "central governmental, security, detention and emergency-rule apparatus of El Salvador"
+    source_dossier: "../dossiers/states/SLV.md"
+    readiness: frozen-candidate
+  - iso3: ERI
+    entity: Eritrea
+    candidate_class: "central governmental, security, detention and national-service apparatus of Eritrea"
+    source_dossier: "../dossiers/states/ERI.md"
+    readiness: frozen-candidate
+  - iso3: SWZ
+    entity: Eswatini
+    candidate_class: "central monarchical governing, security, political-control and detention apparatus of Eswatini"
+    source_dossier: "../dossiers/states/SWZ.md"
+    readiness: frozen-candidate
+  - iso3: GIN
+    entity: Guinea
+    candidate_class: "current central governing, political-control, media-control and security apparatus of Guinea"
+    source_dossier: "../dossiers/states/GIN.md"
+    readiness: frozen-candidate
+  - iso3: IRN
+    entity: Iran
+    candidate_class: "central governmental, security, intelligence, judicial and coercive administrative apparatus of the Islamic Republic of Iran"
+    source_dossier: "../dossiers/states/IRN.md"
+    readiness: frozen-candidate
+  - iso3: KWT
+    entity: Kuwait
+    candidate_class: "central governmental, executive, security, judicial and nationality/deportation apparatus of Kuwait"
+    source_dossier: "../dossiers/states/KWT.md"
+    readiness: frozen-candidate
+  - iso3: MDG
+    entity: Madagascar
+    candidate_class: "current military/transitional governing and security apparatus of Madagascar"
+    source_dossier: "../dossiers/states/MDG.md"
+    readiness: frozen-candidate
+  - iso3: MLI
+    entity: Mali
+    candidate_class: "current military/transitional governing, security and political-control apparatus of Mali"
+    source_dossier: "../dossiers/states/MLI.md"
+    readiness: frozen-candidate
+  - iso3: MMR
+    entity: Myanmar
+    candidate_class: "current military-backed/de facto governing, security, detention and electoral-control apparatus of Myanmar"
+    source_dossier: "../dossiers/states/MMR.md"
+    readiness: frozen-candidate
+  - iso3: NIC
+    entity: Nicaragua
+    candidate_class: "central governmental, security, judicial, military and administrative repression apparatus of Nicaragua"
+    source_dossier: "../dossiers/states/NIC.md"
+    readiness: frozen-candidate
+  - iso3: NER
+    entity: Niger
+    candidate_class: "current military/de facto governing, security, detention and civic-control apparatus of Niger"
+    source_dossier: "../dossiers/states/NER.md"
+    readiness: frozen-candidate
+  - iso3: PRK
+    entity: North Korea
+    candidate_class: "central governmental, party-state, security, surveillance, detention and movement-control apparatus of the Democratic People's Republic of Korea"
+    source_dossier: "../dossiers/states/PRK.md"
+    readiness: frozen-candidate
+  - iso3: OMN
+    entity: Oman
+    candidate_class: "central governmental, security, surveillance, censorship, citizenship and coercive-labour administration apparatus of Oman"
+    source_dossier: "../dossiers/states/OMN.md"
+    readiness: frozen-candidate
+  - iso3: RUS
+    entity: Russia
+    candidate_class: "central governmental, military, occupation, security, judicial, surveillance and information-control apparatus of the Russian Federation"
+    source_dossier: "../dossiers/states/RUS.md"
+    readiness: frozen-candidate
+  - iso3: RWA
+    entity: Rwanda
+    candidate_class: "central governmental, security, political-control and materially directed external-security apparatus of Rwanda"
+    source_dossier: "../dossiers/states/RWA.md"
+    readiness: frozen-candidate
+  - iso3: SAU
+    entity: Saudi Arabia
+    candidate_class: "central governmental, security, judicial, detention and coercive administrative apparatus of Saudi Arabia"
+    source_dossier: "../dossiers/states/SAU.md"
+    readiness: frozen-candidate
+  - iso3: TJK
+    entity: Tajikistan
+    candidate_class: "central governmental, security, judicial, detention and political-control apparatus of Tajikistan"
+    source_dossier: "../dossiers/states/TJK.md"
+    readiness: frozen-candidate
+  - iso3: TZA
+    entity: Tanzania
+    candidate_class: "central governmental, security, electoral/public-order and political-control apparatus of Tanzania"
+    source_dossier: "../dossiers/states/TZA.md"
+    readiness: frozen-candidate
+  - iso3: TGO
+    entity: Togo
+    candidate_class: "central governing, security, information-control and political-detention apparatus of Togo"
+    source_dossier: "../dossiers/states/TGO.md"
+    readiness: frozen-candidate
+  - iso3: TUN
+    entity: Tunisia
+    candidate_class: "central executive, judicial, security, migration and civic-control apparatus of Tunisia"
+    source_dossier: "../dossiers/states/TUN.md"
+    readiness: frozen-candidate
+  - iso3: TKM
+    entity: Turkmenistan
+    candidate_class: "central governmental, security, information-control, detention and transnational-repression apparatus of Turkmenistan"
+    source_dossier: "../dossiers/states/TKM.md"
+    readiness: frozen-candidate
+  - iso3: ARE
+    entity: United Arab Emirates
+    candidate_class: "federal governmental, security, judicial and detention apparatus of the United Arab Emirates"
+    source_dossier: "../dossiers/states/ARE.md"
+    readiness: frozen-candidate
+  - iso3: VEN
+    entity: Venezuela
+    candidate_class: "central governmental, security, intelligence, judicial, detention and political-control apparatus of Venezuela"
+    source_dossier: "../dossiers/states/VEN.md"
+    readiness: frozen-candidate
+  - iso3: VNM
+    entity: Viet Nam
+    candidate_class: "central governmental, party-state, security, judicial, detention and information-control apparatus of Viet Nam"
+    source_dossier: "../dossiers/states/VNM.md"
+    readiness: frozen-candidate
+  - iso3: GNB
+    entity: Guinea-Bissau
+    candidate_class: "current Military High Command / de facto transitional governing apparatus of Guinea-Bissau"
+    source_dossier: "../dossiers/states/GNB.md"
+    readiness: frozen-candidate
+
+# These are candidate class identities for Schedule drafting, not operative designations.
+# Each final Schedule entry must retain the common exclusions and exact ECL 0.2 compatibility statement.
