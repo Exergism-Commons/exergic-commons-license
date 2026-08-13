@@ -1,0 +1,33 @@
+version: "2026-08-13-post-freeze-progress"
+status: provisional-governance
+operative: false
+base_index: "schedule-translations.yml"
+state_outcome_overlay: "state-outcome-overrides.yml"
+status_overlay: "schedule-status-overrides.yml"
+precedence: "Counts in this file supersede aggregate State-S progress counts in base_index until the next consolidated snapshot."
+
+state_schedule_progress:
+  R_candidates: 34
+  R_frozen: 34
+  S_candidates_active: 85
+  S_fully_frozen: 19
+  S_renderable_subset_only: 52
+  S_schedule_renderable_states: 71
+  S_current_status_or_remediation_review: 14
+  S_identity_or_project_freeze_pending: 0
+
+state_governance_counts_after_overrides:
+  R: 34
+  S: 85
+  U: 29
+  N: 47
+  total: 195
+
+schedule_gate:
+  state_identity_translation_complete: true
+  state_identity_freeze_queue_complete: true
+  state_current_status_review_complete: false
+  render_partial_draft_candidate_from_frozen_entries: true
+  render_adoptable_schedule: false
+
+# Governance/release-readiness overlay only; no licensing effect.
