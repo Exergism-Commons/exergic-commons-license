@@ -1,0 +1,70 @@
+version: "2026-08-13-ecl-0.2-s-freeze-04"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+records:
+  - state: MYS
+    entity: Malaysia
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Immigration Department of Malaysia — Detention and Depot Management Division, only in immigration-detention operations independently satisfying ECL §5.6"
+    candidate_projects:
+      - "immigration-detention depot operations involving arbitrary/prolonged detention, serious conditions, preventable custody-risk or obstruction of independent accountability where the specific facility/workflow satisfies ECL §5.6"
+    capacity_limit: "detention/depot management in the qualifying coercive capacity only; not immigration enforcement generally"
+    exclusions:
+      - "ordinary immigration administration and lawful deportation processing"
+      - "courts, SUHAKAM and independent remediation"
+      - "detention/depot operations that do not independently satisfy ECL §5"
+    residual_unfrozen_scope:
+      - "speech/public-order enforcement pending exact police case/statutory boundary freeze"
+    identity_sources:
+      - "https://www.imi.gov.my/index.php/en/departments-profile/introduction/"
+      - "https://www.imi.gov.my/index.php/en/departments-profile/organization-chart/"
+    dossier: "../../dossiers/states/MYS.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: PAK
+    entity: Pakistan
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "National Cyber Crime Investigation Agency (NCCIA), Ministry of Interior and Narcotics Control, only in PECA investigations/prosecutions independently satisfying ECL §5.6 or §5.1"
+    candidate_projects:
+      - "Prevention of Electronic Crimes Act (PECA), including the 2025 amendment framework, as enforced by NCCIA against protected journalism/expression where the specific case independently satisfies ECL §5"
+    capacity_limit: "coercive PECA enforcement against protected journalism/expression; not cybercrime investigation generally"
+    exclusions:
+      - "ordinary cybercrime investigation and digital forensics"
+      - "courts, parliamentary oversight and independent remediation"
+      - "other military/security or censorship projects not separately frozen"
+    residual_unfrozen_scope:
+      - "enforced-disappearance/detention and protest-repression projects"
+      - "non-PECA media-control projects"
+      - "other surveillance systems"
+    identity_sources:
+      - "https://www.nccia.gov.pk/WhatWeAre.php"
+      - "https://www.nccia.gov.pk/mandate.php"
+      - "https://www.nccia.gov.pk/faqs.php"
+    dossier: "../../dossiers/states/PAK.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: GAB
+    entity: Gabon
+    freeze_status: renderable-subset
+    candidate_projects:
+      - "temporary suspension of access to social-media / digital platforms addressed by the Council of Ministers on 26 February 2026"
+    candidate_parties:
+      - "Gabonese executive/digital-administration authorities only to the extent of Material Participation in implementing the frozen February 2026 platform-suspension project"
+    capacity_limit: "coercive nationwide digital-platform blocking materially suppressing protected civic/political communication and independently satisfying ECL §5.5 or §5.6; not digital regulation generally"
+    exclusions:
+      - "ordinary telecommunications/digital administration"
+      - "later platform-governance dialogue or rights-compliant regulation"
+      - "courts and independent remediation"
+    residual_unfrozen_scope:
+      - "device-confiscation/inspection and individual political-detention projects pending exact unit/case freeze"
+    identity_sources:
+      - "https://gouvernement.ga/2026/02/27/communique-final-du-conseil-des-ministres-du-26-fevrier-2026/"
+      - "https://gouvernement.ga/2026/07/11/economie-numerique-le-gabon-et-tiktok-engagent-un-dialogue-sur-la-gouvernance-des-plateformes-numeriques/"
+    dossier: "../../dossiers/states/GAB.md"
+    schedule_status: ready-narrowed-subset
+
+# Governance work product only; no licensing effect.
