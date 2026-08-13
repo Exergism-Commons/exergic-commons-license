@@ -1,17 +1,27 @@
 # Restricted Parties Schedules
 
-This directory contains exact, versioned ECL Restricted Parties Schedules.
+This directory contains exact, versioned ECL Schedule artifacts.
 
-A dossier, registry entry, issue, adjudication or review does **not** create a licensing restriction. A designation becomes relevant to a software release only when that release expressly incorporates the exact Schedule ID containing it together with the exact ECL license version governing that release.
+A dossier, review or registry record has no licensing effect by itself. Only an exact Schedule expressly incorporated with an exact ECL version can affect a release.
 
-## Current schedule status
+## Current artifacts
 
-- [`ECL-RP-0.4-DRAFT.md`](ECL-RP-0.4-DRAFT.md) — **historical/pre-0.2 working draft; not eligible for adoption with ECL 0.2-DRAFT.**
+- `ECL-RP-0.4-DRAFT.md` — historical pre-ECL-0.2 draft; do not treat it as synchronized with the current root license.
+- `ECL-RP-0.5-PARTIAL-DRAFT.md` — non-operative post-0.2 rendering test; deliberately incomplete and not adoption-ready.
 
-`ECL-RP-0.4-DRAFT` predates completion of the 195-State adversarial cycle and the global license-fit audit that produced ECL 0.2-DRAFT. It therefore must not be treated as a synchronized Schedule for the current root `LICENSE`.
+## Current Schedule sources
 
-A replacement Schedule should be **regenerated** after the 195-dossier ECL 0.2 delta audit and State/organization/person/project reconciliation. It should not be produced by silently patching Draft 0.4.
+Use the current machine-readable sources under `../registry/`, in particular:
 
-## Schedule rules
+- `state-outcome-overrides.yml`
+- `schedule-progress-overrides.yml`
+- `schedule-status-overrides.yml`
+- `schedule-state-r-freeze.yml`
+- `schedule-state-s-freezes/`
+- `schedule-organization-freezes.yml`
+- `schedule-armed-organization-freezes.yml`
+- `schedule-project-freezes.yml`
 
-Schedules are separately versioned from the ECL license text and are non-retroactive. A stable Schedule should identify exact legal entities, named projects or reasonably determinable classes and state material exclusions where needed for knowability and scope discipline.
+`../tools/render_schedule.py` renders a non-operative candidate from frozen records. Unfrozen or factual-review scope must remain omitted.
+
+Schedules are separately versioned from the license text and are non-retroactive.
