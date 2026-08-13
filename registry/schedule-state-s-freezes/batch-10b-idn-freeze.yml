@@ -1,0 +1,17 @@
+state: IDN
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Khariq Anhar EIT-law prosecution project"
+project_boundary: "the continued criminal prosecution of Khariq Anhar concerning a satirical social-media post linked to the August 2025 protest cycle, as documented on 22 July 2026"
+capacity_limit: "this named prosecution only, where protected expression is the basis of the canonical finding"
+exclusions:
+  - "Indonesia's EIT law generally"
+  - "other protest cases absent separate freeze"
+  - "acquitting/remedial courts and unrelated public functions"
+identity_sources:
+  - "https://www.amnesty.org/en/documents/asa21/1300/2026/en/"
+  - "https://www.amnesty.org/en/documents/asa21/0624/2026/en/"
+residual_scope: "other protest, information-control and security projects remain governance-only until separately frozen"
+schedule_status: ready-named-case-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
