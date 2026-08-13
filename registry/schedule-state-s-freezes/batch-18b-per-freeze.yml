@@ -1,0 +1,18 @@
+state: PER
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Law No. 32735 military-police jurisdiction transfer project"
+project_boundary: "implementation of Law No. 32735, promulgated 20 July 2026, only where an investigation or proceeding concerning alleged serious abuse against civilians is transferred, halted or displaced from ordinary jurisdiction through the new military-police jurisdiction rules"
+capacity_limit: "the jurisdiction-transfer workflow only; not military-police justice generally"
+exclusions:
+  - "ordinary courts and prosecutors retaining competent independent jurisdiction"
+  - "constitutional review and independent remediation"
+  - "military offences properly confined to strictly military functions"
+  - "unrelated police or armed-forces activity"
+identity_sources:
+  - "https://www.elperuano.pe/noticia/300766-ley-32735-redefine-las-reglas-del-delito-de-funcion-en-el-ambito-militar-y-policial"
+  - "https://www.amnesty.org/en/latest/news/2026/07/peru-un-paso-mas-hacia-la-consolidacion-de-la-impunidad/"
+residual_scope: "public-order and civic-control scope remains governance-only until separately frozen"
+schedule_status: ready-statutory-jurisdiction-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
