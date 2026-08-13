@@ -4,49 +4,57 @@ entity: "Pakistan"
 iso3: PAK
 issue: 131
 provisional_outcome: S
-provisional_scope: "military/intelligence, Balochistan security, counterterrorism, preventive-detention, censorship and specified coercive surveillance projects"
+provisional_scope: "military/intelligence/security and counterterrorism projects involving disappearance, torture, extrajudicial killing, arbitrary/preventive detention or protest repression; censorship/media-control and specifically evidenced coercive-surveillance projects"
 confidence: high
 evidence_cutoff: 2026-08-11
 last_reviewed: 2026-08-11
-review_stage: whole-state-adversarial-reviewed
-adversarial_result: "DOWNGRADE R -> S"
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD / DEFINE S after prior R -> S"
 operative: false
 ---
 # Pakistan
 
-> Governance record only; no licensing effect by itself.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.**
+**S — Restricted with defined scope.** Whole-State review previously downgraded Pakistan from `R` to `S`; the scoped review confirms that narrower outcome.
 
-## 2. Evidence preserving scoped restriction
+## 2. ECL criteria engaged
 
-UN Special Procedures describe a continuing Balochistan pattern involving alleged arbitrary arrest, torture/ill-treatment, enforced disappearance, extrajudicial killing, excessive force against peaceful protesters, censorship, counterterrorism misuse and preventive detention. Other communications concern reprisals and disappearances connected to the Reko Diq project.
+- enforced disappearance, torture and unlawful coercive targeting;
+- arbitrary/preventive detention and counterterrorism misuse;
+- coercive suppression of peaceful protest/civic activity;
+- censorship and information control;
+- coercive surveillance where specifically evidenced.
 
-## 3. Counter-evidence and attribution correction
+## 3. Evidence supporting the determination
 
-Pakistan is a federal State with a multi-party National Assembly. Its Standing Committee on Human Rights remained active in 2026, publicly criticized government departments, summoned federal bodies and demanded measures. This does not erase abuse but makes whole-federal-State attribution too broad.
+The current record continues to document enforced disappearance, arbitrary detention, counterterrorism misuse, excessive force against peaceful protesters and censorship, particularly in Balochistan. Human Rights Watch's 2026 assessment also records arbitrary arrests/disappearances of journalists and extensive use of PECA against media. In August 2026 the government expanded reporting restrictions affecting Pakistani staff and associates of foreign media, requiring registration and permission for reporting outside major cities.
 
-## 4. Attribution and exclusions
+## 4. Counter-evidence and exergic institutions
 
-The finding follows military/intelligence/security, counterterrorism, preventive-detention, censorship and coercive project structures. Parliamentary oversight, unrelated civilian services and independent remediation are excluded absent separate evidence.
+Pakistan remains a federal, multi-party State with parliamentary human-rights oversight, courts and civilian institutions capable of contesting executive/security action. The National Assembly Standing Committee on Human Rights remained active in 2026. These institutions do not erase coercive abuse but materially defeat whole-federal-State attribution.
 
-## 5. Adversarial determination
+## 5. Attribution and exclusions
 
-**DOWNGRADE R → S.**
+Scope follows **military/intelligence/security and counterterrorism projects materially involved in enforced disappearance, torture, extrajudicial killing, arbitrary/preventive detention or repression of peaceful protest; censorship/media-control projects materially suppressing independent reporting; and specifically evidenced coercive-surveillance systems**. Parliamentary oversight, courts/remedial functions and unrelated civilian services are excluded.
 
-## 6. Review triggers
+## 6. Adversarial determination
 
-End/remedy for disappearances/torture, independent Balochistan investigations, restored civic/media rights and effective civilian/parliamentary control of coercive security systems.
+**UPHOLD / DEFINE S after prior R → S.** Fresh 2026 evidence confirms persistence of coercive security and media-control projects, but no evidence defeats the prior attribution correction that made a whole-State `R` overbroad.
 
-## 7. Sources
+## 7. Review / removal triggers
 
+Effective disappearance/torture investigations and remedies; restored civic/media freedoms; rights-compliant counterterrorism/preventive detention; repeal/non-use of coercive reporting restrictions; and effective civilian/parliamentary control of implicated security structures.
+
+## 8. Sources
+
+- https://www.hrw.org/world-report/2026/country-chapters/pakistan
+- https://www.hrw.org/news/2026/02/04/pakistan-suppression-of-free-speech-civil-society
 - https://na.gov.pk/en/content.php?id=190
-- https://na.gov.pk/en/pressrelease.php?content=103
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=PAK+1%2F2025
-- https://spcommreports.ohchr.org/TmSearch/SearchCode?code=PAK+1%2F2025%3B+PAK+12%2F2025
 
-## 8. Procedural history
+## 9. Procedural history
 
-Issue #131 · `../../reviews/2026/adversarial/state-level/tranche-03.md`
+Issue #131 · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
