@@ -10,7 +10,7 @@ Files use ISO 3166-1 alpha-3 codes. `PSE.md` is used for the State of Palestine 
 
 All State dossiers are normalized and self-contained.
 
-For current aggregate State outcomes, read `../../registry/states.yml` and then apply `../../registry/state-outcome-overrides.yml` with higher precedence.
+For current aggregate State outcomes, read `../../registry/states.yml` and then apply every `../../registry/state-outcome-overrides*.yml` in lexical order.
 
 For Schedule preparation, use:
 
