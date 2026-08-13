@@ -1,0 +1,17 @@
+state: UZB
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Javokhir Muminov June 2026 detention/prosecution project"
+project_boundary: "the arrest, pre-trial detention and extortion investigation concerning human-rights defender Javokhir Muminov beginning 5 June 2026 in Karshi, including materially participating custody/prosecution functions"
+capacity_limit: "this named case only, while the detention/proceeding remains materially active and the canonical retaliation/ill-treatment concerns remain unremediated"
+exclusions:
+  - "Uzbek police, prosecutors or criminal justice generally"
+  - "independent investigation of the alleged custody abuse"
+  - "release, dismissal, acquittal or effective remediation"
+  - "other Karakalpakstan, agriculture, LGBTI or eviction scope absent separate freeze"
+identity_sources:
+  - "https://www.hrw.org/news/2026/06/18/uzbekistan-activist-held-in-trumped-up-case"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-named-case-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
