@@ -21,9 +21,13 @@
 - The `U` phase produced 14 `U → S`, 9 `U → N`, 22 retained `U`, and no `U → R` outcomes.
 - Full adversarial review of all 44 States originally classified `N` is complete in `reviews/2026/adversarial/no-basis/full-cohort.md`.
 - The original-`N` phase produced 38 retained `N`, 6 `N → U`, and no `N → S/R` outcomes. Austria, Costa Rica, Japan, Nauru, Samoa and South Africa moved to `U`.
-- Current audited provisional State distribution remains **36 `R`, 84 `S`, 28 `U`, 47 `N` = 195** pending the ECL 0.2 delta audit.
 - **All 195 State dossiers have completed detailed factual/adversarial normalization** at the 2026-08-11 evidence cutoff.
 - Added `reviews/2026/consistency/global-license-fit-audit.md`, which identified a material mismatch between the non-domination standard expressed in `spec/PRINCIPLES.md` / `spec/GOVERNANCE.md` and the narrower operative wording of ECL 0.1.
+- Completed `reviews/2026/consistency/ecl-0.2-state-delta.md`, reconciling every State dossier against the exact ECL 0.2-DRAFT language.
+- ECL 0.2 State delta result: **34 `R`, 86 `S`, 28 `U`, 47 `N` = 195**.
+- United States and Israel were narrowed **`R → S`** because whole-federal/whole-governmental classes were inconsistent with materially independent judicial/audit/remedial functions and the narrowest-accurate-attribution rule.
+- Singapore retained `S` but its `capital-punishment/execution` component was removed as a standalone ECL basis; POFMA/information-control and qualifying public-order repression remain the scoped basis.
+- All 28 current `U` dossiers were re-read under ECL 0.2 and retained `U`; their unresolved issues are factual, attribution, persistence or remediation questions rather than merely the former drafting gap.
 
 ### ECL 0.2-DRAFT
 
@@ -37,14 +41,16 @@
 
 ### Schedule status
 
-- `schedules/ECL-RP-0.4-DRAFT.md` predates the completed 195-State adversarial cycle and ECL 0.2 normative audit. It must not be treated as ready for adoption with ECL 0.2-DRAFT.
-- The next Schedule should be regenerated from the post-0.2 delta-audited determinations rather than patched piecemeal from Draft 0.4.
+- `schedules/ECL-RP-0.4-DRAFT.md` predates the completed 195-State adversarial cycle, ECL 0.2 normative audit and State delta audit. It must not be treated as ready for adoption with ECL 0.2-DRAFT.
+- The old Draft 0.4 blanket Israel and U.S. federal classes no longer match the canonical post-delta scopes.
+- The next Schedule should be regenerated from the post-0.2 determinations rather than patched piecemeal from Draft 0.4.
 
 ### Next work
 
-- Run a 195-dossier **ECL 0.2 State delta audit** for normative fit, with priority consistency checks for capital-punishment, migration/detention, public-order and forced-displacement scopes.
-- Reconcile State, organization, person and project designations and produce exact knowable Schedule entries/exclusions.
-- Freeze a new draft Schedule only after the 0.2 delta audit.
+- Reconcile State, organization, person and project designations, especially technology suppliers, government customers, named conflict/security projects and Covered-Associate boundaries.
+- Audit exact class knowability, controlled-entity treatment and duplicate/overlapping designations.
+- Generate a fresh post-0.2 Schedule candidate from the reconciled governance records.
+- Define stable governance decision mechanics, conflict-of-interest rules and dissent documentation.
 - Obtain specialist legal review before proposing stable ECL 1.0, including patent, termination/reinstatement, Schedule-incorporation, hosted-service and cross-jurisdiction enforceability questions.
 
 No item in this changelog changes an incorporated license or Restricted Parties Schedule retroactively.
