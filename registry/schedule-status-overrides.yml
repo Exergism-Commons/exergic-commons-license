@@ -8,9 +8,10 @@ current_status_review:
   - LAO
   - IRQ
   - MDA
-identity_project_pending:
   - COL
   - GRC
   - PHL
+identity_project_pending: []
 
+# All remaining non-renderable active-S State records are factual/current-status/remediation reviews rather than unresolved identity translations.
 # Aggregate Schedule-preparation status only; no licensing effect.
