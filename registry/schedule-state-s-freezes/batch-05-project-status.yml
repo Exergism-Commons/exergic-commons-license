@@ -1,0 +1,64 @@
+version: "2026-08-13-ecl-0.2-s-freeze-05"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+records:
+  - state: ETH
+    entity: Ethiopia
+    freeze_status: renderable-subset
+    candidate_projects:
+      - "Addis Ababa Corridor Development Project, only in relocation/clearance implementations that independently satisfy ECL §5.6"
+    candidate_parties:
+      - "Addis Ababa City Administration and materially participating municipal implementation bodies, only in the frozen Corridor Development relocation/clearance capacity"
+    capacity_limit: "forced-eviction implementation lacking meaningful notice, consultation, remedy or compensation and independently satisfying ECL §5.6; not urban development generally"
+    exclusions:
+      - "corridor construction, transport, public-space or housing activity that does not independently satisfy ECL §5"
+      - "remediation, compensation and rights-compliant relocation activity"
+      - "unrelated federal/regional/city administration"
+    residual_unfrozen_scope:
+      - "Corridor Development implementations outside Addis Ababa pending city/project-specific freeze"
+      - "journalist/security/media-regulatory projects pending exact unit/case freeze"
+    identity_sources:
+      - "https://www.pmo.gov.et/news/"
+      - "https://www.corridorandriverside.gov.et/"
+      - "https://www.amnesty.org/en/documents/afr25/9021/2025/en/"
+    dossier: "../../dossiers/states/ETH.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: FJI
+    entity: Fiji
+    freeze_status: current-status-review
+    identified_party:
+      - "Republic of Fiji Military Forces (RFMF)"
+    identified_location:
+      - "Queen Elizabeth Barracks, Nabua, Suva"
+    identified_incident:
+      - "16-17 April 2026 military-custody incident concerning Jone Vakarisi"
+    status_note: "Identity and incident boundary are sufficiently knowable. The remaining question is whether a current, materially continuous detention/interrogation workflow remains deployed and unremediated while the police investigation proceeds. A past incident alone should not create an open-ended Schedule class."
+    exclusions:
+      - "Fiji Police investigation and accountability activity"
+      - "RFMF functions unrelated to a separately substantiated qualifying custody/interrogation project"
+    identity_sources:
+      - "https://www.rfmf.mil.fj/contact-us/"
+    dossier: "../../dossiers/states/FJI.md"
+    schedule_status: needs-current-workflow-and-remediation-confirmation
+
+  - state: SVK
+    entity: Slovakia
+    freeze_status: current-status-review
+    identified_measure:
+      - "Act No. 109/2025 Z. z. NGO-regulation framework"
+    binding_remediation:
+      - "Constitutional Court judgment PL. ÚS 11/2025, published as 13/2026 Z. z. and effective 4 February 2026"
+    status_note: "The NGO-law component of the existing dossier cannot be rendered as a current Schedule entry without first reconciling the binding Constitutional Court judgment. Identity is not the blocker. Remaining discriminatory-implementation and police-accountability components require separate current project/unit freeze."
+    exclusions:
+      - "Constitutional Court and Public Defender/Ombudsperson remediation"
+      - "invalidated or ineffective NGO-law provisions"
+    identity_sources:
+      - "https://www.ustavnysud.sk/en/actual-information/actuality/-/asset_publisher/B99toBHZi1uA/content/z%C3%A1kon-ktor%C3%BD-novelizuje-pr%C3%A1vnu-%C3%BApravu-mimovl%C3%A1dnych-organiz%C3%A1ci%C3%AD-je-v-rozpore-s-%C3%BAstavou"
+      - "https://www.slov-lex.sk/ezbierky-fe/pravne-predpisy/SK/ZZ/2026/13/"
+    dossier: "../../dossiers/states/SVK.md"
+    schedule_status: needs-dossier-remediation-reconciliation
+
+# Governance work product only; no licensing effect.
