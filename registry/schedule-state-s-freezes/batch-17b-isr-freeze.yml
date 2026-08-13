@@ -1,0 +1,17 @@
+state: ISR
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Incarceration of Unlawful Combatants Law detention process"
+project_boundary: "detention, custody-location disclosure and review processes under the Unlawful Combatants Law, limited to applications lacking the individualized safeguards identified by the 2026 UN Committee against Torture record"
+capacity_limit: "the frozen statutory detention process only where arbitrary/prolonged detention, denial of meaningful contestability or qualifying ill-treatment independently satisfies ECL 0.2 §5.6"
+exclusions:
+  - "Israeli State institutions generally"
+  - "independent judicial review, legal defence, audit and remediation"
+  - "detention independently shown to comply with individualized necessity and procedural safeguards"
+  - "other occupation/security/detention projects absent separate freeze"
+identity_sources:
+  - "https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=xhwMYnm0erR85h7C3nsLwRBNpou7UBnDwN%2F5yq4dsydazXgyfHOSuRojGaa0vPBGyIIauZB0Jna7L%2BJ8NKhjEQ%3D%3D"
+residual_scope: "other occupation, surveillance, targeting, prison and displacement scope remains governance-only until separately frozen"
+schedule_status: ready-statutory-detention-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
