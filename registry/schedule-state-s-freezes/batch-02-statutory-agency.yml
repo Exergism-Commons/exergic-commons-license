@@ -1,0 +1,105 @@
+version: "2026-08-13-ecl-0.2-s-freeze-02"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+# These records freeze only objectively identifiable subsets of broader S dossiers.
+# Residual dossier scope remains governance-only unless separately frozen.
+
+records:
+  - state: GBR
+    entity: United Kingdom
+    source_translation_status: needs-exact-counterterrorism-surveillance-migration-project-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Counter Terrorism Policing and participating territorial police forces, only in enforcement activity linked to Palestine Action's proscription under the Terrorism Act 2000"
+      - "Crown Prosecution Service, only in charging/prosecution activity under the frozen Palestine Action-support enforcement project where the specific use independently satisfies ECL §5.6"
+    candidate_projects:
+      - "Terrorism Act 2000 enforcement arising from the 5 July 2025 proscription of Palestine Action, including arrests/charges for alleged support where the frozen use materially suppresses protected peaceful expression/assembly and independently satisfies ECL §5.6"
+    capacity_limit: "Palestine Action-proscription enforcement against protected peaceful activity; not counterterrorism enforcement generally"
+    exclusions:
+      - "enforcement concerning violence, serious criminal damage or other conduct independently satisfying ordinary criminal thresholds without protected-expression nexus"
+      - "courts and judicial review, including Ammori proceedings"
+      - "Parliament and unrelated Home Office functions"
+      - "unrelated policing/counterterrorism activity"
+    residual_unfrozen_scope:
+      - "covert police-surveillance systems outside the frozen Palestine Action project"
+      - "asylum/migration systems"
+    identity_sources:
+      - "https://www.gov.uk/government/statistics/operation-of-police-powers-under-tact-2000-to-march-2026/operation-of-police-powers-under-the-terrorism-act-2000-and-subsequent-legislation-arrests-outcomes-and-stop-and-search-great-britain-quarterly-u"
+      - "https://www.judiciary.uk/live-hearings/ammori-claimant-respondent-v-secretary-of-state-for-the-home-department-appellant-defendant/"
+      - "https://www.cps.gov.uk/cps/news/cps-announces-further-prosecutions-palestine-action-supporters"
+    dossier: "../../dossiers/states/GBR.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: LKA
+    entity: Sri Lanka
+    source_translation_status: needs-pta-unit-detention-surveillance-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Sri Lanka Police — Counter Terrorist Investigation Division (CTID), only in actual Prevention of Terrorism Act / counterterrorism detention or investigation activity independently satisfying ECL §5.6 or §5.1"
+    candidate_projects:
+      - "actual PTA/counterterrorism detention, investigation or surveillance of protected journalism, memorialisation or defender activity where the specific use independently satisfies ECL §5"
+    capacity_limit: "actual coercive PTA/counterterrorism use; not the statute, CTID or counterterrorism work generally"
+    exclusions:
+      - "draft replacement legislation not yet materially implemented"
+      - "Human Rights Commission of Sri Lanka / NPM"
+      - "Office on Missing Persons"
+      - "courts and independent remediation"
+      - "ordinary counterterrorism investigation not satisfying ECL §5"
+    residual_unfrozen_scope:
+      - "specific prison/detention torture or custody-death projects pending exact facility/unit freeze"
+      - "security/intelligence harassment outside an attributable CTID/PTA project"
+    identity_sources:
+      - "https://www.police.lk/?page_id=1301"
+    dossier: "../../dossiers/states/LKA.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: SOM
+    entity: Somalia
+    source_translation_status: needs-nisa-police-eviction-project-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "National Intelligence and Security Agency (NISA) of the Federal Government of Somalia, only in federal detention, intimidation, censorship or prosecution activity independently satisfying ECL §5.6 or §5.1"
+    candidate_projects:
+      - "NISA detention or coercive information-control action against protected journalists, peaceful activists or political/civic expression where the specific action independently satisfies ECL §5"
+    capacity_limit: "federal NISA political/civic repression; not intelligence or counterterrorism work generally"
+    exclusions:
+      - "Somali Police Force generally"
+      - "Somaliland authorities"
+      - "Al-Shabaab and other independent armed actors"
+      - "courts, journalists, civil society and independent remediation"
+    residual_unfrozen_scope:
+      - "specific Federal Police repression projects pending exact unit/case freeze"
+      - "forced-eviction projects pending exact implementing authority/location freeze"
+    identity_sources:
+      - "https://mois.gov.so/en/the-ministry/"
+    dossier: "../../dossiers/states/SOM.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: ZMB
+    entity: Zambia
+    source_translation_status: needs-cyber-security-police-case-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Zambia Police Service, only in enforcement of the Cyber Crimes Act No. 4 of 2025 or State-security offences against protected journalism/political expression where the specific case independently satisfies ECL §5.6"
+    candidate_projects:
+      - "Cyber Crimes Act No. 4 of 2025 enforcement against protected journalism/expression, including the frozen 2026 MacPherson Mukuka matter to the extent supported by the canonical dossier"
+      - "State-security/sedition detention of Xavier Chungu following protected political expression, to the extent the frozen case independently satisfies ECL §5.6"
+    capacity_limit: "case-specific criminalisation or detention of protected journalism/political expression; not cybercrime or State-security enforcement generally"
+    exclusions:
+      - "Cyber Security Agency activity not independently tied to a qualifying coercive deployment"
+      - "ordinary cybercrime investigation"
+      - "courts and constitutional litigation"
+      - "unrelated public-order functions"
+    residual_unfrozen_scope:
+      - "surveillance/interception deployment pending exact technical system/operator freeze"
+      - "other opposition-meeting/public-order incidents pending exact operation/unit freeze"
+    identity_sources:
+      - "https://www.parliament.gov.zm/acts-of-parliament?page=5"
+      - "https://zambiapolice.gov.zm/about-the-zambia-police-service/"
+      - "https://zambiapolice.gov.zm/legal-documents/"
+    dossier: "../../dossiers/states/ZMB.md"
+    schedule_status: ready-narrowed-subset
+
+# Governance work product only; no licensing effect until an exact Schedule adopts an exact frozen entry.
