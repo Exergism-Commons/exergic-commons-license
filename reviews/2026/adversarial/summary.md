@@ -36,7 +36,7 @@ All 46 initial `R` findings were subjected to falsification-first review: contra
 - #189 Uzbekistan
 - #195 Zimbabwe
 
-The common reason is **not** that serious ECL-relevant coercive conduct disappeared. The reason is attribution precision: each of these States has counter-institutions or fragmented/federal structures producing sufficiently real rights-protective effects that a single whole-State Restricted Party would capture institutions not materially participating in the prohibited project.
+The common reason is attribution precision: each of these States has counter-institutions or fragmented/federal structures producing sufficiently real rights-protective effects that a single whole-State Restricted Party would capture institutions not materially participating in the prohibited project.
 
 ### Whole-State / governing-apparatus `R` surviving that phase — 35
 
@@ -76,8 +76,6 @@ The common reason is **not** that serious ECL-relevant coercive conduct disappea
 - #191 Venezuela
 - #192 Viet Nam
 
-Some surviving `R` findings carry mandatory or milestone review conditions recorded in the tranche files.
-
 ### Historical post-whole-State distribution
 
 - `R` — **35**
@@ -92,7 +90,7 @@ Those counts describe that completed phase. They are not the current registry co
 
 Scoped review tests the current `S` cohort against the same falsification-first principles: whether scope is too broad, whether a project has ceased or been remediated, whether attribution belongs to a narrower organ/project, and whether counter-institutions defeat broader restriction.
 
-Completed scoped work through tranche 6 includes:
+Completed scoped work through tranche 7 includes:
 
 - high-impact review: United Kingdom, Morocco and Ukraine;
 - tranche 1: Denmark, France, Netherlands and Serbia;
@@ -100,9 +98,10 @@ Completed scoped work through tranche 6 includes:
 - tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia;
 - tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia;
 - tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon;
-- tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal.
+- tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal;
+- tranche 7: Nigeria, North Macedonia, Pakistan, Palestine, Panama, Paraguay, Peru and Philippines.
 
-The current audited provisional distribution after scoped tranche 6 is:
+The current audited provisional distribution after scoped tranche 7 is:
 
 - `R` — **36**
 - `S` — **71**
@@ -110,7 +109,7 @@ The current audited provisional distribution after scoped tranche 6 is:
 - `N` — **44**
 - **Total — 195**
 
-Notable reversibility/precision outcomes include escalation where the coercive apparatus itself became the governing authority, downgrade where an active project ended or current persistence no longer supported a stable restriction, and systematic narrowing where generic agency/capability labels would capture rights-protective or non-coercive functions. The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
+Tranche 7 produced no tier changes but materially narrowed attribution in several dossiers. The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
 
 ## 4. Dossier-normalization invariant
 
@@ -128,24 +127,13 @@ The target architecture for ECL 1.0 is that every completed `dossiers/states/*.m
 
 Review tranche files remain immutable history and should not be required to reconstruct the current determination.
 
-After scoped tranche 6, **91 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Kazakhstan and Kyrgyzstan were already counted in the initially-`R` normalized cohort, so tranche 5 added six new unique dossiers; tranche 6 adds eight.
+After scoped tranche 7, **98 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Kazakhstan, Kyrgyzstan and Pakistan were already counted in the initially-`R` normalized cohort; tranche 7 therefore adds seven new unique dossiers.
 
 ## 5. Architectural conclusion
 
 Adversarial review demonstrated that ECL needs an **Accountability and Remediation Exception** before a stable 1.0. A State-level restriction should not prevent ECL-covered software from being used exclusively and independently to investigate, challenge, audit, prosecute, remedy or disclose the very conduct that caused the State to be restricted.
 
-Candidate protected functions include:
-
-- independent judicial review;
-- ombuds/National Preventive Mechanism work;
-- public audit and inspector-general investigations;
-- criminal investigation/prosecution of official abuse;
-- legal defence and access-to-justice work;
-- civilian-harm investigation;
-- human-rights remediation and compensation;
-- whistleblower protection.
-
-The exception must not become a loophole for ordinary governmental use and must not materially support a Restricted Project.
+Candidate protected functions include independent judicial review, ombuds/National Preventive Mechanism work, public audit, criminal investigation/prosecution of official abuse, legal defence, civilian-harm investigation, human-rights remediation and whistleblower protection. The exception must not become a loophole for ordinary governmental use and must not materially support a Restricted Project.
 
 ## 6. Remaining work before a new operative Schedule
 
