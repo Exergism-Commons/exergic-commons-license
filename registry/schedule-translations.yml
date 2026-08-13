@@ -11,10 +11,10 @@ state_translation:
     S_candidates: 86
     S_translated: 86
     S_fully_frozen: 19
-    S_renderable_subset_only: 12
+    S_renderable_subset_only: 15
     S_current_status_blocked: 3
-    S_identity_or_project_freeze_pending: 52
-    S_schedule_renderable_states: 31
+    S_identity_or_project_freeze_pending: 49
+    S_schedule_renderable_states: 34
     total_candidates: 120
     total_translated_or_frozen: 120
   R_status: frozen-candidate
@@ -29,6 +29,7 @@ state_translation:
     - "schedule-state-s-freezes/batch-03a-usa.yml"
     - "schedule-state-s-freezes/batch-04-detention-digital.yml"
     - "schedule-state-s-freezes/batch-05-project-status.yml"
+    - "schedule-state-s-freezes/batch-06-statutory-cases.yml"
 
 cross_entity_sources:
   organization_registry: "organizations.yml"
@@ -46,7 +47,7 @@ schedule_gate:
   narrowed_subset_rendering_supported: true
   direct_project_designation_supported: true
   render_adoptable_schedule: false
-  reason: "19 S records are fully frozen; 12 additional S records have a renderable narrowed subset; 3 require current-status/remediation review; 52 still require exact identity/project-boundary work."
+  reason: "19 S records are fully frozen; 15 additional S records have a renderable narrowed subset; 3 require current-status/remediation review; 49 still require exact identity/project-boundary work."
 
 # Index/work queue only. Canonical outcomes and detailed freezes live in referenced registries.
 # No entry here has licensing effect by itself.
