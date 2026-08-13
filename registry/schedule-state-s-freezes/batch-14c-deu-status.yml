@@ -1,0 +1,8 @@
+state: DEU
+outcome: S
+freeze_status: identity-resolved-current-status-review
+identified_scope: "specific return/deportation and public-order projects identified in the canonical dossier"
+blocker: "confirm a current qualifying 2026 deployment or materially continuous unremediated project before rendering"
+schedule_status: not-renderable-pending-current-status
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
