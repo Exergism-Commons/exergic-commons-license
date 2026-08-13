@@ -1,0 +1,10 @@
+state: HTI
+entity: Haiti
+outcome: S
+schedule_identity: "Prime-Minister-created Security Task Force qualifying project"
+project_boundary: "the exact State-linked project documented by the canonical Haiti dossier and legacy ready translation"
+capacity_limit: "Task Force and materially participating units/contractors only in the qualifying project"
+exclusions: ["specialized judicial accountability units", "police internal affairs", "non-State violence", "humanitarian/remedial work"]
+schedule_status: ready-promoted-named-project-apparatus
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
