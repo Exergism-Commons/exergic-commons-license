@@ -4,9 +4,9 @@ operative: false
 compatible_license: "ECL-0.2-DRAFT"
 source_state_registry: "states.yml"
 target_count: 86
-translated_count: 10
-schedule_ready_count: 5
-blocked_or_partial_count: 5
+translated_count: 20
+schedule_ready_count: 8
+blocked_or_partial_count: 12
 
 common_exclusions:
   - population-and-nationality
@@ -25,13 +25,8 @@ records:
       - "specified Udbetaling Danmark automated fraud/risk-profiling models documented in the canonical dossier"
     capacity_limit: "automated welfare fraud/risk profiling with discriminatory, opaque or disproportionate surveillance effects that remain unremediated"
     criteria: ["ECL-0.2 §5.3", "ECL-0.2 §5.5"]
-    exclusions:
-      - "ATP pension/investment activity"
-      - "ordinary welfare payment administration"
-      - "systems independently retired, corrected and validated"
-    identity_sources:
-      - "https://www.atp.dk/om-os/organisationen"
-      - "https://www.atp.dk/karriere/udbetaling-danmark"
+    exclusions: ["ATP pension/investment activity", "ordinary welfare payment administration", "systems independently retired, corrected and validated"]
+    identity_sources: ["https://www.atp.dk/om-os/organisationen", "https://www.atp.dk/karriere/udbetaling-danmark"]
     dossier: "../dossiers/states/DNK.md"
     status: ready-project-class
 
@@ -39,171 +34,229 @@ records:
     entity: Netherlands
     outcome: S
     candidate_parties: []
-    candidate_projects:
-      - "identified deployed government/probation profiling or risk algorithms that remain materially defective, discriminatory or non-contestable"
+    candidate_projects: ["identified deployed government/probation profiling or risk algorithms that remain materially defective, discriminatory or non-contestable"]
     capacity_limit: "only the exact algorithm/version remaining unremediated after independent review"
     criteria: ["ECL-0.2 §5.3", "ECL-0.2 §5.5"]
-    exclusions:
-      - "withdrawn/corrected systems"
-      - "independently validated remediated versions"
-      - "government algorithm use generally"
-    identity_sources:
-      - "https://www.inspectie-jenv.nl/actueel/nieuws/2026/02/12/risicovol-algoritmegebruik-door-reclassering"
-      - "https://www.rijksoverheid.nl/documenten/2026/02/16/impact-assessment-mensenrechten-en-algoritmes"
+    exclusions: ["withdrawn/corrected systems", "independently validated remediated versions", "government algorithm use generally"]
+    identity_sources: ["https://www.inspectie-jenv.nl/actueel/nieuws/2026/02/12/risicovol-algoritmegebruik-door-reclassering", "https://www.rijksoverheid.nl/documenten/2026/02/16/impact-assessment-mensenrechten-en-algoritmes"]
     dossier: "../dossiers/states/NLD.md"
     status: needs-exact-algorithm-name-and-operator
 
   - state: FRA
     entity: France
     outcome: S
-    candidate_parties:
-      - "authorized public operators of the national algorithmic video-surveillance experiment only for a deployment that independently satisfies ECL criteria"
-    candidate_projects:
-      - "national Olympic-derived algorithmic video-surveillance experiment / any enacted continuation materially deployed through 31 December 2027"
+    candidate_parties: ["authorized public operators of the national algorithmic video-surveillance experiment only for a deployment that independently satisfies ECL criteria"]
+    candidate_projects: ["national Olympic-derived algorithmic video-surveillance experiment / any enacted continuation materially deployed through 31 December 2027"]
     capacity_limit: "algorithmic analysis of public-space video deployed by authorized law-enforcement/public-security operators and actually satisfying ECL surveillance/repression criteria"
     criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
-    exclusions:
-      - "Nice school-entrance algorithmic CCTV project blocked by Conseil d'État"
-      - "mere legislative proposals"
-      - "lawful non-repressive video analysis that does not satisfy §5"
-    identity_sources:
-      - "https://www.interieur.gouv.fr/actualites/actualites-du-ministere/experimentation-en-temps-reel-de-cameras-augmentees"
-      - "https://www.conseil-etat.fr/actualites/nice-le-traitement-algorithmique-des-images-de-videosurveillance-de-la-voie-publique-n-est-en-l-etat-actuel-de-la-loi-pas-autorise"
+    exclusions: ["Nice school-entrance algorithmic CCTV project blocked by Conseil d'État", "mere legislative proposals", "lawful non-repressive video analysis that does not satisfy §5"]
+    identity_sources: ["https://www.interieur.gouv.fr/actualites/actualites-du-ministere/experimentation-en-temps-reel-de-cameras-augmentees", "https://www.conseil-etat.fr/actualites/nice-le-traitement-algorithmique-des-images-de-videosurveillance-de-la-voie-publique-n-est-en-l-etat-actuel-de-la-loi-pas-autorise"]
     dossier: "../dossiers/states/FRA.md"
     status: ready-project-class
 
   - state: SRB
     entity: Serbia
     outcome: S
-    candidate_parties:
-      - "Security Information Agency (BIA), only in materially evidenced repressive spyware/mobile-forensic deployments"
-      - "Ministry of Internal Affairs / police units, only in materially evidenced repressive spyware/mobile-forensic or protest-repression deployments"
-    candidate_projects:
-      - "NoviSpy and other State-linked spyware/mobile-forensic surveillance of journalists, activists or lawful opposition where current attribution is established"
+    candidate_parties: ["Security Information Agency (BIA), only in materially evidenced repressive spyware/mobile-forensic deployments", "Ministry of Internal Affairs / police units, only in materially evidenced repressive spyware/mobile-forensic or protest-repression deployments"]
+    candidate_projects: ["NoviSpy and other State-linked spyware/mobile-forensic surveillance of journalists, activists or lawful opposition where current attribution is established"]
     capacity_limit: "repressive digital surveillance and specifically substantiated protest-repression operations"
     criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
-    exclusions:
-      - "policing and intelligence activity generally"
-      - "Cellebrite as supplier absent its own Material Participation in a prohibited project"
-      - "independent journalism/civil society"
-    identity_sources:
-      - "https://www.amnesty.org/en/documents/eur70/8813/2024/en/"
-      - "https://securitylab.amnesty.org/latest/2025/03/journalists-targeted-with-pegasus-spyware/"
+    exclusions: ["policing and intelligence activity generally", "Cellebrite as supplier absent its own Material Participation in a prohibited project", "independent journalism/civil society"]
+    identity_sources: ["https://www.amnesty.org/en/documents/eur70/8813/2024/en/", "https://securitylab.amnesty.org/latest/2025/03/journalists-targeted-with-pegasus-spyware/"]
     dossier: "../dossiers/states/SRB.md"
     status: ready-capacity-limited-parties
 
   - state: ARM
     entity: Armenia
     outcome: S
-    candidate_parties:
-      - "Police of the Ministry of Internal Affairs of the Republic of Armenia, only in biometric/facial-recognition surveillance deployments satisfying ECL §5.1"
-    candidate_projects:
-      - "live-camera-access facial-recognition/biometric police identification framework"
+    candidate_parties: ["Police of the Ministry of Internal Affairs of the Republic of Armenia, only in biometric/facial-recognition surveillance deployments satisfying ECL §5.1"]
+    candidate_projects: ["live-camera-access facial-recognition/biometric police identification framework"]
     capacity_limit: "police biometric surveillance used for repression, arbitrary detention, unlawful intimidation or suppression of protected activity; separately evidenced abusive public-order operations"
     criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
-    exclusions:
-      - "Human Rights Defender"
-      - "courts and independent oversight"
-      - "ordinary policing not satisfying ECL criteria"
-    identity_sources:
-      - "https://www.police.am/"
-      - "https://www.ombuds.am/en_us/site/ViewNews/3147"
+    exclusions: ["Human Rights Defender", "courts and independent oversight", "ordinary policing not satisfying ECL criteria"]
+    identity_sources: ["https://www.police.am/", "https://www.ombuds.am/en_us/site/ViewNews/3147"]
     dossier: "../dossiers/states/ARM.md"
     status: ready-capacity-limited-party
 
   - state: ARG
     entity: Argentina
     outcome: S
-    candidate_parties:
-      - "federal police/intelligence bodies only in the exact surveillance, identity-detention or protest-policing deployments documented by the canonical dossier"
-    candidate_projects:
-      - "2025/26 federal social-media monitoring, State-database/intelligence cross-referencing and identity-detention measures where deployed against protected activity"
+    candidate_parties: ["federal police/intelligence bodies only in the exact surveillance, identity-detention or protest-policing deployments documented by the canonical dossier"]
+    candidate_projects: ["2025/26 federal social-media monitoring, State-database/intelligence cross-referencing and identity-detention measures where deployed against protected activity"]
     capacity_limit: "unlawful force, arbitrary/warrantless detention or coercive political monitoring against protected peaceful activity"
     criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
-    exclusions:
-      - "federal courts/prosecutors acting independently"
-      - "provincial institutions"
-      - "ordinary federal policing/intelligence activity"
-    identity_sources:
-      - "https://www.argentina.gob.ar/seguridad"
+    exclusions: ["federal courts/prosecutors acting independently", "provincial institutions", "ordinary federal policing/intelligence activity"]
+    identity_sources: ["https://www.argentina.gob.ar/seguridad"]
     dossier: "../dossiers/states/ARG.md"
     status: needs-exact-federal-agency-and-measure-freeze
 
   - state: KEN
     entity: Kenya
     outcome: S
-    candidate_parties:
-      - "National Police Service units materially participating in the documented disappearance/torture/protest-repression operations"
-      - "Directorate of Criminal Investigations (DCI), only where materially participating in the documented qualifying operations"
-    candidate_projects:
-      - "25 June 2026 protest-related disappearance, secret-detention, torture, unlawful-force and coercive surveillance/media-suppression operations"
+    candidate_parties: ["National Police Service units materially participating in the documented disappearance/torture/protest-repression operations", "Directorate of Criminal Investigations (DCI), only where materially participating in the documented qualifying operations"]
+    candidate_projects: ["25 June 2026 protest-related disappearance, secret-detention, torture, unlawful-force and coercive surveillance/media-suppression operations"]
     capacity_limit: "only units/operations materially linked to disappearance, torture, arbitrary protest detention, unlawful force, intimidation or repressive surveillance"
     criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
-    exclusions:
-      - "KNCHR"
-      - "courts and independent oversight/prosecution"
-      - "National Police Service activity generally"
-    identity_sources:
-      - "https://www.knchr.org/Articles/ArtMID/2432/ArticleID/1258/Enforced-Disappearances-Torture-and-other-Human-Rights-Violations-following-the-25th-June-2026-Protests-Marking-the-2nd-Anniversary-of-the-2024-Gen-Z-Protests"
+    exclusions: ["KNCHR", "courts and independent oversight/prosecution", "National Police Service activity generally"]
+    identity_sources: ["https://www.knchr.org/Articles/ArtMID/2432/ArticleID/1258/Enforced-Disappearances-Torture-and-other-Human-Rights-Violations-following-the-25th-June-2026-Protests-Marking-the-2nd-Anniversary-of-the-2024-Gen-Z-Protests"]
     dossier: "../dossiers/states/KEN.md"
     status: needs-exact-unit-freeze
 
   - state: MEX
     entity: Mexico
     outcome: S
-    candidate_parties:
-      - "identified federal/state/municipal security or military-public-security unit only after a case/project record establishes Material Participation"
-    candidate_projects:
-      - "enforced-disappearance/torture/search-obstruction projects identified by authoritative recommendations or UN findings"
-      - "biometric/data deployment only when a concrete implementation materially enables repressive surveillance, discriminatory targeting or coercive capture"
+    candidate_parties: ["identified federal/state/municipal security or military-public-security unit only after a case/project record establishes Material Participation"]
+    candidate_projects: ["enforced-disappearance/torture/search-obstruction projects identified by authoritative recommendations or UN findings", "biometric/data deployment only when a concrete implementation materially enables repressive surveillance, discriminatory targeting or coercive capture"]
     capacity_limit: "case/project-specific; no generic military, police or biometric class"
     criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.2", "ECL-0.2 §5.6"]
-    exclusions:
-      - "Mexican federation generally"
-      - "CNDH/search commissions/courts/victim-remediation bodies"
-      - "ordinary biometric identity administration"
-      - "non-attributable organized-crime conduct"
-    identity_sources:
-      - "https://docs.un.org/en/CED/C/MEX/A.34/D/1"
-      - "https://hist.cndh.org.mx/index.php/documento/recomendacion-206vg2026"
+    exclusions: ["Mexican federation generally", "CNDH/search commissions/courts/victim-remediation bodies", "ordinary biometric identity administration", "non-attributable organized-crime conduct"]
+    identity_sources: ["https://docs.un.org/en/CED/C/MEX/A.34/D/1", "https://hist.cndh.org.mx/index.php/documento/recomendacion-206vg2026"]
     dossier: "../dossiers/states/MEX.md"
     status: needs-case-by-case-unit-project-freeze
 
   - state: MDV
     entity: Maldives
     outcome: S
-    candidate_parties:
-      - "current media/broadcast regulatory body and enforcement officials only in enforcement of the 2025 media/broadcast framework against protected journalism/expression"
-    candidate_projects:
-      - "2025 Broadcasting/Media Regulation enforcement framework involving fines, suspension/closure or compelled source/information control"
+    candidate_parties: ["current media/broadcast regulatory body and enforcement officials only in enforcement of the 2025 media/broadcast framework against protected journalism/expression"]
+    candidate_projects: ["2025 Broadcasting/Media Regulation enforcement framework involving fines, suspension/closure or compelled source/information control"]
     capacity_limit: "coercive censorship/suppression of protected journalism, source compulsion or vague-rule repression"
     criteria: ["ECL-0.2 §5.5", "ECL-0.2 §5.6"]
-    exclusions:
-      - "courts"
-      - "non-coercive media regulation"
-      - "public-order administration generally"
-    identity_sources:
-      - "https://www.amnesty.org/en/location/asia-and-the-pacific/south-asia/maldives/report-maldives/"
+    exclusions: ["courts", "non-coercive media regulation", "public-order administration generally"]
+    identity_sources: ["https://www.amnesty.org/en/location/asia-and-the-pacific/south-asia/maldives/report-maldives/"]
     dossier: "../dossiers/states/MDV.md"
     status: needs-current-regulator-legal-name-freeze
 
   - state: SVN
     entity: Slovenia
     outcome: S
-    candidate_parties:
-      - "authorities implementing the 2025/26 Security Law only in the discriminatory social-benefit/property/policing/data workflows identified by the canonical dossier"
-    candidate_projects:
-      - "Security Law enforcement involving subsistence-benefit seizure, discriminatory vehicle/property enforcement and associated enhanced policing/data powers"
+    candidate_parties: ["authorities implementing the 2025/26 Security Law only in the discriminatory social-benefit/property/policing/data workflows identified by the canonical dossier"]
+    candidate_projects: ["Security Law enforcement involving subsistence-benefit seizure, discriminatory vehicle/property enforcement and associated enhanced policing/data powers"]
     capacity_limit: "materially discriminatory/coercive implementation against Roma communities or other protected groups; not the statute abstractly"
     criteria: ["ECL-0.2 §5.3", "ECL-0.2 §5.6"]
-    exclusions:
-      - "Supreme Court and Constitutional Court"
-      - "legal challenges and remediation"
-      - "ordinary Slovenian social-benefit/police administration"
-    identity_sources:
-      - "https://www.amnesty.org/en/documents/eur68/0702/2026/en/"
+    exclusions: ["Supreme Court and Constitutional Court", "legal challenges and remediation", "ordinary Slovenian social-benefit/police administration"]
+    identity_sources: ["https://www.amnesty.org/en/documents/eur68/0702/2026/en/"]
     dossier: "../dossiers/states/SVN.md"
     status: needs-implementing-authority-and-statutory-name-freeze
+
+  - state: HRV
+    entity: Croatia
+    outcome: S
+    candidate_parties: ["Croatian border-police units only in operations materially involving violence, summary pushback or obstruction of protection access"]
+    candidate_projects: ["current Croatia border pushback / protection-access operations documented by the canonical dossier"]
+    capacity_limit: "unlawful coercive return, violence or obstruction of individualized protection; not border policing generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["courts", "independent border monitoring", "humanitarian assistance", "unrelated police/public functions"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/croatia/report-croatia/"]
+    dossier: "../dossiers/states/HRV.md"
+    status: needs-exact-border-police-directorate-freeze
+
+  - state: CYP
+    entity: Cyprus
+    outcome: S
+    candidate_parties: ["Cypriot maritime/border enforcement units only in the exact summary-return operation shown to lack individualized non-refoulement safeguards"]
+    candidate_projects: ["current maritime summary-return/non-refoulement operations", "separately substantiated public-order operation suppressing protected assembly"]
+    capacity_limit: "summary maritime return or specific unlawful public-order repression; not migration/policing generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Supreme Constitutional Court", "judicial/inquest mechanisms", "civil-society remediation", "ordinary border/public-order functions"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/cyprus/report-cyprus/"]
+    dossier: "../dossiers/states/CYP.md"
+    status: needs-exact-maritime-operator-and-operation-freeze
+
+  - state: DOM
+    entity: Dominican Republic
+    outcome: S
+    candidate_parties: ["Dirección General de Migración (DGM), only in the qualifying deportation/detention operations", "Cuerpo Especializado en Seguridad Fronteriza Terrestre (CESFRONT), only where materially participating in the qualifying border operations", "DGM subordinate Rapid Reaction / control units only where their identity and Material Participation are frozen"]
+    candidate_projects: ["2025/26 collective/discriminatory deportation and detention operations against Haitians/persons perceived as Haitian documented by the canonical dossier"]
+    capacity_limit: "collective or discriminatory deportation, racial profiling, arbitrary detention, abusive force or denial of protection procedures"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["ordinary DGM residence/document services", "unrelated Dominican State functions", "independent remedies"]
+    identity_sources: ["https://migracion.gob.do/", "https://migracion.gob.do/directorio-de-funcionarios/"]
+    dossier: "../dossiers/states/DOM.md"
+    status: ready-capacity-limited-parties
+
+  - state: DEU
+    entity: Germany
+    outcome: S
+    candidate_parties: ["authority executing a specific Afghanistan/Syria return only after the operation and competent federal/Land authority are frozen", "public-order police unit only for a specifically substantiated unlawful-force operation"]
+    candidate_projects: ["specific 2025/26 Afghanistan/Syria deportation operations lacking adequate individualized non-refoulement safeguards", "specific protest-policing operations materially using unlawful force against protected assembly"]
+    capacity_limit: "operation-specific; no generic German federal/Land immigration or police class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["constitutional/federal courts", "parliamentary oversight", "prosecutorial remediation", "ordinary immigration/policing administration"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/germany/report-germany/"]
+    dossier: "../dossiers/states/DEU.md"
+    status: needs-operation-and-competent-authority-freeze
+
+  - state: HUN
+    entity: Hungary
+    outcome: S
+    candidate_parties: ["current Hungarian border/asylum authorities only in the operative pushback/asylum-suspension workflow documented by the canonical dossier"]
+    candidate_projects: ["mass-migration state-of-crisis / border-pushback system materially denying individualized protection or non-refoulement review"]
+    capacity_limit: "only coercive pushback/asylum-access implementation; not migration policy generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Pride/assembly component removed after 2026 change", "courts/remediation", "ordinary asylum/immigration administration"]
+    identity_sources: []
+    dossier: "../dossiers/states/HUN.md"
+    status: needs-exact-authority-and-current-measure-freeze
+
+  - state: LTU
+    entity: Lithuania
+    outcome: S
+    candidate_parties: ["State Border Guard Service at the Ministry of the Interior of the Republic of Lithuania, only in unlawful pushback/protection-access/de facto-detention operations"]
+    candidate_projects: ["current Belarus-border pushback, asylum-access denial and de facto detention operations identified by the canonical dossier"]
+    capacity_limit: "unlawful summary return, obstruction of individualized protection or arbitrary/de facto detention; not SBGS functions generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["courts", "lawful SBGS border control", "search and rescue", "independent remedies"]
+    identity_sources: ["https://vsat.lrv.lt/en/", "https://vsat.lrv.lt/en/about-service/tasks-functions/"]
+    dossier: "../dossiers/states/LTU.md"
+    status: ready-capacity-limited-party
+
+  - state: MLT
+    entity: Malta
+    outcome: S
+    candidate_parties: ["specific detention, maritime or return authority only after the competent unit/project is frozen"]
+    candidate_projects: ["automatic/arbitrary immigration-detention workflows", "maritime non-assistance/pushback or Libya-cooperation operation materially facilitating unsafe return", "specific prosecution only if materially criminalizing protected resistance to such return"]
+    capacity_limit: "project-specific arbitrary/punitive confinement, unsafe forced transfer or qualifying coercive prosecution; not Maltese migration administration generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Maltese/European courts", "legal defence", "independent monitoring/remediation", "ordinary migration administration"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/malta/report-malta/"]
+    dossier: "../dossiers/states/MLT.md"
+    status: needs-detention-maritime-operator-freeze
+
+  - state: POL
+    entity: Poland
+    outcome: S
+    candidate_parties: ["Polish Border Guard (Straż Graniczna), only in qualifying Belarus-border pushback/protection-access operations", "Ministry of the Interior and Administration, only in administration of the operative asylum-suspension/buffer-zone project where it materially defeats protection or independent monitoring"]
+    candidate_projects: ["Belarus-border temporary restriction on lodging international-protection applications and related pushback/access-exclusion measures as extended in July/August 2026"]
+    capacity_limit: "summary return, denial/bypass of individualized protection or material obstruction of independent monitoring; not border control generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["courts/prosecutorial remediation", "humanitarian assistance", "unrelated migration/public-order functions"]
+    identity_sources: ["https://www.gov.pl/web/mswia-en/extension-of-the-buffer-zone-on-the-polish-belarusian-border", "https://eli.gov.pl/eli/DU/2026/945/ogl"]
+    dossier: "../dossiers/states/POL.md"
+    status: ready-capacity-limited-parties
+
+  - state: BGR
+    entity: Bulgaria
+    outcome: S
+    candidate_parties: ["specific municipal/public authority responsible for an evidenced forced-eviction project", "Bulgarian border-enforcement unit only in a specific non-assistance/pushback operation"]
+    candidate_projects: ["identified forced-eviction project affecting Roma residents", "identified border non-assistance/abuse operation affecting migrants"]
+    capacity_limit: "forced discriminatory displacement or qualifying border coercion; no generic municipality/border-police class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["courts", "Ombudsman", "rights litigation", "ordinary local/border administration"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/bulgaria/report-bulgaria/"]
+    dossier: "../dossiers/states/BGR.md"
+    status: needs-specific-municipality-and-border-operation-freeze
+
+  - state: MKD
+    entity: North Macedonia
+    outcome: S
+    candidate_parties: ["southern-border police unit only in qualifying summary-pushback/violence operations", "specific police/prison unit or facility only where current ill-treatment/accountability evidence is frozen"]
+    candidate_projects: ["southern-border pushback operations to Greece", "specific current detention ill-treatment project where evidenced"]
+    capacity_limit: "unlawful summary pushback/violence or specifically evidenced severe detention ill-treatment; not police/prisons generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["specialized prosecutor", "courts", "penitentiary reform/oversight projects", "ordinary police/prison administration"]
+    identity_sources: ["https://www.coe.int/en/web/cooperation-in-police-and-deprivation-of-liberty/hf-iii-strengthening-the-capacities-of-the-penitentiary-system-in-north-macedonia"]
+    dossier: "../dossiers/states/MKD.md"
+    status: needs-border-unit-and-detention-project-freeze
 
 # Translation records are governance work products only and have no licensing effect.
 # 'ready-*' means identity/project boundary is sufficiently knowable for draft Schedule rendering, subject to legal drafting review.
