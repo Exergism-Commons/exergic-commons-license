@@ -1,0 +1,21 @@
+version: "2026-08-13-ecl-0.2-cross-entity"
+evidence_cutoff: "2026-08-13"
+status: provisional-governance
+operative: false
+dossier_pattern: "../dossiers/projects/{ID}.md"
+counts:
+  R: 1
+  S: 1
+  U: 2
+  N: 0
+outcomes:
+  R:
+    - MITIGA-DETENTION-APPARATUS
+  S:
+    - OPERATION-EPIC-FURY-MINAB-TARGETING
+  U:
+    - ICE-ICM-INVESTIGATIVE-ANALYTICS
+    - MAVEN-SMART-SYSTEM
+  N: []
+
+# Governance registry only; no licensing effect.
