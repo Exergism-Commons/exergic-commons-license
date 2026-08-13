@@ -4,15 +4,13 @@
 
 Audit date: **2026-08-13**
 
-## 1. Current answer
+## Current answer
 
-A post-ECL-0.2 Schedule is **not yet ready for adoption**, but the work is now separated into evidence, identity and rendering layers.
+A post-ECL-0.2 Schedule is **not yet ready for adoption**. The evidence and translation layers are complete; identity/project freeze is still in progress.
 
-The State evidence cycle and Schedule translation cycle are complete. The remaining State work is exact identity/project-boundary freeze.
+## State inventory
 
-## 2. State governance inventory
-
-Current post-ECL-0.2 State registry:
+Current State governance remains:
 
 - `R`: **34**
 - `S`: **86**
@@ -20,104 +18,72 @@ Current post-ECL-0.2 State registry:
 - `N`: **47**
 - total: **195**
 
-Only `R`/`S` can generate Schedule candidates. `U`/`N` remain non-operative governance outcomes.
-
-## 3. State Schedule engineering status
+## Schedule engineering status
 
 ### `R`
 
 **34 / 34 identity freezes complete.**
 
-The canonical freeze source is `registry/schedule-state-r-freeze.yml`.
+Source: `registry/schedule-state-r-freeze.yml`.
 
 ### `S`
 
-**86 / 86 Schedule Translation Records complete.**
+**86 / 86 translation records complete.**
 
-Current freeze status from `registry/schedule-translations.yml`:
+Current freeze status:
 
-- **19** `S` records fully frozen;
-- **11** additional `S` records with at least one precise, Schedule-renderable narrowed subset;
-- **1** record where identity is resolved but current deployment/remediation status must be revalidated before rendering; and
-- **55** records still requiring an exact identity, unit, case, facility, order, deployment or project boundary.
+- **19** fully frozen;
+- **15** additional records with at least one precise renderable subset;
+- **3** pending current-status/remediation review rather than identity work;
+- **49** still requiring an exact identity or project-boundary freeze.
 
-Therefore **30 / 86 State `S` dossiers already have at least one Schedule-renderable entry**.
+Therefore **34 / 86 State `S` dossiers have at least one Schedule-renderable entry**.
 
-## 4. Narrowed-subset rule
+Live counts are maintained in `registry/schedule-translations.yml`.
 
-A governance dossier may support more than one coercive project. The Schedule does **not** need to operationalize every evidentiary scope at once.
+## Narrowed-subset rule
 
-A frozen subset may be rendered when:
+A Schedule entry may be narrower than its governance dossier. A precise frozen subset can be rendered while residual scope remains governance-only.
 
-1. the actor/project identity is objectively knowable;
-2. the capacity limitation is explicit;
-3. excluded functions are stated;
-4. Material Participation remains the operative connection rule; and
-5. every unfrozen residual scope remains governance-only.
+A renderable subset requires:
 
-This avoids two bad outcomes: either delaying every precise entry until the broadest dossier is fully frozen, or converting descriptive research labels into vague contractual classes.
+1. objectively knowable identity or project boundary;
+2. explicit capacity limitation;
+3. explicit exclusions;
+4. Material Participation as the connection rule; and
+5. no silent incorporation of residual dossier scope.
 
-## 5. Freeze work products created after translation
+## Current freeze registries
 
-Current State `S` freeze files:
+State `S` freeze records are maintained under `registry/schedule-state-s-freezes/`. Direct-project freezes are maintained in `registry/schedule-project-freezes.yml`.
 
-- `registry/schedule-state-s-freezes/batch-01-identity.yml`
-- `registry/schedule-state-s-freezes/batch-02-statutory-agency.yml`
-- `registry/schedule-state-s-freezes/batch-03a-usa.yml`
-- `registry/schedule-state-s-freezes/batch-04-detention-digital.yml`
+`registry/schedule-translations.yml` is an index/work queue, not a duplicate entity registry.
 
-They add exact agency, statutory, project and temporal boundaries while preserving unfrozen residual scope as non-operative.
+## Revalidation rule
 
-## 6. Current-status revalidation
+Solved identity does not prove current restrictability. If a system, measure or project may have been suspended, invalidated, remediated or materially changed, current-status review must complete before Schedule rendering.
 
-Identity freeze and substantive currency are separate gates.
+## Direct-project rule
 
-The Netherlands illustrates the distinction: the relevant probation algorithms and operators are now identified, but the February 2026 official record says the principal OXREC deployment was temporarily stopped. The Schedule must therefore confirm current deployment/remediation status before creating an operative candidate rather than treating a solved identity question as proof of present restriction.
+ECL 0.2 may designate an exact Restricted Project directly without converting its entire parent institution into a Restricted Party. This is preferred where project identity is more precise than institutional identity.
 
-## 7. Direct Restricted Project rule
+## Schedule generation gate
 
-ECL 0.2 permits an exact project to be designated directly without first converting the entire parent State or organization into a Restricted Party.
+A post-0.2 **draft candidate** may be rendered from frozen entries while unfrozen scope is omitted.
 
-`registry/schedule-project-freezes.yml` now contains the first fully frozen direct-project record. Its boundary is incident/project-specific and expressly excludes unrelated operations, suppliers and personnel absent Material Participation.
+It is not adoption-ready until every included entry passes:
 
-This is the preferred architecture whenever a prohibited-use finding is more precise than the institution that contains it.
+- identity/project knowability;
+- overlap and duplicate-scope reconciliation;
+- controlled-class membership review;
+- remediation/exclusion synchronization;
+- internal legal-consistency review; and
+- exact ECL-version compatibility review.
 
-## 8. Cross-entity data sources
+`ECL-RP-0.4-DRAFT` remains historical/pre-0.2 material.
 
-The Schedule work queue no longer duplicates full non-State candidate lists. Canonical sources are:
+## Current queue
 
-- `registry/organizations.yml`
-- `registry/projects.yml`
-- `registry/persons.yml`
-- `registry/schedule-project-freezes.yml`
+Immediate State work: **49 identity/project freezes + 3 current-status/remediation reviews**.
 
-`registry/schedule-translations.yml` is now an index/progress file rather than a second parallel entity registry.
-
-## 9. External-list and supplier rules
-
-External sanctions/warrant records may provide evidence or identity anchors, but they are not dynamically imported as ECL classes.
-
-Likewise, a supplier is not Restricted merely because it supplies a sensitive customer or system. Exact entity designation, direct Restricted Project designation or Material Participation in a qualifying frozen project is required.
-
-## 10. Schedule generation gate
-
-A fresh post-0.2 Schedule may be rendered as a **draft candidate** from frozen entries before every governance dossier is fully operationalized, provided unfrozen scope is omitted.
-
-It must **not** be presented as ready for adoption until:
-
-- every included entry has a frozen knowable identity/project boundary;
-- overlaps between State, organization and project entries are deduplicated;
-- controlled-class membership is objectively determinable;
-- remediation/exclusion rules are synchronized;
-- the candidate is reviewed for internal legal consistency; and
-- compatibility is stated for the exact ECL version.
-
-`ECL-RP-0.4-DRAFT` remains historical/pre-0.2 material and must not be patched into apparent compatibility.
-
-## 11. Current executable queue
-
-The immediate State queue is **55 unresolved identity/project freezes**, plus one current-status revalidation case.
-
-A previously attempted Ukraine freeze was not persisted because the repository connector rejected that write; it is therefore not counted as completed.
-
-The source of truth for live counts is `registry/schedule-translations.yml`.
+A previously attempted write that was rejected by the repository connector is not included in completed counts.
