@@ -16,24 +16,39 @@ This document provides repository-wide governance terminology. The operative leg
 
 ## Governance outcomes
 
-**R — State apparatus Restricted** — provisional governance conclusion that the relevant governing/state apparatus itself satisfies the ECL threshold. It has no licensing effect until adopted by a Schedule.
+The same `R/S/U/N` vocabulary is used across State, organization, project and person dossiers, but its object depends on entity type.
 
-**S — Restricted with defined scope** — only identified organs, systems, projects, functions or materially participating structures satisfy the threshold. A future Schedule must translate that governance scope into exact Restricted Parties, Restricted Projects, determinable classes and exclusions.
+**R — Restricted candidate** — provisional governance conclusion that the canonical actor or exact project itself is the narrowest accurate unit satisfying the ECL threshold. For a State dossier this normally means the defined governing/state apparatus; for an organization it means the organization itself; for a project it means the exact project; for a person it means an exceptional person-level candidate after heightened review.
 
-**U — Under Review / insufficient evidence** — material concerns exist but evidence, attribution, persistence, normative fit or scope is insufficient for a stable designation.
+**S — Restricted with defined scope** — the canonical actor is not restricted without qualification; only identified organs, business lines, operational wings, systems, projects, capacities, phases, functions or materially participating structures satisfy the threshold. A future Schedule must translate the scope into exact Restricted Parties, Restricted Projects, determinable classes, capacity limitations and exclusions.
 
-**N — No current state-level basis** — current evidence does not establish a State-level or defined scoped restriction. This is not an ethical endorsement.
+**U — Under Review / insufficient current basis for stable designation** — material concerns exist but evidence, attribution, persistence, normative fit, current deployment, identity or scope is insufficient for a stable `R/S` designation. `U` has no licensing effect unless a future operative ECL version expressly says otherwise.
+
+**N — No current basis** — current evidence does not establish a stable ECL designation for the reviewed actor/project. This is not an ethical endorsement and does not immunize future or separate projects.
+
+## Entity-specific scope discipline
+
+- **States:** `R` concerns the defined governing/state apparatus, never the population/nationality. `S` must ultimately translate to exact agencies, units, controlled apparatuses, projects or determinable classes.
+- **Organizations:** `R` requires organization-wide attribution; `S` follows an operational wing, business line, controlled unit or defined project/capacity.
+- **Projects:** `R` means the exact project is a Restricted-Project candidate; `S` limits the finding to a phase/component/deployment.
+- **Persons:** individual `R/S` designations are exceptional and use a heightened specificity/due-process standard. Office, employment, membership, sanctions-list presence or an arrest warrant does not automatically create person-level status.
 
 ## Review outcomes
 
 **UPHOLD** — prior governance finding survives adversarial review.
 
-**NARROW** — the category survives but its scope must be reduced.
+**NARROW** — the tier survives but its scope must be reduced.
 
 **DOWNGRADE** — evidence or normative fit no longer supports the prior tier.
 
+**ESCALATE** — new/current evidence supports a more restrictive governance tier.
+
 **REMOVE** — current evidence no longer supports restriction.
+
+**IDENTITY FREEZE** — a reviewed actor/apparatus/project has been translated into a candidate Schedule identity/class sufficiently precise for drafting, but remains non-operative until adopted by an exact Schedule.
+
+**SCHEDULE TRANSLATION** — conversion of a dossier-level scope into exact contract-readable actors/projects/classes, capacity limits and exclusions without changing the underlying evidentiary outcome.
 
 ## Normative effect
 
-Dossiers, registry entries and review outcomes are governance records only. Licensing effect arises only through an exact ECL version plus exact Schedule expressly incorporated by a software release.
+Dossiers, registry entries, translation records and review outcomes are governance records only. Licensing effect arises only through an exact ECL version plus exact Schedule expressly incorporated by a software release.
