@@ -18,57 +18,67 @@ Historical post-whole-State distribution: `R 35 / S 75 / U 41 / N 44 = 195`.
 
 ## 3. Scoped `S` adversarial review — complete
 
-High-impact review plus scoped tranches 1–10 tested every current `S` at project/apparatus level, including second falsification passes for former `R → S` cases. The cycle produced narrowing, reversibility downgrades and actor-fragmentation rules rather than treating a country as a unitary moral category.
+High-impact review plus scoped tranches 1–10 tested every scoped/current `S` at project/apparatus level, including second falsification passes for former `R → S` cases. The cycle produced narrowing, reversibility downgrades and actor-fragmentation rules rather than treating a country as a unitary moral category.
 
 Before the full `U` phase, the distribution stood at `R 36 / S 70 / U 45 / N 44 = 195`.
 
 ## 4. Full `U` adversarial review — complete
 
-All 45 dossiers entering the `U` phase were reviewed together in `under-review/full-cohort.md`.
+All 45 dossiers entering the `U` phase were reviewed in `under-review/full-cohort.md`.
 
 Results:
 
 - **14 `U → S`**: Argentina, Armenia, Bangladesh, Bolivia, Bulgaria, Chad, Croatia, Cyprus, Fiji, Gabon, Germany, Lithuania, Maldives and Slovenia.
 - **9 `U → N`**: Botswana, Brunei, Czechia, Malawi, Montenegro, Namibia, New Zealand, Portugal and South Korea.
-- **22 retained `U`** after explicit second-pass review.
+- **22 retained `U`** after explicit review.
 - **0 `U → R`**.
 
-The retained `U` cohort is therefore not an unprocessed queue. It now records genuine unresolved cases where serious concerns persist but deployment, attribution, persistence or ECL-project fit remains insufficiently resolved for `S` or `N`.
+Retained `U` therefore means genuine unresolved uncertainty about deployment, attribution, persistence or ECL-project fit, not an unprocessed queue.
 
-The phase also reinforced four invariants: capability is not deployment; severe institutional failure is not automatically an ECL-prohibited project; counter-institutions are substantive evidence; and prospective risk can justify `S` once it becomes materially deployed coercion.
+## 5. Original `N` adversarial review — complete
 
-## 5. Current audited governance state
+All 44 States that were `N` in the initial adjudication were reviewed in `no-basis/full-cohort.md`. This phase applied `LICENSE` §5 more strictly than a general human-rights screen: a bad law, harsh punishment, migration restriction, institutional failure or coercive capacity is not automatically an ECL prohibited use unless the material project fits the operative categories.
+
+Results:
+
+- **38 retained `N`**;
+- **6 `N → U`**: Austria, Costa Rica, Japan, Nauru, Samoa and South Africa;
+- **0 `N → S`**;
+- **0 `N → R`**.
+
+Those six moved to `U` because current developments defeated a confident no-basis finding while the direct ECL §5 prohibited-use/technology nexus or attribution remained insufficient for `S`.
+
+The phase also exposed consistency work that must precede ECL 1.0. In particular, capital-punishment and migration/detention scopes cannot be treated as Restricted merely because the underlying policy is rights-incompatible; each surviving `S` must identify how ECL-covered software materially enables repressive surveillance, coercive targeting, automated/data-driven discriminatory domination, deceptive population manipulation, irreversible coercive technological capture, circumvention, or a separately valid Restricted Project theory.
+
+## 6. Current audited governance state
 
 Current provisional distribution:
 
 - `R` — **36**
 - `S` — **84**
-- `U` — **22**
-- `N` — **53**
+- `U` — **28**
+- `N` — **47**
 - **Total — 195**
 
 The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
 
-## 6. Dossier-normalization invariant
+## 7. State dossier normalization — complete
 
-A completed `dossiers/states/*.md` record must be understandable and auditable by itself: current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, stable sources where possible and procedural history.
+A completed `dossiers/states/*.md` record is intended to be understandable and auditable by itself: current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, sources and procedural history.
 
-Historical review files remain immutable procedural history and are not required to reconstruct a current determination.
+Historical review files remain immutable procedural history and are not required to reconstruct the current determination.
 
-After completion of the `U` phase, **151 unique State dossiers** have detailed normalization. Forty-one previously minimal `U` dossiers were expanded; Honduras, Lebanon, Nepal and Trinidad and Tobago were already self-contained from earlier scoped downgrades and were revalidated in the full cohort review.
+**All 195 / 195 State dossiers now have detailed normalization at the 2026-08-11 evidence cutoff.**
 
-The only State dossiers not yet detailed-normalized are the **44 States that were already `N` in the initial adjudication**.
+## 8. Architectural conclusion and remaining work
 
-## 7. Architectural conclusion and remaining work
+State-by-State dossier completion is finished. The next governance phase is a global consistency and normative audit:
 
-Adversarial review continues to support an **Accountability and Remediation Exception** before stable ECL 1.0 so ECL-covered software can be used independently to investigate, challenge, audit, prosecute, remedy or disclose the conduct that caused a restriction without creating a loophole for ordinary Restricted Project use.
-
-Remaining State/governance work:
-
-1. normalize/audit the 44 original `N` dossiers so all 195 State records are independently auditable;
-2. run a global cross-dossier consistency audit for scope vocabulary, attribution, triggers and organization/project overlap;
-3. resolve the Accountability and Remediation Exception and other normative changes;
-4. perform Schedule consistency/freeze work; and
-5. obtain specialist legal review before proposing a stable Restricted Parties Schedule / ECL 1.0.
+1. re-test every surviving `R`/`S` scope against the exact `LICENSE` §5 prohibited-use language, with capital-punishment and migration/detention scopes as priority consistency cases;
+2. normalize attribution vocabulary and objective review/removal triggers across dossiers;
+3. resolve overlap between State, organization, person and project dossiers;
+4. define an **Accountability and Remediation Exception** so independent investigation, judicial review, audit, prosecution of official abuse, legal defence, human-rights remediation and whistleblowing are not accidentally blocked while avoiding a loophole for ordinary Restricted Project use;
+5. resolve any other normative license/governance changes and perform Schedule design/freeze work; and
+6. obtain specialist legal review before proposing a stable Restricted Parties Schedule / ECL 1.0.
 
 No item in this summary changes the operative license or a Restricted Parties Schedule by itself.
