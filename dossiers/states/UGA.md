@@ -4,49 +4,63 @@ entity: "Uganda"
 iso3: UGA
 issue: 183
 provisional_outcome: S
-provisional_scope: "security/intelligence and law-enforcement units involved in arbitrary/incommunicado detention, torture, disappearance, political repression and specified election/surveillance operations"
+provisional_scope: "military/intelligence/police political repression, arbitrary and incommunicado detention, election-period communications/surveillance control, civic-organization suspension and independent-media coercion"
 confidence: high
 evidence_cutoff: 2026-08-11
 last_reviewed: 2026-08-11
-review_stage: whole-state-adversarial-reviewed
-adversarial_result: "DOWNGRADE R -> S"
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD S after prior R -> S; expand defined scope for 2026 election/post-election coercive projects without re-escalating whole State"
 operative: false
 ---
 # Uganda
 
-> Governance record only; no licensing effect by itself.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.**
+**S — Restricted with defined scope.** The 2026 election and post-election record materially strengthens the restriction, but a whole-State `R` would still capture the Uganda Human Rights Commission and other remedial institutions that are not shown to participate in the prohibited projects.
 
-## 2. Evidence preserving scoped restriction
+## 2. ECL criteria engaged
 
-A January 2026 UN communication concerned alleged arbitrary detention of rights defender Sarah Bireete. Uganda's own Human Rights Commission recognizes a persistent national history/pattern of arbitrary detention, torture and abuse by security organs, particularly around political contestation.
+- arbitrary/incommunicado detention, enforced disappearance and torture/ill-treatment;
+- political repression of opposition, defenders, lawyers and journalists;
+- coercive election-period communications shutdown/surveillance;
+- administrative suppression of rights organisations and independent media.
 
-## 3. Counter-evidence and exergic institutions
+## 3. Evidence supporting the determination
 
-The Uganda Human Rights Commission is a constitutional institution with court-like powers to order release, compensation, injunctions and other remedies, subject to High Court appeal. It investigates complaints, visits detention facilities, monitors treaties and elections and published its 28th Annual Report in June 2026.
+UN Special Procedures addressed the arbitrary detention of Sarah Bireete and, in a separate 2026 communication, the suspension of permits for multiple human-rights organisations around the January election. Human Rights Watch documented post-election mass arrests/disappearances and, in July 2026, renewed military seizures of critics, incommunicado detention and coercive pressure on independent media.
 
-## 4. Attribution and exclusions
+The evidence is current and attributable to military, security, police and political-control projects.
 
-The finding follows abusive security/intelligence/law-enforcement and election/surveillance projects. UHRC, independent judicial/remediation functions and unrelated public services are excluded.
+## 4. Counter-evidence and exergic institutions
 
-## 5. Adversarial determination
+The Uganda Human Rights Commission remains a constitutional institution with tribunal powers to investigate, order release/compensation, inspect detention and monitor elections. Courts and independent legal/remedial functions remain separately capable of contesting abuse.
 
-**DOWNGRADE R → S.** A rights tribunal capable of ordering release and compensation makes whole-State attribution too broad.
+These institutions do not erase the violations but continue to defeat a blanket whole-State inference.
 
-## 6. Review triggers
+## 5. Attribution and exclusions
 
-Effective remedies/prosecutions for torture/disappearance, cessation of political detention and demonstrated compliance with UHRC/court orders.
+Scope covers **UPDF/intelligence/police and other attributable security projects materially involved in arbitrary/incommunicado detention, enforced disappearance, torture/ill-treatment, political repression or unlawful force; election-period communications shutdown/surveillance or opposition-suppression projects; and administrative projects arbitrarily suspending rights organisations or independent media as a tool of political control**.
 
-## 7. Sources
+UHRC, courts/remedial functions, unrelated services and the population/nationality are excluded.
 
-- https://uhrc.ug/page/about-tribunal
-- https://uhrc.ug/about/
-- https://uhrc.ug/download-category/annual-reports/
+## 6. Adversarial determination
+
+**UPHOLD S after prior R → S; EXPAND DEFINED SCOPE.** The 2026 record is more severe, but current counter-institutions still make whole-State re-escalation overbroad.
+
+## 7. Review / removal triggers
+
+Release/remedy for political detainees, independent investigation/prosecution of military/police abuses, compliance with UHRC/court orders, restoration of independent media/civic organisations and demonstrably rights-compliant future electoral security.
+
+## 8. Sources
+
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=UGA+1%2F2026
+- https://spcommreports.ohchr.org/TmSearch/RelCom?code=UGA+2%2F2026
+- https://www.hrw.org/news/2026/01/28/uganda-post-election-assault-on-political-opposition
+- https://www.hrw.org/news/2026/07/16/uganda-military-seizing-government-critics
+- https://uhrc.ug/page/about-tribunal
 
-## 8. Procedural history
+## 9. Procedural history
 
-Issue #183 · `../../reviews/2026/adversarial/state-level/tranche-04.md`
+Issue #183 · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
