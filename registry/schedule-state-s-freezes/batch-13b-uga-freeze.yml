@@ -1,0 +1,16 @@
+state: UGA
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Erias Lukwago June 2026 detention and prosecution project"
+project_boundary: "the 15-22 June 2026 military seizure, incommunicado holding, transfer to police/court process and associated prosecution concerning lawyer Erias Lukwago"
+capacity_limit: "this named detention/prosecution chain only, including materially participating military/security functions"
+exclusions:
+  - "UPDF, police or Ugandan courts generally"
+  - "independent legal/remedial activity"
+  - "other critics/media cases absent separate freeze"
+identity_sources:
+  - "https://www.hrw.org/news/2026/07/16/uganda-military-seizing-government-critics"
+residual_scope: "other military, intelligence, media and civic-control scope remains governance-only until separately frozen"
+schedule_status: ready-named-case-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
