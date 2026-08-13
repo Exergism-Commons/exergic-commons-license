@@ -1,0 +1,8 @@
+state: BGR
+outcome: S
+freeze_status: identity-resolved-remediation-review
+identified_scope: "Zaharna Fabrika forced-eviction project identified in the canonical dossier"
+blocker: "confirm continuing project/remedial failure before rendering rather than treating the completed 2025 incident alone as a current restriction"
+schedule_status: not-renderable-pending-remediation-status
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
