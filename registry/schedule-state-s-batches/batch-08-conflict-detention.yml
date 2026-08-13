@@ -1,0 +1,155 @@
+batch: 8
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 10
+schedule_ready_count: 1
+blocked_or_partial_count: 9
+
+records:
+  - state: SVK
+    entity: Slovakia
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific implementation/enforcement workflow of the enacted NGO/civic-control rules materially burdening protected association or privacy"
+      - "specific legally coercive discriminatory constitutional/administrative measure materially denying equal rights"
+      - "specific police/complaint-investigation project where discriminatory violence or severe ill-treatment is credibly alleged and effective investigation is materially obstructed"
+    capacity_limit: "named statute/provision/implementing authority or police case only; no generic Slovak legislature/police/administration class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.3"]
+    exclusions: ["Constitutional Court", "Ombudsperson", "independent litigation/remediation", "unrelated public functions"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/slovakia/report-slovakia/"]
+    dossier: "../dossiers/states/SVK.md"
+    status: needs-exact-statute-provision-implementing-authority-and-police-case-freeze
+
+  - state: SOM
+    entity: Somalia
+    outcome: S
+    candidate_parties:
+      - "National Intelligence and Security Agency (NISA), only in exact arbitrary-detention/intimidation projects against protected peaceful activism or journalism"
+    candidate_projects:
+      - "specific federal police/information-control operation materially using violence, threats, censorship, arbitrary detention or prosecution against protected journalism/peaceful activism"
+      - "specific federal/local forced-eviction project involving unlawful coercion or denial of basic safeguards"
+    capacity_limit: "federal actor/project-specific; Somaliland, Al-Shabaab and independent armed/clan actors excluded"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.5"]
+    exclusions: ["Somaliland authorities", "Al-Shabaab", "independent armed/clan actors", "courts/civil society/journalists/remedial functions"]
+    identity_sources: ["https://www.amnesty.org/en/location/africa/east-africa-the-horn-and-great-lakes/somalia/report-somalia/"]
+    dossier: "../dossiers/states/SOM.md"
+    status: needs-federal-police-information-control-and-eviction-operation-freeze
+
+  - state: SSD
+    entity: South Sudan
+    outcome: S
+    candidate_parties:
+      - "National Security Service (NSS), only in exact arbitrary/incommunicado/secret-detention or political-repression projects"
+    candidate_projects:
+      - "specific military/police/state-aligned security operation materially involving arbitrary detention, torture/ill-treatment, enforced disappearance, political repression, unlawful attacks/reprisals or obstruction of humanitarian/accountability work"
+    capacity_limit: "named agency/unit/operation/facility-specific; rival/opposition armed actors separately attributed"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Judiciary", "mobile courts", "independent prosecutors/investigators", "legal aid", "unrelated civilian functions"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=SSD+1%2F2026"]
+    dossier: "../dossiers/states/SSD.md"
+    status: needs-military-police-operation-and-detention-facility-freeze
+
+  - state: LKA
+    entity: Sri Lanka
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific Prevention of Terrorism Act detention/prosecution process materially producing arbitrary/prolonged detention or repression of protected journalism/memorialisation/defender activity"
+      - "specific detention/prison project involving torture, severe ill-treatment or custody-death accountability failure"
+      - "specific security/intelligence surveillance or harassment project targeting war-affected minorities/defenders seeking accountability"
+    capacity_limit: "case/unit/facility/deployment-specific; proposed replacement legislation excluded until coercively enacted/implemented"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["HRCSL/NPM", "Office on Missing Persons", "courts", "independent reform/remediation", "draft law as such"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=LKA+1%2F2026"]
+    dossier: "../dossiers/states/LKA.md"
+    status: needs-pta-case-security-unit-detention-facility-surveillance-project-freeze
+
+  - state: SDN
+    entity: Sudan
+    outcome: S
+    candidate_parties:
+      - "Sudanese Armed Forces (SAF), only in the capacity defined by the synchronized organization dossier"
+    candidate_projects:
+      - "specifically attributable SAF/state-aligned conflict, reprisal or detention project materially carrying out unlawful attacks, reprisals, arbitrary detention, torture or obstruction of humanitarian/accountability activity"
+    capacity_limit: "SAF/state-aligned operations only; RSF and independent armed actors are separately governed"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["RSF", "independent armed actors", "civilian institutions", "humanitarian/medical/accountability networks"]
+    identity_sources: ["../dossiers/organizations/SUDANESE-ARMED-FORCES.md", "https://www.amnesty.org/en/latest/news/2026/04/three-years-on-sudans-warring-parties-intensify-war-against-civilians/"]
+    dossier: "../dossiers/states/SDN.md"
+    status: ready-cross-entity-capacity-limited-party
+
+  - state: SYR
+    entity: Syria
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific transitional-government security/military/detention or government-backed militia project materially involved in unlawful killing, arbitrary detention, torture/ill-treatment, sectarian coercive targeting or obstruction of accountability"
+    capacity_limit: "named unit/militia/facility/operation-specific; no blanket transitional-government class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["National Commission for Transitional Justice", "National Commission for Missing Persons", "independent courts/remediation", "SDF/AANES", "independent/non-State armed actors"]
+    identity_sources: ["https://www.amnesty.org/en/location/middle-east-and-north-africa/middle-east/syria/report-syria/"]
+    dossier: "../dossiers/states/SYR.md"
+    status: needs-transitional-security-unit-militia-facility-operation-freeze
+
+  - state: THA
+    entity: Thailand
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific Section 112/sedition/computer-crime/public-order prosecution or detention process materially criminalising protected peaceful expression/assembly"
+      - "coordinated police/military Cyber Team project used to tarnish, intimidate or undermine civil-society/opposition actors"
+    capacity_limit: "named prosecution/cyber operation/unit only; generic active refoulement component removed"
+    criteria: ["ECL-0.2 §5.4", "ECL-0.2 §5.6"]
+    exclusions: ["courts exercising independent remedy", "torture-accountability proceedings", "unrelated policing/public administration", "historical refoulement absent fresh recurrence"]
+    identity_sources: ["https://www.hrw.org/news/2026/02/24/thailand-free-speech-activists-get-32-month-sentences"]
+    dossier: "../dossiers/states/THA.md"
+    status: needs-expression-case-and-cyber-team-command-identity-freeze
+
+  - state: TUR
+    entity: Türkiye
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific counterterrorism/security/prosecutorial project materially criminalising protected defender, lawyer, journalistic or peaceful political activity"
+      - "specific police/public-order operation using unlawful force or arbitrary detention against protected peaceful assembly"
+      - "specific association-dissolution/civic-control or political information-blocking project materially implementing political repression"
+    capacity_limit: "named agency/unit/case/order/project only; no generic Turkish security/prosecution/police class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.5"]
+    exclusions: ["Constitutional Court", "ECtHR/remedial compliance functions", "independent legal defence", "unrelated administration"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=TUR+6%2F2026"]
+    dossier: "../dossiers/states/TUR.md"
+    status: needs-counterterrorism-agency-case-public-order-unit-and-blocking-order-freeze
+
+  - state: UGA
+    entity: Uganda
+    outcome: S
+    candidate_parties:
+      - "Uganda People's Defence Forces (UPDF), only in exact political-detention/seizure or unlawful-force projects materially satisfying ECL criteria"
+    candidate_projects:
+      - "specific intelligence/police project involving arbitrary/incommunicado detention, disappearance, torture/ill-treatment or political repression"
+      - "specific election-period communications shutdown/surveillance or opposition-suppression project"
+      - "specific administrative suspension/control project against rights organisations or independent media"
+    capacity_limit: "named command/unit/order/project only; no generic Ugandan military/intelligence/police class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["Uganda Human Rights Commission", "courts/remedial functions", "unrelated services"]
+    identity_sources: ["https://www.hrw.org/news/2026/07/16/uganda-military-seizing-government-critics", "https://uhrc.ug/page/about-tribunal"]
+    dossier: "../dossiers/states/UGA.md"
+    status: needs-updf-command-intelligence-police-unit-and-admin-order-freeze
+
+  - state: UKR
+    entity: Ukraine
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific Territorial Recruitment Centre (TCC) unit/personnel project involving substantiated unlawful confinement, violence, torture/ill-treatment or coercive abuse"
+      - "specific collaboration-prosecution/security project independently satisfying ECL §5.6"
+    capacity_limit: "named abusive TCC unit/personnel/case/project only; ordinary lawful conscription/recruitment expressly excluded"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["ordinary lawful recruitment/conscription", "State Bureau of Investigation accountability work", "Ombudsman/NPM", "Russian conduct separately attributed"]
+    identity_sources: ["https://dbr.gov.ua/en/news/rukopashnij-bij-zamist-zakonu-dbr-povidomilo-pro-pidozru-policejskomu-z-poltavi-yakij-zlamav-cholovikovi-ruku-pid-chas-dostavlennya-do-tck"]
+    dossier: "../dossiers/states/UKR.md"
+    status: needs-specific-tcc-unit-personnel-and-collaboration-case-freeze
+
+# Batch-level translation records are governance work products only; no licensing effect.
