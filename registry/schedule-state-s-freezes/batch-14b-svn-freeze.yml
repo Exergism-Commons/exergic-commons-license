@@ -1,0 +1,18 @@
+state: SVN
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "21 January 2026 social-assistance seizure project under the Act on Urgent Measures to Ensure Public Security"
+project_boundary: "implementation beginning 21 January 2026 of the measure allowing seizure of social assistance from persons meeting the specified unpaid-misdemeanour-fine threshold"
+capacity_limit: "the frozen social-assistance seizure workflow only, where its implementation materially satisfies the canonical discriminatory/coercive ECL finding"
+exclusions:
+  - "the Act generally"
+  - "Slovenian police, courts and social services generally"
+  - "Supreme/Constitutional Court review and remediation"
+  - "other measures under the Act absent separate freeze"
+identity_sources:
+  - "https://www.amnesty.org/en/documents/eur68/0702/2026/en/"
+  - "https://www.amnesty.org/en/latest/news/2025/11/slovenia-mps-must-reject-draconian-security-bill-which-puts-rights-at-risk-and-targets-roma-community/"
+residual_scope: "other policing/property/data provisions remain governance-only until separately frozen"
+schedule_status: ready-direct-statutory-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
