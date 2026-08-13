@@ -1,0 +1,16 @@
+state: BGD
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "BGD 1/2026 — Shahriar Kabir continued detention/prosecution project"
+project_boundary: "the continued detention and materially participating prosecution/custody processes concerning Shahriar Kabir identified by UN Special Procedures communication BGD 1/2026 and the Working Group on Arbitrary Detention opinion referenced there"
+capacity_limit: "this named detention/prosecution project only, while the detention or materially continuous coercive proceeding remains unremediated"
+exclusions:
+  - "Bangladesh anti-terrorism or criminal-justice enforcement generally"
+  - "other journalists or cases absent separate freeze"
+  - "independent judicial review, release or remediation"
+identity_sources:
+  - "https://spcommreports.ohchr.org/TMResultsBase/DownLoadPublicCommunicationFile?gId=30869"
+residual_scope: "other media, cyber/ICT and political-association enforcement remains governance-only until separately frozen"
+schedule_status: ready-named-case-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
