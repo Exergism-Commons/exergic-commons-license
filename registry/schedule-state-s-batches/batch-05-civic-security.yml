@@ -1,0 +1,130 @@
+batch: 5
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 10
+schedule_ready_count: 2
+blocked_or_partial_count: 8
+
+records:
+  - state: GEO
+    entity: Georgia
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific executive/police protest-repression operation", "specific prosecutorial/administrative project targeting protected opposition/civic activity", "specific foreign-influence/grant/registration enforcement project suppressing independent civil society", "specific media/information-control enforcement project coercing protected journalism"]
+    capacity_limit: "project/agency/case-specific; no generic Georgian executive/police/prosecution class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.5"]
+    exclusions: ["Public Defender", "Constitutional Court", "genuinely independent prosecution/accountability", "unrelated public services"]
+    identity_sources: ["https://www.coe.int/en/web/commissioner/-/georgia-council-of-europe-commissioner-calls-for-accountability-of-law-enforcement-and-expresses-concerns-regarding-mounting-restrictions-on-democratic-freedoms"]
+    dossier: "../dossiers/states/GEO.md"
+    status: needs-project-agency-case-freeze
+
+  - state: GRC
+    entity: Greece
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific public-order/protest-policing operation materially involving unlawful force, arbitrary protest detention or dangerous less-lethal deployment", "specific accountability-obstruction project where independently established"]
+    capacity_limit: "named operation/unit only; no generic Hellenic Police or justice-sector class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.2"]
+    exclusions: ["courts", "EMIDIPA", "criminal/disciplinary remediation", "ordinary policing"]
+    identity_sources: ["https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/greece/report-greece/"]
+    dossier: "../dossiers/states/GRC.md"
+    status: needs-public-order-unit-operation-freeze
+
+  - state: GTM
+    entity: Guatemala
+    outcome: S
+    candidate_parties: ["Ministerio Público / FECI, only in exact prosecutorial processes materially used for arbitrary/unfounded criminalization of protected anti-corruption, journalistic, defender or Indigenous civic activity", "specific detention/judicial actor only where Material Participation in the same qualifying project is independently frozen"]
+    candidate_projects: ["specific criminalization/detention cases involving protected anti-corruption justice workers, defenders, journalists or peaceful Indigenous-protest leaders"]
+    capacity_limit: "case/prosecution-specific; not Ministerio Público/FECI functions generally"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Constitutional Court", "independent judicial/remediation functions", "ordinary prosecution"]
+    identity_sources: ["https://www.oas.org/en/iachr/decisions/mc/2026/res_40-26_mc_171-25_gt_en.pdf"]
+    dossier: "../dossiers/states/GTM.md"
+    status: ready-capacity-limited-party
+
+  - state: HTI
+    entity: Haiti
+    outcome: S
+    candidate_parties: ["Prime-Minister-created Security Task Force, only in unlawful drone/summary-execution operations", "Haitian National Police units and private contractors only where Material Participation in the same operation is frozen"]
+    candidate_projects: ["specific State-linked lethal-drone or summary-execution targeting operations documented by the canonical dossier"]
+    capacity_limit: "unlawful targeting/summary execution/civilian-harm project only; not Haitian security activity generally"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["specialized judicial accountability units", "police internal affairs", "gang violence not attributable to the State", "humanitarian/remedial work"]
+    identity_sources: ["https://www.amnesty.org/en/location/americas/central-america-and-the-caribbean/haiti/report-haiti/"]
+    dossier: "../dossiers/states/HTI.md"
+    status: ready-named-project-apparatus
+
+  - state: ISL
+    entity: Iceland
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific prosecutorial/police request, judicial order or detention practice imposing pretrial solitary confinement beyond strict necessity/proportionality"]
+    capacity_limit: "case/order/facility-specific, especially child/vulnerable-person isolation; no generic court/prosecution/police/prison class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["ordinary lawful pretrial detention", "independent courts/oversight", "proportionate/non-abusive isolation where lawful"]
+    identity_sources: []
+    dossier: "../dossiers/states/ISL.md"
+    status: needs-procedure-facility-order-class-freeze
+
+  - state: IND
+    entity: India
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific Union/state UAPA/AFSPA/counterterrorism detention project materially producing arbitrary/prolonged detention, torture/disappearance or civic repression", "specific police/public-order operation using unlawful force or communications shutdown against peaceful assembly", "specific digital takedown/censorship/surveillance deployment materially coercing protected expression"]
+    capacity_limit: "named law-enforcement project/state/agency/case only; no generic Union, State, police, UAPA or AFSPA class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["Supreme Court/High Courts", "independent remedies", "unrelated state governments/agencies", "punitive demolition absent fresh recurrence"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=IND+5%2F2026", "https://www.sci.gov.in/jurisdiction/"]
+    dossier: "../dossiers/states/IND.md"
+    status: needs-state-agency-law-project-case-freeze
+
+  - state: IDN
+    entity: Indonesia
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific peaceful-protest criminalization process", "specific TNI/military-connected coordinated deception/intimidation project", "specific implemented abusive military/counterterrorism or Papua/extractive security operation"]
+    capacity_limit: "named operation/unit/campaign only; draft powers or military capacity alone excluded"
+    criteria: ["ECL-0.2 §5.4", "ECL-0.2 §5.6"]
+    exclusions: ["acquitting/remedial courts", "unimplemented statutory powers", "ordinary military/security activity"]
+    identity_sources: ["https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/indonesia/report-indonesia/"]
+    dossier: "../dossiers/states/IDN.md"
+    status: needs-campaign-operation-unit-freeze
+
+  - state: IRQ
+    entity: Iraq
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific security/detention/PMF-linked or State-connected project materially participating in enforced disappearance, secret/irregular detention, reprisal or obstruction of search/investigation"]
+    capacity_limit: "named unit/armed structure/project with State attribution only; no generic Iraqi security or PMF class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["independent courts/investigators", "unrelated ministries/services", "non-State armed actors lacking covered State connection"]
+    identity_sources: ["https://tbinternet.ohchr.org/_layouts/TreatyBodyExternal/countries.aspx?CountryCode=IRQ&Lang=EN"]
+    dossier: "../dossiers/states/IRQ.md"
+    status: needs-security-pmf-unit-project-freeze
+
+  - state: ISR
+    entity: Israel
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific occupation/settlement-administration project", "specific military/security/intelligence surveillance or targeting project", "specific detention/prison project", "specific coercive-displacement/discriminatory project materially satisfying ECL 0.2"]
+    capacity_limit: "exact organ/project/capacity only; blanket State governmental/legal apparatus expressly rejected"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.2", "ECL-0.2 §5.6", "ECL-0.2 §5.7"]
+    exclusions: ["independent judicial review", "State Comptroller/Ombudsman", "legal defence/remediation", "unrelated civilian ministries/services", "private/civil society absent Material Participation"]
+    identity_sources: ["https://www.icj-cij.org/index.php/node/204160", "https://www.mevaker.gov.il/en/state-audit/status-and-powers-of-the-state-comptroller"]
+    dossier: "../dossiers/states/ISR.md"
+    status: needs-exact-occupation-security-detention-project-boundaries
+
+  - state: ITA
+    entity: Italy
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific implementation of Law No. 54/2026 public-order/preventive-policing power materially suppressing protected peaceful protest", "specific detention practice amounting to arbitrary confinement or severe ill-treatment", "specific migration-externalization/return operation materially facilitating detention/transfer into substantiated serious-abuse/non-refoulement risk"]
+    capacity_limit: "named implementing authority/measure/facility/return project only; no generic Italy police/migration/detention class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.1"]
+    exclusions: ["judiciary", "rights-protective investigations/remedies", "ordinary policing", "individualized lawful migration review"]
+    identity_sources: ["https://www.gazzettaufficiale.it/atto/vediMenuHTML?atto.codiceRedazionale=26A02297&atto.dataPubblicazioneGazzetta=2026-05-11&tipoSerie=serie_generale&tipoVigenza=originario"]
+    dossier: "../dossiers/states/ITA.md"
+    status: needs-implementing-authority-measure-facility-freeze
+
+# Batch-level translation records are governance work products only; no licensing effect.
