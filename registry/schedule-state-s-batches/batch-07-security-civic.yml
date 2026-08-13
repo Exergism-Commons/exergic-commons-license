@@ -1,0 +1,153 @@
+batch: 7
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 10
+schedule_ready_count: 2
+blocked_or_partial_count: 8
+
+records:
+  - state: NGA
+    entity: Nigeria
+    outcome: S
+    candidate_parties:
+      - "Imo State Police Anti-Kidnapping Unit (Tiger Base), only in the documented detention/torture/disappearance project and materially continuous unremediated operations"
+    candidate_projects:
+      - "Tiger Base detention/custody project involving prolonged arbitrary detention, torture, enforced disappearance, extortion, unrecorded child removal or custody abuse"
+      - "other police/military/public-security operation only after the exact unit/facility and qualifying conduct are separately frozen"
+    capacity_limit: "named unit/facility/project-specific; no generic Nigeria Police Force or armed-forces class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.2"]
+    exclusions: ["National Human Rights Commission/NPM", "courts", "independent oversight/remediation", "security units lacking separate evidence"]
+    identity_sources: ["https://www.amnesty.org/en/documents/afr44/0719/2026/en/"]
+    dossier: "../dossiers/states/NGA.md"
+    status: ready-named-unit-project
+
+  - state: PAK
+    entity: Pakistan
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific military/intelligence/security or counterterrorism project materially involving enforced disappearance, torture, extrajudicial killing, arbitrary/preventive detention or protest repression"
+      - "specific censorship/media-control or coercive-surveillance project materially suppressing independent reporting or protected civic activity"
+    capacity_limit: "named agency/unit/case/order/project only; no generic Pakistan military/intelligence/security class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["parliamentary human-rights oversight", "courts/remedial functions", "unrelated civilian services", "lawful counterterrorism/media administration"]
+    identity_sources: ["https://www.hrw.org/world-report/2026/country-chapters/pakistan", "https://na.gov.pk/en/content.php?id=190"]
+    dossier: "../dossiers/states/PAK.md"
+    status: needs-security-intelligence-unit-case-and-media-order-freeze
+
+  - state: PSE
+    entity: Palestine
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific Palestinian Authority security/intelligence, detention or prosecutorial project in the West Bank materially involving arbitrary detention, torture/ill-treatment, disregard of judicial release orders or repression of protected journalism/political dissent"
+    capacity_limit: "PA West Bank agency/unit/facility/case-specific; Hamas and other de facto/non-State actors excluded and governed separately"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Palestinian courts ordering release", "torture-prevention/remedial functions", "unrelated civilian services", "Hamas and other armed actors"]
+    identity_sources: ["https://www.un.org/unispal/document/ohchr-palestinian-authorities-must-stop-practices-arbitrary-detention-torture-and-ill-treatment-en-ar/"]
+    dossier: "../dossiers/states/PSE.md"
+    status: needs-pa-security-unit-detention-facility-case-freeze
+
+  - state: PAN
+    entity: Panama
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific police/security operation materially involving unlawful force, arbitrary detention, torture or criminalisation of peaceful Indigenous protest"
+      - "specific territorial/development enforcement project materially defeating Indigenous consultation/FPIC or using coercive dispossession"
+    capacity_limit: "named operation/unit/development project/community-specific; generic migration component removed"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Defensoría del Pueblo", "courts", "humanitarian/protection programmes", "unrelated police functions", "generic migration detention"]
+    identity_sources: ["https://spcommreports.ohchr.org/LatestReports/SummaryPrint?id=30452"]
+    dossier: "../dossiers/states/PAN.md"
+    status: needs-police-unit-indigenous-operation-development-project-freeze
+
+  - state: PRY
+    entity: Paraguay
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific police/prosecutorial/public-administration project repressing peaceful protest or criminalising protected defender activity"
+      - "specific Indigenous-land/eviction or development-enforcement project involving coercive displacement, discriminatory denial of recognised rights or serious FPIC failure"
+    capacity_limit: "named unit/case/community/land project only; private agribusiness conduct excluded absent State attribution"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["independent courts/remediation", "unrelated public services", "non-attributable private conduct"]
+    identity_sources: ["https://www.amnesty.org/es/location/americas/south-america/paraguay/", "https://www.iniciativa-amotocodie.org/2026/04/21/criminalization-indigenous-demands-paraguay-ayoreo/"]
+    dossier: "../dossiers/states/PRY.md"
+    status: needs-police-prosecutor-case-and-land-project-freeze
+
+  - state: PER
+    entity: Peru
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific police/military public-order operation materially using unlawful/disproportionate force against peaceful demonstrators"
+      - "specific civic-control project materially suppressing protected NGOs, journalists or defenders"
+      - "specific jurisdictional/legal implementation materially obstructing ordinary-court accountability for serious security-force abuses"
+    capacity_limit: "named operation/authority/case/jurisdictional transfer only; no generic Peruvian police, military or judiciary class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6", "ECL-0.2 §5.5"]
+    exclusions: ["independent courts/prosecutors", "electoral institutions", "journalists/civil society", "unrelated public functions"]
+    identity_sources: ["https://www.amnesty.org/en/location/americas/south-america/peru/"]
+    dossier: "../dossiers/states/PER.md"
+    status: needs-public-order-unit-civic-project-jurisdiction-case-freeze
+
+  - state: PHL
+    entity: Philippines
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific anti-drug police/security operation materially involving extrajudicial killing, arbitrary/warrantless detention, fabricated evidence, torture/ill-treatment or obstruction of accountability"
+      - "specific counterterrorism/security project materially criminalising protected activism or causing enforced disappearance"
+    capacity_limit: "named unit/operation/case only; no generic Philippine National Police/security class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Truth and Reconciliation Commission", "ICC cooperation", "courts/legal aid/independent monitors", "generic online regulation/protest policing"]
+    identity_sources: ["https://www.hrw.org/news/2026/06/30/philippines-drug-war-abuses-persist-10-years-on"]
+    dossier: "../dossiers/states/PHL.md"
+    status: needs-anti-drug-unit-operation-and-counterterrorism-case-freeze
+
+  - state: QAT
+    entity: Qatar
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific security/cybercrime/public-order or surveillance project materially punishing protected expression, peaceful association or private communications"
+      - "specific labour-administration/enforcement failure materially enabling forced-labour-like coercion, retaliation, blocked mobility or unrecoverable wage abuse despite formal safeguards"
+    capacity_limit: "named security/surveillance case or labour-administration workflow only; labour system/employers/ministries not restricted generically"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["labour-complaint/remediation mechanisms", "ILO cooperation", "ordinary labour/migration administration", "lawful public-order activity"]
+    identity_sources: ["https://www.ilo.org/publications/state-qatar-and-ilo", "https://www.amnesty.org/en/location/middle-east-and-north-africa/qatar/report-qatar/"]
+    dossier: "../dossiers/states/QAT.md"
+    status: needs-security-surveillance-case-and-labour-workflow-freeze
+
+  - state: COG
+    entity: Republic of the Congo
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific political-security/public-order project materially carrying out arbitrary political detention or suppression of protected opposition/assembly"
+      - "specific detention facility/process involving serious ill-treatment or material obstruction of remedy"
+    capacity_limit: "named unit/case/facility only; no generic Congo security/police/prosecution/detention class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["independent judicial/monitoring/remedial activity", "unrelated administration/public services"]
+    identity_sources: ["https://www.amnesty.org/en/location/africa/west-and-central-africa/congo/"]
+    dossier: "../dossiers/states/COG.md"
+    status: needs-security-unit-political-case-detention-facility-freeze
+
+  - state: SGP
+    entity: Singapore
+    outcome: S
+    candidate_parties:
+      - "issuing ministry/public authority only in a frozen POFMA direction/prosecution materially implementing unlawful political repression"
+      - "specific public-order/assembly enforcement authority only in a frozen operation materially suppressing protected peaceful civic activity"
+    candidate_projects:
+      - "POFMA direction/prosecution process used to criminalise or coercively burden protected political, journalistic or rights expression"
+      - "specific public-order/assembly enforcement materially suppressing protected peaceful civic activity"
+    capacity_limit: "order/prosecution/operation-specific; capital punishment/execution expressly excluded as standalone ECL basis"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.1"]
+    exclusions: ["High Court/Court of Appeal POFMA review", "independent legal defence", "unrelated public administration", "capital punishment absent independent ECL criterion"]
+    identity_sources: ["https://www.judiciary.gov.sg/civil/appeals-under-the-protection-from-online-falsehoods-and-manipulation-act-%28pofma%29-%28from-1-april-2022%29/pofma-appeals", "https://www.mlaw.gov.sg/issuance-of-correction-direction-under-the-protection-from-online-falsehoods-and-manipulation-act/"]
+    dossier: "../dossiers/states/SGP.md"
+    status: ready-project-class
+
+# Batch-level translation records are governance work products only; no licensing effect.
