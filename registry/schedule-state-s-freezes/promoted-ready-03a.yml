@@ -1,0 +1,31 @@
+batch: promoted-ready-03a
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+records:
+  - state: JOR
+    entity: Jordan
+    outcome: S
+    schedule_identity: "State Security Court / Media Commission / governor detention qualifying project class"
+    project_boundary: "expression-only security prosecution, governor-administered detention without meaningful judicial challenge, qualifying cybercrime enforcement or politically grounded media-blocking orders"
+    capacity_limit: "case/order/detention-specific; no generic security/judicial/media-regulatory class"
+    exclusions: ["National Centre for Human Rights", "parliament", "ordinary courts providing independent remedy", "unrelated administration"]
+    schedule_status: ready-promoted-capacity-limited-parties
+
+  - state: LSO
+    entity: Lesotho
+    outcome: S
+    schedule_identity: "Lesotho Correctional Service qualifying detention/conditions project"
+    project_boundary: "Maseru correctional abuse/conditions project and materially continuous unremediated LCS practices"
+    capacity_limit: "LCS only in detention/conditions/accountability practices materially involving severe ill-treatment or coercive deprivation"
+    exclusions: ["Ombudsman", "courts", "remediation projects", "ordinary public services"]
+    schedule_status: ready-promoted-capacity-limited-party
+
+  - state: NGA
+    entity: Nigeria
+    outcome: S
+    schedule_identity: "Imo State Police Anti-Kidnapping Unit (Tiger Base) detention/custody project"
+    project_boundary: "Tiger Base detention/custody project described by the canonical dossier"
+    capacity_limit: "Tiger Base only in the documented project and materially continuous unremediated operations"
+    exclusions: ["National Human Rights Commission/NPM", "courts", "independent oversight/remediation", "security units lacking separate evidence"]
+    schedule_status: ready-promoted-named-unit-project
