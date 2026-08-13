@@ -1,0 +1,101 @@
+batch: 9
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 6
+schedule_ready_count: 0
+blocked_or_partial_count: 6
+
+records:
+  - state: GBR
+    entity: United Kingdom
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific counterterrorism protest-enforcement project materially applying terrorism powers to protected peaceful civic activity"
+      - "specific covert police-surveillance deployment materially targeting protected journalists, lawyers or lawful political/civic activity"
+      - "specific asylum/migration project materially implementing arbitrary detention, unsafe forced transfer or denial of meaningful individualized protection"
+    capacity_limit: "named legislation/order/operation/unit/deployment-specific; no generic Home Office/police/security or UK State class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["courts", "Parliament", "independent regulators", "public services", "unrelated government activity"]
+    identity_sources: ["https://www.judiciary.uk/judgments/home-secretary-v-huda-ammori/", "https://www.judiciary.uk/judgments/mkr-v-secretary-of-state-for-the-home-department-anonymity-order/"]
+    dossier: "../dossiers/states/GBR.md"
+    status: needs-counterterrorism-operation-surveillance-unit-and-migration-project-freeze
+
+  - state: USA
+    entity: United States
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "Operation Epic Fury — Minab school targeting chain, as separately defined in the canonical project dossier"
+      - "specific federal immigration/detention project materially implementing arbitrary detention, severe ill-treatment or forced transfer/expulsion without meaningful individualized protection"
+      - "specific federal surveillance/security project materially used for political repression, persecution, arbitrary detention or suppression of lawful dissent"
+    capacity_limit: "exact federal project/agency/unit/contractor in the capacity materially participating; blanket Federal Government class expressly rejected"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.2", "ECL-0.2 §5.6", "ECL-0.2 §5.7"]
+    exclusions: ["Federal Judiciary", "GAO", "inspectors general", "prosecutors investigating official abuse", "public defenders/legal defence", "Congress absent separate project evidence", "ordinary civilian departments/services", "State/local governments", "Palantir/Maven absent project-specific proof"]
+    identity_sources: ["../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md", "https://www.gao.gov/about", "https://www.uscourts.gov/about-federal-courts/court-role-and-structure"]
+    dossier: "../dossiers/states/USA.md"
+    status: needs-federal-detention-immigration-and-surveillance-project-agency-freeze
+
+  - state: UZB
+    entity: Uzbekistan
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific security/prosecutorial/prison or psychiatric-detention project materially involving fabricated/political prosecution, arbitrary detention, torture/ill-treatment or Karakalpakstan repression"
+      - "specific discriminatory law-enforcement project materially criminalising/blackmailing LGBTI people"
+      - "specific coercive eviction project"
+      - "specific agricultural production/quota system materially enforced through land-loss threats, violence, extortion or comparable coercion"
+    capacity_limit: "named agency/unit/case/facility/agricultural mandate/project only; no generic Uzbekistan State/security/agriculture class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Ombudsman/NPM", "independent torture prosecution", "unrelated reform/remedial projects", "non-coercive agriculture administration"]
+    identity_sources: ["https://www.hrw.org/news/2026/02/16/uzbekistan-cotton-wheat-farmers-exploited-abused", "https://ombudsman.uz/en/news/2026/05/18/tergov-hibsxonalarida-saqlanayotgan-shaxslar-uchun-moddiy-va-huquqiy-kafolatlar-kengaytirilmoqda"]
+    dossier: "../dossiers/states/UZB.md"
+    status: needs-security-case-facility-eviction-and-agricultural-mandate-freeze
+
+  - state: YEM
+    entity: Yemen
+    outcome: S
+    candidate_parties:
+      - "Huthi de facto detention/security apparatus, only after exact organizational/authority boundary is frozen"
+      - "internationally recognised-government detention/security unit only after exact unit is frozen"
+      - "STC/UAE-backed detention/security structure only after exact entity/control relationship is frozen"
+    candidate_projects:
+      - "specific actor-attributable arbitrary detention, disappearance, torture, reprisal against humanitarian/civic actors or unlawful coercive-targeting project"
+    capacity_limit: "actor-specific; Yemen is not a unitary party and rival actors never inherit one another's conduct"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Yemeni population/nationality", "humanitarian institutions", "independent civilian administration", "prisoner-exchange/remedial mechanisms", "rival actors absent their own attribution"]
+    identity_sources: ["https://www.un.org/sg/en/content/sg/statements/2026-06-10/statement-attributable-the-spokesperson-for-the-secretary-general-two-years-of-detention-of-un-and-other-personnel-yemen"]
+    dossier: "../dossiers/states/YEM.md"
+    status: needs-huthi-government-stc-uae-actor-boundary-and-unit-freeze
+
+  - state: ZMB
+    entity: Zambia
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific Cyber Crimes Act/security enforcement case materially criminalising protected journalism or peaceful political expression"
+      - "specific surveillance/interception deployment lacking meaningful safeguards and materially used for coercive political targeting"
+      - "specific public-order project materially obstructing peaceful opposition assembly or imposing arbitrary political detention"
+    capacity_limit: "named enforcement authority/case/order/deployment-specific; no generic Zambia cyber-security, police or State-security class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["courts", "constitutional litigation", "election administration absent separate evidence", "unrelated public services"]
+    identity_sources: ["https://www.amnesty.org/en/latest/news/2026/07/zambia-authorities-must-free-journalist-arrested-over-social-media-posts/"]
+    dossier: "../dossiers/states/ZMB.md"
+    status: needs-cyber-security-enforcement-authority-case-surveillance-deployment-freeze
+
+  - state: ZWE
+    entity: Zimbabwe
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific police/security/intelligence project materially using arbitrary political detention, surveillance/harassment or violent suppression of peaceful meetings/protest"
+      - "specific executive-administrative civil-society or presidential-term-extension enforcement project materially coercing protected political activity"
+    capacity_limit: "named unit/case/operation/administrative measure only; no generic Zimbabwe executive/security class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["independent courts", "lawyers/remedial functions", "unrelated public services", "death-penalty history as standalone ECL basis"]
+    identity_sources: ["https://www.hrw.org/news/2026/03/10/zimbabwe-violence-and-intimidation-against-opponents-of-presidential-term-extension", "https://www.hrw.org/news/2026/06/08/zimbabwe-opposition-activist-acquitted-freed-after-7-months"]
+    dossier: "../dossiers/states/ZWE.md"
+    status: needs-security-unit-case-and-term-extension-measure-freeze
+
+# Batch-level translation records are governance work products only; no licensing effect.
