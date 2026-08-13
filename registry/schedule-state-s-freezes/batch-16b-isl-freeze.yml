@@ -1,0 +1,18 @@
+state: ISL
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Act No. 88/2008 Articles 98-99 pre-trial solitary-confinement request/order process"
+project_boundary: "police/prosecutorial requests and judicial orders imposing pre-trial isolation under the identified Criminal Procedure Act provisions"
+capacity_limit: "only requests/orders/practices that exceed strict necessity and proportionality, including materially prolonged or vulnerable-person isolation"
+exclusions:
+  - "pre-trial custody generally"
+  - "isolation that independently satisfies necessity/proportionality safeguards"
+  - "courts acting as independent remedy or refusing disproportionate requests"
+  - "unrelated police/prosecutorial/prison activity"
+identity_sources:
+  - "https://island.is/en/pre-trial-detention"
+  - "https://www.amnesty.org/en/documents/eur28/1243/2026/en/"
+residual_scope: "no broader Iceland justice-sector class is created"
+schedule_status: ready-statutory-process-class
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
