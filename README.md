@@ -1,20 +1,36 @@
 # Exergic Commons License (ECL)
 
-> **Status: Draft 0.1 — experimental source-available ethical software license.**
+> **Status: Draft 0.2 — experimental source-available ethical software license.**
 
 The **Exergic Commons License (ECL)** is a source-available software license designed to preserve and expand human agency, truthful understanding, reversibility, distributed capacity, and the ability of people and communities to shape their own futures.
 
-ECL grants broad software rights while withholding permission from defined prohibited uses, Restricted Parties and Restricted Projects that materially contribute to coercive capture, systemic domination, deceptive population manipulation, repressive surveillance, unlawful coercive targeting or comparable destruction of meaningful agency.
+ECL grants broad software rights while withholding permission from defined prohibited uses, Restricted Parties and Restricted Projects that materially contribute to coercive capture, systemic domination, deceptive population manipulation, repressive surveillance, unlawful coercive targeting, unlawful political repression or comparable destruction of meaningful agency.
 
 ECL is **not OSI-approved Open Source** and is not intended to satisfy the Open Source Definition.
 
+## Current working draft
+
+`LICENSE` is now **ECL 0.2-DRAFT**. It was created after the 2026 State-review consistency audit identified a mismatch between the broader non-domination rule in `spec/PRINCIPLES.md` / `spec/GOVERNANCE.md` and the narrower operative wording of ECL 0.1.
+
+The immutable ECL 0.1 snapshot remains at [`versions/licenses/ECL-0.1.md`](versions/licenses/ECL-0.1.md). It has not been rewritten.
+
+ECL 0.2-DRAFT adds or clarifies:
+
+- an operative systematic-coercive-domination / unlawful-political-repression category consistent with the project principles;
+- direct Schedule designation of exact Restricted Projects;
+- a narrowly bounded `Independent Remediation Activity` exception for genuinely independent accountability/remedial functions;
+- a more explicit designation standard and Schedule-knowability rule; and
+- current repository paths and terminology.
+
+The global drafting audit is recorded in [`reviews/2026/consistency/global-license-fit-audit.md`](reviews/2026/consistency/global-license-fit-audit.md).
+
 ## Start here
 
-- [`LICENSE`](LICENSE) — current working license text.
+- [`LICENSE`](LICENSE) — current working license text (ECL 0.2-DRAFT).
 - [`schedules/`](schedules/) — versioned Restricted Parties Schedules. A schedule has licensing effect only when a software release expressly incorporates that exact schedule.
 - [`spec/`](spec/) — principles, governance, terminology and designation standards.
 - [`dossiers/`](dossiers/) — per-entity evidence records. Dossiers do not create licensing restrictions by themselves.
-- [`reviews/`](reviews/) — adjudication and adversarial-review history.
+- [`reviews/`](reviews/) — adjudication, adversarial-review and consistency-audit history.
 - [`registry/`](registry/) — machine-readable governance registry.
 - [`versions/`](versions/) — immutable historical license/version snapshots.
 
@@ -22,21 +38,23 @@ ECL is **not OSI-approved Open Source** and is not intended to satisfy the Open 
 
 ECL deliberately separates law-like terms from research and governance records:
 
-1. **`LICENSE`** defines the operative license terms.
-2. **The exact Schedule incorporated by a software release** defines its Restricted Parties.
+1. **The exact ECL license text adopted by a software release** defines the operative license terms.
+2. **The exact Schedule incorporated by that release** defines its Restricted Parties, Restricted Projects, classes and express exclusions.
 3. **`spec/`** governs how future designations are reasoned, reviewed and interpreted, but does not silently create restrictions.
-4. **`dossiers/`, `reviews/` and `registry/`** are evidence and governance records. They have no licensing effect unless a later Schedule expressly adopts a designation.
+4. **`dossiers/`, `reviews/` and `registry/`** are evidence and governance records. They have no licensing effect unless a Schedule expressly adopts a designation.
 
-No later Schedule silently or retroactively changes rights attached to an earlier software release.
+No later ECL version or Schedule silently or retroactively changes rights attached to an earlier software release.
 
 ## Designation lifecycle
 
 ```text
 proposal / evidence
         ↓
-entity dossier
+entity or project dossier
         ↓
 adversarial review
+        ↓
+license-fit / consistency review
         ↓
 reasoned governance determination
         ↓
@@ -51,9 +69,13 @@ A designation concerns an institutional actor, project or materially participati
 
 ## 2026 State review
 
-The repository contains an ECL-native review of 195 State entities. The current governance status is provisional and remains subject to adversarial review. See [`reviews/2026/`](reviews/2026/) and the per-State records in [`dossiers/states/`](dossiers/states/).
+The repository contains an ECL-native review of **195 State entities**. Initial adjudication, whole-State adversarial review, scoped `S` review, full `U` review, original-`N` review and detailed dossier normalization are complete.
 
-These findings are **not** the operative Restricted Parties Schedule.
+**195 / 195 State dossiers are self-contained at the 2026-08-11 evidence cutoff.**
+
+The current governance distribution remains provisional and is recorded in [`registry/states.yml`](registry/states.yml). These findings are **not** an operative Restricted Parties Schedule.
+
+The next evidence/governance step is a delta review of State determinations against the exact ECL 0.2-DRAFT language before a new Schedule is generated.
 
 ## Why exergism?
 
