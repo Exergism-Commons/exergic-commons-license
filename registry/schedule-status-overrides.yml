@@ -1,0 +1,16 @@
+version: "2026-08-13"
+status: provisional-governance
+operative: false
+base_index: "schedule-translations.yml"
+precedence: "This overlay supersedes blocker categories in the base index until the next consolidated snapshot."
+current_status_review:
+  - UKR
+  - LAO
+  - IRQ
+  - MDA
+identity_project_pending:
+  - COL
+  - GRC
+  - PHL
+
+# Aggregate Schedule-preparation status only; no licensing effect.
