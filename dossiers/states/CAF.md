@@ -4,12 +4,12 @@ entity: "Central African Republic"
 iso3: CAF
 issue: 33
 provisional_outcome: S
-provisional_scope: "identified government forces, State-aligned/contracted armed actors and security operations materially connected to unlawful attacks, killings, disappearance, torture or coercive repression"
+provisional_scope: "27 February 2026 Ouanda-Djale FACA incident and other separately frozen current State-attributable security projects; independent accountability/remediation excluded"
 confidence: high
-evidence_cutoff: 2026-08-11
-last_reviewed: 2026-08-11
-review_stage: scoped-adversarial-reviewed
-adversarial_result: "UPHOLD / NARROW S; SCC excluded"
+evidence_cutoff: 2026-08-13
+last_reviewed: 2026-08-13
+review_stage: schedule-status-revalidated
+adversarial_result: "UPHOLD / NARROW S to current attributable incident; broader historical security scope remains governance-only"
 operative: false
 ---
 # Central African Republic
@@ -18,34 +18,33 @@ operative: false
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.**
+**S — Restricted with defined current scope.** The Schedule-ready basis is the 27 February 2026 Ouanda-Djalé incident and any separately frozen current State-attributable security project, not the security sector generally.
 
-## 2. Evidence supporting the determination
+## 2. Evidence supporting determination
 
-Current reporting documents unlawful attacks and killings by government forces and allies alongside non-State armed-group violence, as well as expression, detention and disappearance concerns.
+MINUSCA reported that incidents on 27 February 2026 in Ouanda-Djalé caused the deaths of three young people and about ten gunshot injuries. During a 2 March joint mission, the local FACA detachment acknowledged partial responsibility for the events.
 
 ## 3. Counter-evidence and exergic institutions
 
-The UN-backed hybrid Special Criminal Court remains a genuine accountability institution with active investigations/trials; in June 2026 it opened the Bozizé crimes-against-humanity trial. Funding and warrant-enforcement problems limit but do not negate its role.
+MINUSCA and State authorities conducted dialogue/remediation missions, while the Special Criminal Court and other accountability institutions remain active. MINUSCA also supports human-rights training and security-sector reform.
 
 ## 4. Attribution and exclusions
 
-Scope follows identified government/State-aligned security operations materially tied to prohibited conduct. The SCC, independent investigators/prosecutors and victim-remediation projects are excluded.
+Scope follows only materially participating FACA personnel/functions in the frozen Ouanda-Djalé incident and separately evidenced current projects. The Special Criminal Court, independent investigation/remediation, unrelated FACA/security functions and non-State armed actors are excluded.
 
 ## 5. Adversarial determination
 
-**UPHOLD / NARROW S.**
+**UPHOLD / NARROW `S`.** Fresh 2026 evidence supports a current attributable incident, while active reform/accountability defeats any broader apparatus class.
 
 ## 6. Review triggers
 
-Effective SCC/national prosecutions, execution of warrants, termination of abusive allied-force relationships and security-sector reform.
+Independent investigation/remedy for the February incident, command accountability, non-recurrence and verified rights-compliant security operations.
 
 ## 7. Sources
 
-- https://www.amnesty.org/en/location/africa/west-and-central-africa/central-african-republic/report-central-african-republic/
-- https://www.amnesty.org/en/latest/news/2026/06/car-bozize/
-- https://www.amnesty.org/en/latest/news/2026/02/car-special-criminal-court-2/
+- https://minusca.unmissions.org/fr/node/134381
+- https://minusca.unmissions.org/fr/node/135293
 
 ## 8. Procedural history
 
-Issue #33 · `../../reviews/2026/adversarial/scoped/tranche-03.md`
+Issue #33 · `../../reviews/2026/adversarial/scoped/tranche-03.md` · 2026-08-13 Schedule current-status revalidation
