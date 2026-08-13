@@ -1,0 +1,16 @@
+state: QAT
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "28 February-9 March 2026 Ministry of Interior online-content enforcement cohort"
+project_boundary: "the 313-person cohort publicly identified by Qatar News Agency and the competent cybercrime department"
+capacity_limit: "this exact recording/sharing/information-enforcement cohort only"
+exclusions:
+  - "cybercrime or police activity generally"
+  - "unrelated investigations"
+  - "courts and independent remediation"
+identity_sources:
+  - "https://qna.org.qa/es-ES/news/news-details?date=9%2F03%2F2026&id=el-ministerio-del-interior-anuncia-la-detencion-de-313-personas-por-grabar-y-difundir-informacion-enganosa"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-frozen-cohort
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
