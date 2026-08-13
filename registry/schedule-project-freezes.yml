@@ -1,0 +1,31 @@
+version: "2026-08-13-ecl-0.2-project-freeze"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+projects:
+  - id: OPERATION-EPIC-FURY-MINAB-TARGETING
+    outcome: S
+    freeze_status: fully-frozen-direct-project
+    schedule_identity: "Operation Epic Fury — 28 February 2026 Minab / Shajareh Tayyebeh Elementary School targeting chain"
+    temporal_boundary:
+      start: "2026-02-28"
+      end: "2026-02-28"
+    operator_boundary: "United States / U.S. Central Command operational chain, only to the extent of Material Participation in planning, target development, approval, execution or technical support for the frozen Minab strike"
+    prohibited_capacity: "targeting/planning/execution workflow associated with the strike where the identified feasible-precautions/civilian-protection failure satisfies ECL 0.2 §5.2"
+    exclusions:
+      - "Operation Epic Fury generally"
+      - "other U.S. or Israeli targets/strikes absent separate evidence"
+      - "Palantir Technologies, Maven Smart System or any other supplier absent project-specific Material Participation evidence"
+      - "personnel/contractors whose Material Participation in this exact targeting chain is not established"
+      - "ordinary military targeting activity not independently satisfying ECL §5.2"
+    continuation_rule: "No later or parallel Epic Fury targeting workflow is included merely by continuity. Any continuation requires a separate frozen evidentiary finding that the same qualifying defect persisted."
+    identity_sources:
+      - "https://www.centcom.mil/OPERATIONS-AND-EXERCISES/EPIC-FURY/"
+      - "https://www.amnesty.org/en/latest/news/2026/03/usa-iran-those-responsible-for-deadly-and-unlawful-us-strike-on-school-that-killed-over-100-children-must-be-held-accountable/"
+    dossier: "../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md"
+    schedule_status: ready-direct-restricted-project
+
+# Direct-project freeze avoids the need to name every internal participant where
+# the project itself is objectively identifiable. Material Participation still
+# controls whether a particular licensee/use falls within the frozen project.
