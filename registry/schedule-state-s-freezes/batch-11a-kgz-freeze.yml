@@ -1,0 +1,17 @@
+state: KGZ
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Makhabat Tazhibek-kyzy retrial and travel-restriction project"
+project_boundary: "the continued criminal proceeding against Makhabat Tazhibek-kyzy after the 10 March 2026 Supreme Court retrial order, including the travel restriction and materially participating prosecution process that remained active on 2 June 2026"
+capacity_limit: "this named proceeding and associated coercive restriction only"
+exclusions:
+  - "Kyrgyz courts, prosecution or media regulation generally"
+  - "the custodial sentence overturned on 10 March 2026 as a currently operative measure"
+  - "remedial proceedings or final dismissal/acquittal"
+identity_sources:
+  - "https://www.amnesty.org/en/latest/news/2026/03/kyrgyzstan-authorities-must-drop-trumped-up-charges-against-makhabat-tazhibek-kyzy-following-her-release-from-prison/"
+  - "https://24.kg/english/376334_Bishkek_City_Court_refuses_to_dismiss_Makhabat_Tazhibek_kyzys_criminal_case/"
+residual_scope: "other security, media, extremism and religious-enforcement scope remains governance-only until separately frozen"
+schedule_status: ready-named-case-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
