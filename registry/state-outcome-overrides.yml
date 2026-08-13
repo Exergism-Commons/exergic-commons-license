@@ -1,0 +1,19 @@
+version: "2026-08-13-post-delta-overrides"
+status: provisional-governance
+operative: false
+base_registry: "states.yml"
+precedence: "Entries in this file supersede the same State outcome in base_registry until the next consolidated State registry snapshot."
+counts_after_overrides:
+  R: 34
+  S: 85
+  U: 29
+  N: 47
+overrides:
+  BOL:
+    from: S
+    to: U
+    dossier: "../dossiers/states/BOL.md"
+    reviewed: "2026-08-13"
+    reason: "later independent monitoring materially weakened the emergency-deployment basis for the prior S escalation"
+
+# Governance overlay only; no licensing effect.
