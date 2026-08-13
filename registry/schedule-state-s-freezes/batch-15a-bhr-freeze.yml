@@ -1,0 +1,17 @@
+state: BHR
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Jaww Prison detention-conditions and political-detainee retaliation project"
+project_boundary: "Jaww Prison practices identified in the January 2026 UN Committee against Torture concluding observations, limited to the documented conditions, collective-punishment, excessive-force and prolonged-solitary-confinement concerns"
+capacity_limit: "Jaww Prison custody/administration only where the specific practice independently satisfies ECL 0.2 §5.6"
+exclusions:
+  - "Bahrain correctional, police, intelligence or justice institutions generally"
+  - "ordinary lawful detention administration"
+  - "independent monitoring, medical care and remedial activity"
+  - "practices independently shown remediated after the frozen CAT record"
+identity_sources:
+  - "https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=%2F0aLqb%2BD86wFVEqMSMj7marJZz7q6eZ6uue7ppBVcvL3oDOFbTK%2F91v4HcvhDP%2FDvPnT%2BfyBG2imgEaPIfezcQ%3D%3D"
+residual_scope: "other counterterrorism, speech and detention projects remain governance-only until separately frozen"
+schedule_status: ready-facility-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
