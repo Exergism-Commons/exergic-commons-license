@@ -4,49 +4,67 @@ entity: "South Sudan"
 iso3: SSD
 issue: 164
 provisional_outcome: S
-provisional_scope: "security/intelligence, arbitrary/secret detention and substantiated state-aligned conflict operations"
+provisional_scope: "NSS/intelligence, military, police and attributable state-aligned security projects involving arbitrary/secret detention, political repression or unlawful conflict operations"
 confidence: high
 evidence_cutoff: 2026-08-11
 last_reviewed: 2026-08-11
-review_stage: whole-state-adversarial-reviewed
-adversarial_result: "DOWNGRADE R -> S"
+review_stage: scoped-adversarial-reviewed
+adversarial_result: "UPHOLD and expand defined S after prior R -> S; severe current military/security evidence does not erase functioning judicial counter-institutions"
 operative: false
 ---
 # South Sudan
 
-> Governance record only; no licensing effect by itself.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.**
+**S — Restricted with defined scope.** The 2026 conflict/security record is severe and strengthens the scoped restriction, but whole-State `R` remains overbroad while formal justice institutions continue producing material contrary outcomes.
 
-## 2. Evidence preserving scoped restriction
+## 2. ECL criteria engaged
 
-Serious arbitrary detention, political repression, conflict-related civilian harm and security-sector abuse remain attributable to State/security institutions. Conflict fragmentation and multiple armed actors make whole-State attribution especially risky.
+Current review concerns:
 
-## 3. Counter-evidence and exergic institutions
+- arbitrary/incommunicado or secret detention, torture and enforced disappearance;
+- political repression through intelligence/security organs;
+- unlawful or indiscriminate State-aligned attacks on civilians and reprisals;
+- material obstruction of humanitarian or accountability activity.
 
-The Judiciary, Ministry of Justice, prosecutors and police investigators participate in mobile justice interventions that produce actual case review, judgments and dispute resolution. UNMISS-supported mobile courts concluded criminal/SGBV cases in 2026, and a Leer mobile court dismissed a case involving a woman alleging torture in detention. Prison officers also participated in human-rights reform training.
+## 3. Evidence supporting `S`
 
-## 4. Attribution and exclusions
+A 1 April 2026 UN Special Procedures communication addressed South Sudan over serious alleged violations against civilians linked to intensified military operations since late December 2025. Wider UN reporting describes renewed conflict, arbitrary/prolonged detention, repression and severe civilian harm involving government/state-aligned forces.
 
-The restriction follows intelligence/security and detention organs involved in political detention/torture/secret detention and substantiated state-aligned unlawful conflict operations. Judiciary/mobile-court/remediation functions are excluded absent separate evidence.
+The current evidence therefore strengthens rather than weakens the security/military component of the prior `S`.
 
-## 5. Adversarial determination
+## 4. Counter-evidence and exergic institutions
 
-**DOWNGRADE R → S.** The original finding collapsed a fragmented and partially reforming State too broadly into abusive security components.
+The Judiciary of South Sudan, Ministry of Justice, prosecutors and police investigators continue participating in mobile justice interventions with measurable results. A southern Unity mobile court concluded 68 cases in April 2026, released 29 people who were wrongfully detained or had completed sentences and heard cases involving members of security forces. In July 2026 a first judicial mission to Duk reviewed criminal cases and resolved civil disputes.
 
-## 6. Review triggers
+These are substantive rights-protective State functions, not merely announced reforms, and therefore prevent recursive attribution of coercive security conduct to the whole State.
 
-Expansion of functioning justice access, accountability for arbitrary detention/conflict abuses, closure/reform of secret detention and demonstrable civilian control.
+## 5. Attribution and exclusions
 
-## 7. Sources
+The active scope covers **NSS/intelligence, military, police or other attributable State-aligned security projects materially involved in arbitrary/incommunicado or secret detention, torture/ill-treatment, enforced disappearance, political repression, unlawful/indiscriminate attacks on civilians, reprisals or material obstruction of humanitarian/accountability work**.
 
-- https://unmiss.unmissions.org/en/node/134575
-- https://unmiss.unmissions.org/en/news/first-judicial-mission-to-remote-duk-county-brings-fresh-hope-for-justice
+Rival armed/opposition actors require separate attribution. The Judiciary, mobile courts, prosecutors/investigators acting independently to remedy abuse, legal aid and unrelated civilian functions are excluded.
+
+## 6. Adversarial determination
+
+**UPHOLD AND EXPAND DEFINED `S` after prior `R → S`; NO `R` RE-ESCALATION.** Severe current military/security evidence warrants a stronger defined scope, but functioning justice institutions still make a whole-State designation inaccurate.
+
+## 7. Review / removal triggers
+
+**Move toward `U/N`** on closure/reform of secret detention, release/remedy for arbitrary detainees, independent command accountability for civilian harm, effective civilian control and durable expansion of functioning judicial access.
+
+**Re-escalate toward `R`** only if independent justice/remedial institutions become materially captured or incapable of producing meaningful contrary outcomes across the governing/security system.
+
+## 8. Sources
+
+- https://spcommreports.ohchr.org/TmSearch/RelCom?code=SSD+1%2F2026
+- https://unmiss.unmissions.org/en/press-releases/information-note-unmiss-supported-southern-unity-mobile-court-concludes-in
 - https://unmiss.unmissions.org/en/node/135155
-- https://unmiss.unmissions.org/en/news/prison-officers-trained-human-rights-pave-way-fairer-and-stronger-justice-system
+- https://unmiss.unmissions.org/en/news/first-judicial-mission-to-remote-duk-county-brings-fresh-hope-for-justice
+- https://unmiss.unmissions.org/en/node/134575
 
-## 8. Procedural history
+## 9. Procedural history
 
-Issue #164 · `../../reviews/2026/adversarial/state-level/tranche-03.md`
+Issue #164 · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md`
