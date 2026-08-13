@@ -20,23 +20,21 @@ ECL 0.2-DRAFT adds or clarifies:
 - direct Schedule designation of exact Restricted Projects;
 - a narrowly bounded `Independent Remediation Activity` exception for genuinely independent accountability/remedial functions;
 - a more explicit designation standard and Schedule-knowability rule; and
-- current repository paths and terminology.
+- current repository paths and cross-entity terminology.
 
-The global drafting audit is recorded in [`reviews/2026/consistency/global-license-fit-audit.md`](reviews/2026/consistency/global-license-fit-audit.md), followed by the complete [`ECL 0.2 State delta audit`](reviews/2026/consistency/ecl-0.2-state-delta.md).
+The global drafting audit is recorded in [`reviews/2026/consistency/global-license-fit-audit.md`](reviews/2026/consistency/global-license-fit-audit.md), followed by the complete [`ECL 0.2 State delta audit`](reviews/2026/consistency/ecl-0.2-state-delta.md) and [`cross-entity reconciliation`](reviews/2026/consistency/cross-entity-reconciliation.md).
 
 ## Start here
 
 - [`LICENSE`](LICENSE) — current working license text (ECL 0.2-DRAFT).
 - [`schedules/`](schedules/) — versioned Restricted Parties Schedules. A schedule has licensing effect only when a software release expressly incorporates that exact schedule with the exact ECL version.
 - [`spec/`](spec/) — principles, governance, terminology and designation standards.
-- [`dossiers/`](dossiers/) — per-entity evidence records. Dossiers do not create licensing restrictions by themselves.
+- [`dossiers/`](dossiers/) — canonical State, organization, person and project evidence/governance records.
 - [`reviews/`](reviews/) — adjudication, adversarial-review and consistency-audit history.
-- [`registry/`](registry/) — machine-readable governance registry.
+- [`registry/`](registry/) — machine-readable governance and Schedule-translation registries.
 - [`versions/`](versions/) — immutable historical license/version snapshots.
 
 ## Normative hierarchy
-
-ECL deliberately separates law-like terms from research and governance records:
 
 1. **The exact ECL license text adopted by a software release** defines the operative license terms.
 2. **The exact Schedule incorporated by that release** defines its Restricted Parties, Restricted Projects, classes and express exclusions.
@@ -50,13 +48,13 @@ No later ECL version or Schedule silently or retroactively changes rights attach
 ```text
 proposal / evidence
         ↓
-entity or project dossier
+canonical State / organization / person / project dossier
         ↓
 adversarial review
         ↓
-license-fit / consistency review
+license-fit / cross-entity consistency review
         ↓
-reasoned governance determination
+Schedule identity / project-boundary translation
         ↓
 versioned Restricted Parties Schedule
         ↓
@@ -65,7 +63,7 @@ explicit incorporation by a software release
 licensing effect
 ```
 
-A designation concerns an institutional actor, project or materially participating entity. It does **not** impose guilt by nationality, ethnicity, religion, residence or remote association.
+A designation concerns an institutional actor, project or materially participating entity. It does **not** impose guilt by nationality, ethnicity, religion, residence, employment graph or remote association.
 
 ## 2026 State review
 
@@ -73,7 +71,7 @@ The repository contains an ECL-native review of **195 State entities**. Initial 
 
 **195 / 195 State dossiers are self-contained at the 2026-08-11 evidence cutoff.**
 
-After the ECL 0.2 normative delta, the current provisional governance distribution is:
+Post-ECL-0.2 provisional State distribution:
 
 - **34 `R`**
 - **86 `S`**
@@ -81,15 +79,45 @@ After the ECL 0.2 normative delta, the current provisional governance distributi
 - **47 `N`**
 - **195 total**
 
-The delta narrowed the United States and Israel from whole-apparatus `R` to scoped `S` under the narrowest-accurate-attribution rule, and narrowed Singapore's `S` by removing capital punishment/execution as a standalone ECL basis. The 28 `U` cases were all re-read and remained unresolved for factual/attribution reasons rather than merely because ECL 0.1 had narrower wording.
+The delta narrowed the United States and Israel from whole-apparatus `R` to scoped `S` under the narrowest-accurate-attribution rule, and narrowed Singapore's `S` by removing capital punishment/execution as a standalone ECL basis. All 28 `U` cases were re-read and remained unresolved for factual/attribution reasons rather than merely because ECL 0.1 had narrower wording.
 
-The canonical governance state is [`registry/states.yml`](registry/states.yml). These findings are **not** an operative Restricted Parties Schedule.
+The canonical State governance source is [`registry/states.yml`](registry/states.yml).
 
-## Schedule status
+## Cross-entity reconciliation
 
-[`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) predates the completed State cycle and ECL 0.2 consistency work. It is historical/pre-0.2 draft material and should **not** be adopted with ECL 0.2-DRAFT.
+Draft 0.4 contained companies, armed organizations, natural-person classes and named projects without canonical non-State dossiers. That lifecycle gap is now being removed.
 
-The next Schedule candidate should be regenerated from the post-delta dossiers after State/organization/person/project reconciliation.
+Canonical organization/person/project schemas exist, and the first reconciled corpus is machine-readable in:
+
+- [`registry/organizations.yml`](registry/organizations.yml)
+- [`registry/projects.yml`](registry/projects.yml)
+- [`registry/persons.yml`](registry/persons.yml)
+
+Current core non-State results include:
+
+- Palantir Technologies Inc. — `U` organization-level; specific ICE/Maven deployments reviewed separately rather than whole-company restriction;
+- NSO Group and Candiru — scoped `S` commercial-spyware candidates;
+- Intellexa/Predator network — scoped `S`, with exact legal entities required in the Schedule;
+- Al-Qaida / ISIL-Da'esh / Izz al-Din al-Qassam Brigades / RSF — organization-level `R` candidates;
+- Hamas / SAF / SDF-RADA — scoped `S` organization candidates;
+- Mitiga detention apparatus — `R` project candidate;
+- Minab targeting chain — scoped `S` project candidate;
+- ICE ICM/IA and Maven Smart System — `U`, because sensitive dual-use capability is not enough without project-specific prohibited-use evidence; and
+- no current person-level `R/S` candidate; ICC-warrant status is evidence, not automatic ECL restriction.
+
+External UN sanctions and ICC warrant lists are treated as evidence/identity sources, **not automatically imported as mutable ECL classes**.
+
+## Schedule readiness
+
+[`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) is historical/pre-0.2 draft material and must not be adopted with ECL 0.2-DRAFT.
+
+The readiness analysis is recorded in [`reviews/2026/consistency/schedule-readiness.md`](reviews/2026/consistency/schedule-readiness.md). A machine-readable work queue lives at [`registry/schedule-translations.yml`](registry/schedule-translations.yml).
+
+All **34 State `R` candidates now have frozen candidate apparatus identities** in [`registry/schedule-state-r-freeze.yml`](registry/schedule-state-r-freeze.yml).
+
+The main remaining Schedule gate is translation of the **86 State `S` outcomes** from dossier-level descriptions such as `security apparatus`, `border system` or `detention project` into exact agencies, units, named projects or objectively determinable classes with capacity limitations and exclusions.
+
+A fresh Schedule will be generated from the translation registry only after those entries pass knowability; Draft 0.4 will not be patched into apparent compatibility.
 
 ## Why exergism?
 
