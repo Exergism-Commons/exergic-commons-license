@@ -1,0 +1,90 @@
+version: "2026-08-13-ecl-0.2-armed-organization-freeze"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+organizations:
+  - id: AL-QAIDA
+    outcome: R
+    freeze_status: identity-frozen
+    schedule_identity: "AL-QAIDA — UN Security Council permanent reference QDe.004"
+    scope_rule: "organization itself only"
+    exclusions:
+      - "affiliates, splinters, individuals or associated entities absent separate ECL identity/control analysis"
+      - "the remainder of the UN sanctions list"
+    dossier: "../dossiers/organizations/AL-QAIDA.md"
+    schedule_status: ready-organization
+
+  - id: ISIL-DAESH
+    outcome: R
+    freeze_status: identity-frozen
+    schedule_identity: "Islamic State in Iraq and the Levant / ISIL / Da'esh — UN permanent reference QDe.115"
+    scope_rule: "core organization identified by the frozen reference only"
+    exclusions:
+      - "territorial affiliates, splinters or similarly named groups absent separate review"
+      - "individuals or populations by association"
+    dossier: "../dossiers/organizations/ISIL-DAESH.md"
+    schedule_status: ready-organization
+
+  - id: IZZ-AL-DIN-AL-QASSAM-BRIGADES
+    outcome: R
+    freeze_status: identity-alias-frozen
+    schedule_identity: "Izz al-Din al-Qassam Brigades"
+    frozen_aliases:
+      - "al-Qassam Brigades"
+    scope_rule: "armed/military-wing command, operational, hostage/detention, logistics and technical structures acting for the organization"
+    exclusions:
+      - "Hamas civilian/political/social functions not materially participating in the frozen organization/project"
+      - "other Palestinian armed groups"
+      - "individuals absent membership or Material Participation evidence"
+    dossier: "../dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md"
+    schedule_status: ready-organization
+
+  - id: RAPID-SUPPORT-FORCES
+    outcome: R
+    freeze_status: identity-frozen
+    schedule_identity: "Rapid Support Forces (RSF)"
+    scope_rule: "RSF organization and materially controlled operational/detention structures"
+    exclusions:
+      - "undefined associated forces or local armed groups absent control/Material Participation evidence"
+      - "persons or civilians by geography or association"
+    dossier: "../dossiers/organizations/RAPID-SUPPORT-FORCES.md"
+    schedule_status: ready-organization
+
+  - id: HAMAS
+    outcome: S
+    freeze_status: scope-frozen
+    schedule_identity: "Hamas"
+    scope_rule: "only armed-command, hostage/detention, procurement/logistics/technical or other exact Hamas-controlled structures/projects materially participating in conduct covered by the canonical dossier"
+    exclusions:
+      - "civilian population"
+      - "unrelated civil administration, political opinion or humanitarian activity"
+      - "the al-Qassam organization where a separate direct entry controls"
+    dossier: "../dossiers/organizations/HAMAS.md"
+    schedule_status: ready-capacity-limited-organization
+
+  - id: SUDANESE-ARMED-FORCES
+    outcome: S
+    freeze_status: synchronized-cross-entity
+    schedule_identity: "Sudanese Armed Forces (SAF)"
+    scope_rule: "no broader than the exact SAF/state-aligned scope frozen through the canonical Sudan State record"
+    exclusions:
+      - "Rapid Support Forces and other armed actors"
+      - "unrelated civilian State functions"
+      - "independent remediation"
+    dossier: "../dossiers/organizations/SUDANESE-ARMED-FORCES.md"
+    schedule_status: ready-by-state-scope-reference
+
+  - id: SDF-RADA
+    outcome: S
+    freeze_status: synchronized-cross-entity
+    schedule_identity: "Special Deterrence Forces / RADA"
+    scope_rule: "only the Mitiga detention/security apparatus and materially continuous structures within the canonical organization/project records"
+    exclusions:
+      - "unrelated Libyan authorities or functions"
+      - "individual persons absent separate status or Material Participation"
+    dossier: "../dossiers/organizations/SDF-RADA.md"
+    linked_project: "MITIGA-DETENTION-APPARATUS"
+    schedule_status: ready-by-project-reference
+
+# Identity/scope preparation only; no licensing effect until an exact Schedule adopts an entry.
