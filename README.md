@@ -111,13 +111,17 @@ External UN sanctions and ICC warrant lists are treated as evidence/identity sou
 
 [`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) is historical/pre-0.2 draft material and must not be adopted with ECL 0.2-DRAFT.
 
-The readiness analysis is recorded in [`reviews/2026/consistency/schedule-readiness.md`](reviews/2026/consistency/schedule-readiness.md). A machine-readable work queue lives at [`registry/schedule-translations.yml`](registry/schedule-translations.yml).
+The readiness analysis is recorded in [`reviews/2026/consistency/schedule-readiness.md`](reviews/2026/consistency/schedule-readiness.md). The machine-readable work queue is [`registry/schedule-translations.yml`](registry/schedule-translations.yml).
 
-All **34 State `R` candidates now have frozen candidate apparatus identities** in [`registry/schedule-state-r-freeze.yml`](registry/schedule-state-r-freeze.yml).
+State candidate processing is now complete at the **translation** layer:
 
-The main remaining Schedule gate is translation of the **86 State `S` outcomes** from dossier-level descriptions such as `security apparatus`, `border system` or `detention project` into exact agencies, units, named projects or objectively determinable classes with capacity limitations and exclusions.
+- **34 / 34 `R`** — candidate apparatus identity freezes complete in [`registry/schedule-state-r-freeze.yml`](registry/schedule-state-r-freeze.yml).
+- **86 / 86 `S`** — Schedule Translation Records complete across [`registry/schedule-state-s-translations.yml`](registry/schedule-state-s-translations.yml) and `registry/schedule-state-s-batches/`.
+- Of those 86 `S` translations, **18 are sufficiently knowable for candidate Schedule rendering now** and **68 require a final identity/project freeze**.
 
-A fresh Schedule will be generated from the translation registry only after those entries pass knowability; Draft 0.4 will not be patched into apparent compatibility.
+The 68 are not unresolved ECL classifications. Each already has an explicit translation record identifying exactly what remains to freeze — for example an agency/unit legal name, detention facility, prosecution/case, statutory implementing authority, public-order operation, surveillance deployment, controlled-proxy relation or temporal project boundary.
+
+A fresh Schedule will be generated only after those remaining freezes and scoped non-State identity freezes pass knowability. Draft 0.4 will not be patched into apparent compatibility.
 
 ## Why exergism?
 
