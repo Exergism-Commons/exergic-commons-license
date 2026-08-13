@@ -6,18 +6,13 @@ Audit date: **2026-08-13**
 
 ## 1. Current answer
 
-Can the current post-ECL-0.2 governance records be converted directly into an adoptable Restricted Parties Schedule without vague or unknowable obligations?
+A post-ECL-0.2 Schedule is **not yet ready for adoption**, but the work is now separated into evidence, identity and rendering layers.
 
-**Not yet.** Substantive State review and Schedule translation are complete, but identity/project-boundary freeze is incomplete for part of the scoped `S` cohort.
-
-The gate now separates two questions that Draft 0.4 incorrectly mixed together:
-
-1. **Does the evidence support an ECL restriction?** — completed for the State corpus.
-2. **Can a reasonable licensee determine exactly who/what is restricted from the Schedule text itself?** — complete for all State `R` candidates and only part of State `S` candidates.
+The State evidence cycle and Schedule translation cycle are complete. The remaining State work is exact identity/project-boundary freeze.
 
 ## 2. State governance inventory
 
-Post-ECL-0.2 State delta:
+Current post-ECL-0.2 State registry:
 
 - `R`: **34**
 - `S`: **86**
@@ -25,143 +20,104 @@ Post-ECL-0.2 State delta:
 - `N`: **47**
 - total: **195**
 
-Only `R`/`S` are potential Schedule inputs. `U` and `N` have no restriction effect.
+Only `R`/`S` can generate Schedule candidates. `U`/`N` remain non-operative governance outcomes.
 
-## 3. State Schedule translation status
+## 3. State Schedule engineering status
 
-### `R` cohort
+### `R`
 
 **34 / 34 identity freezes complete.**
 
-`registry/schedule-state-r-freeze.yml` translates each current `R` dossier into a candidate governing/coercive apparatus class and carries common exclusions for:
+The canonical freeze source is `registry/schedule-state-r-freeze.yml`.
 
-- population/nationality;
-- independent private actors;
-- unrelated non-controlled entities; and
-- qualifying Independent Remediation Activity.
-
-The special de facto/military/transitional cases are frozen as those actual apparatuses rather than generic `Government of X` labels.
-
-### `S` cohort
+### `S`
 
 **86 / 86 Schedule Translation Records complete.**
 
-The records are distributed across:
+Current freeze status from `registry/schedule-translations.yml`:
 
-- `registry/schedule-state-s-translations.yml` — first 20;
-- `registry/schedule-state-s-batches/batch-03-security-political.yml`;
-- `batch-04-conflict-security.yml`;
-- `batch-05-civic-security.yml`;
-- `batch-06-detention-political.yml`;
-- `batch-07-security-civic.yml`;
-- `batch-08-conflict-detention.yml`; and
-- `batch-09-final.yml`.
+- **19** `S` records fully frozen;
+- **11** additional `S` records with at least one precise, Schedule-renderable narrowed subset;
+- **1** record where identity is resolved but current deployment/remediation status must be revalidated before rendering; and
+- **55** records still requiring an exact identity, unit, case, facility, order, deployment or project boundary.
 
-A direct status audit of those records yields:
+Therefore **30 / 86 State `S` dossiers already have at least one Schedule-renderable entry**.
 
-- **18 `S` translations sufficiently knowable for draft Schedule rendering now**;
-- **68 `S` translations requiring one or more additional identity/project freezes**.
+## 4. Narrowed-subset rule
 
-The ready count is based on the actual record `status` values, not batch metadata. A prior intermediate aggregate overcounted the first two batches by one; this audit corrects that bookkeeping error before Schedule generation.
+A governance dossier may support more than one coercive project. The Schedule does **not** need to operationalize every evidentiary scope at once.
 
-The 68 blocked/partial records are **not unresolved ECL outcomes**. Each remains `S`; the remaining problem is contract engineering such as the exact:
+A frozen subset may be rendered when:
 
-- agency/unit legal name;
-- detention facility;
-- prosecution/case;
-- statutory provision and implementing authority;
-- public-order operation;
-- surveillance deployment;
-- controlled proxy relationship; or
-- project/temporal boundary.
+1. the actor/project identity is objectively knowable;
+2. the capacity limitation is explicit;
+3. excluded functions are stated;
+4. Material Participation remains the operative connection rule; and
+5. every unfrozen residual scope remains governance-only.
 
-## 4. Examples of State `S` entries already sufficiently knowable
+This avoids two bad outcomes: either delaying every precise entry until the broadest dossier is fully frozen, or converting descriptive research labels into vague contractual classes.
 
-Current ready translations include examples such as:
+## 5. Freeze work products created after translation
 
-- Denmark — Udbetaling Danmark / ATP implicated welfare-profiling workflows;
-- France — national algorithmic video-surveillance experiment in its qualifying capacity;
-- Serbia — BIA/Interior units only in evidenced repressive spyware/mobile-forensic deployments;
-- Armenia — Police biometric/facial-recognition surveillance capacity;
-- Dominican Republic — DGM/CESFRONT only in qualifying deportation/detention operations;
-- Lithuania — State Border Guard Service only in qualifying pushback/protection-access operations;
-- Poland — Border Guard / Interior administration only in the frozen Belarus-border protection-access project;
-- Angola — Rapid Intervention / National Police units only in frozen qualifying operations;
-- Benin — HAAC/CRIET only in exact protected-expression enforcement processes;
-- DRC — FARDC / specifically State-backed proxy project only where support/control is frozen;
-- Ecuador — named `Exterminio Total` operation subject to final participating-unit freeze on rendering;
-- Guatemala — Ministerio Público/FECI only in exact arbitrary-criminalisation cases;
-- Haiti — Security Task Force / materially participating PNH or contractors only in the frozen unlawful-drone/summary-execution project;
-- Jordan — State Security Court/security-prosecution, Media Commission and governor detention functions only in the frozen qualifying capacities;
-- Lesotho — Lesotho Correctional Service only in the defined coercive detention/conditions project;
-- Nigeria — Imo State Police Anti-Kidnapping Unit (`Tiger Base`) in the documented detention/torture/disappearance project;
-- Singapore — POFMA/public-order project class with independent judicial review and capital punishment expressly excluded; and
-- Sudan — SAF only through the synchronized cross-entity scoped organization record.
+Current State `S` freeze files:
 
-Final legal drafting can still narrow any of these further; `ready` means identity/boundary is sufficiently knowable to render a candidate, not that the entry is legally approved.
+- `registry/schedule-state-s-freezes/batch-01-identity.yml`
+- `registry/schedule-state-s-freezes/batch-02-statutory-agency.yml`
+- `registry/schedule-state-s-freezes/batch-03a-usa.yml`
+- `registry/schedule-state-s-freezes/batch-04-detention-digital.yml`
 
-## 5. Non-State inventory
+They add exact agency, statutory, project and temporal boundaries while preserving unfrozen residual scope as non-operative.
 
-### Organizations
+## 6. Current-status revalidation
 
-Current canonical registry:
+Identity freeze and substantive currency are separate gates.
 
-- `R`: Al-Qaida; ISIL/Da'esh; Izz al-Din al-Qassam Brigades; Rapid Support Forces.
-- `S`: NSO Group; Candiru; Intellexa/Predator network; Hamas; Sudanese Armed Forces; SDF/RADA.
-- `U`: Palantir Technologies Inc.
+The Netherlands illustrates the distinction: the relevant probation algorithms and operators are now identified, but the February 2026 official record says the principal OXREC deployment was temporarily stopped. The Schedule must therefore confirm current deployment/remediation status before creating an operative candidate rather than treating a solved identity question as proof of present restriction.
 
-Several scoped organization candidates still require exact legal-entity, alias or organizational-boundary freeze before Schedule rendering.
+## 7. Direct Restricted Project rule
 
-### Projects
+ECL 0.2 permits an exact project to be designated directly without first converting the entire parent State or organization into a Restricted Party.
 
-- `R`: Mitiga Prison / SDF-RADA detention apparatus.
-- `S`: Operation Epic Fury — Minab school targeting chain.
-- `U`: ICE ICM/Investigative Analytics; Maven Smart System.
+`registry/schedule-project-freezes.yml` now contains the first fully frozen direct-project record. Its boundary is incident/project-specific and expressly excludes unrelated operations, suppliers and personnel absent Material Participation.
 
-The Minab record intentionally does **not** infer Palantir/Maven participation absent project-specific evidence.
+This is the preferred architecture whenever a prohibited-use finding is more precise than the institution that contains it.
 
-### Persons
+## 8. Cross-entity data sources
 
-No person is currently `R` or `S`. Osama Elmasry Njeem remains `U` under the heightened person-level standard. The old blanket ICC-warrant class is not carried forward.
+The Schedule work queue no longer duplicates full non-State candidate lists. Canonical sources are:
 
-## 6. External-list rule
+- `registry/organizations.yml`
+- `registry/projects.yml`
+- `registry/persons.yml`
+- `registry/schedule-project-freezes.yml`
 
-The replacement Schedule will **not** dynamically import:
+`registry/schedule-translations.yml` is now an index/progress file rather than a second parallel entity registry.
 
-- the full UN ISIL/Al-Qaida sanctions list; or
-- all public ICC warrant subjects.
+## 9. External-list and supplier rules
 
-UN/ICC records are authoritative evidence/identity inputs, but ECL makes its own substantive/scope decision. If an external identifier is used, the exact named entry/reference must be frozen as of Schedule adoption rather than incorporating a mutable third-party list by reference.
+External sanctions/warrant records may provide evidence or identity anchors, but they are not dynamically imported as ECL classes.
 
-## 7. Supplier/project rule
+Likewise, a supplier is not Restricted merely because it supplies a sensitive customer or system. Exact entity designation, direct Restricted Project designation or Material Participation in a qualifying frozen project is required.
 
-Sensitive contracting is not guilt by procurement graph.
+## 10. Schedule generation gate
 
-Current examples:
+A fresh post-0.2 Schedule may be rendered as a **draft candidate** from frozen entries before every governance dossier is fully operationalized, provided unfrozen scope is omitted.
 
-- Palantir Technologies Inc. remains `U` at organization level;
-- ICE ICM/IA remains `U` at project level;
-- Maven Smart System remains `U` at project level; and
-- Minab's targeting chain is independently `S` without attributing that strike to Palantir/Maven absent evidence.
+It must **not** be presented as ready for adoption until:
 
-A supplier becomes restricted only through an exact entity designation or the operative Material Participation / Covered Associate rules for a qualifying project.
+- every included entry has a frozen knowable identity/project boundary;
+- overlaps between State, organization and project entries are deduplicated;
+- controlled-class membership is objectively determinable;
+- remediation/exclusion rules are synchronized;
+- the candidate is reviewed for internal legal consistency; and
+- compatibility is stated for the exact ECL version.
 
-## 8. Schedule generation gate
+`ECL-RP-0.4-DRAFT` remains historical/pre-0.2 material and must not be patched into apparent compatibility.
 
-A fresh post-0.2 Schedule should be rendered as **adoptable** only after:
+## 11. Current executable queue
 
-- State `R` identity freeze — **complete 34/34**;
-- State `S` translation — **complete 86/86**;
-- State `S` identity/project freeze — **18 ready / 68 still to freeze**;
-- scoped non-State legal identities/aliases are frozen;
-- State↔organization↔project overlaps are deduplicated;
-- candidate controlled classes pass objective-membership/knowability review; and
-- the resulting Schedule explicitly declares compatibility with **ECL 0.2-DRAFT only**, unless later re-audited.
+The immediate State queue is **55 unresolved identity/project freezes**, plus one current-status revalidation case.
 
-`ECL-RP-0.4-DRAFT` remains historical/pre-0.2 draft material and must not be patched into apparent readiness.
+A previously attempted Ukraine freeze was not persisted because the repository connector rejected that write; it is therefore not counted as completed.
 
-## 9. Current executable work queue
-
-The machine-readable source of truth is `registry/schedule-translations.yml`.
-
-The next work is no longer `translate all S dossiers`; that phase is complete. The current queue is **resolve the 68 explicit State-`S` freeze blockers plus the remaining scoped non-State identity blockers**. Only after those blockers are resolved should a fresh Schedule be rendered from the registries.
+The source of truth for live counts is `registry/schedule-translations.yml`.
