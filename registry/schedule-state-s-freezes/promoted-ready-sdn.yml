@@ -1,0 +1,10 @@
+state: SDN
+entity: Sudan
+outcome: S
+schedule_identity: "canonical synchronized Sudan State scope"
+project_boundary: "only the exact State-aligned project boundary already frozen by the canonical cross-entity record"
+capacity_limit: "no broader than the synchronized canonical scope"
+exclusions: ["other armed actors", "unrelated civilian functions", "independent humanitarian/remedial activity"]
+schedule_status: ready-promoted-cross-entity-scope
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
