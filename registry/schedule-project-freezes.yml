@@ -4,6 +4,21 @@ operative: false
 compatible_license: "ECL-0.2-DRAFT"
 
 projects:
+  - id: MITIGA-DETENTION-APPARATUS
+    outcome: R
+    freeze_status: fully-frozen-direct-project
+    schedule_identity: "Mitiga Prison / SDF-RADA detention apparatus, Tripoli"
+    project_boundary: "Mitiga Prison detention/security operational processes and materially continuous SDF/RADA structures covered by the canonical project dossier"
+    prohibited_capacity: "the frozen detention/security project only where Material Participation falls within the canonical ECL 0.2 coercive-domination/targeting scope"
+    exclusions:
+      - "other Libyan prisons, authorities or security functions"
+      - "SDF/RADA activity outside the frozen detention project absent separate scope"
+      - "individual persons absent separate status or Material Participation"
+      - "independent judicial/remedial activity"
+    identity_sources:
+      - "../dossiers/projects/MITIGA-DETENTION-APPARATUS.md"
+    schedule_status: ready-direct-restricted-project
+
   - id: OPERATION-EPIC-FURY-MINAB-TARGETING
     outcome: S
     freeze_status: fully-frozen-direct-project
@@ -26,6 +41,5 @@ projects:
     dossier: "../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md"
     schedule_status: ready-direct-restricted-project
 
-# Direct-project freeze avoids the need to name every internal participant where
-# the project itself is objectively identifiable. Material Participation still
-# controls whether a particular licensee/use falls within the frozen project.
+# Direct-project freezes are Schedule-preparation records only. Material Participation
+# controls whether a particular licensee/use falls within a frozen project.
