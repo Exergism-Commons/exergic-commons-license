@@ -1,0 +1,122 @@
+version: "2026-08-13-ecl-0.2-s-freeze-01"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+# A freeze record may make a precise subset Schedule-renderable without making
+# every evidentiary scope in the State dossier operative. Unfrozen residual
+# scope remains governance-only until separately frozen.
+
+records:
+  - state: HRV
+    entity: Croatia
+    source_translation_status: needs-exact-border-police-directorate-freeze
+    freeze_status: fully-frozen
+    candidate_parties:
+      - "Police Directorate (Ravnateljstvo policije) — Border Directorate (Uprava za granicu), including subordinate border-police units, only in the qualifying capacity below"
+    candidate_projects:
+      - "Croatian external-border operations materially involving violence, summary pushback or obstruction of individualized international-protection access"
+    capacity_limit: "unlawful coercive return, violence or obstruction of individualized protection; not border policing generally"
+    exclusions:
+      - "ordinary border checks and surveillance that do not satisfy ECL §5"
+      - "courts and independent border monitoring"
+      - "humanitarian assistance and qualifying Independent Remediation Activity"
+      - "unrelated police/public functions"
+    identity_sources:
+      - "https://mup.gov.hr/vijesti-8/sastanak-predstavnika-granicne-policije-republike-hrvatske-i-republike-kosovo/9512?big=0"
+      - "https://mup.gov.hr/vijesti/casnica-za-vezu-frontexa-posjetila-ravnateljstvo-policije/282413"
+    dossier: "../../dossiers/states/HRV.md"
+    schedule_status: ready-capacity-limited-party
+
+  - state: MDV
+    entity: Maldives
+    source_translation_status: needs-current-regulator-legal-name-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Maldives Media and Broadcasting Commission, only when enforcing Act No. 16/2025 or successor powers in a manner that materially suppresses protected journalism/expression, compels protected sources or otherwise satisfies ECL §5"
+    candidate_projects:
+      - "enforcement of the Maldives Media and Broadcasting Regulation Act (Act No. 16/2025) through fines, suspension/closure, source compulsion or comparable coercive information control where ECL §5 is independently satisfied"
+    capacity_limit: "coercive censorship/suppression of protected journalism or source compulsion; not media regulation generally"
+    exclusions:
+      - "non-coercive licensing/registration/standards activity"
+      - "courts and independent judicial remedy"
+      - "unrelated public-order administration"
+    residual_unfrozen_scope:
+      - "separate public-order projects not objectively identified by the current canonical record"
+    identity_sources:
+      - "https://presidency.gov.mv/Press/Article/34936"
+      - "https://presidency.gov.mv/Press/Article/34942"
+    dossier: "../../dossiers/states/MDV.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: MLT
+    entity: Malta
+    source_translation_status: needs-detention-maritime-operator-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Detention Services Agency, only in immigration-detention practices independently satisfying ECL §5.6"
+      - "Malta Police Force / Commissioner of Police in the capacity of Principal Immigration Officer, only in detention/removal orders or operations independently satisfying ECL §5.6"
+      - "Armed Forces of Malta, including Rescue Coordination Centre Malta and relevant maritime/SAR units, only in a specifically evidenced maritime non-assistance, pushback or transfer operation independently satisfying ECL §5.6"
+    candidate_projects:
+      - "immigration detention pursuant to detention orders where confinement is arbitrary or seriously punitive and remains unremediated"
+      - "specific maritime non-assistance/pushback or Libya-related interception/transfer operation where the frozen incident record establishes material facilitation of unsafe return"
+    capacity_limit: "project-specific arbitrary/punitive confinement or unsafe forced transfer; not Maltese immigration, detention or SAR functions generally"
+    exclusions:
+      - "International Protection Agency and appeals/remedial functions"
+      - "Immigration Appeals Board / International Protection Appeals Tribunal"
+      - "Monitoring Board for Detained Persons and qualifying Independent Remediation Activity"
+      - "lawful SAR, rescue, detention or return operations that do not satisfy ECL §5"
+    residual_unfrozen_scope:
+      - "El Hiblu or other prosecution project until exact case/prosecutorial boundary is frozen"
+      - "any maritime incident not separately identified and substantiated"
+    identity_sources:
+      - "https://homeaffairs.gov.mt/public-bodies/detention-services-agency/"
+      - "https://pulizija.gov.mt/en/european-union-funding/"
+      - "https://afm.gov.mt/operations-centre/"
+      - "https://afm.gov.mt/defence-roles/"
+    dossier: "../../dossiers/states/MLT.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: MKD
+    entity: North Macedonia
+    source_translation_status: needs-border-unit-and-detention-project-freeze
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Bureau for Public Security — Regional Center for Border Affairs South, including subordinate border-check and border-surveillance stations, only in qualifying southern-border operations"
+    candidate_projects:
+      - "southern-border operations toward Greece materially carrying out unlawful summary pushback, associated violence or denial of individualized protection"
+    capacity_limit: "qualifying pushback/violence at the southern border; not border policing generally"
+    exclusions:
+      - "ordinary border checks, anti-smuggling activity and lawful surveillance"
+      - "specialized prosecutor, courts and penitentiary reform/oversight"
+      - "qualifying Independent Remediation Activity"
+    residual_unfrozen_scope:
+      - "police/prison detention ill-treatment component until an exact unit/facility/project is frozen"
+    identity_sources:
+      - "https://mvr.gov.mk/en-GB/ministerstvo/oddel-za-granicni-raboti-i-migracii"
+      - "https://mvr.gov.mk/en-GB/ministerstvo/za-biroto"
+    dossier: "../../dossiers/states/MKD.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: NLD
+    entity: Netherlands
+    source_translation_status: needs-exact-algorithm-name-and-operator
+    freeze_status: identity-resolved-current-deployment-unresolved
+    identified_projects:
+      - "OXREC recidivism-risk algorithm"
+      - "STATIC-99R, STABLE-2007 and ACUTE-2007 risk-assessment algorithms"
+    identified_operators:
+      - "Reclassering Nederland"
+      - "Leger des Heils Jeugdbescherming & Reclassering"
+      - "Stichting Verslavingsreclassering GGZ"
+    current_status_note: "The February 2026 Inspectorate record states that the probation organizations announced a temporary stop to OXREC. Identity is therefore no longer the blocker; current deployment/remediation status must be confirmed before an operative Schedule candidate is rendered."
+    exclusions:
+      - "algorithms that remain suspended, withdrawn, corrected and independently validated"
+      - "probation activity generally"
+    identity_sources:
+      - "https://www.inspectie-jenv.nl/actueel/nieuws/2026/02/12/risicovol-algoritmegebruik-door-reclassering"
+      - "https://www.inspectie-jenv.nl/documenten/2026/02/12/rapport-risicovol-algoritmegebruik"
+    dossier: "../../dossiers/states/NLD.md"
+    schedule_status: needs-current-deployment-and-remediation-confirmation
+
+# This file is a Schedule-preparation work product only and has no licensing effect.
