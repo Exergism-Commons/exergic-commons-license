@@ -1,0 +1,16 @@
+state: KEN
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "KNCHR 25 June 2026 Parliament-arrest incident cohort"
+project_boundary: "the six-person arrest/disappearance incident outside Parliament documented by KNCHR on 29 June 2026, together with materially participating security functions"
+capacity_limit: "this exact incident cohort only"
+exclusions:
+  - "Kenyan police/security institutions generally"
+  - "other protest operations absent separate freeze"
+  - "KNCHR, courts and independent remediation"
+identity_sources:
+  - "https://www.knchr.org/Articles/ArtMID/2432/ArticleID/1258/Enforced-Disappearances-Torture-and-other-Human-Rights-Violations-following-the-25th-June-2026-Protests-Marking-the-2nd-Anniversary-of-the-2024-Gen-Z-Protests"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-frozen-incident-cohort
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
