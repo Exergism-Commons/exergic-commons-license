@@ -1,0 +1,16 @@
+state: GNQ
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "GNQ 1/2026 Malabo transfer project"
+project_boundary: "the temporary transfer arrangement identified by UN communication GNQ 1/2026 for the nine-person cohort then present in Malabo"
+capacity_limit: "this exact cohort and transfer workflow only"
+exclusions:
+  - "other migration administration"
+  - "persons outside the frozen cohort"
+  - "independent protection and remedial activity"
+identity_sources:
+  - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=GNQ+1%2F2026"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-direct-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
