@@ -4,92 +4,71 @@
 
 Evidence cutoff: **2026-08-11**
 
-This document distinguishes the completed whole-State `R` adversarial review from the now-completed scoped review of the current `S` cohort. Historical tranche files remain procedural records; the canonical current per-entity state lives in `../../dossiers/` and the machine-readable current distribution in `../../registry/states.yml`.
+This document distinguishes immutable historical review phases from the canonical current per-entity state in `../../dossiers/` and machine-readable distribution in `../../registry/states.yml`.
 
 ## 1. Initial count audit
 
-The first adjudication in `../initial-adjudication.md` contained exactly:
+The first adjudication in `../initial-adjudication.md` contained exactly `R 46 / S 64 / U 41 / N 44 = 195`. An intermediate whole-State working list omitted #189 Uzbekistan; historical state-level tranche 10 corrected that reconstruction error.
 
-- `R` — **46**
-- `S` — **64**
-- `U` — **41**
-- `N` — **44**
-- **Total — 195**
+## 2. Whole-State `R` adversarial review — complete
 
-An intermediate adversarial working list incorrectly counted only 45 `R` findings because **#189 Uzbekistan** was accidentally omitted from the reconstruction. State-level tranche 10 corrected that error.
+All 46 initial `R` findings received falsification-first review. Eleven were downgraded `R → S` for attribution precision: Georgia, India, Kazakhstan, Kyrgyzstan, Pakistan, Singapore, South Sudan, Türkiye, Uganda, Uzbekistan and Zimbabwe. Courts, ombuds institutions, federal/fragmented structures or other rights-protective functions made whole-State attribution overbroad.
 
-## 2. Whole-State adversarial outcomes
+Historical post-whole-State distribution: `R 35 / S 75 / U 41 / N 44 = 195`.
 
-All 46 initial `R` findings were subjected to falsification-first review. Eleven were downgraded `R → S` for attribution precision:
+## 3. Scoped `S` adversarial review — complete
 
-- #63 Georgia
-- #77 India
-- #87 Kazakhstan
-- #91 Kyrgyzstan
-- #131 Pakistan
-- #157 Singapore
-- #164 South Sudan
-- #180 Türkiye
-- #183 Uganda
-- #189 Uzbekistan
-- #195 Zimbabwe
+High-impact review plus scoped tranches 1–10 tested every current `S` at project/apparatus level, including second falsification passes for former `R → S` cases. The cycle produced narrowing, reversibility downgrades and actor-fragmentation rules rather than treating a country as a unitary moral category.
 
-The common reason was not disappearance of serious conduct; it was that courts, ombuds institutions, federal/fragmented structures or other rights-protective functions made a single whole-State Restricted Party overbroad.
+Before the full `U` phase, the distribution stood at `R 36 / S 70 / U 45 / N 44 = 195`.
 
-The historical post-whole-State distribution was `R 35 / S 75 / U 41 / N 44 = 195`.
+## 4. Full `U` adversarial review — complete
 
-## 3. Scoped adversarial review — complete for current `S`
+All 45 dossiers entering the `U` phase were reviewed together in `under-review/full-cohort.md`.
 
-Scoped review tested whether each `S` scope was too broad, stale, remediated, misattributed or insufficiently project-specific. Completed work:
+Results:
 
-- high-impact review: United Kingdom, Morocco and Ukraine;
-- tranche 1: Denmark, France, Netherlands and Serbia;
-- tranche 2: Algeria, Angola, Bahrain, Benin, Bhutan, Bosnia and Herzegovina, Brazil and Cameroon;
-- tranche 3: Central African Republic, Colombia, Côte d’Ivoire, Democratic Republic of the Congo, Dominican Republic, Ecuador, Equatorial Guinea and Ethiopia;
-- tranche 4: Greece, Guatemala, Guinea-Bissau, Haiti, Honduras, Hungary, Iceland and Indonesia;
-- tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon;
-- tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal;
-- tranche 7: Nigeria, North Macedonia, Pakistan, Palestine, Panama, Paraguay, Peru and Philippines;
-- tranche 8: Poland, Qatar, Republic of the Congo, Slovakia, Somalia, Sri Lanka, Sudan and Syria;
-- tranche 9: Thailand, Trinidad and Tobago, Türkiye, Uganda, Uzbekistan, Yemen, Zambia and Zimbabwe;
-- tranche 10: Georgia, India, Singapore and South Sudan.
+- **14 `U → S`**: Argentina, Armenia, Bangladesh, Bolivia, Bulgaria, Chad, Croatia, Cyprus, Fiji, Gabon, Germany, Lithuania, Maldives and Slovenia.
+- **9 `U → N`**: Botswana, Brunei, Czechia, Malawi, Montenegro, Namibia, New Zealand, Portugal and South Korea.
+- **22 retained `U`** after explicit second-pass review.
+- **0 `U → R`**.
 
-Tranche 10 was the final second-pass check for former whole-State `R → S` cases not already re-tested during scoped work. All four retained `S`; India was narrowed and South Sudan's defined security/military scope was strengthened without re-expanding to whole-State `R`.
+The retained `U` cohort is therefore not an unprocessed queue. It now records genuine unresolved cases where serious concerns persist but deployment, attribution, persistence or ECL-project fit remains insufficiently resolved for `S` or `N`.
 
-**The scoped adversarial review of the current `S` cohort is complete.** Every current `S` has been tested at project/apparatus level, including a second scoped falsification pass where needed for former `R → S` cases.
+The phase also reinforced four invariants: capability is not deployment; severe institutional failure is not automatically an ECL-prohibited project; counter-institutions are substantive evidence; and prospective risk can justify `S` once it becomes materially deployed coercion.
 
-## 4. Current audited governance state
+## 5. Current audited governance state
 
 Current provisional distribution:
 
 - `R` — **36**
-- `S` — **70**
-- `U` — **45**
-- `N` — **44**
+- `S` — **84**
+- `U` — **22**
+- `N` — **53**
 - **Total — 195**
-
-Notable scoped-review changes include escalation where the coercive apparatus itself became the governing authority, downgrades where current persistence was no longer established, and systematic narrowing where generic country/agency labels would capture rights-protective or non-coercive functions.
 
 The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
 
-## 5. Dossier-normalization invariant
+## 6. Dossier-normalization invariant
 
-The target architecture for ECL 1.0 is that every completed `dossiers/states/*.md` record is understandable and auditable by itself. A normalized dossier contains current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, stable sources where possible and procedural history.
+A completed `dossiers/states/*.md` record must be understandable and auditable by itself: current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, stable sources where possible and procedural history.
 
-Review tranche files remain immutable history and are not required to reconstruct the current determination.
+Historical review files remain immutable procedural history and are not required to reconstruct a current determination.
 
-After tranche 10, **110 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Tranche 10 adds no new unique dossiers because Georgia, India, Singapore and South Sudan were already among the initially-`R` normalized cohort; it completes their second scoped review.
+After completion of the `U` phase, **151 unique State dossiers** have detailed normalization. Forty-one previously minimal `U` dossiers were expanded; Honduras, Lebanon, Nepal and Trinidad and Tobago were already self-contained from earlier scoped downgrades and were revalidated in the full cohort review.
 
-## 6. Architectural conclusion and remaining work
+The only State dossiers not yet detailed-normalized are the **44 States that were already `N` in the initial adjudication**.
 
-Adversarial review demonstrated that ECL needs an **Accountability and Remediation Exception** before a stable 1.0. A restriction should not prevent ECL-covered software from being used independently to investigate, challenge, audit, prosecute, remedy or disclose the very conduct that caused the restriction. Candidate protected functions include independent judicial review, ombuds/NPM work, public audit, prosecution of official abuse, legal defence, civilian-harm investigation, human-rights remediation and whistleblower protection.
+## 7. Architectural conclusion and remaining work
 
-The next governance phase is no longer scoped `S` review. It is to:
+Adversarial review continues to support an **Accountability and Remediation Exception** before stable ECL 1.0 so ECL-covered software can be used independently to investigate, challenge, audit, prosecute, remedy or disclose the conduct that caused a restriction without creating a loophole for ordinary Restricted Project use.
 
-1. resolve and normalize the **45 current `U` dossiers** using the same falsification-first standard;
-2. normalize/audit the **44 `N` dossiers** so `N` is independently auditable rather than a placeholder;
-3. perform a global cross-dossier consistency audit, including attribution vocabulary, review triggers and overlap with organization/project dossiers;
-4. resolve the Accountability and Remediation Exception and other normative changes; and
+Remaining State/governance work:
+
+1. normalize/audit the 44 original `N` dossiers so all 195 State records are independently auditable;
+2. run a global cross-dossier consistency audit for scope vocabulary, attribution, triggers and organization/project overlap;
+3. resolve the Accountability and Remediation Exception and other normative changes;
+4. perform Schedule consistency/freeze work; and
 5. obtain specialist legal review before proposing a stable Restricted Parties Schedule / ECL 1.0.
 
-Only after that evidence-normalization, governance-consistency and legal-review cycle should a new operative Schedule be proposed.
+No item in this summary changes the operative license or a Restricted Parties Schedule by itself.
