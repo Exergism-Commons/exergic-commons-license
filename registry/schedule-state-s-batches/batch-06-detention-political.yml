@@ -1,0 +1,130 @@
+batch: 6
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 10
+schedule_ready_count: 2
+blocked_or_partial_count: 8
+
+records:
+  - state: JOR
+    entity: Jordan
+    outcome: S
+    candidate_parties: ["State Security Court/prosecutorial-security structures, only in exact expression/political cases satisfying ECL §5.6", "Media Commission, only in politically grounded blocking/suppression of protected media", "governor-administered detention authority only in detention without meaningful ordinary judicial review"]
+    candidate_projects: ["specific expression-only State Security Court/prosecution case", "governor-administered administrative detention without meaningful judicial challenge", "specific cybercrime enforcement against protected speech", "specific politically grounded media-blocking order"]
+    capacity_limit: "case/order/detention-specific; no generic Jordan security/judicial/media-regulatory class"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.5"]
+    exclusions: ["National Centre for Human Rights", "parliament", "ordinary courts providing independent remedy", "unrelated administration"]
+    identity_sources: ["https://nchr.org.jo/en/statements/statement-on-world-press-freedom-day/"]
+    dossier: "../dossiers/states/JOR.md"
+    status: ready-capacity-limited-parties
+
+  - state: KAZ
+    entity: Kazakhstan
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific political-security/prosecutorial detention case involving protected assembly/expression", "specific media-repression/retaliatory professional-sanction project", "specific discriminatory religious-registration/enforcement case"]
+    capacity_limit: "named case/agency/order-specific; no generic Kazakhstan security/prosecution/media/religious-regulation class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Constitutional Court", "rights-protective judicial functions", "unrelated State services"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=KAZ+2%2F2026", "https://spcommreports.ohchr.org/TmSearch/RelCom?code=KAZ+3%2F2026"]
+    dossier: "../dossiers/states/KAZ.md"
+    status: needs-security-prosecutor-media-religious-case-freeze
+
+  - state: KGZ
+    entity: Kyrgyzstan
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific politically motivated detention/prosecution or torture project", "specific coercive media/civic-control enforcement", "specific vague/discriminatory extremism or religious-enforcement case"]
+    capacity_limit: "case/unit/regulatory-action-specific; no generic Kyrgyz security/prosecution/media/religious class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Ombudsman/Akyikatchy", "independent remedial judicial functions", "unrelated State services"]
+    identity_sources: ["https://www.amnesty.org/en/latest/news/2026/01/kyrgyzstan-authorities-must-free-journalist-makhabat-tazhibek-kyzy-and-quash-her-wrongful-conviction/"]
+    dossier: "../dossiers/states/KGZ.md"
+    status: needs-security-prosecutor-regulator-case-freeze
+
+  - state: LAO
+    entity: Laos
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific attributable political-security detention/disappearance case", "specific obstruction of disappearance investigation", "specific cross-border transfer into substantiated serious-abuse risk", "specific discriminatory religious-persecution enforcement"]
+    capacity_limit: "named case/unit/transfer authority/religious-enforcement action only; unproven proxy/transnational activity excluded"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["unproven proxy conduct", "unrelated public services", "allegations lacking sufficient State attribution"]
+    identity_sources: ["https://www.hrw.org/news/2026/03/02/laos-investigate-prominent-dissidents-death", "https://spcommreports.ohchr.org/TmSearch/RelCom?code=LAO+3%2F2025"]
+    dossier: "../dossiers/states/LAO.md"
+    status: needs-security-unit-transfer-authority-religious-case-freeze
+
+  - state: LSO
+    entity: Lesotho
+    outcome: S
+    candidate_parties: ["Lesotho Correctional Service, only in detention/conditions/accountability practices materially involving severe ill-treatment or coercive deprivation", "specific police/public-order authority only in a frozen sedition/expression/assembly enforcement project"]
+    candidate_projects: ["Maseru correctional abuse/conditions project and materially continuous unremediated LCS practices", "specific sedition/public-order enforcement suppressing protected non-violent expression or peaceful assembly"]
+    capacity_limit: "LCS detention/conditions and exact public-order case only; no generic Lesotho State/police class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Ombudsman", "courts", "remediation projects", "ordinary public services"]
+    identity_sources: ["https://www.lena.gov.ls/lcs-resists-ombudsman-recommendations/"]
+    dossier: "../dossiers/states/LSO.md"
+    status: ready-capacity-limited-party
+
+  - state: LBY
+    entity: Libya
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific GNU-, LAAF- or other de-facto-authority security/detention/migration unit or State-affiliated project materially participating in arbitrary detention, torture, coercive abuse or unsafe transfer/interception"]
+    capacity_limit: "authority/unit/facility/project-specific; Libya is not treated as unitary and non-attributable armed-group conduct is excluded"
+    criteria: ["ECL-0.2 §5.6", "ECL-0.2 §5.2"]
+    exclusions: ["independent/remedial functions", "unrelated public services", "non-attributable private armed groups"]
+    identity_sources: ["https://searchlibrary.ohchr.org/record/35248"]
+    dossier: "../dossiers/states/LBY.md"
+    status: needs-gnu-laaf-unit-facility-transfer-project-freeze
+
+  - state: MYS
+    entity: Malaysia
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific police/speech/public-order enforcement criminalizing protected expression or peaceful assembly", "specific immigration-detention depot/system producing arbitrary/prolonged detention, severe conditions or preventable custody-death risk"]
+    capacity_limit: "case/unit/facility-specific; no generic Malaysian police or immigration class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["SUHAKAM", "courts/remediation", "removed generic LGBTI-raid component", "ordinary immigration/policing"]
+    identity_sources: ["https://suhakam.org.my/2026/07/media-statement-no-38-2026_suhakam-calls-for-urgent-reforms-to-immigration-detention-centres/"]
+    dossier: "../dossiers/states/MYS.md"
+    status: needs-police-case-and-detention-depot-freeze
+
+  - state: MDA
+    entity: Moldova
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific pretrial-detention decision/practice lacking individualized necessity/proportionality", "specific law-enforcement/detention project involving torture/ill-treatment or ineffective investigation/remedy"]
+    capacity_limit: "case/court/facility/unit-specific; Transnistria excluded absent separate attribution"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["Ombudsman/NPM", "courts performing genuine remediation", "media-regulatory component removed", "Transnistrian conduct absent Moldovan attribution"]
+    identity_sources: ["https://www.coe.int/en/web/chisinau/-/strengthening-safeguards-for-liberty-improving-the-reasoning-of-pre-trial-detention-and-house-arrest-decisions-in-the-republic-of-moldova"]
+    dossier: "../dossiers/states/MDA.md"
+    status: needs-pretrial-process-facility-unit-freeze
+
+  - state: MAR
+    entity: Morocco
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific police/intelligence/prosecutorial/judicial or digital-surveillance project materially used against peaceful dissent or Sahrawi human-rights/self-determination activity"]
+    capacity_limit: "named organ/case/surveillance deployment only; no generic Moroccan police/intelligence/judiciary class"
+    criteria: ["ECL-0.2 §5.1", "ECL-0.2 §5.6"]
+    exclusions: ["ordinary public administration", "unrelated judicial/public services", "victim-protection/remediation reforms"]
+    identity_sources: ["https://spcommreports.ohchr.org/TmSearch/RelCom?code=MAR+2%2F2026"]
+    dossier: "../dossiers/states/MAR.md"
+    status: needs-organ-case-surveillance-project-freeze
+
+  - state: MOZ
+    entity: Mozambique
+    outcome: S
+    candidate_parties: []
+    candidate_projects: ["specific police/public-order/security operation involving unlawful lethal force or summary execution, arbitrary detention/disappearance, opposition/journalist repression, intimidation or coercive information suppression"]
+    capacity_limit: "named unit/operation/case only; insurgent/non-State violence excluded absent State attribution"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["SERNIC/prosecutorial accountability work", "non-State Cabo Delgado abuses", "unrelated public services"]
+    identity_sources: ["https://www.amnesty.org/en/latest/news/2026/07/mozambique-authorities-must-immediately-open-investigation-into-summary-execution-of-narciso-castigo-sambo/"]
+    dossier: "../dossiers/states/MOZ.md"
+    status: needs-police-unit-operation-case-freeze
+
+# Batch-level translation records are governance work products only; no licensing effect.
