@@ -1,0 +1,76 @@
+batch: 8
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+records:
+  - state: DZA
+    entity: Algeria
+    outcome: S
+    freeze_status: renderable-subset
+    schedule_identity: "Hassan Bouras detention project — DZA 3/2026 / El Haoud Prison, El Bayadh"
+    project_boundary: "continued detention and materially participating prosecution/detention processes concerning Hassan Bouras as identified in UN Special Procedures communication DZA 3/2026"
+    capacity_limit: "arbitrary detention or coercive suppression of protected journalism/human-rights activity in this frozen case"
+    exclusions:
+      - "Algerian justice/security institutions generally"
+      - "other detainees or prosecutions absent separate freeze"
+      - "clemency, independent remedy and unrelated public functions"
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/Mandates?m=44"
+    residual_scope: "other journalism/lawyer/disappearance-advocacy cases remain governance-only until separately frozen"
+    schedule_status: ready-narrowed-project
+
+  - state: BTN
+    entity: Bhutan
+    outcome: S
+    freeze_status: renderable-subset
+    schedule_identity: "continued detention of the BTN 1/2024 named political-prisoner cohort, excluding persons released on 1 June 2026"
+    project_boundary: "continued enforcement/detention of the individuals frozen by UN Special Procedures communication BTN 1/2024 who remain detained after the 1 June 2026 releases"
+    capacity_limit: "continued detention under the legacy convictions where the canonical dossier and frozen communication support arbitrary-detention/torture/unfair-trial concerns"
+    exclusions:
+      - "Chatur Man Tamang and Hasta Bahadur Rai after their 1 June 2026 release"
+      - "Bhutanese State functions generally"
+      - "future releases, pardons or independently reviewed/remediated cases"
+      - "persons not frozen by the cited communication absent separate review"
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=BTN+1%2F2024"
+      - "https://www.hrw.org/news/2026/06/10/bhutan-2-political-prisoners-freed-but-28-remain"
+    residual_scope: "other known political-prisoner cases remain governance-only unless separately frozen"
+    schedule_status: ready-frozen-cohort
+
+  - state: BRA
+    entity: Brazil
+    outcome: S
+    freeze_status: renderable-subset
+    schedule_identity: "Operação Contenção — 28 October 2025 Alemão/Penha phase"
+    project_boundary: "the State of Rio de Janeiro police operation at the Complexos do Alemão e da Penha on 28 October 2025 reviewed within ADPF 635, only as to materially participating units/functions in that phase"
+    capacity_limit: "the frozen phase only where conduct independently satisfies ECL 0.2 unlawful targeting/systematic coercion criteria; not the continuing Operação Contenção programme generally"
+    exclusions:
+      - "later or earlier Operação Contenção phases absent separate freeze"
+      - "Brazilian or Rio police institutions generally"
+      - "Supreme Federal Court, independent prosecution/forensics and remediation"
+      - "personnel without Material Participation in the frozen phase"
+    identity_sources:
+      - "https://portal.stf.jus.br/processos/detalhe.asp?incidente=5816502"
+      - "https://www.policiacivil.rj.gov.br/news/9929"
+    residual_scope: "other State-level police units/operations remain governance-only until exact operation/unit freeze"
+    schedule_status: ready-direct-incident-project
+
+  - state: CMR
+    entity: Cameroon
+    outcome: S
+    freeze_status: renderable-subset
+    schedule_identity: "Abdu Karim Ali detention / Yaoundé Military Tribunal life-sentence project"
+    project_boundary: "continued detention and enforcement of the 16 April 2025 Yaoundé Military Tribunal life sentence concerning peace activist Abdu Karim Ali, including materially participating detention/prosecution functions"
+    capacity_limit: "the frozen detention/prosecution project only insofar as it materially suppresses protected expression and satisfies ECL 0.2 §5.6"
+    exclusions:
+      - "Cameroonian military courts, police or detention system generally"
+      - "independent appellate/remedial action"
+      - "other political detainees absent separate frozen case"
+    identity_sources:
+      - "https://www.amnesty.org/en/latest/news/2025/05/cameroon-life-sentence-peace-activist/"
+      - "https://www.amnesty.org/en/location/africa/west-and-central-africa/cameroon/report-cameroon/"
+    residual_scope: "post-election operations and other military-court/detention cases remain governance-only until separately frozen"
+    schedule_status: ready-narrowed-project
+
+# Narrowed entries do not operationalize residual State dossier scope.
