@@ -11,10 +11,10 @@ state_translation:
     S_candidates: 86
     S_translated: 86
     S_fully_frozen: 19
-    S_renderable_subset_only: 8
+    S_renderable_subset_only: 11
     S_current_status_blocked: 1
-    S_identity_or_project_freeze_pending: 58
-    S_schedule_renderable_states: 27
+    S_identity_or_project_freeze_pending: 55
+    S_schedule_renderable_states: 30
     total_candidates: 120
     total_translated_or_frozen: 120
   R_status: frozen-candidate
@@ -33,9 +33,10 @@ state_translation:
     - "schedule-state-s-freezes/batch-01-identity.yml"
     - "schedule-state-s-freezes/batch-02-statutory-agency.yml"
     - "schedule-state-s-freezes/batch-03a-usa.yml"
+    - "schedule-state-s-freezes/batch-04-detention-digital.yml"
   freeze_progress:
     newly_fully_frozen: [HRV]
-    newly_renderable_subset: [MDV, MLT, MKD, GBR, LKA, SOM, ZMB, USA]
+    newly_renderable_subset: [MDV, MLT, MKD, GBR, LKA, SOM, ZMB, USA, MYS, PAK, GAB]
     identity_resolved_current_status_pending: [NLD]
     attempted_but_not_persisted: [UKR]
 
@@ -55,7 +56,7 @@ schedule_gate:
   state_s_renderable_subset_policy: "A precise frozen subset may be rendered without making unfrozen residual dossier scope operative."
   direct_project_designation_supported: true
   render_adoptable_schedule: false
-  reason: "19 State S records are fully frozen; 8 additional States have a renderable narrowed subset; 1 has identity resolved but current deployment/remediation status unresolved; 58 still require exact identity/project-boundary work."
+  reason: "19 State S records are fully frozen; 11 additional States have a renderable narrowed subset; 1 has identity resolved but current deployment/remediation status unresolved; 55 still require exact identity/project-boundary work."
 
 # This file is an index/work queue only. Canonical outcomes live in the entity registries;
 # detailed State translations and freezes live in the referenced files.
