@@ -1,5 +1,5 @@
 EXERGIC COMMONS LICENSE
-Version 0.1 — DRAFT
+Version 0.2 — DRAFT
 
 Copyright (c) 2026 Daniel Molinero Lucas and contributors, where applicable.
 
@@ -7,9 +7,9 @@ THIS IS AN EXPERIMENTAL SOURCE-AVAILABLE LICENSE DRAFT. IT IS NOT AN OSI-APPROVE
 
 1. PURPOSE
 
-The Exergic Commons License ("ECL") grants broad rights to use, study, copy, modify, distribute, and build upon software while withholding those permissions from uses, projects, and actors that materially contribute to coercive capture, systemic domination, deceptive manipulation, repressive surveillance, or comparable reductions of meaningful human agency.
+The Exergic Commons License ("ECL") grants broad rights to use, study, copy, modify, distribute, and build upon software while withholding those permissions from uses, projects, and actors that materially contribute to coercive capture, systemic domination, deceptive manipulation, repressive surveillance, unlawful political repression, or comparable reductions of meaningful human agency.
 
-The ethical principles motivating this License are described in EXERGIC-PRINCIPLES.md. Those principles aid interpretation but do not independently create restrictions beyond the operative terms of this License, the applicable Restricted Parties Schedule, and applicable law.
+The ethical principles motivating this License are described in `spec/PRINCIPLES.md`. Those principles aid interpretation but do not independently create restrictions beyond the operative terms of this License, the applicable Restricted Parties Schedule, and applicable law.
 
 2. DEFINITIONS
 
@@ -27,18 +27,26 @@ The ethical principles motivating this License are described in EXERGIC-PRINCIPL
 
 "Material Participation" means participation that makes a non-trivial contribution to the design, financing, governance, development, training, operation, deployment, commercialization, targeting, decision-making, or material outputs of a project.
 
-"Restricted Project" means a project, program, deployment, contract, research effort, service, product, or coordinated activity in which:
+"Restricted Project" means a project, program, deployment, contract, research effort, service, product, or coordinated activity that either:
 
-(a) a Restricted Party has Material Participation;
-(b) a Covered Associate has Material Participation in connection with the Restricted Party;
-(c) the project is performed at the direction of, on behalf of, or primarily for the material benefit of a Restricted Party; or
-(d) the project is structured through an intermediary, contractor, consortium, affiliate, or other arrangement with the purpose or substantial effect of avoiding a restriction in this License.
+(a) is expressly designated as a Restricted Project in the Restricted Parties Schedule incorporated by the applicable Software release;
+(b) has Material Participation by a Restricted Party;
+(c) has Material Participation by a Covered Associate in connection with the Restricted Party;
+(d) is performed at the direction of, on behalf of, or primarily for the material benefit of a Restricted Party; or
+(e) is structured through an intermediary, contractor, consortium, affiliate, or other arrangement with the purpose or substantial effect of avoiding a restriction in this License.
 
 A project does not become a Restricted Project solely because an unrelated participant has an incidental or unknown connection to a Restricted Party.
 
-"Restricted Parties Schedule" or "Schedule" means the versioned document identified by the Software release that lists Restricted Parties and any class-based designations. A later Schedule does not retroactively alter rights granted for an earlier Software release unless that earlier release expressly incorporated the later Schedule.
+"Restricted Parties Schedule" or "Schedule" means the versioned document identified by the Software release that lists Restricted Parties, Restricted Projects, and any expressly defined class-based designations or exclusions. A later Schedule does not retroactively alter rights granted for an earlier Software release unless that earlier release expressly incorporated the later Schedule.
 
 "Prohibited Use" means a use described in Section 5.
+
+"Independent Remediation Activity" means an activity whose principal and actual purpose is to investigate, document, challenge, audit, review, prosecute, defend against, remedy, disclose, or prevent a Prohibited Use or the conduct forming the basis of a Restricted Party or Restricted Project designation, provided that the relevant person or function:
+
+(a) is operationally independent from the persons or functions directing or materially participating in the underlying prohibited conduct;
+(b) does not itself materially participate in that conduct except in an investigative, judicial, defence, audit, oversight, disclosure, or remedial capacity;
+(c) does not use the Software to continue, conceal, optimize, or materially support the underlying Prohibited Use or Restricted Project; and
+(d) limits the use of the Software to what is reasonably necessary for the remedial purpose.
 
 3. GRANT OF RIGHTS
 
@@ -83,14 +91,19 @@ Large-scale systems primarily designed to deliberately deceive a population abou
 5.5 Irreversible coercive capture.
 Systems primarily designed to create or maintain coercive technological dependence, informational control, or decision-making asymmetry where affected persons or communities are intentionally denied a meaningful ability to understand, contest, exit, or seek an alternative, and where that denial materially restricts fundamental rights or civic autonomy.
 
-5.6 Circumvention.
+5.6 Systematic coercive domination and unlawful political repression.
+Systems, deployments, operational processes, or material Software-enabled capabilities whose primary purpose, or whose known and reasonably foreseeable material function in the relevant deployment, is to enable or maintain systematic persecution, unlawful political repression, torture or comparably severe cruel, inhuman, or degrading treatment, enforced disappearance, arbitrary detention, collective punishment, forced labour, forced displacement or expulsion without meaningful individualized protection, severe discriminatory domination, or a comparable coercive denial of fundamental rights or of the practical ability to dissent, contest, or exit.
+
+Ordinary lawful criminal justice, immigration administration, military service, employment, public-health action, emergency response, content moderation, public administration, or other compulsory activity is not prohibited merely because it is coercive, restrictive, controversial, or governmental. Capital punishment, detention, deportation, conscription, protest regulation, and similar exercises of State power are not standalone ECL categories; the relevant Software-enabled use must independently satisfy the elements of this or another subsection.
+
+5.7 Circumvention.
 Any arrangement whose principal purpose is to enable conduct that another provision of this License expressly prohibits.
 
 A use is not prohibited merely because it is controversial, politically disputed, military-adjacent, commercial, governmental, security-related, or capable of dual use. The relevant use must satisfy the substantive criteria above or fall within a Restricted Project.
 
 6. RESTRICTED PARTIES AND RESTRICTED PROJECTS
 
-No rights are granted under this License to a Restricted Party for the applicable Software release.
+No rights are granted under this License to a Restricted Party for the applicable Software release except to the limited extent expressly permitted by the Independent Remediation Activity provision below.
 
 You may not knowingly exercise rights under this License as part of a Restricted Project.
 
@@ -98,17 +111,27 @@ You may not provide the Software, a derivative work, hosted functionality, integ
 
 A person who is a Covered Associate only because of a professional or project-specific relationship is not permanently restricted from unrelated personal or professional activity after that relationship ceases, unless that person is separately designated as a Restricted Party in the applicable Schedule.
 
+Notwithstanding the preceding restrictions, a person or function otherwise within the scope of a Restricted Party may exercise rights under this License solely to conduct an Independent Remediation Activity. This exception may apply, where its definition is actually satisfied, to an independent court or tribunal, ombuds or National Preventive Mechanism function, inspector, auditor, prosecutor investigating official abuse, independent legal defence function, public-interest accountability body, or comparable remedial function.
+
+A person relying on this exception must have reasonably documented grounds for concluding that the Independent Remediation Activity definition is satisfied. The exception does not authorize ordinary operational, intelligence, military, policing, detention, immigration, procurement, surveillance, targeting, administrative, or commercial activity merely because it is described as compliance, oversight, safety, accountability, or remediation.
+
 7. KNOWLEDGE STANDARD
 
-Except for a person or entity expressly designated as a Restricted Party, restrictions based on association, participation, benefit, or project status apply where You actually know, or where a reasonable person in Your position would have substantial grounds to know, the facts creating the restriction.
+Except for a person or entity expressly designated as a Restricted Party, or a project expressly designated as a Restricted Project, restrictions based on association, participation, benefit, or project status apply where You actually know, or where a reasonable person in Your position would have substantial grounds to know, the facts creating the restriction.
 
 You are not required to conduct unlimited investigations into remote ownership chains, unknown collaborators, passive investors, or undisclosed relationships. Deliberate avoidance of readily available facts does not defeat this Section.
 
 8. GOVERNANCE AND DESIGNATIONS
 
-The repository maintaining ECL should publish a governance procedure describing how Restricted Parties are proposed, evaluated, challenged, reviewed, added, or removed. Designations should be based on documented evidence and a reasoned decision rather than mere political disagreement, nationality, ethnicity, religion, or other protected personal status.
+The repository maintaining ECL should publish a governance procedure describing how Restricted Parties and Restricted Projects are proposed, evaluated, challenged, reviewed, added, narrowed, or removed.
 
-The governance procedure does not modify the operative license attached to a Software release. A designation becomes binding for a particular Software release only through the Schedule expressly incorporated by that release.
+A Schedule designation should be based on documented evidence and a reasoned conclusion that the designated party or project materially and systematically participates in, directs, enables, or derives substantial benefit from conduct substantially matching one or more Section 5 criteria, or deliberately circumvents an ECL restriction. Mere political disagreement, nationality, ethnicity, religion, ideology, military status, commercial size, or remote association is insufficient.
+
+A designation should identify the narrowest reasonably knowable actor, project, apparatus, or determinable class supported by the evidence and should state material exclusions or remedial functions where necessary to avoid overbreadth.
+
+For license-compliance purposes, however, an express designation or exclusion in the exact Schedule incorporated by the applicable Software release controls. A licensee is not required to independently re-litigate the evidentiary basis for every Schedule entry in order to determine whether the entry applies.
+
+The governance procedure and supporting evidence do not themselves modify the operative license attached to a Software release. A designation becomes binding for a particular Software release only through the exact Schedule expressly incorporated by that release.
 
 9. NON-RETROACTIVITY
 
@@ -118,7 +141,7 @@ A new Software release may adopt a later ECL version or Schedule.
 
 10. TERMINATION
 
-Your rights under this License terminate automatically with respect to the affected Software if You knowingly violate Sections 5 or 6 and fail to cease the violation within thirty (30) days after receiving reasonably specific notice from a Licensor, except that no cure period is required for deliberate circumvention under Section 5.6.
+Your rights under this License terminate automatically with respect to the affected Software if You knowingly violate Sections 5 or 6 and fail to cease the violation within thirty (30) days after receiving reasonably specific notice from a Licensor, except that no cure period is required for deliberate circumvention under Section 5.7.
 
 For other material breaches, Your rights terminate if You fail to cure the breach within thirty (30) days after receiving reasonably specific notice.
 
@@ -148,10 +171,10 @@ Failure to enforce a provision does not waive the right to enforce it later.
 
 16. ENTIRE LICENSE; VERSION CONTROL
 
-This text, together with the exact Restricted Parties Schedule expressly incorporated by the applicable Software release, constitutes the ECL conditions for that release. EXERGIC-PRINCIPLES.md and EXERGIC-GOVERNANCE.md may guide interpretation and administration but do not independently expand a license restriction unless expressly incorporated into the applicable release.
+This text, together with the exact Restricted Parties Schedule expressly incorporated by the applicable Software release, constitutes the ECL conditions for that release. `spec/PRINCIPLES.md`, `spec/GOVERNANCE.md`, `spec/DESIGNATION-STANDARD.md`, and other governance records may guide interpretation and administration but do not independently expand a license restriction unless expressly incorporated into the applicable release.
 
 17. NOTICE ON OPEN-SOURCE STATUS
 
-Because ECL restricts certain actors, projects, and fields of use, ECL 0.1 is a source-available license and is not intended to satisfy the Open Source Definition.
+Because ECL restricts certain actors, projects, and fields of use, ECL 0.2 is a source-available license and is not intended to satisfy the Open Source Definition.
 
-END OF EXERGIC COMMONS LICENSE 0.1 — DRAFT
+END OF EXERGIC COMMONS LICENSE 0.2 — DRAFT
