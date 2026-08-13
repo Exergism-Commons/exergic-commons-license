@@ -7,15 +7,18 @@ source_state_registry: "states.yml"
 state_translation:
   counts:
     R_candidates: 34
+    R_frozen: 34
     S_candidates: 86
+    S_translated: 0
     total_candidates: 120
   defaults:
-    R: needs-identity-freeze
+    R: frozen-candidate
     S: needs-identity-translation
   status_overrides:
     ISR: needs-project-boundary
     USA: needs-project-boundary
     SGP: needs-scope-freeze
+  R_freeze_registry: "schedule-state-r-freeze.yml"
   R:
     [AFG, AZE, BLR, BFA, BDI, KHM, CHN, CUB, EGY, SLV, ERI, SWZ, GIN, IRN, KWT, MDG, MLI, MMR, NIC, NER, PRK, OMN, RUS, RWA, SAU, TJK, TZA, TGO, TUN, TKM, ARE, VEN, VNM, GNB]
   S:
@@ -98,4 +101,5 @@ external_list_policy:
   auto_import: false
 
 # Translation status is a work queue, not a licensing designation.
-# No Schedule should be rendered as adoptable until all included entries have a frozen knowable identity/project boundary.
+# All 34 current State R candidates have completed identity freeze.
+# No Schedule should be rendered as adoptable until all included S entries have a frozen knowable identity/project boundary.
