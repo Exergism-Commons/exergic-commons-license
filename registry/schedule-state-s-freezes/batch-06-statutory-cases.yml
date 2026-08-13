@@ -1,0 +1,68 @@
+version: "2026-08-13-ecl-0.2-s-freeze-06"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+records:
+  - state: ARG
+    entity: Argentina
+    freeze_status: renderable-subset
+    candidate_parties:
+      - "Policía Federal Argentina (PFA), only in implementation of the frozen Decreto 383/2025 digital-monitoring / identity-establishment powers where the specific deployment independently satisfies ECL §5"
+    candidate_projects:
+      - "Decreto 383/2025 PFA prevention activity in open digital spaces, associated information-system/database use and identity-establishment detention, only when materially deployed for coercive political monitoring, arbitrary detention or suppression of protected peaceful activity"
+    capacity_limit: "the named statutory powers in a qualifying deployment; not PFA investigation, open-source intelligence or identity verification generally"
+    exclusions:
+      - "judicially authorized criminal investigation"
+      - "ordinary crime-prevention use that does not independently satisfy ECL §5"
+      - "courts, prosecutors acting independently and unrelated federal/provincial functions"
+    residual_unfrozen_scope:
+      - "other federal intelligence/public-order projects pending exact measure and agency freeze"
+    identity_sources:
+      - "https://www.argentina.gob.ar/normativa/nacional/decreto-383-2025-414065/texto"
+    dossier: "../../dossiers/states/ARG.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: BIH
+    entity: Bosnia and Herzegovina
+    freeze_status: renderable-subset
+    territorial_boundary: "Republika Srpska entity only"
+    candidate_parties:
+      - "Republika Srpska district public prosecutor offices, only in the frozen criminal-defamation enforcement project where a specific prosecution independently satisfies ECL §5.6"
+    candidate_projects:
+      - "criminal-defamation / honour-reputation enforcement under Articles 208a-208đ of the Republika Srpska Criminal Code as introduced by Official Gazette 73/23, only where materially used against protected journalism or political/civic expression and independently satisfying ECL §5.6"
+    capacity_limit: "case-specific coercive use of the frozen provisions; not Republika Srpska prosecution or criminal law generally"
+    exclusions:
+      - "Bosnia and Herzegovina State institutions"
+      - "Federation of Bosnia and Herzegovina institutions"
+      - "Constitutional Court and independent judicial/remedial functions"
+      - "ordinary defamation proceedings that do not independently satisfy ECL §5"
+    residual_unfrozen_scope:
+      - "retaliatory inspections, other media-pressure and political-repression projects pending exact authority/case freeze"
+    identity_sources:
+      - "https://www.narodnaskupstinars.net/la/akti/usvojeni-zakoni/zakon-o-izmjenama-i-dopunama-krivicnog-zakonika-republike-srpske-0"
+      - "https://sudpol-fbih.pravosudje.ba/vstvfo/E/108"
+    dossier: "../../dossiers/states/BIH.md"
+    schedule_status: ready-narrowed-subset
+
+  - state: THA
+    entity: Thailand
+    freeze_status: renderable-subset
+    candidate_projects:
+      - "Bangkok Criminal Court black case Aor.498/2567 arising from the 29 November 2020 demonstration, limited to the prosecution/detention enforcement concerning protected peaceful expression identified in the canonical dossier"
+    candidate_parties:
+      - "Office of the Attorney General criminal-prosecution functions and detention/enforcement authorities only to the extent of Material Participation in the exact frozen case/project"
+    capacity_limit: "the exact frozen prosecution/detention project; no generic Section 112, court, prosecutor, police or corrections class"
+    exclusions:
+      - "independent appellate/remedial judicial activity"
+      - "unrelated prosecutions and public-order enforcement"
+      - "conduct involving violence or other independently prosecutable acts outside the protected-expression scope"
+    residual_unfrozen_scope:
+      - "other Section 112 / public-order cases"
+      - "the separately described coordinated State cyber/information-control project pending exact organizational freeze"
+    identity_sources:
+      - "https://www3.ago.go.th/center/crim/"
+    dossier: "../../dossiers/states/THA.md"
+    schedule_status: ready-narrowed-subset
+
+# Governance work product only; no licensing effect.
