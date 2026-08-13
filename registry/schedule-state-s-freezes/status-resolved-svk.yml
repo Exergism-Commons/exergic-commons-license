@@ -1,0 +1,12 @@
+state: SVK
+entity: Slovakia
+outcome: S
+freeze_status: status-resolved-renderable
+schedule_identity: "Constitutional Act No. 255/2025 equality-impact implementation project"
+project_boundary: "administrative or judicial implementation of Constitutional Act 255/2025 only where an identified process materially denies equal rights in the family, parenthood, adoption, sex-recognition or related fields"
+capacity_limit: "implementation-specific; the constitutional text or political advocacy is not restricted merely by existence"
+exclusions: ["Act No. 109/2025 NGO regime invalidated by the Constitutional Court", "Constitutional Court", "Ombudsperson", "independent remedies", "implementation not independently satisfying ECL 0.2"]
+identity_sources: ["https://www.slov-lex.sk/ezbierky-fe/pravne-predpisy/SK/ZZ/2025/255/20251101", "https://www.ustavnysud.sk/en/actual-information/actuality/-/asset_publisher/B99toBHZi1uA/content/z%C3%A1kon-ktor%C3%BD-novelizuje-pr%C3%A1vnu-%C3%BApravu-mimovl%C3%A1dnych-organiz%C3%A1ci%C3%AD-je-v-rozpore-s-%C3%BAstavou"]
+schedule_status: ready-status-revalidated-statutory-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
