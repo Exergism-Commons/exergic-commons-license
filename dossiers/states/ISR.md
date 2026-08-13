@@ -3,57 +3,83 @@ id: ECL-STATE-ISR
 entity: "Israel"
 iso3: ISR
 issue: 82
-provisional_outcome: R
-provisional_scope: "State governmental/legal apparatus"
+provisional_outcome: S
+provisional_scope: "identified occupation/settlement-administration, military/security/intelligence, detention/prison and coercive-displacement/discriminatory projects materially meeting ECL 0.2 criteria; participating organs only in the relevant capacity"
 confidence: high
 evidence_cutoff: 2026-08-11
-last_reviewed: 2026-08-11
-review_stage: whole-state-adversarial-reviewed
-adversarial_result: "UPHOLD R; accountability/remediation carve-out required"
+last_reviewed: 2026-08-13
+review_stage: ecl-0.2-delta-reviewed
+adversarial_result: "DOWNGRADE R -> S; whole-State governmental/legal scope conflicts with independent audit/judicial/remedial functions and narrowest-accurate-attribution rule"
 operative: false
 ---
 # Israel
 
-> **Governance record only.** This dossier does not itself create licensing restrictions.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only an exact Schedule incorporated with an exact ECL version has operative effect.
 
 ## 1. Current determination
 
-**R — State apparatus Restricted**, concerning the Israeli State and its governmental/legal apparatus. The finding never extends to Israeli people, Jewish people, residents, civil society, universities, or independent private actors merely by nationality, ethnicity, religion, residence, or association.
+**S — Restricted with defined scope.** The former `R` finding covering the State governmental/legal apparatus is narrowed under the ECL 0.2 consistency audit. Serious evidence continues to support defined occupation/settlement-administration, military/security, detention and coercive-displacement/discriminatory projects, but a blanket designation of every Israeli State institution is not the narrowest accurate unit of attribution.
 
-## 2. ECL criteria engaged
+The finding never extends to Israeli people, Jewish people, residents, civil society, universities or independent private actors merely by nationality, ethnicity, religion, residence or association.
 
-Systematic discriminatory domination, coercive occupation/administration, detention and torture concerns, coercive displacement, and other conduct materially reducing Palestinian agency and self-determination.
+## 2. ECL 0.2 criteria engaged
 
-## 3. Evidence supporting the determination
+The scoped record materially engages:
 
-The ICJ's 19 July 2024 advisory opinion found Israel's continued presence in the occupied Palestinian territory unlawful and identified violations concerning Palestinian self-determination and systemic discrimination. OHCHR's January 2026 thematic work continued to describe discriminatory administration in the occupied West Bank and obligations concerning racial segregation/apartheid. UN mechanisms also continued to raise detention, torture, fair-trial and death-penalty concerns.
+- **§5.1 Repressive surveillance** where intelligence/security surveillance is materially used for persecution, unlawful intimidation, arbitrary detention or suppression of protected dissent;
+- **§5.2 Coercive targeting** for operational systems materially facilitating unlawful violence, torture, enforced disappearance, collective punishment or intentional attacks against protected persons;
+- **§5.6 Systematic coercive domination and unlawful political repression** for defined occupation/administrative, detention, displacement and discriminatory systems materially implementing persecution, arbitrary detention, severe ill-treatment, forced displacement/expulsion without meaningful individualized protection, severe discriminatory domination or comparable coercive denial of fundamental rights; and
+- **§5.7 Circumvention** where an intermediary structure deliberately evades an otherwise applicable restriction.
+
+Ordinary Israeli public administration, lawful security activity or unrelated State services are not restricted merely because they are governmental.
+
+## 3. Evidence preserving scoped restriction
+
+The ICJ's 19 July 2024 advisory opinion found Israel's continued presence in the occupied Palestinian territory unlawful and identified violations concerning Palestinian self-determination and systemic discrimination. The current dossier record also includes 2026 OHCHR/treaty-body material concerning discriminatory administration, detention, torture/ill-treatment and related coercive systems.
+
+Those findings support restrictions following the **organs and projects materially implementing the qualifying conduct**. They do not require treating every judicial, audit, legislative or unrelated civilian function as the same coercive apparatus.
 
 ## 4. Counter-evidence and exergic institutions
 
-Israel retains meaningful judicial review and a State Comptroller/Ombudsman. In 2026 the High Court adjudicated disputes concerning war-related State Comptroller audits, and the Knesset advanced a proposed commission of inquiry into 7 October and the subsequent war. These are material accountability pathways even though they have not remedied the conduct supporting the designation.
+Israel's State Comptroller/Ombudsman has legally protected independence from the Government and audits executive/public bodies, including the defence establishment. Judicial review and other accountability/remedial functions also remain institutionally distinct from the coercive projects identified above.
+
+These functions do not erase the evidentiary basis for scoped restriction, but they materially defeat the proposition that the entire governmental/legal apparatus is the narrowest accurate Restricted Party.
 
 ## 5. Attribution and exclusions
 
-The designation is institutional, not collective. Independent judicial, audit, defence, humanitarian, rights-remediation and whistleblower projects must be protected by a future Accountability and Remediation Exception where they do not materially support a Restricted Project.
+Current review follows only **identified State organs, units, controlled entities or projects in the capacity in which they materially participate in qualifying ECL 0.2 conduct**.
 
-## 6. Adversarial determination
+Expressly outside the generic scope are:
 
-**UPHOLD R.** Existing counter-institutions do not displace the continuing cross-institutional evidentiary basis.
+- independent judicial review and judicial administration absent separate material participation in a Restricted Project;
+- the State Comptroller/Ombudsman and independent audit activity;
+- independent legal defence, investigation of official abuse, whistleblowing, humanitarian/remedial activity and other qualifying Independent Remediation Activity;
+- legislative oversight and unrelated parliamentary activity absent separate project-specific evidence;
+- ordinary civilian ministries/services unrelated to the qualifying projects; and
+- private/civil-society activity absent its own material participation.
+
+A future Schedule should identify the exact occupation/security/detention/displacement parties, projects or determinable classes and their exclusions rather than use `State governmental/legal apparatus` as a blanket class.
+
+## 6. ECL 0.2 delta determination
+
+**DOWNGRADE `R → S`.** This is a scope correction, not a conclusion that the underlying conduct ceased or became less serious. ECL 0.2 requires restriction to follow the narrowest accurate project/apparatus while preserving materially independent judicial, audit and remedial functions.
 
 ## 7. Review / removal triggers
 
-Immediate review should follow material compliance with ICJ obligations, cessation/remediation of the coercive systems underlying the finding, credible independent accountability for torture/unlawful detention and civilian harm, and demonstrated restoration of rights and self-determination.
+Narrow/remove individual scoped findings on material compliance with applicable legal obligations, independently verified cessation/remediation of the relevant coercive systems, accountability for torture/unlawful detention/civilian harm and demonstrable restoration of protected rights. Re-expansion toward `R` would require evidence that qualifying conduct becomes genuinely cross-institutional across the State apparatus **and** materially independent counter-institutions cease to provide meaningful contrary functions.
 
 ## 8. Sources
 
 - https://www.icj-cij.org/index.php/node/204160
 - https://searchlibrary.ohchr.org/record/35209
+- https://www.mevaker.gov.il/en/about/knesset
+- https://www.mevaker.gov.il/en/state-audit/status-and-powers-of-the-state-comptroller
 - https://spcommreports.ohchr.org/TmSearch/SearchCode?code=ISR+23%2F2025%3B+ISR+6%2F2026
-- https://www.mevaker.gov.il/newsroom/2026-06-29
-- https://main.knesset.gov.il/EN/News/PressReleases/Pages/press772026q.aspx
 
 ## 9. Procedural history
 
 - Discussion: issue #82
 - Initial adjudication: `../../reviews/2026/initial-adjudication.md`
-- Adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
+- Whole-State adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
+- Global license-fit audit: `../../reviews/2026/consistency/global-license-fit-audit.md`
+- ECL 0.2 State delta audit: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
