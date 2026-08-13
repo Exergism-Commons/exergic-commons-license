@@ -1,0 +1,18 @@
+state: ZWE
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Constitutional Amendment No. 3 consultation and opposition-enforcement project"
+project_boundary: "the 2026 constitutional-amendment process from gazetting through enactment on 7 July 2026, limited to public-consultation, policing and administrative measures materially used to suppress protected opposition to the amendment"
+capacity_limit: "the amendment-linked coercive enforcement process only; the constitutional change itself is not restricted merely because of its substance"
+exclusions:
+  - "Zimbabwean constitutional institutions, police or executive administration generally"
+  - "lawful legislative debate, voting or implementation that does not independently satisfy ECL criteria"
+  - "independent courts, legal challenges and remediation"
+  - "other political cases absent separate freeze"
+identity_sources:
+  - "https://www.hrw.org/news/2026/03/10/zimbabwe-violence-and-intimidation-against-opponents-of-presidential-term-extension"
+  - "https://www.hrw.org/news/2026/07/08/zimbabwe-constitution-amended-to-extend-presidents-term"
+residual_scope: "other detention, surveillance and civic-control scope remains governance-only until separately frozen"
+schedule_status: ready-statutory-process-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
