@@ -9,16 +9,32 @@ state_translation:
     R_candidates: 34
     R_frozen: 34
     S_candidates: 86
-    S_translated: 0
+    S_translated: 86
+    S_schedule_ready: 19
+    S_needs_identity_or_project_freeze: 67
     total_candidates: 120
-  defaults:
-    R: frozen-candidate
-    S: needs-identity-translation
-  status_overrides:
-    ISR: needs-project-boundary
-    USA: needs-project-boundary
-    SGP: needs-scope-freeze
+    total_translated_or_frozen: 120
+  R_status: frozen-candidate
+  S_status: translation-complete-freeze-in-progress
   R_freeze_registry: "schedule-state-r-freeze.yml"
+  S_translation_sources:
+    - "schedule-state-s-translations.yml"
+    - "schedule-state-s-batches/batch-03-security-political.yml"
+    - "schedule-state-s-batches/batch-04-conflict-security.yml"
+    - "schedule-state-s-batches/batch-05-civic-security.yml"
+    - "schedule-state-s-batches/batch-06-detention-political.yml"
+    - "schedule-state-s-batches/batch-07-security-civic.yml"
+    - "schedule-state-s-batches/batch-08-conflict-detention.yml"
+    - "schedule-state-s-batches/batch-09-final.yml"
+  S_batch_counts:
+    base_batches_01_02: {translated: 20, ready: 8, blocked_or_partial: 12}
+    batch_03: {translated: 10, ready: 2, blocked_or_partial: 8}
+    batch_04: {translated: 10, ready: 2, blocked_or_partial: 8}
+    batch_05: {translated: 10, ready: 2, blocked_or_partial: 8}
+    batch_06: {translated: 10, ready: 2, blocked_or_partial: 8}
+    batch_07: {translated: 10, ready: 2, blocked_or_partial: 8}
+    batch_08: {translated: 10, ready: 1, blocked_or_partial: 9}
+    batch_09: {translated: 6, ready: 0, blocked_or_partial: 6}
   R:
     [AFG, AZE, BLR, BFA, BDI, KHM, CHN, CUB, EGY, SLV, ERI, SWZ, GIN, IRN, KWT, MDG, MLI, MMR, NIC, NER, PRK, OMN, RUS, RWA, SAU, TJK, TZA, TGO, TUN, TKM, ARE, VEN, VNM, GNB]
   S:
@@ -100,6 +116,12 @@ external_list_policy:
   icc_warrants: evidence-and-identity-anchor-only
   auto_import: false
 
+schedule_gate:
+  state_r_identity_freeze_complete: true
+  state_s_translation_complete: true
+  state_s_identity_project_freeze_complete: false
+  render_adoptable_schedule: false
+  reason: "67 State S translations still require exact identity, unit, case, facility, order or project-boundary freeze before contract-readable Schedule use."
+
 # Translation status is a work queue, not a licensing designation.
-# All 34 current State R candidates have completed identity freeze.
-# No Schedule should be rendered as adoptable until all included S entries have a frozen knowable identity/project boundary.
+# No Schedule should be rendered as adoptable until every included entry has a frozen knowable identity/project boundary.
