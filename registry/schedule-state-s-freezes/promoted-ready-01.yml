@@ -1,0 +1,58 @@
+batch: promoted-ready-01
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+records:
+  - state: DNK
+    entity: Denmark
+    outcome: S
+    schedule_identity: "Udbetaling Danmark / ATP automated welfare risk-profiling workflows"
+    project_boundary: "specified Udbetaling Danmark automated fraud/risk-profiling models"
+    capacity_limit: "only qualifying discriminatory, opaque or disproportionate automated welfare profiling"
+    exclusions: ["ATP pension/investment activity", "ordinary welfare payment administration", "systems independently retired, corrected and validated"]
+    schedule_status: ready-promoted-project-class
+
+  - state: FRA
+    entity: France
+    outcome: S
+    schedule_identity: "national algorithmic video-surveillance experiment and qualifying enacted continuation"
+    project_boundary: "national Olympic-derived algorithmic video-surveillance experiment / enacted continuation materially deployed through 31 December 2027"
+    capacity_limit: "only deployments independently satisfying ECL surveillance/repression criteria"
+    exclusions: ["Nice school-entrance project blocked by Conseil d'Etat", "mere legislative proposals", "lawful non-repressive video analysis"]
+    schedule_status: ready-promoted-project-class
+
+  - state: SRB
+    entity: Serbia
+    outcome: S
+    schedule_identity: "BIA / Ministry of Internal Affairs repressive spyware and mobile-forensic deployment class"
+    project_boundary: "NoviSpy and other State-linked spyware/mobile-forensic deployments against journalists, activists or lawful opposition where attribution is established"
+    capacity_limit: "only materially evidenced repressive digital-surveillance or separately substantiated protest-repression operations"
+    exclusions: ["policing and intelligence generally", "suppliers absent Material Participation", "independent journalism/civil society"]
+    schedule_status: ready-promoted-capacity-limited-parties
+
+  - state: ARM
+    entity: Armenia
+    outcome: S
+    schedule_identity: "Police of the Ministry of Internal Affairs biometric/facial-recognition surveillance framework"
+    project_boundary: "live-camera-access facial-recognition/biometric police identification deployment"
+    capacity_limit: "only use for repression, arbitrary detention, unlawful intimidation or suppression of protected activity"
+    exclusions: ["Human Rights Defender", "courts and independent oversight", "ordinary policing"]
+    schedule_status: ready-promoted-capacity-limited-party
+
+  - state: DOM
+    entity: Dominican Republic
+    outcome: S
+    schedule_identity: "DGM / CESFRONT qualifying 2025/26 deportation and detention operations"
+    project_boundary: "collective/discriminatory deportation and detention operations identified by the canonical dossier"
+    capacity_limit: "only racial profiling, collective deportation, arbitrary detention, abusive force or denial of protection procedures"
+    exclusions: ["ordinary residence/document services", "unrelated State functions", "independent remedies"]
+    schedule_status: ready-promoted-capacity-limited-parties
+
+  - state: LTU
+    entity: Lithuania
+    outcome: S
+    schedule_identity: "State Border Guard Service Belarus-border pushback/protection-access project"
+    project_boundary: "Belarus-border pushback, asylum-access denial and de facto detention operations identified by the canonical dossier"
+    capacity_limit: "only unlawful summary return, obstruction of individualized protection or arbitrary/de facto detention"
+    exclusions: ["courts", "lawful border control", "search and rescue", "independent remedies"]
+    schedule_status: ready-promoted-capacity-limited-party
