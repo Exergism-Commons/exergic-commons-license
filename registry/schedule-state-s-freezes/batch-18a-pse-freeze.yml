@@ -1,0 +1,18 @@
+state: PSE
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Crime Prevention Act No. 7 of 1954 post-2023 detention process"
+project_boundary: "continued use in the West Bank of the detention framework addressed by the Supreme Constitutional Court ruling of 25 January 2023 and the July 2026 OHCHR record"
+capacity_limit: "the identified post-ruling detention workflow only"
+exclusions:
+  - "public institutions generally"
+  - "valid detention with meaningful judicial review"
+  - "courts, legal defence and independent remediation"
+  - "other actors not covered by the State dossier"
+identity_sources:
+  - "https://palestine.un.org/en/319839-palestinian-authorities-must-stop-practices-arbitrary-detention-torture-and-ill-treatment"
+  - "https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=r64BGCqgK9dR6B%2FIqwGGvAXUPlruGW0v%2BJOvK1ch8IEiTJN6P3HBtviTgf3SA%2FWq1kcBOdaUofnoNjJ9DuIRxw%3D%3D"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-statutory-process
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
