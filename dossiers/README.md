@@ -3,40 +3,25 @@
 Dossiers are the canonical per-entity entry points for ECL evidence, counter-evidence, scope analysis, determinations and future review.
 
 - `states/` — 195 State dossiers plus the canonical State schema.
-- `organizations/` — companies, organizations and other legal entities.
-- `persons/` — specifically designated natural persons where necessary.
-- `projects/` — project/program-specific records.
+- `organizations/` — companies, organizations and other legal/organizational actors.
+- `persons/` — individualized natural-person records where necessary.
+- `projects/` — project/program/deployment-specific records.
 
-A dossier has **no licensing effect by itself**. Only an exact Schedule expressly incorporated with an exact ECL version can create a Restricted Party or Restricted Project for a software release.
+A dossier has **no licensing effect by itself**. Only an exact Schedule expressly incorporated with an exact ECL version can create an operative Restricted Party or Restricted Project for a software release.
 
-GitHub issues are discussion/submission threads; review tranche/cohort/audit files are procedural history; the dossier is the version-controlled canonical current evidence/governance record.
+GitHub issues are discussion/submission threads; review tranche/cohort/audit files are procedural history; the dossier is the version-controlled canonical current governance record.
 
 ## Normalization rule
 
-A normalized dossier must be understandable and auditable without reconstructing its conclusion from historical review files. It records current outcome/scope, ECL criteria, supporting evidence, counter-evidence/exergic institutions, attribution boundaries, adversarial outcome, objective review/removal triggers, stable sources where possible and procedural history. Historical review files may explain how a conclusion was reached, but they must not be required to understand the current dossier. The schema is in `states/_TEMPLATE.md`.
+A normalized dossier must be understandable and auditable without reconstructing its conclusion from historical review files. It records the current outcome/scope, ECL criteria, supporting evidence, counter-evidence, attribution boundaries, adversarial result, review/removal triggers, sources and procedural history.
 
-## 2026 factual/adversarial normalization status
+Historical review files may explain how a conclusion was reached but are not required to understand the current dossier.
 
-Completed phases:
-
-- all 46 States initially classified `R`: whole-State adversarial review and normalization;
-- scoped/current `S` work: high-impact review plus scoped tranches 1–10, including second falsification passes for former `R → S` cases;
-- full 45-entry `U` phase: `../reviews/2026/adversarial/under-review/full-cohort.md`;
-- full 44-entry original-`N` phase: `../reviews/2026/adversarial/no-basis/full-cohort.md`;
-- global license-fit audit: `../reviews/2026/consistency/global-license-fit-audit.md`;
-- full ECL 0.2 State delta: `../reviews/2026/consistency/ecl-0.2-state-delta.md`.
-
-## Complete State normalization
+## 2026 State corpus
 
 **195 / 195 State dossiers have completed detailed factual/adversarial normalization at the 2026-08-11 evidence cutoff.**
 
-Every State entry point is intended to be independently auditable without opening historical tranche/cohort records.
-
-## ECL 0.2 delta result
-
-The global consistency audit found that ECL 0.1 under-expressed the non-domination rule already present in the project principles/governance standard. The root `LICENSE` is now **ECL 0.2-DRAFT**; the immutable ECL 0.1 snapshot remains under `../versions/licenses/`.
-
-The full 195-State delta audit against ECL 0.2 is complete. Current provisional distribution:
+The ECL 0.2 State delta is also complete. Current provisional distribution:
 
 - **34 `R`**
 - **86 `S`**
@@ -44,16 +29,47 @@ The full 195-State delta audit against ECL 0.2 is complete. Current provisional 
 - **47 `N`**
 - **195 total**
 
-Key normative corrections:
+Canonical machine-readable outcome source: `../registry/states.yml`.
 
-- United States: `R → S`, replacing blanket federal-government attribution with identified materially participating federal projects/agencies/units.
-- Israel: `R → S`, replacing blanket governmental/legal attribution with identified occupation/security/detention/displacement/discriminatory projects and participating organs.
-- Singapore: `S` upheld but narrowed; capital punishment/execution is no longer a standalone ECL basis, while qualifying POFMA/information-control and public-order repression remain in scope.
-- All 28 `U` dossiers retained `U` after explicit 0.2 re-read; their uncertainty remains factual/attribution-based rather than merely lexical.
-- All 47 `N` dossiers retained `N`.
+`R/S/U/N` are governance outcomes, not generic human-rights ratings and not operative licensing designations. Each current dossier must be read through the exact ECL 0.2 criteria and its attribution/exclusion section.
 
-A dossier that remains `R` or `S` after the delta audit must be read through the exact ECL 0.2 criteria rather than as a generic human-rights rating. Capital punishment, detention, migration policy, conscription, protest regulation and comparable State powers are not standalone ECL categories.
+## Cross-entity status
+
+Organization, project and person schemas and canonical registries now exist. The first cross-entity reconciliation cycle is complete for the core non-State corpus.
+
+Canonical registries:
+
+- `../registry/organizations.yml`
+- `../registry/projects.yml`
+- `../registry/persons.yml`
+
+Older Schedule entries are not carried forward merely because they existed previously. External lists may support identity/evidence but do not automatically create ECL status.
+
+## Schedule translation and freeze
+
+State factual normalization is complete; current work is **contract-readable Schedule engineering**.
+
+- **34 / 34 State `R`** candidate apparatus identity freezes are complete.
+- **86 / 86 State `S`** Schedule Translation Records are complete.
+- **19 State `S`** records are fully frozen.
+- **18 additional State `S`** records contain at least one precise renderable subset.
+- **3 State `S`** records require current-status/remediation revalidation.
+- **46 State `S`** records still require exact identity/project-boundary work.
+
+Therefore **37 / 86 State `S` dossiers currently have at least one Schedule-renderable entry**.
+
+Live work queue: `../registry/schedule-translations.yml`.
+
+Freeze records:
+
+- `../registry/schedule-state-r-freeze.yml`
+- `../registry/schedule-state-s-freezes/`
+- `../registry/schedule-project-freezes.yml`
+
+A frozen Schedule entry may be narrower than the dossier that supports it. Residual unfrozen scope remains governance-only until separately frozen.
 
 ## Next phase
 
-State-by-State evidence normalization and ECL 0.2 delta review are complete. The next governance work is cross-entity reconciliation across State, organization, person and project dossiers, followed by creation of a fresh post-0.2 Schedule candidate. `ECL-RP-0.4-DRAFT` is pre-0.2 historical draft material and should not be patched into apparent compatibility.
+Continue resolving the remaining identity/project and current-status blockers, then deduplicate State ↔ organization ↔ project scope and render a fresh post-0.2 Schedule candidate from the registries.
+
+`schedules/ECL-RP-0.4-DRAFT.md` remains historical/pre-0.2 material and must not be patched into apparent compatibility.
