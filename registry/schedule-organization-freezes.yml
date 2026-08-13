@@ -1,0 +1,63 @@
+version: "2026-08-13-ecl-0.2-organization-freeze"
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+
+organizations:
+  - id: NSO-GROUP
+    outcome: S
+    freeze_status: identity-frozen
+    schedule_identity: "NSO Group — BIS Entity List entry, 22 Galgalei Haplada, Herzliya, Israel 4672222"
+    capacity_limit: "commercial-spyware development, licensing, operation, support or distribution only where Material Participation independently satisfies the canonical repressive-surveillance scope"
+    exclusions:
+      - "employees, investors, vendors and customers absent their own Material Participation"
+      - "unrelated corporate activity"
+      - "unknown affiliates or successors not separately frozen"
+    identity_sources:
+      - "https://www.federalregister.gov/d/2021-24123"
+      - "../dossiers/organizations/NSO-GROUP.md"
+    schedule_status: ready-capacity-limited-organization
+
+  - id: CANDIRU
+    outcome: S
+    freeze_status: identity-and-aliases-frozen
+    schedule_identity: "Candiru — BIS Entity List entry, 21 Haarbaa, Tel Aviv-Yafo, Israel 6473921"
+    frozen_aliases:
+      - "Candiru Ltd."
+      - "DF Associates Ltd."
+      - "Grindavik Solutions Ltd."
+      - "Taveta Ltd."
+      - "Saito Tech Ltd."
+      - "Greenwick Solutions"
+      - "Tabatha Ltd."
+    capacity_limit: "commercial-spyware development, licensing, operation, support or distribution only where Material Participation independently satisfies the canonical repressive-surveillance scope"
+    exclusions:
+      - "persons or entities outside the frozen BIS identity/alias set absent separate evidence"
+      - "unrelated activity"
+    identity_sources:
+      - "https://www.federalregister.gov/d/2021-24123"
+      - "../dossiers/organizations/CANDIRU.md"
+    schedule_status: ready-capacity-limited-organization
+
+  - id: INTELLEXA-PREDATOR-NETWORK
+    outcome: S
+    freeze_status: exact-entity-list-frozen
+    schedule_entities:
+      - "Intellexa S.A."
+      - "Intellexa Limited"
+      - "Cytrox AD"
+      - "Cytrox Holdings Zartkoruen Mukodo Reszvenytarsasag (Cytrox Holdings ZRT)"
+      - "Thalestris Limited"
+      - "Aliada Group Inc."
+    capacity_limit: "Predator/commercial-spyware development, ownership, resale, distribution, operation, transaction-processing or material technical-support capacities covered by the canonical dossier"
+    exclusions:
+      - "undefined Intellexa Consortium as a blanket class"
+      - "unknown affiliates, employees or shareholders absent separate evidence"
+      - "unrelated corporate activity"
+    identity_sources:
+      - "https://home.treasury.gov/news/press-releases/jy2155"
+      - "https://home.treasury.gov/news/press-releases/jy2581"
+      - "../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md"
+    schedule_status: ready-exact-entity-set
+
+# Freeze records are Schedule-preparation data only and have no licensing effect by themselves.
