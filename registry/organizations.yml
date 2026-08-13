@@ -1,0 +1,29 @@
+version: "2026-08-13-ecl-0.2-cross-entity"
+evidence_cutoff: "2026-08-13"
+status: provisional-governance
+operative: false
+dossier_pattern: "../dossiers/organizations/{ID}.md"
+counts:
+  R: 4
+  S: 6
+  U: 1
+  N: 0
+outcomes:
+  R:
+    - AL-QAIDA
+    - ISIL-DAESH
+    - IZZ-AL-DIN-AL-QASSAM-BRIGADES
+    - RAPID-SUPPORT-FORCES
+  S:
+    - NSO-GROUP
+    - CANDIRU
+    - INTELLEXA-PREDATOR-NETWORK
+    - HAMAS
+    - SUDANESE-ARMED-FORCES
+    - SDF-RADA
+  U:
+    - PALANTIR-TECHNOLOGIES
+  N: []
+
+# Governance registry only; no licensing effect.
+# INTELLEXA-PREDATOR-NETWORK is an evidence/network dossier. A future Schedule must name exact legal entities from that dossier rather than an undefined consortium label.
