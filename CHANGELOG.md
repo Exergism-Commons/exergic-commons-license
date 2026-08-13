@@ -61,16 +61,20 @@
 - `schedules/ECL-RP-0.4-DRAFT.md` is historical/pre-0.2 draft material and must not be adopted with ECL 0.2-DRAFT.
 - Added `reviews/2026/consistency/schedule-readiness.md`.
 - Added `registry/schedule-translations.yml` as the machine-readable work queue for Schedule generation.
-- Added `registry/schedule-state-r-freeze.yml`: **all 34 current State `R` candidates now have frozen candidate apparatus identities** and common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity.
-- The main remaining Schedule gate is translation of all **86 State `S` outcomes** into exact agencies, units, named projects or objectively determinable classes with capacity limits and exclusions.
+- Added `registry/schedule-state-r-freeze.yml`: **all 34 current State `R` candidates have frozen candidate apparatus identities** and common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity.
+- Completed **86 / 86 State-`S` Schedule Translation Records** across `registry/schedule-state-s-translations.yml` and `registry/schedule-state-s-batches/`.
+- A direct audit of the actual translation statuses yields **18 State `S` entries sufficiently knowable for candidate Schedule rendering now** and **68 State `S` entries requiring a final identity/project freeze**.
+- Corrected an intermediate bookkeeping error that had overcounted the first two `S` translation batches by one; canonical readiness is **18 ready / 68 pending freeze**, not 19/67.
+- The 68 pending entries are not unresolved ECL classifications: each record now identifies the exact missing contract-engineering element such as agency/unit legal identity, detention facility, prosecution/case, statutory implementing authority, operation, surveillance deployment, proxy-control relationship or temporal project boundary.
 - External UN sanctions and ICC warrant records are identity/evidence sources, not automatically updating ECL classes.
 - A supplier is not Restricted merely because it supplies a sensitive customer; project-level Material Participation and prohibited-use evidence control.
 
 ### Next work
 
-- Complete the 86 State-`S` Schedule Translation Records and freeze exact identities/project boundaries.
+- Resolve the **68 explicit State-`S` identity/project freeze blockers**.
+- Freeze remaining scoped non-State legal identities, aliases and organizational/project boundaries.
 - Reconcile State ↔ organization/project duplicate scopes and exact controlled-entity treatment.
-- Render a fresh post-0.2 Schedule only from translation records that pass knowability; do not patch Draft 0.4.
+- Render a fresh post-0.2 Schedule only from records that pass knowability; do not patch Draft 0.4.
 - Define stable governance decision mechanics, conflict-of-interest rules and dissent documentation.
 - Obtain specialist legal review before proposing stable ECL 1.0, including patent, termination/reinstatement, Schedule-incorporation, hosted-service and cross-jurisdiction enforceability questions.
 
