@@ -20,37 +20,39 @@ The immutable ECL 0.1 snapshot is [`versions/licenses/ECL-0.1.md`](versions/lice
 
 Detailed review and normalization are complete for **195 / 195** State dossiers.
 
-Current provisional governance after the post-delta override layer:
+Current provisional governance after applying the State outcome override layers:
 
 - **34 `R`**
-- **85 `S`**
-- **29 `U`**
+- **83 `S`**
+- **31 `U`**
 - **47 `N`**
 - **195 total**
 
-Read `registry/state-outcome-overrides.yml` over `registry/states.yml`; the overlay has precedence until the next consolidated snapshot.
+Read `registry/states.yml`, then apply all `registry/state-outcome-overrides*.yml` in lexical order. The override layer has precedence until the next consolidated snapshot.
 
 ## Schedule engineering
 
-Draft [`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) is historical/pre-0.2 material and must not be treated as synchronized with ECL 0.2-DRAFT.
+Draft [`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) is historical/pre-0.2 material. [`schedules/ECL-RP-0.5-PARTIAL-DRAFT.md`](schedules/ECL-RP-0.5-PARTIAL-DRAFT.md) is a non-operative rendering test.
 
 Current State Schedule status:
 
 - **34 / 34 `R`** identity freezes complete;
-- all current `S` dossiers have completed Schedule translation;
-- **19 `S`** are fully frozen;
-- **52 additional `S`** have at least one precise renderable subset;
-- **71 / 85 active `S`** therefore have at least one Schedule-renderable entry;
-- **14 `S`** remain in current-status, attribution or remediation review; and
+- all active `S` dossiers have completed Schedule translation;
+- **73 / 83 active `S`** have at least one Schedule-renderable frozen entry;
+- **10 `S`** remain in current-status, attribution or remediation review; and
 - **0 `S`** remain blocked merely because identity/project translation is unfinished.
 
-Canonical progress overlays:
+Canonical progress sources:
 
 - [`registry/schedule-progress-overrides.yml`](registry/schedule-progress-overrides.yml)
 - [`registry/schedule-status-overrides.yml`](registry/schedule-status-overrides.yml)
 - [`registry/schedule-state-r-freeze.yml`](registry/schedule-state-r-freeze.yml)
 - `registry/schedule-state-s-freezes/`
+- [`registry/schedule-organization-freezes.yml`](registry/schedule-organization-freezes.yml)
+- [`registry/schedule-armed-organization-freezes.yml`](registry/schedule-armed-organization-freezes.yml)
 - [`registry/schedule-project-freezes.yml`](registry/schedule-project-freezes.yml)
+
+`tools/render_schedule.py` renders a non-operative candidate from frozen records, and Schedule CI validates the current State coverage before producing the artifact.
 
 A Schedule entry may be narrower than the dossier supporting it. Residual unfrozen scope remains governance-only.
 
@@ -69,7 +71,8 @@ External lists may serve as evidence or identity anchors but are not automatical
 ```text
 evidence → dossier → adversarial review → consistency review
         → Schedule translation → identity/project freeze
-        → versioned Schedule → explicit release incorporation
+        → generated Schedule candidate → legal/internal review
+        → explicit release incorporation
 ```
 
 No dossier, review or registry entry has licensing effect by itself. Only an exact Schedule expressly incorporated with an exact ECL version can have licensing effect for a release.
