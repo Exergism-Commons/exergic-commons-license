@@ -1,0 +1,164 @@
+batch: 3
+status: provisional-governance
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
+translated_count: 10
+schedule_ready_count: 2
+blocked_or_partial_count: 8
+
+records:
+  - state: DZA
+    entity: Algeria
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific 2025/26 security/prosecution/detention cases against protected journalists, human-rights lawyers, disappearance advocates and peaceful political actors"
+    capacity_limit: "only the exact security, prosecution, detention or administrative process materially used for arbitrary detention or suppression of protected activity"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["ordinary courts/public services", "presidential clemency/remediation", "unrelated security activity"]
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=DZA+1%2F2026"
+      - "https://spcommreports.ohchr.org/TmSearch/SearchCode?code=DZA+6%2F2025%3B+DZA+2%2F2026"
+    dossier: "../dossiers/states/DZA.md"
+    status: needs-case-agency-detention-freeze
+
+  - state: AGO
+    entity: Angola
+    outcome: S
+    candidate_parties:
+      - "Rapid Intervention Police units, only in the substantiated protest/land-rights repression operations"
+      - "National Police units/commands, only where materially linked to the substantiated unlawful-force or arbitrary-detention operation"
+    candidate_projects:
+      - "July 2025 protest repression and materially continuous operations involving lethal/excessive force or arbitrary detention"
+      - "specific coercive land-rights enforcement operations identified by the canonical dossier"
+    capacity_limit: "identified units/commands/operations only; no generic Angola police class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["independent judicial remediation", "ordinary policing", "released/acquitted cases as such"]
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=AGO+2%2F2025"
+    dossier: "../dossiers/states/AGO.md"
+    status: ready-capacity-limited-units
+
+  - state: BHR
+    entity: Bahrain
+    outcome: S
+    candidate_parties:
+      - "specific security/intelligence/law-enforcement or detention unit only after the unit/facility and qualifying conduct are frozen"
+    candidate_projects:
+      - "identified unofficial/incommunicado detention, torture/coercive-interrogation or political-retaliation project"
+    capacity_limit: "substantiated torture, unofficial/incommunicado detention, political retaliation or materially enabling prosecution process"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["restorative justice", "prison-health reform", "compensation", "genuinely independent Ombudsman/oversight/remediation"]
+    identity_sources:
+      - "https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=%2F0aLqb%2BD86wFVEqMSMj7marJZz7q6eZ6uue7ppBVcvL3oDOFbTK%2F91v4HcvhDP%2FDvPnT%2BfyBG2imgEaPIfezcQ%3D%3D"
+    dossier: "../dossiers/states/BHR.md"
+    status: needs-exact-security-unit-and-detention-facility-freeze
+
+  - state: BGD
+    entity: Bangladesh
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific anti-terrorism/cyber/ICT prosecution or detention process materially targeting protected journalism or peaceful political activity"
+    capacity_limit: "case/prosecution-specific; no generic anti-terror, police, prosecutor or ICT-law class"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["courts acting independently", "reform/remedial bodies", "ordinary ministries", "lawful cyber/terror enforcement"]
+    identity_sources:
+      - "https://www.amnesty.org/en/location/asia-and-the-pacific/south-asia/bangladesh/report-bangladesh/"
+    dossier: "../dossiers/states/BGD.md"
+    status: needs-current-case-prosecutor-security-unit-freeze
+
+  - state: BEN
+    entity: Benin
+    outcome: S
+    candidate_parties:
+      - "Haute Autorité de l'Audiovisuel et de la Communication (HAAC), only in coercive media-control actions materially suppressing protected expression"
+      - "Cour de Répression des Infractions Économiques et du Terrorisme (CRIET), only in the exact detention/prosecution processes found to materially suppress protected journalism or rights-defence activity"
+    candidate_projects:
+      - "specific Digital Code prosecutions for protected expression"
+      - "specific HAAC suspension/control actions and CRIET detention/prosecution processes identified by the canonical dossier"
+    capacity_limit: "protected journalism/political expression/rights-defence suppression; no ordinary media regulation or counterterrorism jurisdiction"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["lifted/remediated media actions", "unrelated policing/public functions", "independent judicial remedy"]
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=BEN+1%2F2025"
+    dossier: "../dossiers/states/BEN.md"
+    status: ready-capacity-limited-parties
+
+  - state: BTN
+    entity: Bhutan
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "continuing detention/enforcement of specific legacy political-prisoner convictions where the detention remains arbitrary or materially linked to torture/unfair-trial findings"
+    capacity_limit: "named prisoner/case and responsible facility/security function only"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["post-2008 constitutional/democratic State generally", "royal clemency/remediation", "ordinary detention"]
+    identity_sources:
+      - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=BTN+1%2F2024"
+    dossier: "../dossiers/states/BTN.md"
+    status: needs-prisoner-case-facility-freeze
+
+  - state: BOL
+    entity: Bolivia
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific 2026 emergency blockade-clearing operation in which military/police units materially used unlawful force or arbitrary detention against protected activity"
+    capacity_limit: "operation-specific; no generic military/police emergency class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Defensoría del Pueblo", "courts/electoral institutions", "ordinary public-order operations"]
+    identity_sources:
+      - "https://www.defensoria.gob.bo/"
+    dossier: "../dossiers/states/BOL.md"
+    status: needs-operation-unit-emergency-measure-freeze
+
+  - state: BIH
+    entity: Bosnia and Herzegovina
+    outcome: S
+    candidate_parties:
+      - "Republika Srpska entity authorities only in the exact criminal-defamation, retaliatory-inspection or media-intimidation project proven by the canonical dossier"
+    candidate_projects:
+      - "Republika Srpska criminal-defamation/media-intimidation enforcement against protected journalism"
+      - "specific retaliatory inspection/administrative project against independent media/civic activity"
+    capacity_limit: "strictly Republika Srpska project-level; Bosnia and Herzegovina and Federation institutions excluded"
+    criteria: ["ECL-0.2 §5.6"]
+    exclusions: ["State Constitutional Court", "Federation institutions", "national journalist-protection mechanisms", "unrelated RS public services"]
+    identity_sources:
+      - "https://www.ohr.int/69th-report-of-the-high-representative-for-implementation-of-the-peace-agreement-on-bosnia-and-herzegovina-to-the-secretary-general-of-the-un-/"
+    dossier: "../dossiers/states/BIH.md"
+    status: needs-exact-rs-enforcement-body-and-case-freeze
+
+  - state: BRA
+    entity: Brazil
+    outcome: S
+    candidate_parties:
+      - "specific State-level police unit/command only after the operation and recurring qualifying pattern are frozen"
+    candidate_projects:
+      - "specific Rio/state police operation with substantiated recurring unlawful lethal-force, torture or disappearance pattern"
+      - "specific accountability-obstruction project where materially proven"
+    capacity_limit: "State/unit/operation-specific; no national Brazilian police class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["Supreme Federal Court", "independent prosecution/forensics", "Federal Police when acting in independent accountability work", "ordinary public security"]
+    identity_sources:
+      - "https://noticias.stf.jus.br/postsnoticias/stf-determina-ao-governo-do-rj-que-apresente-imagens-de-operacao-nos-complexos-do-alemao-e-da-penha/"
+      - "https://www.cnmp.mp.br/portal/component/normas/norma/11739"
+    dossier: "../dossiers/states/BRA.md"
+    status: needs-state-police-unit-operation-freeze
+
+  - state: CMR
+    entity: Cameroon
+    outcome: S
+    candidate_parties: []
+    candidate_projects:
+      - "specific election/protest security operation involving substantiated excessive/lethal force or arbitrary political detention"
+      - "specific military-court/detention process materially used against protected civilian political assembly/expression"
+    capacity_limit: "operation/case/facility-specific; no generic Cameroon security or judicial class"
+    criteria: ["ECL-0.2 §5.2", "ECL-0.2 §5.6"]
+    exclusions: ["unrelated judiciary/public services", "non-State separatist violence", "successful judicial relief/remediation"]
+    identity_sources:
+      - "https://www.amnesty.org/en/location/africa/west-and-central-africa/cameroon/report-cameroon/"
+    dossier: "../dossiers/states/CMR.md"
+    status: needs-security-unit-military-court-case-freeze
+
+# Batch-level translation records are governance work products only; no licensing effect.
