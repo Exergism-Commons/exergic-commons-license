@@ -5,8 +5,8 @@ compatible_license: "ECL-0.2-DRAFT"
 source_state_registry: "states.yml"
 target_count: 86
 translated_count: 20
-schedule_ready_count: 8
-blocked_or_partial_count: 12
+schedule_ready_count: 7
+blocked_or_partial_count: 13
 
 common_exclusions:
   - population-and-nationality
