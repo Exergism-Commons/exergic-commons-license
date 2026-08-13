@@ -1,0 +1,8 @@
+state: CYP
+outcome: S
+freeze_status: identity-resolved-current-status-review
+identified_scope: "specific maritime-return and public-order incidents identified in the canonical dossier"
+blocker: "confirm a current qualifying 2026 operation or materially continuous unremediated project before rendering"
+schedule_status: not-renderable-pending-current-status
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
