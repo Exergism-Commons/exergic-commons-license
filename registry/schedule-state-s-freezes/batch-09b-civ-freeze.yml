@@ -1,0 +1,16 @@
+state: CIV
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "October 2025 Abidjan/Dabou protest-case processing cohort"
+project_boundary: "the arrest, custody and expedited case-processing cohort arising from the October 2025 Abidjan/Dabou protest events that remained active in the 10 March 2026 source record"
+capacity_limit: "the frozen cohort only, where protected activity and missing fair-process safeguards are the basis of the canonical finding"
+exclusions:
+  - "released or independently remedied cases"
+  - "ordinary courts and unrelated public-order activity"
+  - "future events absent separate review"
+identity_sources:
+  - "https://www.amnesty.org/en/latest/news/2026/03/cote-divoire-women-detained-without-cause/"
+residual_scope: "other dossier scope remains governance-only until separately frozen"
+schedule_status: ready-temporal-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
