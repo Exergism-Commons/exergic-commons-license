@@ -1,0 +1,17 @@
+state: PRY
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Community 2 de Enero prosecution arising from the 16 August 2024 SEN food-delivery incident"
+project_boundary: "the continuing criminal proceeding against the three Ayoreo community members arising from the 16 August 2024 National Emergency Secretariat incident in Community 2 de Enero, as documented on 21 April 2026"
+capacity_limit: "this named event/proceeding only, while the prosecution remains materially active and the canonical retaliation/due-process finding remains unremediated"
+exclusions:
+  - "Paraguayan prosecution, judiciary or Indigenous-policy administration generally"
+  - "private land/agricultural conduct absent separate State attribution"
+  - "dismissal, acquittal or independent remediation"
+  - "other Indigenous land/protest projects absent separate freeze"
+identity_sources:
+  - "https://www.iniciativa-amotocodie.org/2026/04/21/criminalization-indigenous-demands-paraguay-ayoreo/"
+residual_scope: "other Indigenous land/eviction, protest and defender scope remains governance-only until separately frozen"
+schedule_status: ready-named-prosecution-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
