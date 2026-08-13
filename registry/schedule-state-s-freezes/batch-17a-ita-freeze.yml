@@ -1,0 +1,18 @@
+state: ITA
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "Law No. 54/2026 Articles 7 and 9 protest-enforcement project"
+project_boundary: "implementation after 25 April 2026 of the preventive-stop/search and demonstration-related measures identified in Articles 7 and 9 of Law No. 54/2026, limited to applications against protected peaceful civic activity that independently satisfy ECL 0.2"
+capacity_limit: "the frozen statutory enforcement workflow only; not public-security law or policing generally"
+exclusions:
+  - "ordinary lawful policing and investigation"
+  - "judicial review and independent remediation"
+  - "applications involving independently unlawful violent conduct rather than protected peaceful activity"
+  - "other provisions of Law No. 54/2026 absent separate freeze"
+identity_sources:
+  - "https://www.gazzettaufficiale.it/atto/serie_generale/caricaDettaglioAtto/originario?atto.codiceRedazionale=26G00078&atto.dataPubblicazioneGazzetta=2026-04-24&elenco30giorni=false"
+  - "https://www.amnesty.it/dissenso-sotto-attacco-cambiare-la-legge-54-2026/"
+residual_scope: "detention and migration-externalization scope remains governance-only until separately frozen"
+schedule_status: ready-statutory-enforcement-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
