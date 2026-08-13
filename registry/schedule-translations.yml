@@ -11,10 +11,10 @@ state_translation:
     S_candidates: 86
     S_translated: 86
     S_fully_frozen: 19
-    S_renderable_subset_only: 33
+    S_renderable_subset_only: 35
     S_current_status_blocked: 3
-    S_identity_or_project_freeze_pending: 31
-    S_schedule_renderable_states: 52
+    S_identity_or_project_freeze_pending: 29
+    S_schedule_renderable_states: 54
     total_candidates: 120
     total_translated_or_frozen: 120
   R_status: frozen-candidate
@@ -41,7 +41,7 @@ schedule_gate:
   narrowed_subset_rendering_supported: true
   direct_project_designation_supported: true
   render_adoptable_schedule: false
-  reason: "19 S records are fully frozen; 33 additional S records have a renderable narrowed subset; 3 require current-status/remediation review; 31 still require exact identity/project-boundary work."
+  reason: "19 S records are fully frozen; 35 additional S records have a renderable narrowed subset; 3 require current-status/remediation review; 29 still require exact identity/project-boundary work."
 
 # Index/work queue only. Detailed records live in the referenced registries/directories.
 # No entry here has licensing effect by itself.
