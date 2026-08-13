@@ -1,0 +1,16 @@
+state: TUR
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "TUR 6/2026 — Esra Işık / Halime Şaman enforcement project"
+project_boundary: "the arrest, pre-trial detention and prosecution of Esra Işık and the judicial/administrative measures concerning Halime Şaman identified by UN Special Procedures communication TUR 6/2026"
+capacity_limit: "these named proceedings/measures only, where they materially burden protected environmental and human-rights activity"
+exclusions:
+  - "Turkish counterterrorism, prosecution, courts or administration generally"
+  - "independent judicial/remedial action"
+  - "other defender cases absent separate freeze"
+identity_sources:
+  - "https://spcommreports.ohchr.org/TmSearch/RelCom?code=TUR+6%2F2026"
+residual_scope: "other public-order, association-control and information-blocking scope remains governance-only until separately frozen"
+schedule_status: ready-named-case-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
