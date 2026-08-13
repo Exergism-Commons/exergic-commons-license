@@ -90,7 +90,7 @@ Those counts describe that completed phase. They are not the current registry co
 
 Scoped review tests the current `S` cohort against the same falsification-first principles: whether scope is too broad, whether a project has ceased or been remediated, whether attribution belongs to a narrower organ/project, and whether counter-institutions defeat broader restriction.
 
-Completed scoped work through tranche 8 includes:
+Completed scoped work through tranche 9 includes:
 
 - high-impact review: United Kingdom, Morocco and Ukraine;
 - tranche 1: Denmark, France, Netherlands and Serbia;
@@ -100,17 +100,20 @@ Completed scoped work through tranche 8 includes:
 - tranche 5: Iraq, Italy, Jordan, Kazakhstan, Kenya, Kyrgyzstan, Laos and Lebanon;
 - tranche 6: Lesotho, Libya, Malaysia, Malta, Mexico, Moldova, Mozambique and Nepal;
 - tranche 7: Nigeria, North Macedonia, Pakistan, Palestine, Panama, Paraguay, Peru and Philippines;
-- tranche 8: Poland, Qatar, Republic of the Congo, Slovakia, Somalia, Sri Lanka, Sudan and Syria.
+- tranche 8: Poland, Qatar, Republic of the Congo, Slovakia, Somalia, Sri Lanka, Sudan and Syria;
+- tranche 9: Thailand, Trinidad and Tobago, Türkiye, Uganda, Uzbekistan, Yemen, Zambia and Zimbabwe.
 
-The current audited provisional distribution after scoped tranche 8 is:
+The current audited provisional distribution after scoped tranche 9 is:
 
 - `R` — **36**
-- `S` — **71**
-- `U` — **44**
+- `S` — **70**
+- `U` — **45**
 - `N` — **44**
 - **Total — 195**
 
-Tranche 8 produced no tier changes but materially narrowed project attribution and formalized fragmented-authority rules for Somalia, Sudan and Syria. It also records reform, constitutional review, labour reform and transitional-justice mechanisms as substantive counter-evidence rather than exceptions added after the fact. The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
+Tranche 9 downgraded Trinidad and Tobago `S → U` because structural asylum/detention concerns remained but fresh evidence of a systematic current summary-return project was insufficient, while the 2026 registration/appeal framework supplied material counter-evidence. The other seven retained `S`, with narrower or updated attribution. Türkiye, Uganda, Uzbekistan and Zimbabwe were explicitly re-tested after their earlier `R → S` corrections and did not justify re-expansion to whole-State restriction. Yemen was reframed as a fragmented-authority map requiring actor-specific operative designation rather than a fictional unitary Yemen restriction.
+
+The exact current outcome and scope must be read from the canonical dossier/registry rather than inferred from an older tranche.
 
 ## 4. Dossier-normalization invariant
 
@@ -128,7 +131,7 @@ The target architecture for ECL 1.0 is that every completed `dossiers/states/*.m
 
 Review tranche files remain immutable history and should not be required to reconstruct the current determination.
 
-After scoped tranche 8, **106 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Kazakhstan, Kyrgyzstan and Pakistan were already counted in the initially-`R` normalized cohort; tranche 8 adds eight new unique dossiers.
+After scoped tranche 9, **110 unique State dossiers** have completed detailed normalization at the 2026-08-11 evidence cutoff. Kazakhstan, Kyrgyzstan, Pakistan, Türkiye, Uganda, Uzbekistan and Zimbabwe were already counted in the initially-`R` normalized cohort; tranche 9 therefore adds four new unique dossiers.
 
 ## 5. Architectural conclusion
 
