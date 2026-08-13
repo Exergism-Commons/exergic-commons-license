@@ -1,0 +1,17 @@
+state: YEM
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "continued detention of the 73 United Nations personnel identified by the UN on 10 June 2026"
+project_boundary: "the detention project attributed by the United Nations to the Houthi de facto authorities and covering the 73 UN personnel still detained as of 10 June 2026"
+capacity_limit: "this frozen detention cohort and materially participating detention/security functions only"
+exclusions:
+  - "Yemen or Yemeni nationality generally"
+  - "other Houthi, internationally recognized-government or STC/UAE-backed activity absent separate freeze"
+  - "humanitarian activity, dialogue and prisoner-release/remedial mechanisms"
+  - "persons outside the frozen cohort absent separate review"
+identity_sources:
+  - "https://www.un.org/sg/en/content/sg/statements/2026-06-10/statement-attributable-the-spokesperson-for-the-secretary-general-two-years-of-detention-of-un-and-other-personnel-yemen"
+residual_scope: "other actor-specific detention, security and conflict scope remains governance-only until separately frozen"
+schedule_status: ready-frozen-detention-cohort
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
