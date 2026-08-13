@@ -1,0 +1,17 @@
+state: PAN
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "PAN 3/2025 Indigenous protest and territorial-enforcement cohort"
+project_boundary: "the State-attributable protest/enforcement conduct frozen by UN Special Procedures communication PAN 3/2025 for the period beginning April 2025 and the identified alleged victims/Indigenous Peoples in that communication"
+capacity_limit: "the frozen cohort and materially continuous enforcement project only where unlawful coercion or territorial-rights suppression satisfies ECL 0.2"
+exclusions:
+  - "Panamanian police/security institutions generally"
+  - "generic migration administration"
+  - "Defensoría del Pueblo, courts and independent remediation"
+  - "persons/communities outside the frozen communication absent separate review"
+identity_sources:
+  - "https://spcommreports.ohchr.org/TmSearch/SearchCode?code=PAN+2%2F2025%3B+PAN+3%2F2025"
+residual_scope: "other territorial/development and protest projects remain governance-only until separately frozen"
+schedule_status: ready-frozen-cohort-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
