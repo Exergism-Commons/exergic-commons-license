@@ -19,12 +19,20 @@ body:
     id: evidence
     attributes:
       label: Supporting evidence
+      description: Prefer primary/authoritative evidence and identify uncertainty or evidence supporting the current conclusion where material.
     validations:
       required: true
   - type: textarea
     id: remedy
     attributes:
       label: Requested result
-      description: Uphold, narrow, downgrade or remove.
+      description: Uphold, narrow, downgrade, place under review or remove.
+    validations:
+      required: true
+  - type: textarea
+    id: conflict
+    attributes:
+      label: Conflict / material-interest disclosure
+      description: Disclose relevant authorship, employment, financial interest, direct advocacy role or other material relationship. A conflict does not bar evidence submission but affects independent-review status.
     validations:
       required: true
