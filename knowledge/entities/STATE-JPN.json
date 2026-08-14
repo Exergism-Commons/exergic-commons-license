@@ -5,7 +5,6 @@
   "name": "Japan",
   "aliases": ["JPN"],
   "dossier": "../../dossiers/states/JPN.md",
-  "currentGovernance": "U",
   "review": {
     "lastSubstantiveReview": "2026-08-14",
     "nextReview": "2026-09-01",
