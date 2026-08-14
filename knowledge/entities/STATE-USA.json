@@ -1,0 +1,18 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "id": "STATE-USA",
+  "type": "State",
+  "name": "United States",
+  "aliases": ["USA", "United States of America"],
+  "dossier": "../../dossiers/states/USA.md",
+  "currentGovernance": "S",
+  "review": {
+    "lastSubstantiveReview": "2026-08-14",
+    "nextReview": "2026-09-14",
+    "reviewClass": "active",
+    "reason": "Scoped live detention/targeting/security findings and counter-institution-sensitive attribution require current-status review."
+  },
+  "trackedObjects": ["PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS", "PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING"],
+  "monitorIds": [],
+  "relations": []
+}
