@@ -86,6 +86,10 @@ Where practical, the affected party may be notified or given a reasonable opport
 
 Reviewers must actively test both factual sufficiency and normative fit against the exact operative ECL text. Principles and governance documents may expose a drafting defect, but they do not silently add legal prohibitions.
 
+For State dossiers and other review surfaces adopting the same model, [`PUBLIC-REVIEW.md`](PUBLIC-REVIEW.md) defines the independent-review minimum, adversarial/falsification requirement, conflict disclosures, material-objection handling and closure criteria. Internal completion by the primary author or maintainer does not by itself satisfy that public-review gate.
+
+The review duty is symmetric: evidence capable of narrowing, removing or defeating a proposed restriction must be actively considered with the same seriousness as evidence capable of creating or expanding one.
+
 ## 7. Decision record
 
 A designation decision should publish a short reasoned record containing:
@@ -98,6 +102,8 @@ A designation decision should publish a short reasoned record containing:
 - the date of adoption;
 - the first Schedule version containing the designation; and
 - a suggested review date where appropriate.
+
+Where a public review issue exists, the decision record should identify it and record whether the independent-review gate was met, together with any unresolved material dissent.
 
 ## 8. Threshold
 
@@ -153,7 +159,7 @@ A Restricted Party or Restricted Project may request review or removal based on:
 - new evidence; or
 - an overbroad or ambiguous designation.
 
-Removal should use the same evidence-based process as designation.
+Removal should use the same evidence-based process as designation. Where the public-review gate applies, narrowing/removal is reviewed under the same independence and adversarial standards as creation/expansion; review must not be directionally biased toward retaining restrictions.
 
 ## 14. Non-retroactivity
 
@@ -182,6 +188,8 @@ An emergency designation should:
 - expire automatically unless ratified through ordinary review; and
 - never retroactively alter previously released software licenses.
 
+An emergency designation does not count as completion of the ordinary independent public-review gate and must be ratified through that process before becoming a stable ordinary designation.
+
 ## 16. Schedule knowability
 
 The evidentiary process may be complex; application of the final license should not be.
@@ -192,7 +200,9 @@ A stable Schedule should use exact legal names, identifiers, named projects or r
 
 No governance system can eliminate discretion, but ECL should avoid concentrating unreviewable power in a single maintainer.
 
-Before ECL 1.0, this repository should define a stable decision mechanism, conflict-of-interest rules, minimum review requirements, and a process for documenting dissent.
+For final `R`, `S` or `N` decisions intended to support ECL 1.0 readiness or a stable Schedule, the minimum public-review mechanism is defined in [`PUBLIC-REVIEW.md`](PUBLIC-REVIEW.md): at least two substantive independent reviews, at least one adversarial/falsification review, conflict disclosure, and resolution or explicit documentation of material dissent. The primary author/maintainer cannot count their own work toward the independent-review minimum.
+
+This numerical floor is not a voting rule. A well-supported unresolved material objection may require `U`, narrowing or further review despite multiple approvals.
 
 The governance of an anti-capture license should itself be designed to resist arbitrary capture.
 
