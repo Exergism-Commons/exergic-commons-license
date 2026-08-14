@@ -44,11 +44,13 @@ jobs:
         run: |
           python - <<'PY'
           import importlib.util
+          import sys
           from pathlib import Path
 
           path = Path('tools/migrate_state_review_issues.py')
           spec = importlib.util.spec_from_file_location('migrate_state_review_issues', path)
           module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
           assert spec.loader is not None
           spec.loader.exec_module(module)
           dossiers = module.load_dossiers(Path('dossiers/states'))
