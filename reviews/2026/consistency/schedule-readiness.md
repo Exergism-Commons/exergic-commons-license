@@ -35,14 +35,14 @@ All **83 active `S`** dossiers have completed Schedule translation.
 Current freeze/readiness status:
 
 - **19** fully frozen;
-- **56** additional active `S` records with at least one precise renderable subset;
-- **75 / 83** active `S` States therefore have at least one Schedule-renderable frozen entry;
-- **8** active `S` States remain behind a current-status, attribution or remediation gate; and
+- **57** additional active `S` records with at least one precise renderable subset;
+- **76 / 83** active `S` States therefore have at least one Schedule-renderable frozen entry;
+- **7** active `S` States remain behind a current-status, attribution or remediation gate; and
 - **0** remain blocked merely because identity or project-boundary translation is unfinished.
 
 Canonical aggregate counts are maintained in `registry/schedule-progress-overrides.yml`, which supersedes stale aggregate State-`S` progress numbers in `registry/schedule-translations.yml`. Explicit renderer blocking is maintained in `registry/schedule-status-overrides.yml`.
 
-The 2026-08-14 reconciliation also captures the previously unpropagated CAF/Ouanda-Djale ready freeze in addition to the new Moldova revalidation; the Schedule CI ready-set is authoritative for this coverage check.
+The 2026-08-14 reconciliation captures the previously unpropagated CAF/Ouanda-Djale ready freeze plus the Moldova and Greece revalidations; the Schedule CI ready-set is authoritative for this coverage check.
 
 ## Narrowed-subset rule
 
@@ -66,7 +66,7 @@ State `S` freeze records are maintained under `registry/schedule-state-s-freezes
 
 Solved identity does not prove current restrictability. If a system, measure, facility or project may have been suspended, invalidated, remediated or materially changed, current-status review must complete before Schedule rendering.
 
-On 2026-08-14 Moldova (`MDA`) passed that gate for one narrow subset: the informal-prisoner-hierarchy control project at Penitentiary no. 2 Lipcani, no. 6 Soroca and no. 15 Cricova. The freeze is limited to materially participating custody/administration functions and leaves the rest of the Moldova dossier governance-only.
+On 2026-08-14 Moldova (`MDA`) passed that gate for one narrow subset: the informal-prisoner-hierarchy control project at Penitentiary no. 2 Lipcani, no. 6 Soroca and no. 15 Cricova. Greece (`GRC`) also passed for one incident-specific subset: the 26 January 2025 Athens Tempi-demonstration stun-grenade / Marios Lolos incident and its accountability project. Both freezes are Material-Participation-limited and leave residual dossier scope governance-only.
 
 ## Direct-project rule
 
@@ -91,6 +91,6 @@ Schedule CI independently validates active `R`/`S` coverage against the canonica
 
 ## Current queue
 
-Immediate State work is now **8 factual/current-status/attribution/remediation reviews and 0 identity/project-freeze translations**.
+Immediate State work is now **7 factual/current-status/attribution/remediation reviews and 0 identity/project-freeze translations**.
 
 The priority is to resolve those factual gates with named cases, facilities, orders or projects where the current evidence supports a narrow freeze; where remediation or attribution defeats the prior `S`, the correct action is to narrow or downgrade the governance outcome rather than force a Schedule entry.
