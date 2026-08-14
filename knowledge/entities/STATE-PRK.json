@@ -1,17 +1,15 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PRK",
   "id": "STATE-PRK",
   "type": "State",
   "name": "North Korea (DPRK)",
   "aliases": ["PRK", "DPRK", "Democratic People's Republic of Korea"],
   "dossier": "../../dossiers/states/PRK.md",
-  "review": {
-    "lastSubstantiveReview": "2026-08-14",
-    "nextReview": "2026-09-14",
-    "reviewClass": "active",
-    "reason": "Whole-apparatus finding should be actively rechecked for remediation, access and institutional change rather than assumed permanent."
-  },
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-09-14",
+  "reviewClass": "active",
+  "reviewReason": "Whole-apparatus finding should be actively rechecked for remediation, access and institutional change rather than assumed permanent.",
   "trackedObjects": [],
-  "monitorIds": [],
-  "relations": []
+  "monitorIds": []
 }

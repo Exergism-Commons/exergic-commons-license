@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Generate deduplicated ECL living-review signals.
 
-Initial scope: deterministic review-due signals from knowledge/entities/*.json.
-
+Initial scope: deterministic review-due signals from JSON-LD ABox entity records.
 The tool can run in dry-run mode (default) or create GitHub Issues when
 --github is supplied. It never changes ECL outcomes, dossiers or Schedules.
 """
@@ -32,7 +31,8 @@ PRIORITY_BY_CLASS = {
 
 def load_entities(root: Path) -> list[dict[str, Any]]:
     entities: list[dict[str, Any]] = []
-    for path in sorted(root.rglob("*.json")):
+    paths = sorted(set(root.rglob("*.json")) | set(root.rglob("*.jsonld")))
+    for path in paths:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
@@ -56,7 +56,7 @@ def parse_date(value: Any, label: str) -> dt.date:
 def read_dossier_outcome(entity: dict[str, Any]) -> str:
     """Read provisional_outcome from the entity's canonical dossier.
 
-    Entity identity records intentionally do not duplicate the governance tier.
+    ABox identity records intentionally do not duplicate the governance tier.
     """
     entity_path = entity.get("_path")
     dossier = entity.get("dossier")
@@ -81,19 +81,15 @@ def fingerprint(subject: str, due: dt.date) -> str:
 
 
 def build_signal(entity: dict[str, Any], today: dt.date) -> dict[str, Any] | None:
-    review = entity.get("review")
-    if not isinstance(review, dict):
-        raise ValueError(f"{entity.get('_path')}: missing review object")
+    subject = entity.get("id")
+    if not isinstance(subject, str) or not subject:
+        raise ValueError(f"{entity.get('_path')}: missing stable id")
 
-    due = parse_date(review.get("nextReview"), f"{entity.get('id')}.review.nextReview")
+    due = parse_date(entity.get("reviewDue"), f"{subject}.reviewDue")
     if due > today:
         return None
 
-    subject = entity.get("id")
-    if not isinstance(subject, str) or not subject:
-        raise ValueError(f"{entity.get('_path')}: missing id")
-
-    review_class = review.get("reviewClass", "manual")
+    review_class = entity.get("reviewClass", "manual")
     priority = PRIORITY_BY_CLASS.get(str(review_class), "P3")
     fp = fingerprint(subject, due)
     signal_id = f"ECL-UPD-REVIEW-DUE-{subject}-{due.isoformat()}"
@@ -102,14 +98,15 @@ def build_signal(entity: dict[str, Any], today: dt.date) -> dict[str, Any] | Non
         "id": signal_id,
         "fingerprint": fp,
         "subject": subject,
+        "entityIri": entity.get("iri"),
         "entityName": entity.get("name"),
         "currentGovernance": read_dossier_outcome(entity),
         "dossier": entity.get("dossier"),
         "type": "review-due",
         "priority": priority,
         "dueDate": due.isoformat(),
-        "lastSubstantiveReview": review.get("lastSubstantiveReview"),
-        "reason": review.get("reason", "Scheduled substantive review is due."),
+        "lastSubstantiveReview": entity.get("lastSubstantiveReview"),
+        "reason": entity.get("reviewReason", "Scheduled substantive review is due."),
         "sourceEntityPath": entity.get("_path"),
     }
 
@@ -179,10 +176,7 @@ This issue is an **automatic review signal only**. It is not evidence of miscond
 def create_issue(repo: str, token: str, signal: dict[str, Any]) -> str:
     if issue_exists(repo, token, signal["fingerprint"]):
         return "duplicate"
-    title = (
-        f"[ECL UPDATE] {signal['subject']} — review due — "
-        f"{signal['dueDate']}"
-    )
+    title = f"[ECL UPDATE] {signal['subject']} — review due — {signal['dueDate']}"
     url = f"https://api.github.com/repos/{repo}/issues"
     result = github_request(
         "POST",

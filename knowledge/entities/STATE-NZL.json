@@ -1,17 +1,15 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-NZL",
   "id": "STATE-NZL",
   "type": "State",
   "name": "New Zealand",
   "aliases": ["NZL"],
   "dossier": "../../dossiers/states/NZL.md",
-  "review": {
-    "lastSubstantiveReview": "2026-08-14",
-    "nextReview": "2026-11-14",
-    "reviewClass": "stable",
-    "reason": "No current ECL-relevant object after adversarial review; periodic review remains necessary for future material project changes."
-  },
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-11-14",
+  "reviewClass": "stable",
+  "reviewReason": "No current ECL-relevant object after adversarial review; periodic review remains necessary for future material project changes.",
   "trackedObjects": [],
-  "monitorIds": [],
-  "relations": []
+  "monitorIds": []
 }
