@@ -1,0 +1,167 @@
+@prefix ecl: <urn:ecl:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:ecl:ontology> a owl:Ontology ;
+    rdfs:label "Exergic Commons License knowledge ontology"@en ;
+    owl:versionInfo "0.1.0-draft" ;
+    rdfs:comment "TBox for ECL knowledge, evidence, analysis, governance and immutable release/bundle records. It does not itself create licensing restrictions."@en .
+
+# -----------------------------------------------------------------------------
+# Core classes
+# -----------------------------------------------------------------------------
+
+ecl:TrackedObject a owl:Class .
+ecl:Actor a owl:Class ; rdfs:subClassOf ecl:TrackedObject .
+ecl:State a owl:Class ; rdfs:subClassOf ecl:Actor .
+ecl:Organization a owl:Class ; rdfs:subClassOf ecl:Actor .
+ecl:Person a owl:Class ; rdfs:subClassOf ecl:Actor .
+ecl:Agency a owl:Class ; rdfs:subClassOf ecl:Organization .
+ecl:Institution a owl:Class ; rdfs:subClassOf ecl:Organization .
+ecl:Project a owl:Class ; rdfs:subClassOf ecl:TrackedObject .
+ecl:Deployment a owl:Class ; rdfs:subClassOf ecl:TrackedObject .
+
+ecl:EvidenceItem a owl:Class .
+ecl:Claim a owl:Class .
+ecl:ExergicAssessment a owl:Class .
+ecl:GovernanceDecision a owl:Class .
+ecl:UpdateSignal a owl:Class .
+ecl:UpdateCase a owl:Class .
+ecl:KnowledgeSnapshot a owl:Class .
+ecl:ScheduleEntry a owl:Class .
+
+ecl:ReleaseArtifact a owl:Class .
+ecl:LicenseRelease a owl:Class ; rdfs:subClassOf ecl:ReleaseArtifact .
+ecl:ScheduleRelease a owl:Class ; rdfs:subClassOf ecl:ReleaseArtifact .
+ecl:ECLBundle a owl:Class ; rdfs:subClassOf ecl:ReleaseArtifact .
+
+ecl:ExergicVariable a owl:Class .
+ecl:ECLCriterion a owl:Class .
+ecl:GovernanceOutcome a owl:Class .
+
+# These disjointness axioms catch category mistakes without asserting political or
+# legal conclusions. Agency and Institution intentionally remain subclasses of
+# Organization and are therefore not disjoint from it.
+[] a owl:AllDisjointClasses ;
+    owl:members ( ecl:State ecl:Organization ecl:Person ecl:Project ecl:Deployment ) .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( ecl:EvidenceItem ecl:Claim ecl:ExergicAssessment ecl:GovernanceDecision ecl:UpdateCase ecl:KnowledgeSnapshot ecl:ReleaseArtifact ) .
+
+# -----------------------------------------------------------------------------
+# Named analytical/governance concepts
+# -----------------------------------------------------------------------------
+
+ecl:P a ecl:ExergicVariable ; rdfs:label "transformative power"@en .
+ecl:A a ecl:ExergicVariable ; rdfs:label "effective autonomy"@en .
+ecl:V_ep a ecl:ExergicVariable ; rdfs:label "epistemic truth access"@en .
+ecl:L a ecl:ExergicVariable ; rdfs:label "liberation capacity"@en .
+ecl:O a ecl:ExergicVariable ; rdfs:label "openness, exit, alternatives and contestability"@en .
+ecl:U a ecl:ExergicVariable ; rdfs:label "exergic utility"@en .
+ecl:C a ecl:ExergicVariable ; rdfs:label "demiurgic capture"@en .
+ecl:S a ecl:ExergicVariable ; rdfs:label "structural suffering/damage"@en .
+ecl:R a ecl:ExergicVariable ; rdfs:label "relapse/reproduction risk"@en .
+ecl:Ecol a ecl:ExergicVariable ; rdfs:label "ecological cost"@en .
+
+ecl:ECL5_1 a ecl:ECLCriterion ; rdfs:label "ECL 5.1 Repressive surveillance"@en .
+ecl:ECL5_2 a ecl:ECLCriterion ; rdfs:label "ECL 5.2 Coercive targeting"@en .
+ecl:ECL5_3 a ecl:ECLCriterion ; rdfs:label "ECL 5.3 Systematic discriminatory domination"@en .
+ecl:ECL5_4 a ecl:ECLCriterion ; rdfs:label "ECL 5.4 Deceptive population manipulation"@en .
+ecl:ECL5_5 a ecl:ECLCriterion ; rdfs:label "ECL 5.5 Irreversible coercive capture"@en .
+ecl:ECL5_6 a ecl:ECLCriterion ; rdfs:label "ECL 5.6 Systematic coercive domination and unlawful political repression"@en .
+ecl:ECL5_7 a ecl:ECLCriterion ; rdfs:label "ECL 5.7 Circumvention"@en .
+
+ecl:OutcomeR a ecl:GovernanceOutcome ; rdfs:label "Restricted"@en .
+ecl:OutcomeS a ecl:GovernanceOutcome ; rdfs:label "Scoped restriction"@en .
+ecl:OutcomeU a ecl:GovernanceOutcome ; rdfs:label "Under review / insufficient basis"@en .
+ecl:OutcomeN a ecl:GovernanceOutcome ; rdfs:label "No current ECL-relevant basis"@en .
+
+# -----------------------------------------------------------------------------
+# Generic identity/provenance data properties
+# -----------------------------------------------------------------------------
+
+ecl:stableId a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:range xsd:string .
+ecl:name a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:alias a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:dossier a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:status a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:fingerprint a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:priority a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:rationale a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:validFrom a owl:DatatypeProperty ; rdfs:range xsd:date .
+ecl:validTo a owl:DatatypeProperty ; rdfs:range xsd:date .
+ecl:observedAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime .
+ecl:publicationDate a owl:DatatypeProperty ; rdfs:range xsd:date .
+ecl:retrievedAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime .
+ecl:evidenceGrade a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:claimConfidence a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:reviewDue a owl:DatatypeProperty ; rdfs:range xsd:date .
+ecl:lastSubstantiveReview a owl:DatatypeProperty ; rdfs:range xsd:date .
+ecl:reviewClass a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:reviewReason a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:literalValue a owl:DatatypeProperty .
+
+# -----------------------------------------------------------------------------
+# Graph relationships
+# -----------------------------------------------------------------------------
+
+ecl:subject a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( ecl:Claim ecl:ExergicAssessment ecl:GovernanceDecision ecl:UpdateCase ) ] ;
+    rdfs:range ecl:TrackedObject .
+
+ecl:predicate a owl:ObjectProperty ; rdfs:domain ecl:Claim .
+ecl:object a owl:ObjectProperty ; rdfs:domain ecl:Claim .
+
+ecl:controls a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:Actor .
+ecl:controlledBy a owl:ObjectProperty ; owl:inverseOf ecl:controls ; rdfs:domain ecl:Actor ; rdfs:range ecl:Actor .
+ecl:participatesIn a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:Project .
+ecl:operates a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:TrackedObject .
+ecl:deploys a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:Deployment .
+ecl:materiallyBenefits a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:TrackedObject .
+ecl:targetsOrAffects a owl:ObjectProperty ; rdfs:domain ecl:TrackedObject ; rdfs:range ecl:TrackedObject .
+ecl:remediates a owl:ObjectProperty ; rdfs:domain ecl:Institution ; rdfs:range ecl:TrackedObject .
+ecl:reviews a owl:ObjectProperty ; rdfs:domain ecl:Institution ; rdfs:range ecl:TrackedObject .
+
+ecl:evidenceFor a owl:ObjectProperty ; rdfs:domain ecl:Claim ; rdfs:range ecl:EvidenceItem .
+ecl:evidenceAgainst a owl:ObjectProperty ; rdfs:domain ecl:Claim ; rdfs:range ecl:EvidenceItem .
+ecl:supersedes a owl:ObjectProperty ; rdfs:range owl:Thing .
+ecl:dependsOnClaim a owl:ObjectProperty ; rdfs:domain ecl:ExergicAssessment ; rdfs:range ecl:Claim .
+ecl:hasAssessment a owl:ObjectProperty ; rdfs:domain ecl:TrackedObject ; rdfs:range ecl:ExergicAssessment .
+ecl:hasDecision a owl:ObjectProperty ; rdfs:domain ecl:TrackedObject ; rdfs:range ecl:GovernanceDecision .
+ecl:triggersReviewOf a owl:ObjectProperty ; rdfs:range owl:Thing .
+ecl:affectedVariable a owl:ObjectProperty ; rdfs:range ecl:ExergicVariable .
+ecl:affectedCriterion a owl:ObjectProperty ; rdfs:range ecl:ECLCriterion .
+ecl:outcome a owl:ObjectProperty ; rdfs:domain ecl:GovernanceDecision ; rdfs:range ecl:GovernanceOutcome .
+ecl:basedOnAssessment a owl:ObjectProperty ; rdfs:domain ecl:GovernanceDecision ; rdfs:range ecl:ExergicAssessment .
+
+# -----------------------------------------------------------------------------
+# Immutable release/versioning model
+# -----------------------------------------------------------------------------
+
+ecl:gitCommit a owl:DatatypeProperty ; rdfs:domain ecl:KnowledgeSnapshot ; rdfs:range xsd:string .
+ecl:aboxSourceSha256 a owl:DatatypeProperty ; rdfs:domain ecl:KnowledgeSnapshot ; rdfs:range xsd:string .
+ecl:ontologySha256 a owl:DatatypeProperty ; rdfs:domain ecl:KnowledgeSnapshot ; rdfs:range xsd:string .
+ecl:evidenceCutoff a owl:DatatypeProperty ; rdfs:domain ecl:KnowledgeSnapshot ; rdfs:range xsd:date .
+ecl:createdAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime .
+
+ecl:releaseVersion a owl:DatatypeProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range xsd:string .
+ecl:releaseDate a owl:DatatypeProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range xsd:date .
+ecl:artifactPath a owl:DatatypeProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range xsd:string .
+ecl:sha256 a owl:DatatypeProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range xsd:string .
+ecl:operative a owl:DatatypeProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range xsd:boolean .
+ecl:channel a owl:DatatypeProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range xsd:string .
+
+ecl:capturesKnowledge a owl:ObjectProperty ; rdfs:domain ecl:ScheduleRelease ; rdfs:range ecl:KnowledgeSnapshot .
+ecl:containsScheduleEntry a owl:ObjectProperty ; rdfs:domain ecl:ScheduleRelease ; rdfs:range ecl:ScheduleEntry .
+ecl:basedOnDecision a owl:ObjectProperty ; rdfs:domain ecl:ScheduleEntry ; rdfs:range ecl:GovernanceDecision .
+ecl:usesLicenseRelease a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ecl:ECLBundle ; rdfs:range ecl:LicenseRelease .
+ecl:usesScheduleRelease a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ecl:ECLBundle ; rdfs:range ecl:ScheduleRelease .
+ecl:previousRelease a owl:ObjectProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range ecl:ReleaseArtifact .
+
+# Deliberate non-axioms:
+# - controls o participatesIn does NOT entail participatesIn;
+# - association with a Restricted actor does NOT infer a GovernanceOutcome;
+# - Exergism scores do NOT infer OutcomeR/OutcomeS/OutcomeU/OutcomeN;
+# - graph reachability may trigger review in tooling, never inherited restriction.
