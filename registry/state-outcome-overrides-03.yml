@@ -1,0 +1,19 @@
+version: "2026-08-14-status-revalidation-03"
+status: provisional-governance
+operative: false
+base_registry: "states.yml"
+apply_after: "state-outcome-overrides-02.yml"
+counts_after_overrides:
+  R: 34
+  S: 82
+  U: 32
+  N: 47
+overrides:
+  CYP:
+    from: S
+    to: U
+    dossier: "../dossiers/states/CYP.md"
+    reviewed: "2026-08-13"
+    reason: "Schedule current-status revalidation found no sufficiently fresh attributable 2026 maritime-return/public-order project to preserve S through historical continuity"
+
+# Governance overlay only; no licensing effect.
