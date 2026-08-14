@@ -1,4 +1,4 @@
-version: "2026-08-13"
+version: "2026-08-14"
 status: provisional-governance
 operative: false
 base_index: "schedule-translations.yml"
@@ -7,11 +7,11 @@ current_status_review:
   - UKR
   - LAO
   - IRQ
-  - MDA
   - COL
   - GRC
   - PHL
 identity_project_pending: []
 
-# All remaining non-renderable active-S State records are factual/current-status/remediation reviews rather than unresolved identity translations.
+# MDA was revalidated into a narrow renderable facility project on 2026-08-14.
+# Remaining listed records require factual/current-status/remediation review before their frozen entries may render.
 # Aggregate Schedule-preparation status only; no licensing effect.
