@@ -23,8 +23,8 @@ Detailed review and normalization are complete for **195 / 195** State dossiers.
 Current provisional governance after applying the State outcome override layers:
 
 - **34 `R`**
-- **83 `S`**
-- **31 `U`**
+- **82 `S`**
+- **32 `U`**
 - **47 `N`**
 - **195 total**
 
@@ -38,8 +38,8 @@ Current State Schedule status:
 
 - **34 / 34 `R`** identity freezes complete;
 - all active `S` dossiers have completed Schedule translation;
-- **77 / 83 active `S`** have at least one Schedule-renderable frozen entry;
-- **6 `S`** remain in current-status, attribution or remediation review; and
+- **77 / 82 active `S`** have at least one Schedule-renderable frozen entry;
+- **5 `S`** remain in current-status, attribution or remediation review; and
 - **0 `S`** remain blocked merely because identity/project translation is unfinished.
 
 Canonical progress sources:
