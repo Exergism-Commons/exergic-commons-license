@@ -1,0 +1,145 @@
+@prefix ecl: <urn:ecl:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# SHACL defines repository/data validity. OWL defines semantics. These shapes do
+# not create licensing restrictions and deliberately avoid score-to-tier rules.
+
+ecl:TrackedObjectShape a sh:NodeShape ;
+    sh:targetClass ecl:State, ecl:Organization, ecl:Person, ecl:Agency, ecl:Institution, ecl:Project, ecl:Deployment ;
+    sh:property [
+        sh:path ecl:stableId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z][A-Z0-9-]+$"
+    ] ;
+    sh:property [
+        sh:path ecl:name ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 1
+    ] ;
+    sh:property [
+        sh:path ecl:dossier ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 1
+    ] .
+
+ecl:ReviewClockShape a sh:NodeShape ;
+    sh:targetSubjectsOf ecl:reviewDue ;
+    sh:property [ sh:path ecl:reviewDue ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path ecl:lastSubstantiveReview ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [
+        sh:path ecl:reviewClass ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "hot" "active" "stable" "manual" )
+    ] .
+
+ecl:ClaimShape a sh:NodeShape ;
+    sh:targetClass ecl:Claim ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path ecl:predicate ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [
+        sh:path ecl:status ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "candidate" "accepted" "disputed" "rejected" "superseded" )
+    ] ;
+    sh:or (
+        [ sh:property [ sh:path ecl:evidenceFor ; sh:minCount 1 ; sh:class ecl:EvidenceItem ] ]
+        [ sh:property [ sh:path ecl:evidenceAgainst ; sh:minCount 1 ; sh:class ecl:EvidenceItem ] ]
+    ) .
+
+ecl:EvidenceItemShape a sh:NodeShape ;
+    sh:targetClass ecl:EvidenceItem ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [
+        sh:path ecl:evidenceGrade ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "E0" "E1" "E2" "E3" )
+    ] .
+
+ecl:AssessmentShape a sh:NodeShape ;
+    sh:targetClass ecl:ExergicAssessment ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] .
+
+ecl:GovernanceDecisionShape a sh:NodeShape ;
+    sh:targetClass ecl:GovernanceDecision ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path ecl:outcome ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:GovernanceOutcome ] ;
+    sh:property [ sh:path ecl:rationale ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] .
+
+ecl:UpdateCaseShape a sh:NodeShape ;
+    sh:targetClass ecl:UpdateCase ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path ecl:fingerprint ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [
+        sh:path ecl:priority ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "P0" "P1" "P2" "P3" "P4" )
+    ] .
+
+# -----------------------------------------------------------------------------
+# Immutable snapshot/release/bundle shapes
+# -----------------------------------------------------------------------------
+
+ecl:KnowledgeSnapshotShape a sh:NodeShape ;
+    sh:targetClass ecl:KnowledgeSnapshot ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:gitCommit ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{40}$" ] ;
+    sh:property [ sh:path ecl:aboxSourceSha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ecl:ontologySha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ecl:evidenceCutoff ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path ecl:createdAt ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] .
+
+ecl:LicenseReleaseShape a sh:NodeShape ;
+    sh:targetClass ecl:LicenseRelease ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:releaseVersion ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:artifactPath ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] .
+
+ecl:ScheduleReleaseShape a sh:NodeShape ;
+    sh:targetClass ecl:ScheduleRelease ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:releaseVersion ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:artifactPath ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ecl:capturesKnowledge ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:KnowledgeSnapshot ] .
+
+ecl:ECLBundleShape a sh:NodeShape ;
+    sh:targetClass ecl:ECLBundle ;
+    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:usesLicenseRelease ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:LicenseRelease ] ;
+    sh:property [ sh:path ecl:usesScheduleRelease ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:ScheduleRelease ] ;
+    sh:property [ sh:path ecl:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ecl:operative ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:boolean ] .
+
+# Global stable-ID uniqueness. This is a repository invariant, not an OWL
+# identity axiom, so an accidental duplicate fails CI rather than silently
+# merging two real-world entities.
+ecl:StableIdUniquenessShape a sh:NodeShape ;
+    sh:targetSubjectsOf ecl:stableId ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "ecl:stableId must be globally unique." ;
+        sh:select """
+            SELECT $this WHERE {
+              $this ecl:stableId ?id .
+              ?other ecl:stableId ?id .
+              FILTER (?other != $this)
+            }
+        """
+    ] .
