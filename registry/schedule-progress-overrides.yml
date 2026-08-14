@@ -1,27 +1,28 @@
-version: "2026-08-14-post-ukr-revalidation"
+version: "2026-08-14-post-cyp-revalidation"
 status: provisional-governance
 operative: false
 base_index: "schedule-translations.yml"
 state_outcome_overlays:
   - "state-outcome-overrides.yml"
   - "state-outcome-overrides-02.yml"
+  - "state-outcome-overrides-03.yml"
 status_overlay: "schedule-status-overrides.yml"
 precedence: "Counts in this file supersede aggregate State-S progress counts in base_index until the next consolidated snapshot."
 
 state_schedule_progress:
   R_candidates: 34
   R_frozen: 34
-  S_candidates_active: 83
+  S_candidates_active: 82
   S_fully_frozen: 19
   S_renderable_subset_only: 58
   S_schedule_renderable_states: 77
-  S_current_status_or_remediation_review: 6
+  S_current_status_or_remediation_review: 5
   S_identity_or_project_freeze_pending: 0
 
 state_governance_counts_after_overrides:
   R: 34
-  S: 83
-  U: 31
+  S: 82
+  U: 32
   N: 47
   total: 195
 
@@ -33,4 +34,5 @@ schedule_gate:
   render_adoptable_schedule: false
 
 # Includes the post-overlay CAF/Ouanda-Djale freeze and the 2026-08-14 MDA/GRC/UKR revalidations.
+# CYP is no longer an active S candidate after its documented S -> U current-status revalidation.
 # Governance/release-readiness overlay only; no licensing effect.
