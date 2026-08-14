@@ -1,0 +1,11 @@
+{
+  "assessment_id": "ECL-EX-NZL-001",
+  "model": "formal-exergism-v2-pilot",
+  "entity": "New Zealand",
+  "dossier": "dossiers/states/NZL.md",
+  "object": "No current ECL-relevant State/project object identified after adversarial review",
+  "scoring_status": "not_applicable",
+  "governance_outcome_at_assessment": "N",
+  "review_status": "pilot-not-independent-reviewed",
+  "reason": "The current dossier concludes that the previously concerning proposals did not mature into a stable ECL project and that redress institutions remain active. Formal scoring of the entire State merely to generate a number would violate narrowest-accurate-attribution discipline. Reopen and score a specific object if a future coercive project becomes materially deployed."
+}
