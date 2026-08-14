@@ -1,43 +1,40 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:ecl:schema:entity",
-  "title": "ECL semantic entity record",
+  "title": "ECL JSON-LD ABox tracked-object record",
   "type": "object",
-  "required": ["id", "type", "name", "dossier", "review"],
+  "required": [
+    "@context",
+    "iri",
+    "id",
+    "type",
+    "name",
+    "dossier",
+    "lastSubstantiveReview",
+    "reviewDue",
+    "reviewClass"
+  ],
   "properties": {
     "@context": {"type": "string"},
+    "iri": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
     "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
     "type": {"enum": ["State", "Organization", "Person", "Agency", "Project", "Deployment", "Institution"]},
     "name": {"type": "string", "minLength": 1},
     "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "dossier": {"type": "string", "minLength": 1},
-    "review": {
-      "type": "object",
-      "required": ["lastSubstantiveReview", "nextReview"],
-      "properties": {
-        "lastSubstantiveReview": {"type": "string", "format": "date"},
-        "nextReview": {"type": "string", "format": "date"},
-        "reviewClass": {"enum": ["hot", "active", "stable", "manual"]},
-        "reason": {"type": "string"}
-      },
-      "additionalProperties": false
-    },
-    "trackedObjects": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "monitorIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "relations": {
+    "lastSubstantiveReview": {"type": "string", "format": "date"},
+    "reviewDue": {"type": "string", "format": "date"},
+    "reviewClass": {"enum": ["hot", "active", "stable", "manual"]},
+    "reviewReason": {"type": "string"},
+    "trackedObjects": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["predicate", "object"],
-        "properties": {
-          "predicate": {"enum": ["controls", "participatesIn", "operates", "deploys", "materiallyBenefits", "targetsOrAffects", "remediates", "reviews"]},
-          "object": {"type": "string"},
-          "validFrom": {"type": ["string", "null"], "format": "date"},
-          "validTo": {"type": ["string", "null"], "format": "date"},
-          "claimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
-        },
-        "additionalProperties": false
-      }
+      "items": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+      "uniqueItems": true
+    },
+    "monitorIds": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
+      "uniqueItems": true
     }
   },
   "additionalProperties": false
