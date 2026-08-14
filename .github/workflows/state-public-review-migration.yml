@@ -1,8 +1,9 @@
-name: State public review migration
+name: State public review synchronization
 
 on:
   pull_request:
     paths:
+      - "dossiers/states/**"
       - "spec/PUBLIC-REVIEW.md"
       - "spec/GOVERNANCE.md"
       - "CONTRIBUTING.md"
@@ -13,13 +14,14 @@ on:
   push:
     branches: [main]
     paths:
+      - "dossiers/states/**"
       - "spec/PUBLIC-REVIEW.md"
       - "tools/migrate_state_review_issues.py"
       - ".github/workflows/state-public-review-migration.yml"
   workflow_dispatch:
     inputs:
       apply:
-        description: "Apply migration to all mapped State issues"
+        description: "Synchronize all mapped State review issues"
         required: true
         default: false
         type: boolean
@@ -59,7 +61,7 @@ jobs:
           print('validated 195 unique State dossier -> issue mappings')
           PY
 
-      - name: Dry-run against current GitHub issues
+      - name: Dry-run synchronization against live GitHub issues
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -74,7 +76,7 @@ jobs:
           assert rows, 'dry-run returned no rows'
           errors = [row for row in rows if row.get('status') == 'error']
           assert not errors, errors
-          print(f'validated {len(rows)} live issue transformations')
+          print(f'validated {len(rows)} live issue transformations/synchronizations')
           PY
 
   apply:
@@ -84,14 +86,14 @@ jobs:
       (github.event_name == 'workflow_dispatch' && inputs.apply)
     runs-on: ubuntu-latest
     concurrency:
-      group: state-public-review-migration
+      group: state-public-review-synchronization
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Migrate all mapped State review issues in place
+      - name: Synchronize all mapped State review issues in place
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python tools/migrate_state_review_issues.py --apply
