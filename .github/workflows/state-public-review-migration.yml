@@ -1,0 +1,95 @@
+name: State public review migration
+
+on:
+  pull_request:
+    paths:
+      - "spec/PUBLIC-REVIEW.md"
+      - "spec/GOVERNANCE.md"
+      - "CONTRIBUTING.md"
+      - ".github/ISSUE_TEMPLATE/state_review.yml"
+      - "tools/migrate_state_review_issues.py"
+      - "tests/test_migrate_state_review_issues.py"
+      - ".github/workflows/state-public-review-migration.yml"
+  push:
+    branches: [main]
+    paths:
+      - "spec/PUBLIC-REVIEW.md"
+      - "tools/migrate_state_review_issues.py"
+      - ".github/workflows/state-public-review-migration.yml"
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply migration to all mapped State issues"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Unit tests
+        run: python -m unittest tests/test_migrate_state_review_issues.py
+
+      - name: Assert complete unique State issue mapping
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+
+          path = Path('tools/migrate_state_review_issues.py')
+          spec = importlib.util.spec_from_file_location('migrate_state_review_issues', path)
+          module = importlib.util.module_from_spec(spec)
+          assert spec.loader is not None
+          spec.loader.exec_module(module)
+          dossiers = module.load_dossiers(Path('dossiers/states'))
+          assert len(dossiers) == 195, f'expected 195 State dossier mappings, got {len(dossiers)}'
+          assert len({d.issue for d in dossiers}) == 195
+          print('validated 195 unique State dossier -> issue mappings')
+          PY
+
+      - name: Dry-run against current GitHub issues
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/migrate_state_review_issues.py --limit 10 > /tmp/state-review-plan.json
+
+      - name: Validate dry-run result
+        if: github.event_name == 'pull_request'
+        run: |
+          python - <<'PY'
+          import json
+          rows = json.load(open('/tmp/state-review-plan.json', encoding='utf-8'))
+          assert rows, 'dry-run returned no rows'
+          errors = [row for row in rows if row.get('status') == 'error']
+          assert not errors, errors
+          print(f'validated {len(rows)} live issue transformations')
+          PY
+
+  apply:
+    needs: validate
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.apply)
+    runs-on: ubuntu-latest
+    concurrency:
+      group: state-public-review-migration
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Migrate all mapped State review issues in place
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/migrate_state_review_issues.py --apply
