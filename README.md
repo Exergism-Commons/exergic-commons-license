@@ -7,11 +7,14 @@ ECL is an experimental software-license project focused on human agency, contest
 ## Canonical sources
 
 - [`LICENSE`](LICENSE) — current working license text.
-- [`spec/`](spec/) — principles, governance, terminology, designation standard and the formal Exergism analysis specification.
+- [`spec/`](spec/) — principles, governance, terminology, designation standard, evidence valuation, formal Exergism and living-update specifications.
+- [`knowledge/`](knowledge/) — proposed Git-native semantic identities, claims and update-event records.
+- [`ontology/`](ontology/) — semantic vocabulary / JSON-LD context for graph-compatible records.
+- [`monitoring/`](monitoring/) — source-monitor contracts and change-detection policy.
 - [`exergism/`](exergism/) — machine-readable formal Exergism assessments and explicit parameter profiles.
-- [`dossiers/`](dossiers/) — canonical evidence/governance records.
+- [`dossiers/`](dossiers/) — canonical human-readable evidence/governance records.
 - [`reviews/`](reviews/) — adjudication, adversarial-review and consistency history.
-- [`registry/`](registry/) — machine-readable governance, translation, freeze and override data.
+- [`registry/`](registry/) — machine-readable governance, translation, freeze and override data; intended to become increasingly generated from canonical decisions.
 - [`schedules/`](schedules/) — exact versioned Schedules.
 - [`versions/`](versions/) — immutable historical snapshots.
 
@@ -19,13 +22,32 @@ The immutable ECL 0.1 snapshot is [`versions/licenses/ECL-0.1.md`](versions/lice
 
 ## Formal Exergism layer
 
-ECL now distinguishes the philosophical/normative use of exergy from the **formal Exergism analysis** defined in [`spec/EXERGIC-ANALYSIS.md`](spec/EXERGIC-ANALYSIS.md).
+ECL distinguishes the philosophical/normative use of exergy from the **formal Exergism analysis** defined in [`spec/EXERGIC-ANALYSIS.md`](spec/EXERGIC-ANALYSIS.md).
 
 The formal layer evaluates a precisely attributed object through normalized, evidence-backed intervals for transformative power, autonomy, epistemic truth access, liberation capacity, openness, exergic utility, capture, structural harm, relapse risk and ecological cost. It preserves separate immediate-ethical (`E_i`), strategic-historical (`X_h`), structural (`B_0`) and temporal (`N_t`) analyses.
 
 There is deliberately **no numerical score-to-tier mapping**. Formal Exergism is an upstream diagnostic and falsification layer; restriction still requires exact ECL criterion fit, evidence, attribution, adversarial review, Schedule knowability and explicit incorporation.
 
 The cross-tier pilot and calculator are documented in [`exergism/README.md`](exergism/README.md).
+
+## Living update system
+
+A one-time analysis of 195 dossiers is not sufficient. ECL also needs a reproducible mechanism for detecting when an actor/project has changed and deciding what must be re-analysed.
+
+[`spec/LIVING-UPDATE-SYSTEM.md`](spec/LIVING-UPDATE-SYSTEM.md) defines a hybrid architecture:
+
+```text
+source/review clock -> Update Signal -> evidence qualification
+                    -> atomic claims -> differential Exergism analysis
+                    -> exact ECL criterion/scope review -> governance
+                    -> dossier -> generated registry -> Schedule candidate
+```
+
+GitHub Issues are a public **ticket/projection layer**, not the canonical database. Structured records use stable semantic IDs and are designed to remain JSON/JSON-LD-compatible without requiring an RDF server.
+
+Evidence quality is separately governed by [`spec/EVIDENCE-VALUATION.md`](spec/EVIDENCE-VALUATION.md). A page change can create a review signal; it cannot create a factual claim or restriction automatically.
+
+The first implemented automation is a deterministic review-due sweep: `tools/update_ticket_sweep.py` and `.github/workflows/living-review-sweep.yml`. It creates deduplicated review tickets when tracked pilot records become due, but has no authority to change tiers, dossiers or Schedules.
 
 ## 2026 State corpus
 
@@ -42,6 +64,8 @@ Current provisional governance after applying the State outcome override layers:
 Read `registry/states.yml`, then apply all `registry/state-outcome-overrides*.yml` in lexical order. The override layer has precedence until the next consolidated snapshot.
 
 The 195 dossiers are **not yet formal-exergism-complete** merely because factual/adversarial normalization is complete. Before ECL 1.0 readiness, each dossier should either link an evidence-backed scorable assessment, document why the object remains insufficiently defined, or document why no current ECL-relevant object exists.
+
+Before scaling that formal analysis to all 195 dossiers, the living-update architecture should be adopted so the resulting assessments remain maintainable rather than becoming another static snapshot.
 
 ## Schedule engineering
 
@@ -73,7 +97,7 @@ A Schedule entry may be narrower than the dossier supporting it. Residual unfroz
 
 ## Non-State records
 
-Canonical organization, project and person sources:
+Canonical organization, project and person sources currently include:
 
 - [`registry/organizations.yml`](registry/organizations.yml)
 - [`registry/projects.yml`](registry/projects.yml)
@@ -84,16 +108,17 @@ External lists may serve as evidence or identity anchors but are not automatical
 ## Release model
 
 ```text
-evidence -> scoped dossier object -> formal Exergism analysis
-        -> exact ECL criterion fit -> adversarial review -> consistency review
-        -> Schedule translation -> identity/project freeze
+source/change detection -> evidence/claims -> scoped dossier object
+        -> formal Exergism analysis -> exact ECL criterion fit
+        -> adversarial review -> consistency review -> governance decision
+        -> generated registry view -> Schedule translation -> identity/project freeze
         -> generated Schedule candidate -> legal/internal review
         -> explicit release incorporation
 ```
 
 Formal Exergism may confirm, weaken, narrow or expose an inconsistency in a governance result. It cannot create a restriction absent operative ECL fit.
 
-No dossier, Exergism assessment, review or registry entry has licensing effect by itself. Only an exact Schedule expressly incorporated with an exact ECL version can have licensing effect for a release.
+No signal, GitHub ticket, claim record, dossier, Exergism assessment, review or registry entry has licensing effect by itself. Only an exact Schedule expressly incorporated with an exact ECL version can have licensing effect for a release.
 
 ## Legal status
 
