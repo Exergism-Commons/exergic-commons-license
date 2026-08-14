@@ -5,7 +5,6 @@
   "name": "North Korea (DPRK)",
   "aliases": ["PRK", "DPRK", "Democratic People's Republic of Korea"],
   "dossier": "../../dossiers/states/PRK.md",
-  "currentGovernance": "R",
   "review": {
     "lastSubstantiveReview": "2026-08-14",
     "nextReview": "2026-09-14",
