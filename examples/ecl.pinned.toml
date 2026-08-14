@@ -1,0 +1,4 @@
+# Illustrative only. The referenced ECL 1.0 bundle does not exist yet.
+# A real pinned policy MUST reference an actually published immutable bundle.
+mode = "pinned"
+bundle = "ECL-1.0.0@RP-2026.10.02.1"

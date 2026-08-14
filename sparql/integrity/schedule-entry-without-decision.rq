@@ -1,0 +1,7 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?entry
+WHERE {
+  ?entry a ecl:ScheduleEntry .
+  FILTER NOT EXISTS { ?entry ecl:basedOnDecision ?decision . }
+}

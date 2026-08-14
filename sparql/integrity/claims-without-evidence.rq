@@ -1,0 +1,9 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?claim ?status
+WHERE {
+  ?claim a ecl:Claim ; ecl:status ?status .
+  FILTER (?status IN ("candidate", "accepted", "disputed"))
+  FILTER NOT EXISTS { ?claim ecl:evidenceFor ?evidence . }
+  FILTER NOT EXISTS { ?claim ecl:evidenceAgainst ?counterEvidence . }
+}

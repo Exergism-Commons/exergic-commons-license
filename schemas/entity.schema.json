@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ecl:schema:entity",
+  "title": "ECL JSON-LD ABox tracked-object record",
+  "type": "object",
+  "required": [
+    "@context",
+    "iri",
+    "id",
+    "type",
+    "name",
+    "dossier",
+    "lastSubstantiveReview",
+    "reviewDue",
+    "reviewClass"
+  ],
+  "properties": {
+    "@context": {"type": "string"},
+    "iri": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+    "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
+    "type": {"enum": ["State", "Organization", "Person", "Agency", "Project", "Deployment", "Institution"]},
+    "name": {"type": "string", "minLength": 1},
+    "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "dossier": {"type": "string", "minLength": 1},
+    "lastSubstantiveReview": {"type": "string", "format": "date"},
+    "reviewDue": {"type": "string", "format": "date"},
+    "reviewClass": {"enum": ["hot", "active", "stable", "manual"]},
+    "reviewReason": {"type": "string"},
+    "trackedObjects": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+      "uniqueItems": true
+    },
+    "monitorIds": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}

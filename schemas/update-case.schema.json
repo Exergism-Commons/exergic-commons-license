@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/ecl/schemas/update-case.schema.json",
+  "title": "ECL living update case",
+  "type": "object",
+  "required": ["id", "fingerprint", "subject", "type", "status", "priority", "trigger", "analysisImpact"],
+  "properties": {
+    "@context": {"type": "string"},
+    "id": {"type": "string", "pattern": "^ECL-UPD-[A-Z0-9-]+$"},
+    "fingerprint": {"type": "string", "minLength": 8},
+    "subject": {"type": "string", "minLength": 1},
+    "relatedObjects": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "type": {"enum": ["new-evidence", "counter-evidence", "remediation", "deployment-start", "deployment-stop", "identity-change", "control-change", "scope-change", "source-correction", "review-due", "temporal-expiry", "model-revalidation"]},
+    "status": {"enum": ["detected", "deduped", "triage", "evidence-qualified", "analysis-required", "no-material-change", "analyzed", "governance-review-required", "resolved", "applied", "rejected", "superseded"]},
+    "priority": {"enum": ["P0", "P1", "P2", "P3", "P4"]},
+    "trigger": {
+      "type": "object",
+      "required": ["kind", "detectedAt"],
+      "properties": {
+        "kind": {"enum": ["source-change", "review-due", "temporal-expiry", "relationship-change", "remediation-trigger", "model-change", "manual"]},
+        "detectedAt": {"type": "string", "format": "date-time"},
+        "sourceId": {"type": ["string", "null"]},
+        "locator": {"type": ["string", "null"]},
+        "eventHash": {"type": ["string", "null"]},
+        "dueDate": {"type": ["string", "null"], "format": "date"},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "claimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "analysisImpact": {
+      "type": "object",
+      "required": ["modes"],
+      "properties": {
+        "modes": {
+          "type": "array",
+          "items": {"enum": ["none", "claim-only", "partial-exergism", "full-exergism", "criterion-review", "scope-review", "schedule-review"]},
+          "uniqueItems": true
+        },
+        "variables": {"type": "array", "items": {"enum": ["P", "A", "V_ep", "L", "O", "U", "C", "S", "R", "Ecol"]}, "uniqueItems": true},
+        "criteria": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "reason": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "previousAssessment": {"type": ["string", "null"]},
+    "resultingAssessment": {"type": ["string", "null"]},
+    "previousDecision": {"type": ["string", "null"]},
+    "resultingDecision": {"type": ["string", "null"]},
+    "githubIssue": {"type": ["integer", "null"], "minimum": 1},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "resolvedAt": {"type": ["string", "null"], "format": "date-time"},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

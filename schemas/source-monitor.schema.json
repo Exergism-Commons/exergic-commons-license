@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/ecl/schemas/source-monitor.schema.json",
+  "title": "ECL source monitor",
+  "type": "object",
+  "required": ["id", "enabled", "adapter", "locator", "subjects", "purpose"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^MON-[A-Z0-9-]+$"},
+    "enabled": {"type": "boolean"},
+    "adapter": {"enum": ["json", "rss", "atom", "document-hash", "publication-index", "html-watch"]},
+    "locator": {"type": "string", "minLength": 1},
+    "subjects": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+    "purpose": {"enum": ["current-status", "remediation", "identity-control", "deployment", "counter-evidence", "criterion-evidence", "general-review"]},
+    "expectedPredicates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "cadence": {"enum": ["daily", "weekly", "monthly", "manual"]},
+    "authorityHint": {"enum": ["primary", "authoritative", "independent-analysis", "secondary", "lead"]},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

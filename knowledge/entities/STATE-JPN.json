@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-JPN",
+  "id": "STATE-JPN",
+  "type": "State",
+  "name": "Japan",
+  "aliases": ["JPN"],
+  "dossier": "../../dossiers/states/JPN.md",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-09-01",
+  "reviewClass": "hot",
+  "reviewReason": "Under Review because the coercive record is current but the exact Software/project nexus remains insufficiently defined.",
+  "trackedObjects": [],
+  "monitorIds": []
+}
