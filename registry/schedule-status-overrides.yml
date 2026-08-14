@@ -11,6 +11,40 @@ current_status_review:
   - PHL
 identity_project_pending: []
 
+current_status_review_details:
+  BGR:
+    current_basis: "2025 Zaharna Fabrika Roma eviction plus Bulgaria-Turkiye border pushback/non-assistance record"
+    blocker: "Zaharna Fabrika is identity-resolved but later ECHR accommodation/remediation measures make the completed April 2025 eviction insufficient by itself as a continuing project; 2026 FRA material confirms serious 2025 border-return patterns but does not yet identify a sufficiently narrow continuing 2026 operation/unit for Schedule freeze"
+    unlock_on: "fresh attributable border operation/project, or reliable evidence that a finite identified 2025 project remains materially unremediated in a way that supports current Schedule treatment"
+    sources:
+      - "https://fra.europa.eu/es/publication/2026/migration-bulletin-1-2026?page=3"
+      - "https://www.coe.int/et/web/commissioner/-/bulgaria-can-go-further-to-enhance-long-term-care-for-older-people-and-secure-housing-for-roma-communities"
+  COL:
+    current_basis: "Military Criminal Justice jurisdictional interference documented in Amnesty's 2025 398-conflict dataset"
+    blocker: "the finite research dataset supplies strong governance evidence but covers conflicts decided between February 2021 and October 2024; current evidence does not establish which exact conflicts/interventions remain active or materially unremediated in August 2026"
+    unlock_on: "case-level current-status mapping from the frozen dataset, or a fresh named Military Criminal Justice intervention obstructing an ordinary human-rights investigation"
+    sources:
+      - "https://www.amnesty.org/en/documents/amr23/0356/2025/en/"
+      - "https://www.amnesty.org/es/documents/amr23/0456/2025/es/"
+  IRQ:
+    current_basis: "March 2026 UN Committee on Enforced Disappearances review preserving serious disappearance/secret-detention accountability concerns"
+    blocker: "current UN findings support S governance but available authoritative material has not yet produced a sufficiently knowable State unit, detention site or exact continuing project without falling back to an open PMF/security-apparatus class"
+    unlock_on: "authoritative 2026 case/facility/unit attribution or an exact project boundary with current continuity/remediation status"
+    sources:
+      - "https://tbinternet.ohchr.org/_layouts/15/TreatyBodyExternal/countries.aspx?CountryCode=IRQ&Lang=EN"
+  LAO:
+    current_basis: "Sisay Luangmonda/Bao Mor Khaen reported arrest-disappearance/death case and March 2026 lack-of-investigation record"
+    blocker: "the case is individually knowable, but no sufficiently authoritative post-March-2026 update was found to establish that the non-investigation/remedial failure remains current rather than inferring continuity from silence"
+    unlock_on: "authoritative current-status confirmation of non-investigation/non-remedy, or a new named attributable disappearance/detention project"
+    sources:
+      - "https://www.hrw.org/news/2026/03/02/laos-investigate-death-after-reported-soldier-arrest"
+  PHL:
+    current_basis: "continuing Marcos-era anti-drug abuses documented through June 2026, including extrajudicial killings, arbitrary/warrantless arrests, torture allegations and missing body-camera evidence"
+    blocker: "current abuse is strong enough for S governance, but the recent published cases are anonymized and the nationwide anti-drug campaign is too broad to freeze without over-including lawful/non-abusive operations"
+    unlock_on: "named current operation/unit/case with objectively knowable institutional identity, or a finite official project whose restricted abusive capacity can be separated from lawful anti-drug enforcement"
+    sources:
+      - "https://www.hrw.org/news/2026/06/30/philippines-drug-war-abuses-persist-10-years-on"
+
 # MDA, GRC and UKR were revalidated into narrow renderable projects on 2026-08-14.
 # CYP was downgraded S -> U by state-outcome-overrides-03.yml after current-status revalidation.
 # Remaining listed records require factual/current-status/remediation review before their frozen entries may render.
