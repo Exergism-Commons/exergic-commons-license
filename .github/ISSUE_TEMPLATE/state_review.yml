@@ -1,0 +1,55 @@
+name: State dossier public review
+description: Review, challenge, narrow or support a canonical State dossier through adversarial evidence review
+title: "[STATE REVIEW] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is a **public governance review surface**, not the canonical dossier and not a licensing artifact. Read `spec/PUBLIC-REVIEW.md` before submitting a review.
+  - type: input
+    id: dossier
+    attributes:
+      label: Canonical dossier
+      description: Link the exact `dossiers/states/*.md` entry being reviewed.
+    validations:
+      required: true
+  - type: dropdown
+    id: disposition
+    attributes:
+      label: Review disposition
+      options:
+        - support-current-conclusion
+        - support-with-narrowing
+        - challenge-current-conclusion
+        - insufficient-evidence
+        - conflict-disclosed / evidence-only
+    validations:
+      required: true
+  - type: textarea
+    id: checked
+    attributes:
+      label: What I checked
+      description: Identity/scope, source evidence, counter-evidence, attribution, exact ECL criterion fit, remediation/removal triggers and formal Exergism where applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and counter-evidence
+      description: Prefer primary/authoritative sources and identify material contrary evidence, not only evidence supporting the current conclusion.
+    validations:
+      required: true
+  - type: textarea
+    id: objections
+    attributes:
+      label: Material objections or uncertainty
+      description: State anything that could materially change identity, scope, criterion fit, attribution, outcome or Schedule knowability.
+    validations:
+      required: true
+  - type: textarea
+    id: independence
+    attributes:
+      label: Independence / conflict declaration
+      description: State whether you authored the substantive conclusion or have a material relationship, financial interest, employment, advocacy role or other relevant conflict.
+    validations:
+      required: true

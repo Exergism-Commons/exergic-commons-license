@@ -25,11 +25,19 @@ body:
     id: contrary
     attributes:
       label: Counter-evidence and uncertainty
+      description: Actively identify evidence capable of weakening, narrowing or defeating the proposed designation.
     validations:
       required: true
   - type: textarea
     id: scope
     attributes:
       label: Proposed scope and narrower alternatives
+    validations:
+      required: true
+  - type: textarea
+    id: conflict
+    attributes:
+      label: Conflict / material-interest disclosure
+      description: Disclose relevant authorship, employment, financial interest, direct advocacy role or other material relationship. A conflict does not bar evidence submission but affects independent-review status.
     validations:
       required: true
