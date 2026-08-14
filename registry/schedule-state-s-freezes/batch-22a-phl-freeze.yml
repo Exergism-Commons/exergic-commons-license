@@ -1,0 +1,25 @@
+state: PHL
+entity: Philippines
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "28 January 2026 Barangay San Isidro unauthorized anti-drug / armed-robbery incident — Malate Police Station 9 SDEU"
+project_boundary: "the 28 January 2026 operation in Barangay San Isidro, Makati City, limited to the six Station Drug Enforcement Unit personnel of Malate Police Station 9 identified by authorities as arrested after the incident and to conduct materially participating in the alleged unauthorized anti-illegal-drug operation, armed threats, restraint, robbery or related concealment/accountability obstruction"
+capacity_limit: "incident-specific alleged conduct and materially participating functions only; this freeze records a pending criminal/administrative project boundary and is not a finding of individual criminal guilt"
+exclusions:
+  - "the Philippine National Police, Manila Police District, Malate Police Station 9 or Station Drug Enforcement Units generally"
+  - "lawful anti-drug investigation, arrest, evidence handling or public-safety functions"
+  - "Makati City Police personnel who arrested the suspects, NAPOLCOM/IMIS, prosecutors, courts, defence counsel and other genuine accountability or remedial functions"
+  - "station or unit personnel without Material Participation in the frozen incident"
+  - "conduct dismissed, acquitted, materially withdrawn from charges or independently shown not attributable to the frozen project"
+identity_sources:
+  - "https://napolcom.gov.ph/niro/pid/index.html"
+  - "https://www.gmanetwork.com/news/topstories/metro/974800/napolcom-6-manila-cops-in-alleged-makati-robbery-face-admin-complaint/story/"
+residual_scope: "other anti-drug killings, arbitrary arrests, torture allegations, body-camera failures and counterterrorism/red-tagging cases remain governance-only until separately frozen"
+review_triggers:
+  - "dismissal or material withdrawal of the criminal or administrative allegations"
+  - "acquittal or final adjudication materially changing attribution"
+  - "credible evidence that the operation, unit identity or participating roles were misidentified"
+  - "independent evidence that the frozen abusive capacities have been fully remediated"
+schedule_status: ready-status-revalidated-pending-incident-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"

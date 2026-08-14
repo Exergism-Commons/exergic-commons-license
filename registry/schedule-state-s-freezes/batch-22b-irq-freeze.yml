@@ -1,0 +1,28 @@
+state: IRQ
+entity: Iraq
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "2025-26 Al-Karkh transferred-ISIS-detainee coercive-interrogation / custody project"
+project_boundary: "the Al-Karkh Central Prison and designated Karkh investigation-site functions handling the cohort transferred from northeast-Syrian detention facilities in 2025-26, limited to materially participating custodial or interrogation conduct involving torture or ill-treatment, coerced-confession extraction, enforced-disappearance-like concealment, or material denial of basic access and safeguards within that transferred-detainee project"
+capacity_limit: "cohort- and project-specific abusive custodial/interrogation capacities only; the freeze does not treat alleged ISIS affiliation, detention, prosecution or Iraqi counterterrorism activity as restricted per se and does not adjudicate individual allegations"
+exclusions:
+  - "Iraq, the Ministry of Justice, the Supreme Judicial Council, the Counter-Terrorism Service, Al-Karkh Central Prison or Iraqi corrections/security functions generally"
+  - "lawful and individualized custody, investigation or prosecution respecting access to counsel, judicial review and protection from torture"
+  - "juvenile-separation and rehabilitation functions, medical care, repatriation/handover after lawful review, defence counsel and independent monitoring/remedial functions"
+  - "judges, prosecutors, corrections or security personnel without Material Participation in the frozen abusive capacities"
+  - "conduct independently investigated and shown not attributable to the frozen project"
+identity_sources:
+  - "https://www.sjc.iq/ncijcen.79111/"
+  - "https://www.sjc.iq/view.79141/"
+  - "https://www.hrw.org/news/2026/02/17/iraq-alleged-isis-detainees-transferred-from-syria-at-risk-of-abuse"
+  - "https://www.aljazeera.com/news/2026/1/29/french-isil-suspects-transferred-from-syria-allege-torture-in-iraqi-prisons"
+  - "https://www.hrw.org/news/2026/07/16/submission-to-the-universal-periodic-review-of-syrian-arab-republic"
+residual_scope: "other disappearance, secret-detention, PMF-linked, reprisal and investigation-obstruction allegations remain governance-only until separately frozen"
+review_triggers:
+  - "credible independent investigation materially rejecting the torture/coercive-interrogation attribution"
+  - "demonstrated safeguards and remediation removing the frozen abusive capacities"
+  - "closure, transfer or material redesign of the transferred-detainee custody/interrogation project"
+  - "authoritative findings materially changing the institutional attribution"
+schedule_status: ready-status-revalidated-karkh-transferred-detainee-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"

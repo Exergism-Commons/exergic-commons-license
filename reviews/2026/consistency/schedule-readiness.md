@@ -6,19 +6,19 @@ Audit date: **2026-08-14**
 
 ## Current answer
 
-A post-ECL-0.2 Schedule candidate **can be generated from frozen records**, but it is **not yet ready for adoption**. State identity/project translation and the identity-freeze queue are complete. The remaining State gate is factual: current-status, attribution and remediation review for the residual non-renderable `S` records.
+A post-ECL-0.2 Schedule candidate **can be generated from frozen records**, but it is **not yet ready for adoption**. State identity/project translation and the identity-freeze queue are complete. After the five-gate current-status review, only one active-`S` State remains non-renderable: Laos (`LAO`), where fresh evidence preserves `S` but public source protection prevents an objectively knowable Schedule identity.
 
 ## State inventory
 
 Current State governance after applying all `registry/state-outcome-overrides*.yml` in lexical order is:
 
 - `R`: **34**
-- `S`: **82**
-- `U`: **32**
+- `S`: **80**
+- `U`: **34**
 - `N`: **47**
 - total: **195**
 
-The outcome overlays have precedence over the base State registry until the next consolidated snapshot. Cyprus (`CYP`) is no longer an active `S`: its 2026-08-13 dossier revalidation had already determined `S -> U`, and `state-outcome-overrides-03.yml` now carries that decision into the machine-readable outcome layer.
+The outcome overlays have precedence over the base State registry until the next consolidated snapshot. Cyprus (`CYP`), Bulgaria (`BGR`) and Colombia (`COL`) are no longer active `S` records after current-status revalidation carried their `S -> U` decisions into machine-readable outcome overlays.
 
 ## Schedule engineering status
 
@@ -30,21 +30,19 @@ Source: `registry/schedule-state-r-freeze.yml`.
 
 ### `S`
 
-All **82 active `S`** dossiers have completed Schedule translation.
+All **80 active `S`** dossiers have completed Schedule translation.
 
 Current freeze/readiness status:
 
 - **19** fully frozen;
-- **58** additional active `S` records with at least one precise renderable subset;
-- **77 / 82** active `S` States therefore have at least one Schedule-renderable frozen entry;
-- **5** active `S` States remain behind a current-status, attribution or remediation gate; and
+- **60** additional active `S` records with at least one precise renderable subset;
+- **79 / 80** active `S` States therefore have at least one Schedule-renderable frozen entry;
+- **1** active `S` State remains behind a current-status/public-knowability gate; and
 - **0** remain blocked merely because identity or project-boundary translation is unfinished.
 
-The remaining factual/status queue is: `BGR`, `COL`, `IRQ`, `LAO`, `PHL`.
+The sole remaining factual/status queue is: `LAO`.
 
 Canonical aggregate counts are maintained in `registry/schedule-progress-overrides.yml`, which supersedes stale aggregate State-`S` progress numbers in `registry/schedule-translations.yml`. Explicit renderer blocking is maintained in `registry/schedule-status-overrides.yml`.
-
-The 2026-08-14 reconciliation captures the previously unpropagated CAF/Ouanda-Djale ready freeze plus the Moldova, Greece and Ukraine revalidations; the Schedule CI ready-set is authoritative for this coverage check.
 
 ## Narrowed-subset rule
 
@@ -58,21 +56,41 @@ A renderable subset requires:
 4. Material Participation as the connection rule; and
 5. no silent incorporation of residual dossier scope.
 
+## Revalidation rule
+
+Solved identity does not prove current restrictability. If a system, measure, facility or project may have been suspended, invalidated, remediated or materially changed, current-status review must complete before Schedule rendering. Conversely, current concern alone is insufficient where the public identity needed for a Schedule entry is intentionally redacted or otherwise unknowable.
+
+ECL does not infer continuing abuse, non-investigation or non-remediation merely because a later public update cannot be found.
+
+## Five-gate current-status revalidation — 2026-08-14
+
+### Bulgaria (`BGR`) — `S -> U`
+
+The 2025 Zaharna Fabrika eviction and Bulgaria-Türkiye border record remain serious governance evidence. However, Zaharna Fabrika was a completed event followed by material accommodation/remediation measures, and the current 2026 record does not identify a sufficiently narrow new Bulgarian border operation/unit with present abusive attribution. Preserving `S` would therefore require inferring continuity from earlier evidence. `BGR` is downgraded to `U` and remains monitored for re-escalation.
+
+### Colombia (`COL`) — `S -> U`
+
+The 2025 398-conflict dataset remains strong evidence that military-jurisdiction claims can interfere with ordinary accountability. Official 2026 Constitutional Court records confirm recurring jurisdiction disputes, but the exact cases reviewed are constitutionally corrected, procedurally supervised or lack a sufficiently authoritative later public status establishing a currently unremediated obstruction. A generic Military Criminal Justice restriction would over-include lawful judicial functions. `COL` is therefore downgraded to `U` pending a fresh named obstruction project or case-level current-status mapping.
+
+### Iraq (`IRQ`) — narrow renderable freeze
+
+The 2025-26 cohort transferred from northeast-Syrian detention facilities provides a finite project boundary. Iraqi Supreme Judicial Council records identify the Karkh First Investigation Court and a designated investigation site; contemporary human-rights evidence raises project-specific torture, coercive-interrogation and safeguard concerns. `registry/schedule-state-s-freezes/batch-22b-irq-freeze.yml` freezes only the materially participating abusive custodial/interrogation capacities of that Al-Karkh transferred-detainee project. Lawful custody, prosecution, courts, juvenile protection, medical care, defence, review and unrelated Iraqi detention/security functions are excluded.
+
+### Philippines (`PHL`) — narrow renderable freeze
+
+Official 2026 NAPOLCOM material identifies six Station Drug Enforcement Unit personnel from Malate Police Station 9 arrested after a 28 January 2026 Barangay San Isidro, Makati incident involving an allegedly unauthorized anti-drug operation, armed threats, restraint and robbery. `registry/schedule-state-s-freezes/batch-22a-phl-freeze.yml` freezes only that incident and its materially participating alleged abusive functions. It is not a finding of individual criminal guilt and does not restrict PNP, MPD, the station, SDEUs or anti-drug enforcement generally. Dismissal, acquittal or material attribution changes trigger review.
+
+### Laos (`LAO`) — sole remaining gate
+
+Fresh reporting from 29 June 2026 states that six young Christians remained detained after December 2025 arrests in northern Laos and were being pressured to renounce Christianity. That preserves a current `S` governance concern. The source deliberately withholds the village, district and detainees' identities for their safety. ECL will not reverse-engineer or guess those protected identities, and therefore cannot produce an objectively knowable Schedule freeze from that record.
+
+The separate Sisay Luangmonda/Bao Mor Khaen disappearance/death case remains relevant, but no sufficiently authoritative post-March public update was found establishing that the reported lack of investigation remains current. Silence is not treated as proof of continuing non-remediation.
+
 ## Current freeze registries
 
 State `S` freeze records are maintained under `registry/schedule-state-s-freezes/`. Direct-project freezes are maintained in `registry/schedule-project-freezes.yml`. Organization and armed-organization freezes are maintained in their dedicated Schedule registries.
 
 `registry/schedule-translations.yml` is a base index/work-queue snapshot, not the current aggregate source of truth once later progress/status overlays apply.
-
-## Revalidation rule
-
-Solved identity does not prove current restrictability. If a system, measure, facility or project may have been suspended, invalidated, remediated or materially changed, current-status review must complete before Schedule rendering.
-
-On 2026-08-14 Moldova (`MDA`) passed that gate for one narrow subset: the informal-prisoner-hierarchy control project at Penitentiary no. 2 Lipcani, no. 6 Soroca and no. 15 Cricova. Greece (`GRC`) passed for one incident-specific subset: the 26 January 2025 Athens Tempi-demonstration stun-grenade / Marios Lolos incident and its accountability project. Ukraine (`UKR`) passed for one incident-specific subset: the May 2025 Kyiv TCC mobilized-person transport death incident involving charged roles at the Podilskyi and Shevchenkivskyi district TCCs. The Ukraine freeze records an indicted institutional project boundary, not a finding of individual criminal guilt, and expressly triggers review on acquittal, material charge withdrawal/dismissal or a final judgment changing attribution.
-
-All three freezes are Material-Participation-limited and leave residual dossier scope governance-only.
-
-Bulgaria (`BGR`) remains `S` but blocked from rendering: the Zaharna Fabrika identity is known, while current remediation evidence makes it improper to treat the completed 2025 eviction alone as a continuing Restricted Project. Cyprus was resolved in the opposite direction: lacking a sufficiently fresh attributable 2026 project, it was downgraded to `U` rather than forcing a Schedule entry.
 
 ## Direct-project rule
 
@@ -97,6 +115,6 @@ Schedule CI independently validates active `R`/`S` coverage against the canonica
 
 ## Current queue
 
-Immediate State work is now **5 factual/current-status/attribution/remediation reviews and 0 identity/project-freeze translations**: `BGR`, `COL`, `IRQ`, `LAO`, `PHL`.
+Immediate State work is now **1 factual/public-knowability review and 0 identity/project-freeze translations**: `LAO`.
 
-The priority is to resolve those factual gates with named cases, facilities, orders or projects where the current evidence supports a narrow freeze; where remediation or attribution defeats the prior `S`, the correct action is to narrow or downgrade the governance outcome rather than force a Schedule entry.
+If that gate can be resolved with a precise public identity, it should be frozen narrowly. If reliable remediation or contrary evidence instead defeats the current `S`, it should be narrowed or downgraded. The Schedule remains non-operative and non-adoptable until the broader consistency, deduplication, controlled-class, remediation, legal/internal and exact-version release gates also pass.

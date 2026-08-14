@@ -4,57 +4,70 @@ entity: "Philippines"
 iso3: PHL
 issue: 138
 provisional_outcome: S
-provisional_scope: "police/anti-drug and participating security projects involving extrajudicial killing, arbitrary/warrantless detention, fabricated evidence, torture/ill-treatment or obstruction of accountability, plus separately evidenced counterterrorism/security projects materially criminalising protected activism or causing enforced disappearance"
+provisional_scope: "28 January 2026 Malate Police Station 9 SDEU unauthorized anti-drug/armed-robbery incident as the current frozen subset; wider anti-drug and security abuse record remains governance-only unless separately frozen"
 confidence: high
-evidence_cutoff: 2026-08-11
-last_reviewed: 2026-08-11
-review_stage: scoped-adversarial-reviewed
-adversarial_result: "UPHOLD / NARROW S"
+evidence_cutoff: 2026-08-14
+last_reviewed: 2026-08-14
+review_stage: schedule-status-revalidated
+adversarial_result: "UPHOLD / NARROW S; freeze the exact January 2026 Malate Police Station 9 SDEU incident, not PNP, MPD or the nationwide anti-drug campaign"
 operative: false
 ---
 # Philippines
 
-> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release has operative effect.
+> **Governance record only.** This dossier does not itself create licensing restrictions. Only a versioned Schedule expressly incorporated by a software release can have operative effect.
 
 ## 1. Current determination
 
-**S — Restricted with defined scope.** The active finding follows abusive anti-drug and specifically evidenced security projects, not the Philippine State or police generically.
+**S — Restricted with a newly frozen incident-specific subset.** Current official evidence supplies an objectively knowable unit, date, location and finite operation. The restriction does not extend to the Philippine National Police, Manila Police District, Malate Police Station 9, Station Drug Enforcement Units or the nationwide anti-drug campaign generally.
 
 ## 2. ECL criteria engaged
 
-- extrajudicial killing and unlawful coercive targeting;
-- arbitrary/warrantless detention;
-- torture/ill-treatment and fabricated evidence;
-- enforced disappearance;
-- coercive counterterrorism repression of protected activism;
-- obstruction of accountability.
+- unlawful coercive targeting;
+- arbitrary restraint/detention;
+- abuse of anti-drug authority;
+- alleged armed robbery and coercion under color of police authority;
+- obstruction/accountability concerns where materially established.
 
 ## 3. Evidence supporting the determination
 
-Human Rights Watch reported in June 2026 that extrajudicial killings and arbitrary arrests continued under the anti-drug campaign and that President Ferdinand Marcos Jr. had not rescinded the Duterte-era policy architecture. Independent monitoring cited by HRW counted 1,273 anti-drug killings since Marcos took office. Current cases also document warrantless arrests and missing body-camera evidence.
+On 30 January 2026, NAPOLCOM announced administrative proceedings against **six personnel assigned to the Station Drug Enforcement Unit of Manila Police District's Malate Police Station 9**. The six had been arrested following a 28 January incident in Barangay San Isidro, Makati City.
+
+According to the official account, follow-up investigation indicated that they allegedly conducted an **unauthorized anti-illegal-drug operation outside their territorial jurisdiction without proper coordination**. Victims alleged armed threats, restraint and robbery. Criminal and administrative proceedings were pending at the time of the official record.
+
+Human Rights Watch's June 2026 reporting separately preserves a wider governance record of continuing anti-drug killings, arbitrary arrests and accountability failures. Those broader allegations are not silently incorporated into this freeze where recent individual cases remain anonymized.
 
 ## 4. Counter-evidence and exergic institutions
 
-Philippine authorities arrested and transferred former President Rodrigo Duterte to the ICC in 2025. In May 2026 an independent civilian Truth and Reconciliation Commission led by former ICC judge Raul Pangalangan was launched to document drug-war killings, conduct public hearings, make legal referrals and support accountability. Courts, legal-aid groups and domestic monitors continue to contest abusive arrests.
+Makati police arrested the six officers, and NAPOLCOM initiated administrative accountability proceedings. Authorities also relieved implicated unit/command personnel while the case proceeded. Separately, NAPOLCOM's 2026 disciplinary actions against other anti-drug personnel demonstrate that domestic accountability mechanisms can act against abusive units.
 
-## 5. Attribution and exclusions
+These facts strongly defeat any generic PNP/MPD/anti-drug restriction.
 
-Scope follows **police, anti-drug and materially participating security projects involved in extrajudicial killing, arbitrary/warrantless detention, planted or fabricated evidence, torture/ill-treatment or material obstruction of accountability; and separately evidenced counterterrorism/security projects materially criminalising protected activism or causing enforced disappearance**. Generic online regulation, protest policing and the Philippine State are excluded absent project-specific evidence. ICC cooperation, the Truth Commission, courts and independent accountability functions are expressly excluded.
+## 5. Frozen attribution and exclusions
+
+The renderable subset is recorded in `../../registry/schedule-state-s-freezes/batch-22a-phl-freeze.yml`.
+
+It covers only the **28 January 2026 Barangay San Isidro incident** and the materially participating functions of the six Malate Police Station 9 SDEU personnel identified by authorities in the pending criminal/administrative case. The freeze records the alleged institutional project boundary; it is **not a finding of individual criminal guilt**.
+
+Expressly excluded are PNP, MPD, Malate Police Station 9 and SDEUs generally; lawful anti-drug investigation/arrest/evidence handling; Makati police who arrested the suspects; NAPOLCOM, prosecutors, courts and defence counsel; personnel without Material Participation; and conduct dismissed, acquitted or independently shown not attributable to the frozen project.
 
 ## 6. Adversarial determination
 
-**UPHOLD / NARROW S.** Ongoing 2026 anti-drug abuse preserves a strong project-level restriction, while the new accountability architecture makes broader State-level or generic security attribution indefensible.
+**UPHOLD / NARROW `S`.** The January 2026 incident solves the knowability problem without converting a nationwide campaign or broad police apparatus into a Restricted Party.
 
 ## 7. Review / removal triggers
 
-Formal termination of abusive drug-war policies; sustained elimination of extrajudicial killings/arbitrary arrests; effective prosecution/remedy; preservation and production of body-camera/custody evidence; and effective protection against abusive counterterrorism, red-tagging or disappearance projects.
+- dismissal or material withdrawal of the criminal/administrative allegations;
+- acquittal or final adjudication materially changing attribution;
+- credible evidence that the operation, unit identity or participating roles were misidentified; or
+- independent evidence that the frozen abusive capacities were fully remediated.
 
 ## 8. Sources
 
+- https://napolcom.gov.ph/niro/pid/index.html
+- https://www.gmanetwork.com/news/topstories/metro/974800/napolcom-6-manila-cops-in-alleged-makati-robbery-face-admin-complaint/story/
 - https://www.hrw.org/news/2026/06/30/philippines-drug-war-abuses-persist-10-years-on
 - https://www.hrw.org/world-report/2026/country-chapters/philippines
-- https://www.amnesty.org/en/documents/asa35/8759/2024/en/
 
 ## 9. Procedural history
 
-Issue #138 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
+Issue #138 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md` · `../../reviews/2026/consistency/schedule-readiness.md`

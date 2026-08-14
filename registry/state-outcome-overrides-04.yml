@@ -1,0 +1,25 @@
+version: "2026-08-14-status-revalidation-04"
+status: provisional-governance
+operative: false
+base_registry: "states.yml"
+apply_after: "state-outcome-overrides-03.yml"
+counts_after_overrides:
+  R: 34
+  S: 80
+  U: 34
+  N: 47
+overrides:
+  BGR:
+    from: S
+    to: U
+    dossier: "../dossiers/states/BGR.md"
+    reviewed: "2026-08-14"
+    reason: "Current-status revalidation preserves serious 2025 Roma-eviction and border-rights evidence but finds no sufficiently fresh, attributable and unremediated 2026 project narrow enough to sustain S without inferring continuity."
+  COL:
+    from: S
+    to: U
+    dossier: "../dossiers/states/COL.md"
+    reviewed: "2026-08-14"
+    reason: "2026 Constitutional Court records confirm recurring military/ordinary jurisdiction disputes, but the reviewed exact interventions are being resolved through constitutional supervision and no fresh, currently unremediated obstruction project was established strongly enough to preserve S."
+
+# Governance overlay only; no licensing effect.

@@ -23,8 +23,8 @@ Detailed review and normalization are complete for **195 / 195** State dossiers.
 Current provisional governance after applying the State outcome override layers:
 
 - **34 `R`**
-- **82 `S`**
-- **32 `U`**
+- **80 `S`**
+- **34 `U`**
 - **47 `N`**
 - **195 total**
 
@@ -37,10 +37,12 @@ Draft [`schedules/ECL-RP-0.4-DRAFT.md`](schedules/ECL-RP-0.4-DRAFT.md) is histor
 Current State Schedule status:
 
 - **34 / 34 `R`** identity freezes complete;
-- all active `S` dossiers have completed Schedule translation;
-- **77 / 82 active `S`** have at least one Schedule-renderable frozen entry;
-- **5 `S`** remain in current-status, attribution or remediation review; and
+- all **80 active `S`** dossiers have completed Schedule translation;
+- **79 / 80 active `S`** have at least one Schedule-renderable frozen entry;
+- **1 `S`** remains in current-status / public-knowability review (`LAO`); and
 - **0 `S`** remain blocked merely because identity/project translation is unfinished.
+
+The 2026-08-14 five-gate revalidation froze narrow current projects for Iraq (`IRQ`) and the Philippines (`PHL`), downgraded Bulgaria (`BGR`) and Colombia (`COL`) from `S` to `U` rather than inferring continuing restrictability, and left Laos (`LAO`) as the sole active-`S` factual/knowability gate because the fresh public evidence deliberately withholds the identity needed for a defensible Schedule entry.
 
 Canonical progress sources:
 
