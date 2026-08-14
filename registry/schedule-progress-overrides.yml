@@ -1,4 +1,4 @@
-version: "2026-08-13-post-freeze-progress"
+version: "2026-08-14-post-mda-revalidation"
 status: provisional-governance
 operative: false
 base_index: "schedule-translations.yml"
@@ -13,9 +13,9 @@ state_schedule_progress:
   R_frozen: 34
   S_candidates_active: 83
   S_fully_frozen: 19
-  S_renderable_subset_only: 54
-  S_schedule_renderable_states: 73
-  S_current_status_or_remediation_review: 10
+  S_renderable_subset_only: 55
+  S_schedule_renderable_states: 74
+  S_current_status_or_remediation_review: 9
   S_identity_or_project_freeze_pending: 0
 
 state_governance_counts_after_overrides:
