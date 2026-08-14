@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Migrate historical State dossier issues into public governance-review surfaces.
 
-The canonical mapping is read from dossiers/states/*.md frontmatter (`issue:`).
+The canonical mapping is read from dossiers/states/ISO.md frontmatter (`issue:`).
 Default mode is a deterministic dry-run. `--apply` requires a GitHub token and
 updates issues in place without closing them or changing any governance outcome.
 """
@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 MARKER = "<!-- ecl-state-review-surface:v1"
+STATE_DOSSIER_NAME = re.compile(r"^[A-Z]{3}\.md$")
 REVIEW_LABELS = {
     "review:external-needed": ("0e8a16", "Independent public review is still required"),
     "review:adversarial": ("5319e7", "Adversarial/falsification review surface"),
@@ -66,11 +67,14 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 def load_dossiers(root: Path) -> list[Dossier]:
     dossiers: list[Dossier] = []
     seen_issues: set[int] = set()
-    for path in sorted(root.glob("*.md")):
+    paths = [path for path in sorted(root.glob("*.md")) if STATE_DOSSIER_NAME.fullmatch(path.name)]
+    for path in paths:
         meta = parse_frontmatter(path.read_text(encoding="utf-8"))
         required = ("iso3", "entity", "issue", "provisional_outcome")
         if any(not meta.get(key) for key in required):
             raise ValueError(f"{path}: missing one of {required}")
+        if meta["iso3"] != path.stem:
+            raise ValueError(f"{path}: frontmatter iso3={meta['iso3']} does not match filename")
         issue = int(meta["issue"])
         if issue in seen_issues:
             raise ValueError(f"duplicate issue mapping #{issue}")
