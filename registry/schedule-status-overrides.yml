@@ -4,6 +4,7 @@ operative: false
 base_index: "schedule-translations.yml"
 precedence: "This overlay supersedes blocker categories in the base index until the next consolidated snapshot."
 current_status_review:
+  - BGR
   - LAO
   - IRQ
   - COL
@@ -11,5 +12,6 @@ current_status_review:
 identity_project_pending: []
 
 # MDA, GRC and UKR were revalidated into narrow renderable projects on 2026-08-14.
+# CYP was downgraded S -> U by state-outcome-overrides-03.yml after current-status revalidation.
 # Remaining listed records require factual/current-status/remediation review before their frozen entries may render.
 # Aggregate Schedule-preparation status only; no licensing effect.
