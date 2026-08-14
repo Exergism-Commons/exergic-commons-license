@@ -1,0 +1,24 @@
+state: UKR
+entity: Ukraine
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "May 2025 Kyiv TCC mobilized-person transport death incident — Podilskyi deputy-head / Shevchenkivskyi soldier case"
+project_boundary: "the May 2025 transport of mobilized persons from training centres in western Ukraine to Kyiv, limited to the conduct for which the State Bureau of Investigation completed its pretrial investigation and sent an indictment to court on 23 April 2026: the Shevchenkivskyi District TCC and SP soldier's alleged use of physical force and an electric shock device against the victim, and the Podilskyi District TCC and SP deputy head's alleged intentional failure, while responsible for the transport, to stop that conduct"
+capacity_limit: "incident-specific charged conduct and materially participating functions only; this freeze records an indicted project boundary and is not a finding of individual criminal guilt"
+exclusions:
+  - "Podilskyi District TCC and SP, Shevchenkivskyi District TCC and SP, Kyiv TCC structures or Ukrainian mobilisation administration generally"
+  - "ordinary lawful conscription, recruitment, transport or medical-administration functions"
+  - "personnel present in or connected to the transport without Material Participation in the frozen charged conduct"
+  - "State Bureau of Investigation, Darnytsia Specialized Defense Prosecutor, courts, defence counsel, Ombudsman/NPM and other accountability or remedial functions"
+  - "conduct materially withdrawn from the indictment, dismissed, acquitted or otherwise independently shown not attributable to the frozen project"
+identity_sources:
+  - "https://dbr.gov.ua/news/smert-mobilizovanogo-pid-chas-perevezennya-suditimut-vijskovosluzhbovciv-kiivskih-tck"
+  - "https://dbr.gov.ua/news/dbr-prodovzhue-retelne-rozsliduvannya-obstavin-smerti-cholovika-cherez-dii-spivrobitnikiv-kiivskih-tck-ta-sp"
+residual_scope: "other TCC violence/detention cases, conscientious-objection matters and collaboration-prosecution/security projects remain governance-only until separately frozen"
+review_triggers:
+  - "acquittal, material charge withdrawal or dismissal"
+  - "final judgment materially changing the factual attribution"
+  - "credible evidence that the charged institutional roles or project boundary were misidentified"
+schedule_status: ready-status-revalidated-indicted-incident-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
