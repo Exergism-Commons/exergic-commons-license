@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "channel": "draft",
+  "operative": false,
+  "license": {
+    "ref": "ECL-0.2-DRAFT",
+    "path": "LICENSE",
+    "mutable_working_copy": true
+  },
+  "schedule": {
+    "ref": "ECL-RP-0.5-PARTIAL-DRAFT",
+    "path": "schedules/ECL-RP-0.5-PARTIAL-DRAFT.md",
+    "mutable_working_copy": true
+  },
+  "bundle": null,
+  "note": "Development pointer only. There is no stable ECL 1.0 bundle yet and this channel has no licensing effect by itself."
+}

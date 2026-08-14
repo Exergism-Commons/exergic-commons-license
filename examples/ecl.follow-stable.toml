@@ -1,0 +1,7 @@
+# Publisher policy: resolve the newest compatible stable ECL bundle when a
+# NEW software release is prepared. Previously published releases keep their
+# exact lock/bundle.
+mode = "follow-stable"
+license = "1.x"
+schedule = "latest-compatible"
+channel = "stable-1"

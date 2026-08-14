@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ecl:schema:channel",
+  "title": "ECL mutable channel pointer",
+  "type": "object",
+  "required": ["schema_version", "channel", "operative", "license", "schedule", "bundle"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "channel": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "operative": {"type": "boolean"},
+    "license": {"$ref": "#/$defs/component"},
+    "schedule": {"$ref": "#/$defs/component"},
+    "bundle": {"type": ["string", "null"]},
+    "note": {"type": "string"}
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": ["ref", "path", "mutable_working_copy"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "mutable_working_copy": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
