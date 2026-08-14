@@ -57,6 +57,8 @@ GitHub Issues are the public ticket/projection layer, not the database. The cano
 
 The OWL ontology deliberately does **not** infer restriction from association, graph reachability or Exergism scores. Such relationships can trigger review only through explicit governance procedure.
 
+The RDF tooling is pinned reproducibly in `requirements-ontology.txt`. It currently uses the exact upstream RDFLib commit containing the JSON-LD internal `ConjunctiveGraph` warning fix, rather than falsely claiming that fix exists in the older RDFLib 7.6.0 release.
+
 The first implemented automation is a deterministic review-due sweep: `tools/update_ticket_sweep.py` and `.github/workflows/living-review-sweep.yml`. The current five-State pilot exercises different review classes without changing any tier automatically.
 
 ## Versioning and exact ECL Bundles
