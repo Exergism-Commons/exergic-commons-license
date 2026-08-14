@@ -13,12 +13,12 @@ A post-ECL-0.2 Schedule candidate **can be generated from frozen records**, but 
 Current State governance after applying all `registry/state-outcome-overrides*.yml` in lexical order is:
 
 - `R`: **34**
-- `S`: **83**
-- `U`: **31**
+- `S`: **82**
+- `U`: **32**
 - `N`: **47**
 - total: **195**
 
-The outcome overlays have precedence over the base State registry until the next consolidated snapshot.
+The outcome overlays have precedence over the base State registry until the next consolidated snapshot. Cyprus (`CYP`) is no longer an active `S`: its 2026-08-13 dossier revalidation had already determined `S -> U`, and `state-outcome-overrides-03.yml` now carries that decision into the machine-readable outcome layer.
 
 ## Schedule engineering status
 
@@ -30,15 +30,17 @@ Source: `registry/schedule-state-r-freeze.yml`.
 
 ### `S`
 
-All **83 active `S`** dossiers have completed Schedule translation.
+All **82 active `S`** dossiers have completed Schedule translation.
 
 Current freeze/readiness status:
 
 - **19** fully frozen;
 - **58** additional active `S` records with at least one precise renderable subset;
-- **77 / 83** active `S` States therefore have at least one Schedule-renderable frozen entry;
-- **6** active `S` States remain behind a current-status, attribution or remediation gate; and
+- **77 / 82** active `S` States therefore have at least one Schedule-renderable frozen entry;
+- **5** active `S` States remain behind a current-status, attribution or remediation gate; and
 - **0** remain blocked merely because identity or project-boundary translation is unfinished.
+
+The remaining factual/status queue is: `BGR`, `COL`, `IRQ`, `LAO`, `PHL`.
 
 Canonical aggregate counts are maintained in `registry/schedule-progress-overrides.yml`, which supersedes stale aggregate State-`S` progress numbers in `registry/schedule-translations.yml`. Explicit renderer blocking is maintained in `registry/schedule-status-overrides.yml`.
 
@@ -70,6 +72,8 @@ On 2026-08-14 Moldova (`MDA`) passed that gate for one narrow subset: the inform
 
 All three freezes are Material-Participation-limited and leave residual dossier scope governance-only.
 
+Bulgaria (`BGR`) remains `S` but blocked from rendering: the Zaharna Fabrika identity is known, while current remediation evidence makes it improper to treat the completed 2025 eviction alone as a continuing Restricted Project. Cyprus was resolved in the opposite direction: lacking a sufficiently fresh attributable 2026 project, it was downgraded to `U` rather than forcing a Schedule entry.
+
 ## Direct-project rule
 
 ECL 0.2 may designate an exact Restricted Project directly without converting its entire parent institution into a Restricted Party. This is preferred where project identity is more precise than institutional identity.
@@ -93,6 +97,6 @@ Schedule CI independently validates active `R`/`S` coverage against the canonica
 
 ## Current queue
 
-Immediate State work is now **6 factual/current-status/attribution/remediation reviews and 0 identity/project-freeze translations**.
+Immediate State work is now **5 factual/current-status/attribution/remediation reviews and 0 identity/project-freeze translations**: `BGR`, `COL`, `IRQ`, `LAO`, `PHL`.
 
 The priority is to resolve those factual gates with named cases, facilities, orders or projects where the current evidence supports a narrow freeze; where remediation or attribution defeats the prior `S`, the correct action is to narrow or downgrade the governance outcome rather than force a Schedule entry.
