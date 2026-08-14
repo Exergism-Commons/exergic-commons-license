@@ -48,8 +48,10 @@ def state_outcomes() -> dict[str, str]:
         for iso3 in base.get(outcome, []) or []:
             result[str(iso3)] = outcome
 
-    overlay_path = REG / "state-outcome-overrides.yml"
-    if overlay_path.exists():
+    # Outcome overlays are intentionally cumulative. Apply every matching
+    # layer in lexical order so renderer semantics match the canonical
+    # governance precedence documented by README/progress validation.
+    for overlay_path in sorted(REG.glob("state-outcome-overrides*.yml")):
         overlay = load_yaml(overlay_path)
         for iso3, record in (overlay.get("overrides") or {}).items():
             if not isinstance(record, dict) or "to" not in record:
