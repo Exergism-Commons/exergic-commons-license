@@ -1,0 +1,21 @@
+state: MDA
+entity: Moldova
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "2025 CPT-observed informal-prisoner-hierarchy control project — Penitentiary no. 2 Lipcani, no. 6 Soroca and no. 15 Cricova"
+project_boundary: "custody/administration practices at Penitentiary no. 2 Lipcani, no. 6 Soroca and no. 15 Cricova, limited to materially tolerating, relying on or de facto relinquishing custodial control to informal prisoner leaders where that enables the caste-based intimidation, violence, degrading treatment or forced-labour conditions documented by the CPT; current-status revalidated by the 5 March 2026 Petrov judgment and the Council of Europe execution discussion published 20 July 2026 identifying the informal-hierarchy problem as systemic and still requiring a comprehensive national strategy"
+capacity_limit: "only materially participating custody/administration functions in the frozen three-facility project and only while the documented hierarchy-related conditions remain unremediated; no generic Moldovan penitentiary or criminal-justice class"
+exclusions:
+  - "National Administration of Penitentiaries and Moldovan prison staff generally"
+  - "staff or functions not materially participating in the frozen hierarchy-tolerance/control project"
+  - "rehabilitation, health care, legal defence, Ombudsman/NPM, inspection and independent remediation activity"
+  - "facility-specific practices independently shown to have been durably remediated after the frozen CPT record"
+  - "pre-trial detention reasoning, police ill-treatment and other residual MDA dossier scope absent separate freeze"
+identity_sources:
+  - "https://www.coe.int/en/web/chisinau/-/prisons-in-the-republic-of-moldova-anti-torture-committee-finds-progress-but-calls-for-resolute-action-to-tackle-informal-prisoner-hierarchies"
+  - "https://www.echr.coe.int/w/judgment-concerning-the-republic-of-moldova-6"
+  - "https://www.coe.int/uk/web/execution/-/meeting-with-the-advisory-council-of-the-government-agent-of-the-republic-of-moldova-2"
+residual_scope: "Sarban-group pre-trial detention, Levinta-group ill-treatment/investigation failures and other detention projects remain governance-only until separately frozen"
+schedule_status: ready-status-revalidated-facility-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
