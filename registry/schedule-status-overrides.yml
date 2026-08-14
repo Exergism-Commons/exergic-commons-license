@@ -8,10 +8,9 @@ current_status_review:
   - LAO
   - IRQ
   - COL
-  - GRC
   - PHL
 identity_project_pending: []
 
-# MDA was revalidated into a narrow renderable facility project on 2026-08-14.
+# MDA and GRC were revalidated into narrow renderable projects on 2026-08-14.
 # Remaining listed records require factual/current-status/remediation review before their frozen entries may render.
 # Aggregate Schedule-preparation status only; no licensing effect.
