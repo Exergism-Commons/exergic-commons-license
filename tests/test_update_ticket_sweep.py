@@ -10,6 +10,8 @@ MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
 
 class UpdateTicketSweepTests(unittest.TestCase):
     def entity(self, next_review="2026-09-01", review_class="hot"):
@@ -17,7 +19,6 @@ class UpdateTicketSweepTests(unittest.TestCase):
             "id": "STATE-TEST",
             "name": "Test State",
             "dossier": "../../dossiers/states/TST.md",
-            "currentGovernance": "U",
             "review": {
                 "lastSubstantiveReview": "2026-08-14",
                 "nextReview": next_review,
@@ -53,6 +54,14 @@ class UpdateTicketSweepTests(unittest.TestCase):
             (root / "a.json").write_text(json.dumps(another), encoding="utf-8")
             loaded = MODULE.load_entities(root)
             self.assertEqual([Path(item["_path"]).name for item in loaded], ["a.json", "b.json"])
+
+    def test_pilot_signal_reads_governance_from_dossier(self):
+        entity_path = REPO_ROOT / "knowledge" / "entities" / "STATE-JPN.json"
+        entity = json.loads(entity_path.read_text(encoding="utf-8"))
+        entity["_path"] = str(entity_path)
+        signal = MODULE.build_signal(entity, MODULE.dt.date(2026, 9, 1))
+        self.assertIsNotNone(signal)
+        self.assertEqual(signal["currentGovernance"], "U")
 
 
 if __name__ == "__main__":
