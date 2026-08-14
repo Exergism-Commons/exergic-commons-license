@@ -5,11 +5,20 @@ on:
     paths:
       - "spec/LIVING-UPDATE-SYSTEM.md"
       - "spec/EVIDENCE-VALUATION.md"
+      - "spec/VERSIONING.md"
       - "knowledge/**"
       - "monitoring/**"
       - "ontology/**"
       - "schemas/**"
+      - "channels/**"
+      - "releases/**"
+      - "sparql/**"
+      - "requirements-ontology.txt"
+      - "tools/build_knowledge_graph.py"
+      - "tools/run_sparql_checks.py"
+      - "tools/ecl_resolve.py"
       - "tools/update_ticket_sweep.py"
+      - "tests/test_ecl_resolve.py"
       - "tests/test_update_ticket_sweep.py"
       - ".github/workflows/living-update-integrity.yml"
       - ".github/workflows/living-review-sweep.yml"
@@ -17,11 +26,20 @@ on:
     paths:
       - "spec/LIVING-UPDATE-SYSTEM.md"
       - "spec/EVIDENCE-VALUATION.md"
+      - "spec/VERSIONING.md"
       - "knowledge/**"
       - "monitoring/**"
       - "ontology/**"
       - "schemas/**"
+      - "channels/**"
+      - "releases/**"
+      - "sparql/**"
+      - "requirements-ontology.txt"
+      - "tools/build_knowledge_graph.py"
+      - "tools/run_sparql_checks.py"
+      - "tools/ecl_resolve.py"
       - "tools/update_ticket_sweep.py"
+      - "tests/test_ecl_resolve.py"
       - "tests/test_update_ticket_sweep.py"
       - ".github/workflows/living-update-integrity.yml"
       - ".github/workflows/living-review-sweep.yml"
@@ -37,8 +55,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-ontology.txt
+
+      - name: Install RDF/SHACL tooling
+        run: python -m pip install -r requirements-ontology.txt
+
       - name: Unit tests
-        run: python -m unittest tests/test_update_ticket_sweep.py
+        run: python -m unittest tests/test_update_ticket_sweep.py tests/test_ecl_resolve.py
+
       - name: Parse structured JSON records
         shell: bash
         run: |
@@ -47,14 +72,51 @@ jobs:
           import json
           from pathlib import Path
 
-          roots = [Path('knowledge'), Path('ontology'), Path('schemas')]
+          roots = [Path('knowledge'), Path('ontology'), Path('schemas'), Path('channels')]
           for root in roots:
+              if not root.exists():
+                  continue
               for path in sorted(root.rglob('*.json')) + sorted(root.rglob('*.jsonld')):
                   with path.open(encoding='utf-8') as handle:
                       json.load(handle)
                   print(f'validated JSON parse: {path}')
           PY
+
+      - name: Parse OWL TBox and SHACL shapes
+        run: |
+          python - <<'PY'
+          from rdflib import Graph
+          for path in ('ontology/ecl.owl.ttl', 'ontology/ecl.shacl.ttl'):
+              graph = Graph().parse(path, format='turtle')
+              print(f'parsed {path}: {len(graph)} triples')
+          PY
+
+      - name: Build derived RDF dataset
+        run: python tools/build_knowledge_graph.py --output-dir build
+
+      - name: Validate ABox with OWL-RL plus SHACL
+        run: pyshacl -s ontology/ecl.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build/ecl-abox.ttl
+
+      - name: Run SPARQL integrity queries
+        run: python tools/run_sparql_checks.py build/ecl-knowledge.ttl sparql/integrity
+
       - name: Dry-run review ticket sweep
         run: python tools/update_ticket_sweep.py knowledge/entities --today 2026-09-01 >/tmp/signals.json
+
       - name: Assert Japan pilot becomes due on 2026-09-01
         run: grep -q 'ECL-UPD-REVIEW-DUE-STATE-JPN-2026-09-01' /tmp/signals.json
+
+      - name: Assert draft channel cannot resolve as stable
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/ecl.toml <<'EOF'
+          mode = "follow-stable"
+          license = "1.x"
+          schedule = "latest-compatible"
+          channel = "draft"
+          EOF
+          if python tools/ecl_resolve.py /tmp/ecl.toml --output /tmp/ecl.lock; then
+            echo "draft channel unexpectedly resolved as stable" >&2
+            exit 1
+          fi
