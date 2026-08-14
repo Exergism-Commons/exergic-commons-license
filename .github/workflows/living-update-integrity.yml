@@ -3,8 +3,10 @@ name: Living update integrity
 on:
   push:
     paths:
+      - "README.md"
       - "spec/LIVING-UPDATE-SYSTEM.md"
       - "spec/EVIDENCE-VALUATION.md"
+      - "spec/KNOWLEDGE-MODEL.md"
       - "spec/VERSIONING.md"
       - "knowledge/**"
       - "monitoring/**"
@@ -13,6 +15,7 @@ on:
       - "channels/**"
       - "releases/**"
       - "sparql/**"
+      - "examples/**"
       - "requirements-ontology.txt"
       - "tools/build_knowledge_graph.py"
       - "tools/run_sparql_checks.py"
@@ -24,8 +27,10 @@ on:
       - ".github/workflows/living-review-sweep.yml"
   pull_request:
     paths:
+      - "README.md"
       - "spec/LIVING-UPDATE-SYSTEM.md"
       - "spec/EVIDENCE-VALUATION.md"
+      - "spec/KNOWLEDGE-MODEL.md"
       - "spec/VERSIONING.md"
       - "knowledge/**"
       - "monitoring/**"
@@ -34,6 +39,7 @@ on:
       - "channels/**"
       - "releases/**"
       - "sparql/**"
+      - "examples/**"
       - "requirements-ontology.txt"
       - "tools/build_knowledge_graph.py"
       - "tools/run_sparql_checks.py"
