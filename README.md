@@ -38,8 +38,8 @@ Current State Schedule status:
 
 - **34 / 34 `R`** identity freezes complete;
 - all active `S` dossiers have completed Schedule translation;
-- **73 / 83 active `S`** have at least one Schedule-renderable frozen entry;
-- **10 `S`** remain in current-status, attribution or remediation review; and
+- **74 / 83 active `S`** have at least one Schedule-renderable frozen entry;
+- **9 `S`** remain in current-status, attribution or remediation review; and
 - **0 `S`** remain blocked merely because identity/project translation is unfinished.
 
 Canonical progress sources:
