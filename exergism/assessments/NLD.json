@@ -1,0 +1,24 @@
+{
+  "assessment_id": "ECL-EX-NLD-001",
+  "model": "formal-exergism-v2-pilot",
+  "entity": "Netherlands",
+  "dossier": "dossiers/states/NLD.md",
+  "object": "STATIC-99R, STABLE-2007 and ACUTE-2007 probation risk tools while materially deployed without demonstrated responsible validation",
+  "scoring_status": "scorable",
+  "governance_outcome_at_assessment": "S",
+  "review_status": "pilot-not-independent-reviewed",
+  "notes": "OXREC is deliberately excluded because the dossier credits its suspension as remediation. This pilot tests whether a narrow algorithmic S case remains distinguishable from whole-apparatus restriction.",
+  "variables": {
+    "P": {"low": 0.45, "central": 0.55, "high": 0.65, "basis": "mixed", "rationale": "The tools materially influence probation risk assessment but do not determine the entire criminal-justice process.", "evidence_refs": ["dossiers/states/NLD.md#3-evidence-supporting-the-determination"]},
+    "A": {"low": 0.40, "central": 0.55, "high": 0.70, "basis": "mixed", "rationale": "Risk tools can constrain affected persons, but professional judgment, courts and review pathways preserve substantial residual autonomy.", "evidence_refs": ["dossiers/states/NLD.md#4-counter-evidence-and-remediation", "dossiers/states/NLD.md#5-attribution-and-exclusions"]},
+    "V_ep": {"low": 0.50, "central": 0.65, "high": 0.80, "basis": "mixed", "rationale": "Validation defects reduce epistemic reliability, while an independent Inspectorate has identified and publicly documented the defects.", "evidence_refs": ["dossiers/states/NLD.md#3-evidence-supporting-the-determination", "dossiers/states/NLD.md#4-counter-evidence-and-remediation"]},
+    "L": {"low": 0.30, "central": 0.45, "high": 0.60, "basis": "inferred", "rationale": "The tools themselves are not primarily liberatory, but active supervision, suspension of OXREC and remediation requirements create meaningful corrective capacity around the deployment.", "evidence_refs": ["dossiers/states/NLD.md#4-counter-evidence-and-remediation"]},
+    "O": {"low": 0.45, "central": 0.60, "high": 0.75, "basis": "mixed", "rationale": "Contestability is imperfect but the system is neither irreversible nor institutionally closed; oversight and retirement/correction pathways exist.", "evidence_refs": ["dossiers/states/NLD.md#4-counter-evidence-and-remediation", "dossiers/states/NLD.md#7-review--removal-triggers"]},
+    "U": {"low": 0.50, "central": 0.65, "high": 0.80, "basis": "inferred", "rationale": "Probation risk assessment has legitimate public and rehabilitative utility even though the current validation defects can make the deployed tools exergically harmful.", "evidence_refs": ["dossiers/states/NLD.md#2-ecl-criteria-engaged"]},
+    "C": {"low": 0.30, "central": 0.45, "high": 0.60, "basis": "inferred", "rationale": "Algorithmic scoring creates decision asymmetry, but independent supervision, professional override and courts materially limit capture.", "evidence_refs": ["dossiers/states/NLD.md#4-counter-evidence-and-remediation", "dossiers/states/NLD.md#5-attribution-and-exclusions"]},
+    "S": {"low": 0.20, "central": 0.35, "high": 0.50, "basis": "inferred", "rationale": "The record establishes serious risk from irresponsible algorithm use but not a comprehensive high-severity coercive apparatus.", "evidence_refs": ["dossiers/states/NLD.md#3-evidence-supporting-the-determination"]},
+    "R": {"low": 0.30, "central": 0.45, "high": 0.60, "basis": "inferred", "rationale": "Continued deployment without demonstrated validation creates recurrence risk, while active Inspectorate supervision and removal triggers materially constrain it.", "evidence_refs": ["dossiers/states/NLD.md#4-counter-evidence-and-remediation", "dossiers/states/NLD.md#7-review--removal-triggers"]},
+    "Ecol": {"low": 0.02, "central": 0.05, "high": 0.10, "basis": "inferred", "rationale": "The dossier contains no evidence of material ecological burden specific to these relatively bounded software tools; a nonzero interval preserves the variable without overstating it.", "evidence_refs": ["dossiers/states/NLD.md"]},
+    "D_p": {"low": 1.0, "central": 1.0, "high": 1.0, "basis": "observed", "rationale": "Primary ECL human moral domain.", "evidence_refs": ["spec/EXERGIC-ANALYSIS.md#3-normalized-variables"]}
+  }
+}
