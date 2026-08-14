@@ -17,9 +17,11 @@ ECL cannot remain credible if actor/project status is periodically rewritten by 
 
 GitHub Issues are useful for discussion, assignment and public review, but they are not a database. The canonical state must remain versioned, structured repository data.
 
+The semantic architecture is normative for repository structure and is defined in [`KNOWLEDGE-MODEL.md`](KNOWLEDGE-MODEL.md): **OWL TBox + JSON-LD ABox + SHACL shapes -> derived RDF -> SPARQL**. Release/non-retroactivity behavior is defined in [`VERSIONING.md`](VERSIONING.md).
+
 ## 2. Architecture
 
-The living system uses five layers:
+The living system uses these layers:
 
 ```text
 external sources / scheduled review clocks
@@ -37,10 +39,23 @@ external sources / scheduled review clocks
 (provenance + validity + grade)
               |
               v
- semantic graph / Exergism assessment
+       JSON-LD ABox in Git
+              +
+          OWL TBox
+              |
+       SHACL validation
               |
               v
- governance decision -> dossier -> generated registry -> Schedule candidate
+      derived RDF / SPARQL
+              |
+              v
+ semantic dependency analysis / Exergism assessment
+              |
+              v
+ governance decision -> dossier -> generated registry
+              |
+              v
+ immutable ScheduleRelease -> exact ECLBundle for new software release
 ```
 
 ### 2.1 Semantic identity layer
@@ -54,16 +69,16 @@ Stable IDs represent entities and reviewable objects independent of names:
 - `INSTITUTION-...`
 - `DEPLOYMENT-...`
 
-Names and aliases may change; IDs do not.
+Each ABox object also receives a global RDF IRI such as `urn:ecl:STATE-USA`. Names and aliases may change; the stable ID/IRI pair does not.
 
 ### 2.2 Claim layer
 
-Facts are stored as atomic, temporally qualified claims rather than buried only in prose. A claim says, in effect:
+Facts are stored as atomic, temporally qualified `Claim` individuals rather than buried only in prose. A claim says, in effect:
 
 ```text
 subject --predicate--> object/value
        valid during [from, to]
-       supported/disputed by evidence items
+       supported/disputed by EvidenceItem records
 ```
 
 Examples:
@@ -109,26 +124,42 @@ Accepted claims may affect:
 
 The system performs **differential re-analysis**: re-evaluate only what the new evidence can materially change, then escalate to full review when necessary.
 
-### 2.5 Output layer
+### 2.5 Output/release layer
 
-Dossiers remain canonical human-readable governance records. Registries should increasingly become **generated materialized views** of accepted decisions rather than independently edited outcome stores.
+Dossiers remain canonical human-readable governance records during migration. Registries should increasingly become **generated materialized views** of accepted `GovernanceDecision` records rather than independently edited outcome stores.
 
-Schedules remain separate, exact, versioned legal artifacts and are never rewritten automatically from a ticket.
+A governance decision may update the current governance state, but it never edits an older released Schedule in place. A new legal state requires a new immutable `ScheduleRelease`; a software publisher then resolves an exact `ECLBundle = LicenseRelease + ScheduleRelease` under `spec/VERSIONING.md`.
 
-## 3. Why a semantic model, but not an RDF-only database
+## 3. Semantic stack and database boundary
 
-ECL benefits from ontology semantics because restrictions and reviews depend on relationships: control, participation, operation, remediation, project scope, identity, evidence and temporal validity.
+ECL uses ontology semantics because restrictions and reviews depend on relationships: control, participation, operation, remediation, project scope, identity, evidence and temporal validity.
 
-However, an RDF triplestore should not be required to edit or audit the repository. The canonical records should be small Git-friendly JSON/JSON-LD-compatible documents with stable IDs. A JSON-LD context / ontology vocabulary can give them graph semantics and permit later RDF export, SPARQL use or SHACL validation without making those technologies a prerequisite for ordinary contribution.
+The repository architecture is:
 
-This hybrid approach provides:
+```text
+OWL TBox        ontology/ecl.owl.ttl
+JSON-LD ABox    knowledge/**
+SHACL           ontology/ecl.shacl.ttl
+    ↓
+derived RDF graph/triplestore
+    ↓
+SPARQL
+```
+
+An RDF server is **not** the canonical storage system. The canonical editable records are small Git-friendly JSON-LD documents plus the versioned ontology/shapes. A triplestore is a disposable index and MUST be reconstructible from Git.
+
+This approach provides:
 
 - readable diffs;
 - deterministic CI;
 - provenance/history through Git;
-- no mandatory database service;
-- graph traversal when needed;
-- future API/RDF export without migration of identifiers.
+- formal OWL semantics;
+- graph-native SHACL validation;
+- SPARQL dependency/integrity queries;
+- no mandatory long-lived database service;
+- future APIs/triplestores without migration of identifiers.
+
+Ontological inference, SHACL validation and ECL governance inference are deliberately separate. OWL MUST NOT encode inherited guilt/designation or score-to-tier rules.
 
 ## 4. Core semantic classes
 
@@ -148,7 +179,11 @@ The minimum conceptual model is:
 - `GovernanceDecision`
 - `UpdateSignal`
 - `UpdateCase`
+- `KnowledgeSnapshot`
 - `ScheduleEntry`
+- `LicenseRelease`
+- `ScheduleRelease`
+- `ECLBundle`
 
 Core relationships include:
 
@@ -162,10 +197,15 @@ Core relationships include:
 - `reviews`
 - `evidenceFor`
 - `evidenceAgainst`
+- `dependsOnClaim`
 - `supersedes`
 - `hasAssessment`
 - `hasDecision`
 - `triggersReviewOf`
+- `basedOnDecision`
+- `capturesKnowledge`
+- `usesLicenseRelease`
+- `usesScheduleRelease`
 
 A relationship may trigger review of a related actor but **must never propagate an ECL restriction automatically**. Graph reachability is not guilt by association.
 
@@ -189,7 +229,7 @@ A page changing is not evidence that the actor changed. It is only a signal to i
 
 ### 5.2 Scheduled review due
 
-Each tracked entity/object may define a `next_review` date. Reaching it creates a deterministic review-due update case even if no external source changed.
+Each tracked entity/object may define a `reviewDue` date. Reaching it creates a deterministic review-due signal even if no external source changed.
 
 ### 5.3 Expiry / temporal boundary
 
@@ -205,7 +245,7 @@ A dossier's explicit removal/narrowing trigger is linked to monitorable facts. E
 
 ### 5.6 ECL-model change
 
-Changes to the operative working license, designation standard, formal Exergism model or accepted parameter profile can invalidate prior analytical assumptions. These create model-revalidation cases independently of actor behavior.
+Changes to the operative working license, designation standard, formal Exergism model, ontology semantics or accepted parameter profile can invalidate prior analytical assumptions. These create model-revalidation cases independently of actor behavior.
 
 ## 6. Update-case types
 
@@ -359,7 +399,7 @@ A governance re-review is mandatory when any of the following occurs:
 
 A numerical delta threshold alone is deliberately insufficient.
 
-## 13. Downstream application
+## 13. Downstream application and non-retroactivity
 
 Once an update case is resolved:
 
@@ -368,19 +408,22 @@ accepted evidence
   -> claim graph
   -> assessment delta (if applicable)
   -> dossier/review record
-  -> governance decision
-  -> generated registry view
+  -> GovernanceDecision
+  -> generated current registry view
   -> Schedule candidate/revalidation if required
+  -> new immutable ScheduleRelease if approved
 ```
 
 Possible outcomes:
 
 - **no material change:** close update case; preserve provenance;
 - **evidence refresh:** update claims/evidence cutoff only;
-- **formal change without legal change:** update assessment/dossier, retain tier/scope;
-- **scope/criterion change:** adversarial review before registry change;
-- **governance outcome change:** update canonical decision and regenerate registry views;
-- **Schedule implication:** prepare a new Schedule version/candidate. Never retroactively mutate an incorporated older Schedule.
+- **formal change without legal change:** update assessment/dossier, retain outcome/scope;
+- **scope/criterion change:** adversarial review before governance change;
+- **governance outcome change:** adopt a new decision and regenerate current views;
+- **Schedule implication:** prepare a new immutable Schedule release/candidate.
+
+An older `ScheduleRelease` is never rewritten. Software releases already bound to an older exact `ECLBundle` remain reproducible under `spec/VERSIONING.md`.
 
 ## 14. Registry migration direction
 
@@ -407,7 +450,9 @@ Automation MAY:
 - attach source metadata and hashes;
 - identify potentially affected objects/variables/criteria;
 - compute formal analysis from already reviewed variable inputs;
-- run staleness checks.
+- run OWL/SHACL/SPARQL integrity/dependency checks;
+- run staleness checks;
+- resolve publisher policy to an already approved exact ECL Bundle.
 
 Automation MUST NOT:
 
@@ -416,20 +461,25 @@ Automation MUST NOT:
 - create a Restricted Party designation by itself;
 - alter an incorporated Schedule automatically;
 - turn weak or anonymous evidence into a high-confidence claim;
-- tune Exergism parameters to reach a desired outcome.
+- tune Exergism parameters to reach a desired outcome;
+- present a draft/candidate channel as stable;
+- silently change the exact ECL Bundle of an already published software release.
 
 ## 16. Pre-195-dossier gate
 
 Before scaling formal Exergism to all 195 State dossiers, ECL should have:
 
-1. stable semantic identifiers for the objects being assessed;
-2. claim/evidence schemas;
-3. an evidence valuation standard;
-4. a deterministic update-case format;
-5. automatic review-due ticket generation;
-6. a source-monitor adapter interface;
-7. differential Exergism rules;
-8. governance escalation rules; and
-9. CI ensuring that accepted decisions, dossiers, assessments and generated registry views do not silently diverge.
+1. stable RDF IRIs and human IDs for assessed objects;
+2. OWL TBox and SHACL shapes;
+3. JSON-LD ABox claim/evidence schemas;
+4. an evidence valuation standard;
+5. a deterministic update-case format;
+6. automatic review-due ticket generation;
+7. a source-monitor adapter interface;
+8. differential Exergism rules;
+9. governance escalation rules;
+10. SPARQL dependency/integrity checks;
+11. exact Schedule/License/Bundle versioning; and
+12. CI ensuring that accepted decisions, dossiers, assessments and generated views do not silently diverge.
 
 Only then does mass formal analysis become maintainable rather than a one-time snapshot.
