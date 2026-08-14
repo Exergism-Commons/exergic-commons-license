@@ -1,0 +1,60 @@
+name: Living update integrity
+
+on:
+  push:
+    paths:
+      - "spec/LIVING-UPDATE-SYSTEM.md"
+      - "spec/EVIDENCE-VALUATION.md"
+      - "knowledge/**"
+      - "monitoring/**"
+      - "ontology/**"
+      - "schemas/**"
+      - "tools/update_ticket_sweep.py"
+      - "tests/test_update_ticket_sweep.py"
+      - ".github/workflows/living-update-integrity.yml"
+      - ".github/workflows/living-review-sweep.yml"
+  pull_request:
+    paths:
+      - "spec/LIVING-UPDATE-SYSTEM.md"
+      - "spec/EVIDENCE-VALUATION.md"
+      - "knowledge/**"
+      - "monitoring/**"
+      - "ontology/**"
+      - "schemas/**"
+      - "tools/update_ticket_sweep.py"
+      - "tests/test_update_ticket_sweep.py"
+      - ".github/workflows/living-update-integrity.yml"
+      - ".github/workflows/living-review-sweep.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests
+        run: python -m unittest tests/test_update_ticket_sweep.py
+      - name: Parse structured JSON records
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          roots = [Path('knowledge'), Path('ontology'), Path('schemas')]
+          for root in roots:
+              for path in sorted(root.rglob('*.json')) + sorted(root.rglob('*.jsonld')):
+                  with path.open(encoding='utf-8') as handle:
+                      json.load(handle)
+                  print(f'validated JSON parse: {path}')
+          PY
+      - name: Dry-run review ticket sweep
+        run: python tools/update_ticket_sweep.py knowledge/entities --today 2026-09-01 >/tmp/signals.json
+      - name: Assert Japan pilot becomes due on 2026-09-01
+        run: grep -q 'ECL-UPD-REVIEW-DUE-STATE-JPN-2026-09-01' /tmp/signals.json
