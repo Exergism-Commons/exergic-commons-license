@@ -1,0 +1,32 @@
+name: ECL living review sweep
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      lookahead_days:
+        description: "Also surface reviews due within this many days"
+        required: false
+        default: "0"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  review-due:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate deduplicated review-due signals
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOOKAHEAD: ${{ inputs.lookahead_days || '0' }}
+        run: >-
+          python tools/update_ticket_sweep.py knowledge/entities
+          --lookahead-days "$LOOKAHEAD"
+          --github
