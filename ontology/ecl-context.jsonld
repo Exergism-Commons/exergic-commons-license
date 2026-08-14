@@ -1,6 +1,6 @@
 {
   "@context": {
-    "ecl": "https://example.invalid/ecl/vocab#",
+    "ecl": "urn:ecl:",
     "id": "@id",
     "type": "@type",
     "Actor": "ecl:Actor",
