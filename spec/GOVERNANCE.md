@@ -195,3 +195,17 @@ No governance system can eliminate discretion, but ECL should avoid concentratin
 Before ECL 1.0, this repository should define a stable decision mechanism, conflict-of-interest rules, minimum review requirements, and a process for documenting dissent.
 
 The governance of an anti-capture license should itself be designed to resist arbitrary capture.
+
+## 18. Formal Exergism analysis
+
+Governance should use the formal multicriteria model in [`EXERGIC-ANALYSIS.md`](EXERGIC-ANALYSIS.md) as an upstream diagnostic and falsification layer before treating a dossier as analytically complete for ECL 1.0 readiness.
+
+The formal layer does not create restrictions and does not replace the exact operative ECL criteria. Its function is to force reviewers to expose assumptions about transformative power, autonomy, epistemic access, liberation, openness, utility, capture, structural harm, relapse risk and ecological cost rather than relying on the word `exergic` as an undefined moral label.
+
+For a sufficiently defined object, reviewers should record evidence-backed uncertainty intervals and calculate the immediate-ethical (`E_i`), strategic-historical (`X_h`), structural (`B_0`) and, where a defensible time series exists, temporal (`N_t`) layers. The machine-readable record should identify the parameter profile used and material sensitivity to alternative plausible profiles.
+
+Where the object or evidence is not sufficiently defined, reviewers must record `insufficient_evidence` instead of assigning arbitrary midpoint values. Where adversarial review finds no current ECL-relevant object at the required scope, reviewers may record `not_applicable` rather than scoring an entire State or institution merely to produce a number.
+
+A formal result may confirm, weaken, narrow or expose an inconsistency in a governance finding. Any material disagreement between the formal layer and the proposed legal/governance outcome should be stated expressly and resolved through evidence, exact criterion fit and adversarial review rather than hidden through parameter tuning.
+
+There is no permissible automatic function from a formal score to `R`, `S`, `U` or `N`. A high strategic or transformative score cannot by itself cancel severe immediate harm, and a negative composite score cannot create a restriction absent exact ECL Section 5 fit and valid attribution.

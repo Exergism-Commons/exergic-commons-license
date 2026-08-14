@@ -1,0 +1,24 @@
+{
+  "assessment_id": "ECL-EX-PRK-001",
+  "model": "formal-exergism-v2-pilot",
+  "entity": "North Korea (DPRK)",
+  "dossier": "dossiers/states/PRK.md",
+  "object": "State surveillance, political-control, detention, information and movement-control apparatus",
+  "scoring_status": "scorable",
+  "governance_outcome_at_assessment": "R",
+  "review_status": "pilot-not-independent-reviewed",
+  "notes": "Variable intervals are provisional translations of the current dossier record. They test the formal method; they do not independently justify the R outcome.",
+  "variables": {
+    "P": {"low": 0.90, "central": 0.95, "high": 0.99, "basis": "mixed", "rationale": "The apparatus has broad demonstrated capacity to alter movement, information access, detention and everyday conditions.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination"]},
+    "A": {"low": 0.02, "central": 0.05, "high": 0.08, "basis": "mixed", "rationale": "The dossier records severe restrictions on movement and individual agency.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination"]},
+    "V_ep": {"low": 0.03, "central": 0.06, "high": 0.10, "basis": "inferred", "rationale": "Centralized information control and surveillance substantially constrain independent epistemic access.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination"]},
+    "L": {"low": 0.01, "central": 0.03, "high": 0.05, "basis": "inferred", "rationale": "The assessed coercive apparatus has little demonstrated liberation or remediation capacity for affected persons.", "evidence_refs": ["dossiers/states/PRK.md#3-counter-evidence"]},
+    "O": {"low": 0.01, "central": 0.03, "high": 0.06, "basis": "mixed", "rationale": "Exit, movement, alternatives, contestation and independent monitoring are all materially constrained.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination", "dossiers/states/PRK.md#5-review-triggers"]},
+    "U": {"low": 0.15, "central": 0.25, "high": 0.35, "basis": "inferred", "rationale": "The apparatus performs some coordination/state functions, but usefulness to affected persons is heavily discounted because the scored object is the coercive control apparatus rather than the State as a whole.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination"]},
+    "C": {"low": 0.90, "central": 0.95, "high": 0.99, "basis": "mixed", "rationale": "The dossier describes a comprehensive centralized structure concentrating surveillance, detention, information and movement control.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination", "dossiers/states/PRK.md#3-counter-evidence"]},
+    "S": {"low": 0.85, "central": 0.92, "high": 0.98, "basis": "mixed", "rationale": "Political detention, severe control and coercive penalties indicate very high structural harm within the assessed apparatus.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination"]},
+    "R": {"low": 0.90, "central": 0.95, "high": 0.99, "basis": "inferred", "rationale": "The dossier reports persistence and deterioration over a decade with few effective independent remedies, indicating strong reproduction risk.", "evidence_refs": ["dossiers/states/PRK.md#2-evidence-supporting-the-determination", "dossiers/states/PRK.md#5-review-triggers"]},
+    "Ecol": {"low": 0.20, "central": 0.40, "high": 0.60, "basis": "inferred", "rationale": "The current dossier is not designed to establish ecological impact; a deliberately wide interval prevents silent zeroing and should be replaced by dedicated evidence.", "evidence_refs": ["dossiers/states/PRK.md"]},
+    "D_p": {"low": 1.0, "central": 1.0, "high": 1.0, "basis": "observed", "rationale": "Primary ECL human moral domain.", "evidence_refs": ["spec/EXERGIC-ANALYSIS.md#3-normalized-variables"]}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "assessment_id": "ECL-EX-JPN-001",
+  "model": "formal-exergism-v2-pilot",
+  "entity": "Japan",
+  "dossier": "dossiers/states/JPN.md",
+  "object": "Potential execution-system technology, prolonged pretrial detention/interrogation systems and future automated migration or criminal-justice targeting",
+  "scoring_status": "insufficient_evidence",
+  "governance_outcome_at_assessment": "U",
+  "review_status": "pilot-not-independent-reviewed",
+  "reason": "The dossier establishes serious current coercive criminal-justice concerns but does not yet identify a sufficiently defined Software-enabled system or Restricted Project with an exact ECL Section 5 nexus. Assigning normalized variable midpoints would manufacture precision rather than measure a defined object.",
+  "required_to_score": [
+    "identify the exact technology, system, deployment or operational process",
+    "establish its material role in the coercive conduct",
+    "establish the affected population and available contestation/remedy pathways",
+    "establish enough evidence to bound P, A, V_ep, L, O, U, C, S, R and Ecol"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "reference-balanced-v2",
+  "status": "mechanical-reference-only",
+  "notes": "Equalized reference weights for regression tests and pilot sensitivity only. These values are not canonical Exergism constants and must not be used as a score-to-tier rule.",
+  "pc": 0.3333333333333333,
+  "pr": 0.3333333333333333,
+  "pe": 0.3333333333333333,
+  "qC": 1.0,
+  "qS": 1.0,
+  "a1": 0.5,
+  "a2": 0.5,
+  "a3": 0.3333333333333333,
+  "a4": 0.3333333333333333,
+  "a5": 0.3333333333333333,
+  "b1": 0.5,
+  "b2": 0.5,
+  "b3": 0.25,
+  "b4": 0.25,
+  "b5": 0.25,
+  "b6": 0.25,
+  "lambda": 0.1
+}

@@ -7,7 +7,8 @@ ECL is an experimental software-license project focused on human agency, contest
 ## Canonical sources
 
 - [`LICENSE`](LICENSE) — current working license text.
-- [`spec/`](spec/) — principles, governance, terminology and designation standard.
+- [`spec/`](spec/) — principles, governance, terminology, designation standard and the formal Exergism analysis specification.
+- [`exergism/`](exergism/) — machine-readable formal Exergism assessments and explicit parameter profiles.
 - [`dossiers/`](dossiers/) — canonical evidence/governance records.
 - [`reviews/`](reviews/) — adjudication, adversarial-review and consistency history.
 - [`registry/`](registry/) — machine-readable governance, translation, freeze and override data.
@@ -16,9 +17,19 @@ ECL is an experimental software-license project focused on human agency, contest
 
 The immutable ECL 0.1 snapshot is [`versions/licenses/ECL-0.1.md`](versions/licenses/ECL-0.1.md). The root `LICENSE` is ECL 0.2-DRAFT.
 
+## Formal Exergism layer
+
+ECL now distinguishes the philosophical/normative use of exergy from the **formal Exergism analysis** defined in [`spec/EXERGIC-ANALYSIS.md`](spec/EXERGIC-ANALYSIS.md).
+
+The formal layer evaluates a precisely attributed object through normalized, evidence-backed intervals for transformative power, autonomy, epistemic truth access, liberation capacity, openness, exergic utility, capture, structural harm, relapse risk and ecological cost. It preserves separate immediate-ethical (`E_i`), strategic-historical (`X_h`), structural (`B_0`) and temporal (`N_t`) analyses.
+
+There is deliberately **no numerical score-to-tier mapping**. Formal Exergism is an upstream diagnostic and falsification layer; restriction still requires exact ECL criterion fit, evidence, attribution, adversarial review, Schedule knowability and explicit incorporation.
+
+The cross-tier pilot and calculator are documented in [`exergism/README.md`](exergism/README.md).
+
 ## 2026 State corpus
 
-Detailed review and normalization are complete for **195 / 195** State dossiers.
+Detailed factual review and normalization are complete for **195 / 195** State dossiers.
 
 Current provisional governance after applying the State outcome override layers:
 
@@ -29,6 +40,8 @@ Current provisional governance after applying the State outcome override layers:
 - **195 total**
 
 Read `registry/states.yml`, then apply all `registry/state-outcome-overrides*.yml` in lexical order. The override layer has precedence until the next consolidated snapshot.
+
+The 195 dossiers are **not yet formal-exergism-complete** merely because factual/adversarial normalization is complete. Before ECL 1.0 readiness, each dossier should either link an evidence-backed scorable assessment, document why the object remains insufficiently defined, or document why no current ECL-relevant object exists.
 
 ## Schedule engineering
 
@@ -71,13 +84,16 @@ External lists may serve as evidence or identity anchors but are not automatical
 ## Release model
 
 ```text
-evidence → dossier → adversarial review → consistency review
-        → Schedule translation → identity/project freeze
-        → generated Schedule candidate → legal/internal review
-        → explicit release incorporation
+evidence -> scoped dossier object -> formal Exergism analysis
+        -> exact ECL criterion fit -> adversarial review -> consistency review
+        -> Schedule translation -> identity/project freeze
+        -> generated Schedule candidate -> legal/internal review
+        -> explicit release incorporation
 ```
 
-No dossier, review or registry entry has licensing effect by itself. Only an exact Schedule expressly incorporated with an exact ECL version can have licensing effect for a release.
+Formal Exergism may confirm, weaken, narrow or expose an inconsistency in a governance result. It cannot create a restriction absent operative ECL fit.
+
+No dossier, Exergism assessment, review or registry entry has licensing effect by itself. Only an exact Schedule expressly incorporated with an exact ECL version can have licensing effect for a release.
 
 ## Legal status
 
