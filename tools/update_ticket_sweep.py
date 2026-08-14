@@ -53,6 +53,28 @@ def parse_date(value: Any, label: str) -> dt.date:
         raise ValueError(f"{label} is not a valid ISO date: {value}") from exc
 
 
+def read_dossier_outcome(entity: dict[str, Any]) -> str:
+    """Read provisional_outcome from the entity's canonical dossier.
+
+    Entity identity records intentionally do not duplicate the governance tier.
+    """
+    entity_path = entity.get("_path")
+    dossier = entity.get("dossier")
+    if not isinstance(entity_path, str) or not isinstance(dossier, str):
+        return "unknown"
+    dossier_path = (Path(entity_path).parent / dossier).resolve()
+    try:
+        lines = dossier_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return "unknown"
+    for line in lines[:40]:
+        stripped = line.strip()
+        if stripped.startswith("provisional_outcome:"):
+            value = stripped.split(":", 1)[1].strip().strip('"\'')
+            return value if value in {"R", "S", "U", "N"} else "unknown"
+    return "unknown"
+
+
 def fingerprint(subject: str, due: dt.date) -> str:
     raw = f"{subject}|review-due|{due.isoformat()}".encode("utf-8")
     return hashlib.sha256(raw).hexdigest()[:20]
@@ -81,7 +103,7 @@ def build_signal(entity: dict[str, Any], today: dt.date) -> dict[str, Any] | Non
         "fingerprint": fp,
         "subject": subject,
         "entityName": entity.get("name"),
-        "currentGovernance": entity.get("currentGovernance"),
+        "currentGovernance": read_dossier_outcome(entity),
         "dossier": entity.get("dossier"),
         "type": "review-due",
         "priority": priority,
@@ -130,7 +152,7 @@ def issue_body(signal: dict[str, Any]) -> str:
 ## Automatic ECL review-due signal
 
 **Subject:** `{signal['subject']}` — {signal.get('entityName') or ''}  
-**Current provisional governance:** `{signal.get('currentGovernance')}`  
+**Current provisional governance (read from dossier):** `{signal.get('currentGovernance')}`  
 **Priority:** `{signal['priority']}`  
 **Last substantive review:** `{signal.get('lastSubstantiveReview')}`  
 **Review due:** `{signal['dueDate']}`
