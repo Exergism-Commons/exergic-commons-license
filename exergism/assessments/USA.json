@@ -1,0 +1,24 @@
+{
+  "assessment_id": "ECL-EX-USA-001",
+  "model": "formal-exergism-v2-pilot",
+  "entity": "United States",
+  "dossier": "dossiers/states/USA.md",
+  "object": "Identified federal immigration/detention, military-targeting and coercive-security projects within the current scoped S finding",
+  "scoring_status": "scorable",
+  "governance_outcome_at_assessment": "S",
+  "review_status": "pilot-not-independent-reviewed",
+  "notes": "This scores only the current restricted-project scope, not the United States Federal Government as a whole. Counter-institutions are reflected in the autonomy, openness, liberation, capture and relapse intervals.",
+  "variables": {
+    "P": {"low": 0.75, "central": 0.85, "high": 0.92, "basis": "mixed", "rationale": "The relevant detention, targeting and security projects possess substantial operational capacity.", "evidence_refs": ["dossiers/states/USA.md#3-evidence-preserving-scoped-restriction"]},
+    "A": {"low": 0.15, "central": 0.25, "high": 0.40, "basis": "mixed", "rationale": "Affected persons face strong coercive constraints, but legal challenge and independent institutional pathways prevent an assumption of near-zero autonomy across all scoped contexts.", "evidence_refs": ["dossiers/states/USA.md#3-evidence-preserving-scoped-restriction", "dossiers/states/USA.md#4-counter-evidence-and-exergic-institutions"]},
+    "V_ep": {"low": 0.20, "central": 0.35, "high": 0.50, "basis": "mixed", "rationale": "Opacity and coercive-security contexts reduce inspectability, while courts, GAO, inspectors general and public accountability preserve material epistemic access.", "evidence_refs": ["dossiers/states/USA.md#4-counter-evidence-and-exergic-institutions"]},
+    "L": {"low": 0.10, "central": 0.20, "high": 0.35, "basis": "inferred", "rationale": "The scored projects themselves have limited liberation capacity, but independent remedial institutions can narrow or reverse harms and therefore prevent a zero value.", "evidence_refs": ["dossiers/states/USA.md#4-counter-evidence-and-exergic-institutions", "dossiers/states/USA.md#7-review--removal-triggers"]},
+    "O": {"low": 0.20, "central": 0.30, "high": 0.45, "basis": "mixed", "rationale": "Contestability is materially constrained in the relevant projects but not eliminated; judicial, audit, defence and oversight alternatives exist.", "evidence_refs": ["dossiers/states/USA.md#4-counter-evidence-and-exergic-institutions", "dossiers/states/USA.md#5-attribution-and-exclusions"]},
+    "U": {"low": 0.35, "central": 0.50, "high": 0.65, "basis": "inferred", "rationale": "Detention, security and targeting systems can pursue legitimate functions, so utility is not presumed zero even where the current deployment is alleged to satisfy ECL criteria.", "evidence_refs": ["dossiers/states/USA.md#2-ecl-02-criteria-engaged"]},
+    "C": {"low": 0.60, "central": 0.72, "high": 0.85, "basis": "mixed", "rationale": "The relevant projects concentrate substantial coercive capacity, while independent branches and remedial functions materially constrain whole-apparatus capture.", "evidence_refs": ["dossiers/states/USA.md#4-counter-evidence-and-exergic-institutions", "dossiers/states/USA.md#6-ecl-02-delta-determination"]},
+    "S": {"low": 0.55, "central": 0.68, "high": 0.80, "basis": "mixed", "rationale": "The scoped record concerns detention, custody, targeting and coercive-security harms serious enough to sustain project-specific review.", "evidence_refs": ["dossiers/states/USA.md#3-evidence-preserving-scoped-restriction"]},
+    "R": {"low": 0.50, "central": 0.65, "high": 0.80, "basis": "inferred", "rationale": "The record is current and recurrent, but effective counter-institutions and identified removal triggers reduce the reproduction risk relative to a comprehensively captured apparatus.", "evidence_refs": ["dossiers/states/USA.md#4-counter-evidence-and-exergic-institutions", "dossiers/states/USA.md#7-review--removal-triggers"]},
+    "Ecol": {"low": 0.10, "central": 0.20, "high": 0.40, "basis": "inferred", "rationale": "The current dossier does not establish ecological cost for the heterogeneous scoped projects; the wide interval is intentionally conservative pending dedicated evidence.", "evidence_refs": ["dossiers/states/USA.md"]},
+    "D_p": {"low": 1.0, "central": 1.0, "high": 1.0, "basis": "observed", "rationale": "Primary ECL human moral domain.", "evidence_refs": ["spec/EXERGIC-ANALYSIS.md#3-normalized-variables"]}
+  }
+}
