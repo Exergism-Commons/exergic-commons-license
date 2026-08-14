@@ -1,0 +1,20 @@
+state: GRC
+entity: Greece
+outcome: S
+freeze_status: renderable-subset
+schedule_identity: "26 January 2025 Athens Tempi-demonstration stun-grenade / Marios Lolos incident and accountability project"
+project_boundary: "the policing incident at the 26 January 2025 Athens demonstration concerning the stun grenade that struck photojournalist Marios Lolos, limited to public-order/riot-policing functions materially participating in the unlawful deployment/targeting alleged and video-corroborated in Amnesty International's June 2026 investigation, plus any function materially obstructing identification or accountability for that same incident"
+capacity_limit: "incident-specific unlawful-force/accountability capacity only; participation in the demonstration-policing operation, public-order policing or the Hellenic Police generally is insufficient without Material Participation in the frozen conduct"
+exclusions:
+  - "Hellenic Police, riot police and public-order units generally"
+  - "officers/personnel participating in the 26 January 2025 operation without Material Participation in the frozen unlawful deployment or accountability obstruction"
+  - "EMIDIPA, criminal investigators, disciplinary investigators, courts and independent/remedial functions"
+  - "later remedial action, discipline or prosecution that does not itself obstruct accountability"
+  - "other demonstrations, stun-grenade deployments or detention incidents absent separate freeze"
+identity_sources:
+  - "https://www.amnesty.org/en/documents/eur25/1012/2026/en/"
+  - "https://www.amnesty.org/en/latest/news/2026/06/greece-dangerous-policing-tactics-have-turned-peaceful-protests-into-battlefields/"
+residual_scope: "other Greek protest-policing incidents and systemic accountability concerns remain governance-only until separately frozen"
+schedule_status: ready-status-revalidated-incident-accountability-project
+operative: false
+compatible_license: "ECL-0.2-DRAFT"
