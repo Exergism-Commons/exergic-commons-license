@@ -1,0 +1,18 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "id": "STATE-NLD",
+  "type": "State",
+  "name": "Netherlands",
+  "aliases": ["NLD", "The Netherlands"],
+  "dossier": "../../dossiers/states/NLD.md",
+  "currentGovernance": "S",
+  "review": {
+    "lastSubstantiveReview": "2026-08-14",
+    "nextReview": "2026-09-14",
+    "reviewClass": "active",
+    "reason": "Narrow algorithmic finding is remediation-sensitive and the formal pilot is uncertainty-sensitive."
+  },
+  "trackedObjects": ["PROJECT-NLD-PROBATION-RISK-TOOLS"],
+  "monitorIds": [],
+  "relations": []
+}
