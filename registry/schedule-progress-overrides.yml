@@ -1,4 +1,4 @@
-version: "2026-08-14-post-grc-revalidation"
+version: "2026-08-14-post-ukr-revalidation"
 status: provisional-governance
 operative: false
 base_index: "schedule-translations.yml"
@@ -13,9 +13,9 @@ state_schedule_progress:
   R_frozen: 34
   S_candidates_active: 83
   S_fully_frozen: 19
-  S_renderable_subset_only: 57
-  S_schedule_renderable_states: 76
-  S_current_status_or_remediation_review: 7
+  S_renderable_subset_only: 58
+  S_schedule_renderable_states: 77
+  S_current_status_or_remediation_review: 6
   S_identity_or_project_freeze_pending: 0
 
 state_governance_counts_after_overrides:
@@ -32,5 +32,5 @@ schedule_gate:
   render_partial_draft_candidate_from_frozen_entries: true
   render_adoptable_schedule: false
 
-# Includes the post-overlay CAF/Ouanda-Djale freeze and the 2026-08-14 MDA/GRC revalidations.
+# Includes the post-overlay CAF/Ouanda-Djale freeze and the 2026-08-14 MDA/GRC/UKR revalidations.
 # Governance/release-readiness overlay only; no licensing effect.
