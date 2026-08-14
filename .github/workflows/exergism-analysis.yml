@@ -1,0 +1,39 @@
+name: Exergism analysis integrity
+
+on:
+  push:
+    paths:
+      - "spec/EXERGIC-ANALYSIS.md"
+      - "exergism/**"
+      - "tools/exergic_analysis.py"
+      - "tests/test_exergic_analysis.py"
+      - ".github/workflows/exergism-analysis.yml"
+  pull_request:
+    paths:
+      - "spec/EXERGIC-ANALYSIS.md"
+      - "exergism/**"
+      - "tools/exergic_analysis.py"
+      - "tests/test_exergic_analysis.py"
+      - ".github/workflows/exergism-analysis.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests
+        run: python -m unittest tests/test_exergic_analysis.py
+      - name: Validate all committed assessments
+        shell: bash
+        run: |
+          set -euo pipefail
+          for assessment in exergism/assessments/*.json; do
+            echo "checking ${assessment}"
+            python tools/exergic_analysis.py "${assessment}" --pretty >/dev/null
+          done
