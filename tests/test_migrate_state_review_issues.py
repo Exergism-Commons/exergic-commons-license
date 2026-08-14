@@ -1,4 +1,5 @@
 import importlib.util
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,6 +7,7 @@ from pathlib import Path
 MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "migrate_state_review_issues.py"
 SPEC = importlib.util.spec_from_file_location("migrate_state_review_issues", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
