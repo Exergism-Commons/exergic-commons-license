@@ -2,9 +2,10 @@ import json
 import unittest
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
 from owlrl import DeductiveClosure, OWLRL_Semantics
 from rdflib import Graph, Namespace, URIRef
-from rdflib.namespace import OWL, RDF
+from rdflib.namespace import OWL, RDF, RDFS
 
 from tools.build_knowledge_graph import iter_abox_files
 
@@ -14,6 +15,7 @@ KNOWLEDGE = ROOT / "knowledge"
 ENTITIES = KNOWLEDGE / "entities"
 MANIFEST = KNOWLEDGE / "generated" / "agency-hierarchy-scaleout-v5.json"
 ONTOLOGY = ROOT / "ontology" / "ecl.owl.ttl"
+ENTITY_SCHEMA = ROOT / "schemas" / "entity.schema.json"
 ECL = Namespace("urn:ecl:")
 
 EXPECTED_AGENCIES = {
@@ -46,6 +48,34 @@ EXPECTED_CLAIMS = {
     ),
 }
 
+ACTOR_IDENTITY_TYPES = {
+    ECL.State,
+    ECL.Organization,
+    ECL.Person,
+    ECL.Agency,
+    ECL.Institution,
+}
+
+FORBIDDEN_PROPAGATION_PREDICATES = {
+    ECL.tracks,
+    ECL.controls,
+    ECL.controlledBy,
+    ECL.participatesIn,
+    ECL.operates,
+    ECL.deploys,
+    ECL.materiallyBenefits,
+    ECL.targetsOrAffects,
+    ECL.remediates,
+    ECL.reviews,
+    ECL.hasAssessment,
+    ECL.hasDecision,
+    ECL.outcome,
+    ECL.basedOnAssessment,
+    ECL.affectedVariable,
+    ECL.affectedCriterion,
+    ECL.triggersReviewOf,
+}
+
 FORBIDDEN_GOVERNANCE_KEYS = {
     "outcome",
     "status",
@@ -75,17 +105,22 @@ def iri(stable_id: str) -> URIRef:
     return URIRef(f"urn:ecl:{stable_id}")
 
 
+def with_owlrl(ontology: Graph, data: Graph) -> Graph:
+    graph = Graph()
+    for triple in ontology:
+        graph.add(triple)
+    for triple in data:
+        graph.add(triple)
+    DeductiveClosure(OWLRL_Semantics).expand(graph)
+    return graph
+
+
 class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.abox = build_abox()
         cls.ontology = Graph().parse(ONTOLOGY, format="turtle")
-        cls.inferred = Graph()
-        for triple in cls.ontology:
-            cls.inferred.add(triple)
-        for triple in cls.abox:
-            cls.inferred.add(triple)
-        DeductiveClosure(OWLRL_Semantics).expand(cls.inferred)
+        cls.inferred = with_owlrl(cls.ontology, cls.abox)
 
     def test_expected_agencies_are_identity_only_and_resolve_direct_parents(self):
         for agency_id, parent_id in EXPECTED_AGENCIES.items():
@@ -113,10 +148,54 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
                     f"{agency_id}: unresolved direct parent {parent_id}",
                 )
 
+    def test_schema_allows_partof_only_on_actor_source_records(self):
+        validator = Draft202012Validator(load_json(ENTITY_SCHEMA))
+        common = {
+            "@context": "../../ontology/ecl-context.jsonld",
+            "name": "Synthetic",
+            "dossier": "../../dossiers/synthetic.md",
+            "lastSubstantiveReview": "2026-08-15",
+            "reviewClass": "manual",
+            "partOf": ["ecl:STATE-USA"],
+        }
+        agency = {
+            **common,
+            "iri": "ecl:AGENCY-SYNTHETIC",
+            "id": "AGENCY-SYNTHETIC",
+            "type": "Agency",
+        }
+        project = {
+            **common,
+            "iri": "ecl:PROJECT-SYNTHETIC",
+            "id": "PROJECT-SYNTHETIC",
+            "type": "Project",
+        }
+        self.assertEqual(list(validator.iter_errors(agency)), [])
+        self.assertTrue(list(validator.iter_errors(project)))
+
+    def test_every_partof_endpoint_is_a_resolved_actor_identity_in_raw_abox(self):
+        for child, parent in self.abox.subject_objects(ECL.partOf):
+            with self.subTest(child=str(child), parent=str(parent)):
+                self.assertTrue(list(self.abox.objects(child, ECL.stableId)), child)
+                self.assertTrue(list(self.abox.objects(parent, ECL.stableId)), parent)
+                child_types = set(self.abox.objects(child, RDF.type))
+                parent_types = set(self.abox.objects(parent, RDF.type))
+                self.assertTrue(child_types.intersection(ACTOR_IDENTITY_TYPES), child_types)
+                self.assertTrue(parent_types.intersection(ACTOR_IDENTITY_TYPES), parent_types)
+
     def test_partof_is_direct_and_non_propagating_even_after_owlrl(self):
         self.assertIn((ECL.partOf, RDF.type, OWL.ObjectProperty), self.ontology)
         self.assertNotIn((ECL.partOf, RDF.type, OWL.TransitiveProperty), self.ontology)
         self.assertEqual(list(self.ontology.triples((None, OWL.propertyChainAxiom, None))), [])
+
+        for forbidden in FORBIDDEN_PROPAGATION_PREDICATES:
+            with self.subTest(forbidden=str(forbidden)):
+                self.assertNotIn((ECL.partOf, RDFS.subPropertyOf, forbidden), self.ontology)
+                self.assertNotIn((forbidden, RDFS.subPropertyOf, ECL.partOf), self.ontology)
+                self.assertNotIn((ECL.partOf, OWL.equivalentProperty, forbidden), self.ontology)
+                self.assertNotIn((forbidden, OWL.equivalentProperty, ECL.partOf), self.ontology)
+                self.assertNotIn((ECL.partOf, OWL.inverseOf, forbidden), self.ontology)
+                self.assertNotIn((forbidden, OWL.inverseOf, ECL.partOf), self.ontology)
 
         non_edges = {
             ("AGENCY-USA-HSI", "AGENCY-USA-DHS"),
@@ -131,6 +210,25 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
                 self.assertNotIn(edge, self.abox)
                 self.assertNotIn(edge, self.inferred)
 
+        fixture = Graph()
+        root = iri("SYNTHETIC-ROOT")
+        parent = iri("SYNTHETIC-PARENT")
+        child = iri("SYNTHETIC-CHILD")
+        sibling = iri("SYNTHETIC-SIBLING")
+        for node in (root, parent, child, sibling):
+            fixture.add((node, RDF.type, ECL.Agency))
+        fixture.add((child, ECL.partOf, parent))
+        fixture.add((sibling, ECL.partOf, parent))
+        fixture.add((parent, ECL.partOf, root))
+        closure = with_owlrl(self.ontology, fixture)
+
+        hierarchy_nodes = {root, parent, child, sibling}
+        for subject in hierarchy_nodes:
+            for predicate in FORBIDDEN_PROPAGATION_PREDICATES:
+                leaked = [obj for obj in closure.objects(subject, predicate) if obj in hierarchy_nodes]
+                with self.subTest(subject=str(subject), predicate=str(predicate)):
+                    self.assertEqual(leaked, [])
+
     def test_functional_claims_are_narrow_evidence_backed_propositions(self):
         for claim_id, (subject_id, predicate, object_id, evidence_id) in EXPECTED_CLAIMS.items():
             claim = iri(claim_id)
@@ -139,7 +237,6 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
                 self.assertIn((claim, ECL.subject, iri(subject_id)), self.abox)
                 self.assertIn((claim, ECL.predicate, predicate), self.abox)
                 self.assertIn((claim, ECL.object, iri(object_id)), self.abox)
-                self.assertIn((claim, ECL.status, None), self.abox)
                 self.assertEqual(
                     {str(value) for value in self.abox.objects(claim, ECL.status)},
                     {"accepted"},

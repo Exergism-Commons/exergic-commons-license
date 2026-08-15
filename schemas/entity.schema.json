@@ -92,6 +92,14 @@
           ]
         }
       }
+    },
+    {
+      "if": {"required": ["partOf"]},
+      "then": {
+        "properties": {
+          "type": {"enum": ["State", "Organization", "Person", "Agency", "Institution"]}
+        }
+      }
     }
   ],
   "additionalProperties": false
