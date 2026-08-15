@@ -30,21 +30,25 @@ sources:
 `reviewed_at` must be either a valid ISO calendar date (`YYYY-MM-DD`) or a
 valid RFC 3339 timestamp with an explicit timezone (`Z` or `±HH:MM`). Unquoted
 YAML date/timestamp scalars are also accepted when PyYAML materializes them as
-`date` or timezone-aware `datetime` values. The renderer validates the original
-YAML scalar lexically **before** PyYAML timestamp construction, including
-explicit clock/offset field ranges, so malformed inputs such as `24:00:00Z`,
-`+01:60`, or `+00:99` cannot be normalized into apparently valid values.
-Leap-second values with `:60` are intentionally rejected rather than accepted
-without an independently maintained table of actual UTC leap-second insertion
-instants. Malformed dates, arbitrary strings, out-of-range clock/offset fields,
-and timezone-less timestamps are rejected.
+`date` or timezone-aware `datetime` values. String values are exact lexical
+values: leading or trailing whitespace is not trimmed or normalized. The
+renderer validates the original YAML scalar **before** PyYAML timestamp
+construction, including explicit clock/offset field ranges, so malformed inputs
+such as `24:00:00Z`, `+01:60`, or `+00:99` cannot be normalized into apparently
+valid values. Leap-second values with `:60` are intentionally rejected rather
+than accepted without an independently maintained table of actual UTC
+leap-second insertion instants. Malformed dates, padded strings, arbitrary text,
+out-of-range clock/offset fields, and timezone-less timestamps are rejected.
 
-The evidence root mapping is parsed structurally before `safe_load`: duplicate
-top-level keys are rejected instead of relying on PyYAML's last-value-wins
-behavior, non-scalar root keys are rejected, and YAML merge keys (`<<`) are not
-permitted. This prevents a lexically validated value from being replaced by a
-different semantic value during YAML construction. These parsing rules are part
-of the compatibility gate itself and are regression-tested through the same
+The complete evidence YAML tree is parsed structurally before `safe_load`.
+Every mapping at every depth must use unique scalar keys; YAML merge keys (`<<`)
+are forbidden recursively, not only at the document root. YAML aliases are also
+forbidden so one node cannot be injected into multiple semantic positions, and
+only standard mapping/sequence/scalar tags used by this evidence schema are
+accepted. This prevents nested target-License or source bindings from relying on
+last-value-wins, merge, alias, or custom-tag construction semantics that differ
+from the bytes reviewed by the lexical pre-pass. These parsing rules are part of
+the compatibility gate itself and are regression-tested through the same
 content-addressed evidence path used by a future `complete` state.
 
 The `sources` set must exactly equal every frozen clause source consumed by
