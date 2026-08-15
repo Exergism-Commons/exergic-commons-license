@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-"""Build the ECL RDF dataset from Git-native JSON-LD ABox records.
+"""Build deterministic derived RDF from the Git-native JSON-LD ABox.
 
-The triplestore/dataset is derived and disposable. Canonical sources remain the
-versioned repository files. A KnowledgeSnapshot can bind the Git commit plus the
-ABox-source and ontology SHA-256 digests emitted by this tool.
+The RDF dataset is disposable. Canonical identity/provenance remains in Git
+ABox sources and ontology; governance remains in dossiers/decisions/Schedules.
 """
-
 from __future__ import annotations
 
 import argparse
@@ -14,6 +12,7 @@ import json
 from pathlib import Path
 
 from rdflib import Graph
+from rdflib.compare import to_canonical_graph
 
 
 def iter_abox_files(root: Path) -> list[Path]:
@@ -45,6 +44,18 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def canonical_ntriples(graph: Graph) -> str:
+    """Return a stable N-Triples serialization, including stable blank-node IDs."""
+    canonical = to_canonical_graph(graph)
+    serialized = canonical.serialize(format="nt")
+    lines = sorted(line for line in serialized.splitlines() if line.strip())
+    return "\n".join(lines) + "\n"
+
+
+def text_sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def build(knowledge_root: Path, ontology_path: Path, output_dir: Path) -> dict[str, object]:
     abox_files = iter_abox_files(knowledge_root)
     if not abox_files:
@@ -54,9 +65,7 @@ def build(knowledge_root: Path, ontology_path: Path, output_dir: Path) -> dict[s
     for path in abox_files:
         abox.parse(path, format="json-ld")
 
-    tbox = Graph()
-    tbox.parse(ontology_path, format="turtle")
-
+    tbox = Graph().parse(ontology_path, format="turtle")
     combined = Graph()
     for triple in tbox:
         combined.add(triple)
@@ -64,20 +73,31 @@ def build(knowledge_root: Path, ontology_path: Path, output_dir: Path) -> dict[s
         combined.add(triple)
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    abox_path = output_dir / "ecl-abox.ttl"
-    graph_path = output_dir / "ecl-knowledge.ttl"
+    abox_ttl = output_dir / "ecl-abox.ttl"
+    graph_ttl = output_dir / "ecl-knowledge.ttl"
+    abox_nt = output_dir / "ecl-abox.nt"
+    graph_nt = output_dir / "ecl-knowledge.nt"
     metadata_path = output_dir / "knowledge-build.json"
 
-    abox.serialize(abox_path, format="turtle")
-    combined.serialize(graph_path, format="turtle")
+    # Turtle is kept for humans. Canonical N-Triples is the deterministic build
+    # target used for byte-for-byte reproducibility and graph digests.
+    abox.serialize(abox_ttl, format="turtle")
+    combined.serialize(graph_ttl, format="turtle")
+    abox_text = canonical_ntriples(abox)
+    graph_text = canonical_ntriples(combined)
+    abox_nt.write_text(abox_text, encoding="utf-8")
+    graph_nt.write_text(graph_text, encoding="utf-8")
 
     metadata = {
         "abox_files": [path.relative_to(knowledge_root).as_posix() for path in abox_files],
         "abox_source_sha256": source_digest(abox_files, knowledge_root),
         "ontology_sha256": file_sha256(ontology_path),
+        "abox_rdf_sha256": text_sha256(abox_text),
+        "combined_rdf_sha256": text_sha256(graph_text),
         "abox_triples": len(abox),
         "combined_triples": len(combined),
-        "note": "RDF serializations are derived. Snapshot identity binds Git commit plus source digests, not blank-node serialization labels."
+        "deterministic_format": "canonical sorted N-Triples",
+        "note": "RDF serializations are derived. Snapshot identity binds Git/source/ontology/RDF digests, never a triplestore."
     }
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return metadata
@@ -89,7 +109,6 @@ def main() -> int:
     parser.add_argument("--ontology", type=Path, default=Path("ontology/ecl.owl.ttl"))
     parser.add_argument("--output-dir", type=Path, default=Path("build"))
     args = parser.parse_args()
-
     try:
         metadata = build(args.knowledge_root, args.ontology, args.output_dir)
     except ValueError as exc:
