@@ -1,0 +1,8 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?claim ?predicate ?evidence
+WHERE {
+  ?claim a ecl:Claim ; ?predicate ?evidence .
+  VALUES ?predicate { ecl:evidenceFor ecl:evidenceAgainst }
+  FILTER NOT EXISTS { ?evidence a ecl:EvidenceItem ; ecl:stableId ?evidenceId . }
+}
