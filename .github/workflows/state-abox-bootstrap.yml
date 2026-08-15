@@ -6,6 +6,11 @@ on:
     paths:
       - "tools/migrate_state_abox.py"
       - ".github/workflows/state-abox-bootstrap.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/migrate_state_abox.py"
+      - ".github/workflows/state-abox-bootstrap.yml"
 
 permissions:
   contents: write
@@ -17,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -41,4 +46,4 @@ jobs:
             exit 0
           fi
           git commit -m "Generate 195 State ABox records"
-          git push origin HEAD:${GITHUB_REF_NAME}
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
