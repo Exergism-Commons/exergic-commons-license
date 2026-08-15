@@ -91,6 +91,7 @@ ecl:StateShape a sh:NodeShape ;
               $this ?p ?value .
               FILTER (
                 ?p = ecl:outcome ||
+                ?p = ecl:status ||
                 REGEX(STR(?p), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i")
               )
             }
