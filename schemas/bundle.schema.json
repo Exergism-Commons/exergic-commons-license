@@ -64,55 +64,13 @@
           "anyOf": [
             {
               "properties": {
-                "license": {
-                  "properties": {"ref": {"const": "ECL-0.3-DRAFT"}},
-                  "required": ["ref"]
-                }
+                "license": {"$ref": "#/$defs/reservedFallbackIdentity"}
               },
               "required": ["license"]
             },
             {
               "properties": {
-                "license": {
-                  "properties": {"path": {"const": "versions/licenses/ECL-0.3-DRAFT.md"}},
-                  "required": ["path"]
-                }
-              },
-              "required": ["license"]
-            },
-            {
-              "properties": {
-                "license": {
-                  "properties": {"sha256": {"const": "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d"}},
-                  "required": ["sha256"]
-                }
-              },
-              "required": ["license"]
-            },
-            {
-              "properties": {
-                "schedule": {
-                  "properties": {"ref": {"const": "ECL-RP-EMPTY-1"}},
-                  "required": ["ref"]
-                }
-              },
-              "required": ["schedule"]
-            },
-            {
-              "properties": {
-                "schedule": {
-                  "properties": {"path": {"const": "schedules/ECL-RP-EMPTY-1.md"}},
-                  "required": ["path"]
-                }
-              },
-              "required": ["schedule"]
-            },
-            {
-              "properties": {
-                "schedule": {
-                  "properties": {"sha256": {"const": "e12a6ffc03aa0be24a9f61d0d325bc8c06bb9c870416a72fcac0bfd968025aa2"}},
-                  "required": ["sha256"]
-                }
+                "schedule": {"$ref": "#/$defs/reservedFallbackIdentity"}
               },
               "required": ["schedule"]
             }
@@ -131,6 +89,34 @@
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       },
       "additionalProperties": false
+    },
+    "reservedFallbackIdentity": {
+      "type": "object",
+      "anyOf": [
+        {
+          "properties": {
+            "ref": {"enum": ["ECL-0.3-DRAFT", "ECL-RP-EMPTY-1"]}
+          },
+          "required": ["ref"]
+        },
+        {
+          "properties": {
+            "path": {"enum": ["versions/licenses/ECL-0.3-DRAFT.md", "schedules/ECL-RP-EMPTY-1.md"]}
+          },
+          "required": ["path"]
+        },
+        {
+          "properties": {
+            "sha256": {
+              "enum": [
+                "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d",
+                "e12a6ffc03aa0be24a9f61d0d325bc8c06bb9c870416a72fcac0bfd968025aa2"
+              ]
+            }
+          },
+          "required": ["sha256"]
+        }
+      ]
     },
     "legalReviewComponent": {
       "type": "object",
