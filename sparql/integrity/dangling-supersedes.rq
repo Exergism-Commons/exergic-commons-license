@@ -1,0 +1,18 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?record ?target
+WHERE {
+  {
+    ?record a ecl:Claim ; ecl:supersedes ?target .
+    FILTER NOT EXISTS {
+      ?target a ecl:Claim ; ecl:stableId ?targetId .
+    }
+  }
+  UNION
+  {
+    ?record a ecl:EvidenceItem ; ecl:supersedes ?target .
+    FILTER NOT EXISTS {
+      ?target a ecl:EvidenceItem ; ecl:stableId ?targetId .
+    }
+  }
+}
