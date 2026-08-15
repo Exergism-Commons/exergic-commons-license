@@ -8,20 +8,65 @@
 
 ecl:TrackedObjectShape a sh:NodeShape ;
     sh:targetClass ecl:State, ecl:Organization, ecl:Person, ecl:Agency, ecl:Institution, ecl:Project, ecl:Deployment ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[A-Z][A-Z0-9-]+$" ] ;
-    sh:property [ sh:path ecl:name ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
-    sh:property [ sh:path ecl:dossier ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] .
+    sh:property [
+        sh:path ecl:stableId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z][A-Z0-9-]+$"
+    ] ;
+    sh:property [
+        sh:path ecl:name ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 1
+    ] ;
+    sh:property [
+        sh:path ecl:dossier ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 1
+    ] .
 
-# State identity/provenance is deliberately narrower than governance.
+# State identity/provenance is deliberately narrower than governance. A State
+# actor must identify the dossier and public review surface, but may not carry a
+# GovernanceOutcome or a governance/tier/restriction-status-like predicate.
 ecl:StateShape a sh:NodeShape ;
     sh:targetClass ecl:State ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^STATE-[A-Z]{3}$" ] ;
-    sh:property [ sh:path ecl:iso3 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[A-Z]{3}$" ] ;
-    sh:property [ sh:path ecl:dossier ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$" ] ;
-    sh:property [ sh:path ecl:publicReviewIssue ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
-    sh:property [ sh:path ecl:lastSubstantiveReview ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
-    sh:property [ sh:path ecl:reviewDue ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
-    sh:property [ sh:path ecl:reviewClass ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "hot" "active" "stable" "manual" ) ] ;
+    sh:property [
+        sh:path ecl:stableId ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^STATE-[A-Z]{3}$"
+    ] ;
+    sh:property [
+        sh:path ecl:iso3 ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^[A-Z]{3}$"
+    ] ;
+    sh:property [
+        sh:path ecl:dossier ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$"
+    ] ;
+    sh:property [
+        sh:path ecl:publicReviewIssue ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI
+    ] ;
+    sh:property [
+        sh:path ecl:lastSubstantiveReview ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date
+    ] ;
+    sh:property [
+        sh:path ecl:reviewDue ;
+        sh:maxCount 1 ; sh:datatype xsd:date
+    ] ;
+    sh:property [
+        sh:path ecl:reviewClass ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( "hot" "active" "stable" "manual" )
+    ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "Non-manual State review classes require an explicit reviewDue date." ;
@@ -80,7 +125,12 @@ ecl:ReviewClockShape a sh:NodeShape ;
     sh:targetSubjectsOf ecl:reviewDue ;
     sh:property [ sh:path ecl:reviewDue ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:lastSubstantiveReview ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
-    sh:property [ sh:path ecl:reviewClass ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "hot" "active" "stable" "manual" ) ] ;
+    sh:property [
+        sh:path ecl:reviewClass ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "hot" "active" "stable" "manual" )
+    ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "reviewDue must not predate lastSubstantiveReview." ;
@@ -95,15 +145,29 @@ ecl:ReviewClockShape a sh:NodeShape ;
 
 ecl:ClaimShape a sh:NodeShape ;
     sh:targetClass ecl:Claim ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^CLAIM-[A-Z0-9-]+$" ] ;
+    sh:property [
+        sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^CLAIM-[A-Z0-9-]+$"
+    ] ;
     sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path ecl:predicate ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
     sh:xone (
-        [ sh:property [ sh:path ecl:object ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ; sh:property [ sh:path ecl:literalValue ; sh:maxCount 0 ] ]
-        [ sh:property [ sh:path ecl:literalValue ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:Literal ] ; sh:property [ sh:path ecl:object ; sh:maxCount 0 ] ]
+        [ sh:property [ sh:path ecl:object ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+          sh:property [ sh:path ecl:literalValue ; sh:maxCount 0 ] ]
+        [ sh:property [ sh:path ecl:literalValue ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:Literal ] ;
+          sh:property [ sh:path ecl:object ; sh:maxCount 0 ] ]
     ) ;
-    sh:property [ sh:path ecl:status ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "candidate" "accepted" "disputed" "rejected" "superseded" ) ] ;
-    sh:property [ sh:path ecl:claimConfidence ; sh:maxCount 1 ; sh:in ( "established" "well-supported" "reasonable-inference" "disputed" "insufficient" "rejected" ) ] ;
+    sh:property [
+        sh:path ecl:status ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "candidate" "accepted" "disputed" "rejected" "superseded" )
+    ] ;
+    sh:property [
+        sh:path ecl:claimConfidence ;
+        sh:maxCount 1 ;
+        sh:in ( "established" "well-supported" "reasonable-inference" "disputed" "insufficient" "rejected" )
+    ] ;
     sh:property [ sh:path ecl:observedAt ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
     sh:property [ sh:path ecl:asOf ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:validFrom ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
@@ -168,9 +232,11 @@ ecl:ClaimShape a sh:NodeShape ;
         sh:select """
             PREFIX ecl: <urn:ecl:>
             SELECT $this ?target WHERE {
-              { $this ecl:subject ?target }
-              UNION
-              { $this ecl:object ?target }
+              {
+                $this ecl:subject ?target .
+              } UNION {
+                $this ecl:object ?target .
+              }
               FILTER (STRSTARTS(STR(?target), "urn:ecl:"))
               FILTER NOT EXISTS { ?target ecl:stableId ?targetId }
             }
@@ -198,7 +264,7 @@ ecl:ClaimShape a sh:NodeShape ;
               FILTER (
                 ?predicate = ecl:outcome ||
                 REGEX(STR(?predicate), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i") ||
-                EXISTS { ?object a ecl:GovernanceOutcome }
+                (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
               )
             }
         """
@@ -206,10 +272,17 @@ ecl:ClaimShape a sh:NodeShape ;
 
 ecl:EvidenceItemShape a sh:NodeShape ;
     sh:targetClass ecl:EvidenceItem ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^EVIDENCE-[A-Z0-9-]+$" ] ;
+    sh:property [
+        sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^EVIDENCE-[A-Z0-9-]+$"
+    ] ;
     sh:property [ sh:path ecl:sourceLocator ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
     sh:property [ sh:path ecl:provenance ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
-    sh:property [ sh:path ecl:evidenceGrade ; sh:maxCount 1 ; sh:in ( "E0" "E1" "E2" "E3" ) ] ;
+    sh:property [
+        sh:path ecl:evidenceGrade ;
+        sh:maxCount 1 ;
+        sh:in ( "E0" "E1" "E2" "E3" )
+    ] ;
     sh:property [ sh:path ecl:publicationDate ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:retrievedAt ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
     sh:sparql [
@@ -241,7 +314,12 @@ ecl:UpdateCaseShape a sh:NodeShape ;
     sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path ecl:fingerprint ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
-    sh:property [ sh:path ecl:priority ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "P0" "P1" "P2" "P3" "P4" ) ] .
+    sh:property [
+        sh:path ecl:priority ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "P0" "P1" "P2" "P3" "P4" )
+    ] .
 
 # -----------------------------------------------------------------------------
 # Immutable snapshot/release/bundle shapes
