@@ -55,6 +55,8 @@ The State dossier's governance identifier remains `ECL-STATE-USA`. That dossier 
 
 ABox records SHOULD remain small and reviewable in ordinary Git diffs. A State Actor may contain semantic identity, provenance, review-clock metadata and explicitly curated relations; it MUST NOT contain `R/S/U/N`, tier, restriction status or an equivalent direct governance classification.
 
+`trackedObjects` on a State is a legacy compatibility/review projection serialized as direct `ecl:tracks` edges. Once the same edge is represented by a first-class Claim, the Claim is the auditable proposition carrying status, evidence and provenance; `trackedObjects` is not an independent governance or evidentiary store. Repository integrity tooling MUST require every non-empty State `trackedObjects` edge to have exactly one active (`candidate`, `accepted` or `disputed`) `ecl:tracks` Claim with the same subject/object and resolving supporting evidence. The inverse is deliberately not required: a reviewed `ecl:tracks` Claim may exist without being copied back into the legacy projection. No tracking edge or Claim implies operation, control, culpability or inherited governance.
+
 Review clocks preserve uncertainty. `hot`, `active` and `stable` identify scheduled review classes and therefore require an explicit `reviewDue`. `manual` means no automatic cadence is asserted; `reviewDue` may be absent until a reviewer curates one. Tooling MUST NOT synthesize a due date merely to satisfy a schema.
 
 ## 4. Claims as first-class individuals

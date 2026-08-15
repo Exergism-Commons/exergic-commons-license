@@ -1,0 +1,69 @@
+{
+  "version": 4,
+  "globalTranche": 4,
+  "issue": 222,
+  "follows": [
+    {
+      "globalTranche": 2,
+      "issue": 217,
+      "pullRequest": 219,
+      "manifest": "knowledge/generated/scoped-system-project-scaleout-v2.json"
+    },
+    {
+      "globalTranche": 3,
+      "issue": 220,
+      "pullRequest": 221,
+      "manifest": "knowledge/generated/cross-entity-scaleout-v3.json"
+    }
+  ],
+  "representationRule": "For every non-empty State trackedObjects edge, the target must resolve to a Project identity and exactly one active Claim must represent the same State -- ecl:tracks --> Project proposition. trackedObjects remains a compatibility/review projection; the Claim is the auditable proposition. No inverse Claim-to-trackedObjects requirement is introduced by this tranche.",
+  "activeClaimStatuses": ["candidate", "accepted", "disputed"],
+  "capturedLegacyEdgeCount": 5,
+  "legacyEdges": [
+    {
+      "subject": "STATE-LBY",
+      "object": "PROJECT-MITIGA-DETENTION",
+      "claim": "CLAIM-LBY-TRACKS-MITIGA-DETENTION",
+      "disposition": "already-normalized"
+    },
+    {
+      "subject": "STATE-NLD",
+      "object": "PROJECT-NLD-PROBATION-RISK-TOOLS",
+      "claim": "CLAIM-NLD-TRACKS-PROBATION-RISK-TOOLS",
+      "disposition": "already-normalized"
+    },
+    {
+      "subject": "STATE-USA",
+      "object": "PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+      "claim": "CLAIM-USA-TRACKS-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+      "disposition": "materialized-in-tranche-4"
+    },
+    {
+      "subject": "STATE-USA",
+      "object": "PROJECT-MAVEN-SMART-SYSTEM",
+      "claim": "CLAIM-USA-TRACKS-MAVEN-SMART-SYSTEM",
+      "disposition": "materialized-in-tranche-4"
+    },
+    {
+      "subject": "STATE-USA",
+      "object": "PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
+      "claim": "CLAIM-USA-TRACKS-OPERATION-EPIC-FURY-MINAB-TARGETING",
+      "disposition": "already-normalized"
+    }
+  ],
+  "newClaims": [
+    "CLAIM-USA-TRACKS-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+    "CLAIM-USA-TRACKS-MAVEN-SMART-SYSTEM"
+  ],
+  "reusedEvidence": [
+    "EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14"
+  ],
+  "explicitNonGoals": [
+    "Do not remove trackedObjects in this tranche.",
+    "Do not require every ecl:tracks Claim to be projected back into trackedObjects.",
+    "Do not create Agency identities or agency hierarchy for ICE, HSI, DoD, Army, or CENTCOM.",
+    "Do not infer operates, controls, participatesIn, supplier causation, culpability, or governance from State tracking.",
+    "Do not change Project dossier outcomes, Schedule, registry governance views, LICENSE, released legal artifacts, or GovernanceDecision records.",
+    "Do not materialize the deferred French national law-enforcement VSA project without a stable reviewed deployment boundary."
+  ]
+}

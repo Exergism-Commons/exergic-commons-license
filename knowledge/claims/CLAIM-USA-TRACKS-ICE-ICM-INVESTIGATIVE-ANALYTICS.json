@@ -1,0 +1,18 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-USA-TRACKS-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+  "id": "CLAIM-USA-TRACKS-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+  "type": "Claim",
+  "subject": "ecl:STATE-USA",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+  "status": "accepted",
+  "asOf": "2026-08-14",
+  "evidenceFor": ["ecl:EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14"],
+  "provenance": [
+    "../../dossiers/states/USA.md",
+    "../../dossiers/projects/ICE-ICM-INVESTIGATIVE-ANALYTICS.md",
+    "../entities/STATE-USA.json"
+  ],
+  "notes": "Canonicalizes the existing State trackedObjects review dependency. It does not assert operation, control, culpability, a GovernanceOutcome, or inherited restriction for ICE ICM/IA."
+}

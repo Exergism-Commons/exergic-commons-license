@@ -1,0 +1,17 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?state ?project (COUNT(?claim) AS ?activeClaimCount) WHERE {
+  ?state a ecl:State ;
+         ecl:tracks ?project .
+
+  OPTIONAL {
+    ?claim a ecl:Claim ;
+           ecl:subject ?state ;
+           ecl:predicate ecl:tracks ;
+           ecl:object ?project ;
+           ecl:status ?claimStatus .
+    FILTER (?claimStatus IN ("candidate", "accepted", "disputed"))
+  }
+}
+GROUP BY ?state ?project
+HAVING (COUNT(?claim) != 1)

@@ -10,6 +10,7 @@ on:
       - "spec/VERSIONING.md"
       - "knowledge/**"
       - "dossiers/organizations/**"
+      - "dossiers/projects/**"
       - "reviews/2026/consistency/cross-entity-reconciliation.md"
       - "monitoring/**"
       - "ontology/**"
@@ -27,6 +28,7 @@ on:
       - "tests/test_update_ticket_sweep.py"
       - "tests/test_identity_only_dossier_governance_boundary.py"
       - "tests/test_cross_entity_claim_evidence_scaleout_v3.py"
+      - "tests/test_state_project_track_claim_completeness.py"
       - ".github/workflows/living-update-integrity.yml"
       - ".github/workflows/living-review-sweep.yml"
   pull_request:
@@ -38,6 +40,7 @@ on:
       - "spec/VERSIONING.md"
       - "knowledge/**"
       - "dossiers/organizations/**"
+      - "dossiers/projects/**"
       - "reviews/2026/consistency/cross-entity-reconciliation.md"
       - "monitoring/**"
       - "ontology/**"
@@ -55,6 +58,7 @@ on:
       - "tests/test_update_ticket_sweep.py"
       - "tests/test_identity_only_dossier_governance_boundary.py"
       - "tests/test_cross_entity_claim_evidence_scaleout_v3.py"
+      - "tests/test_state_project_track_claim_completeness.py"
       - ".github/workflows/living-update-integrity.yml"
       - ".github/workflows/living-review-sweep.yml"
 
@@ -76,7 +80,7 @@ jobs:
         run: python -m pip install -r requirements-ontology.txt
 
       - name: Unit tests
-        run: python -m unittest tests/test_update_ticket_sweep.py tests/test_ecl_resolve.py tests/test_identity_only_dossier_governance_boundary.py tests/test_cross_entity_claim_evidence_scaleout_v3.py
+        run: python -m unittest tests/test_update_ticket_sweep.py tests/test_ecl_resolve.py tests/test_identity_only_dossier_governance_boundary.py tests/test_cross_entity_claim_evidence_scaleout_v3.py tests/test_state_project_track_claim_completeness.py
 
       - name: Parse structured JSON records
         shell: bash

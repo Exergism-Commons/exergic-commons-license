@@ -1,0 +1,18 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-USA-TRACKS-MAVEN-SMART-SYSTEM",
+  "id": "CLAIM-USA-TRACKS-MAVEN-SMART-SYSTEM",
+  "type": "Claim",
+  "subject": "ecl:STATE-USA",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-MAVEN-SMART-SYSTEM",
+  "status": "accepted",
+  "asOf": "2026-08-14",
+  "evidenceFor": ["ecl:EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14"],
+  "provenance": [
+    "../../dossiers/states/USA.md",
+    "../../dossiers/projects/MAVEN-SMART-SYSTEM.md",
+    "../entities/STATE-USA.json"
+  ],
+  "notes": "Canonicalizes the existing State trackedObjects review dependency. It does not assert operation, control, culpability, a GovernanceOutcome, or inherited restriction for Maven Smart System."
+}
