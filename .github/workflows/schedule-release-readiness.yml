@@ -9,6 +9,7 @@ on:
       - "tools/check_schedule_compatibility_output.py"
       - "tools/test_schedule_compatibility_gate.py"
       - "tools/test_schedule_yaml_key_security.py"
+      - "tools/test_schedule_compatibility_pass21.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -20,6 +21,7 @@ on:
       - "tools/check_schedule_compatibility_output.py"
       - "tools/test_schedule_compatibility_gate.py"
       - "tools/test_schedule_yaml_key_security.py"
+      - "tools/test_schedule_compatibility_pass21.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -40,6 +42,7 @@ jobs:
         run: |
           python tools/test_schedule_compatibility_gate.py
           python tools/test_schedule_yaml_key_security.py
+          python tools/test_schedule_compatibility_pass21.py
       - name: Validate State coverage
         run: |
           python - <<'PY'
