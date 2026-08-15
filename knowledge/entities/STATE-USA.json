@@ -16,8 +16,8 @@
   "reviewClass": "active",
   "reviewReason": "Scoped live detention/targeting/security findings and counter-institution-sensitive attribution require current-status review.",
   "trackedObjects": [
-    "ecl:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
-    "ecl:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING"
+    "ecl:PROJECT-ICE-ICM-IA",
+    "ecl:PROJECT-EPIC-FURY-MINAB"
   ],
   "monitorIds": []
 }
