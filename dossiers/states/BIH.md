@@ -46,6 +46,15 @@ Decriminalization/non-use of defamation against protected journalism, effective 
 - https://www.coe.int/en/web/sarajevo/constitutional-justice
 - https://www.coe.int/en/web/sarajevo/media-freedom-bih
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. The Republika Srpska-specific media evidence, national counter-institutions, attribution exclusions and removal triggers are reflected in §§2–7 above. The historical Council of Europe Commissioner reference remains part of the tranche provenance; the current dossier does not invent a more precise locator than the reviewed record preserves in its present source list.
+- Issue #22 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #22 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
