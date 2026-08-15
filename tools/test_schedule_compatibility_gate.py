@@ -27,9 +27,9 @@ def load_module(name: str, relative: str):
 
 class ScheduleCompatibilityGateTests(unittest.TestCase):
     def setUp(self):
-        self.renderer = load_module("render_schedule_pass16", "tools/render_schedule.py")
+        self.renderer = load_module("render_schedule_pass17", "tools/render_schedule.py")
         self.checker = load_module(
-            "check_schedule_compatibility_pass16",
+            "check_schedule_compatibility_pass17",
             "tools/check_schedule_compatibility_output.py",
         )
         self.sources = self.renderer.schedule_clause_source_paths()
@@ -52,6 +52,15 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
         self.created.append(path)
         return path
 
+    def write_evidence_raw(self, raw: str):
+        evidence_id = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        directory = ROOT / "reviews" / "schedule-compatibility"
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / f"{evidence_id}.yml"
+        path.write_text(raw, encoding="utf-8")
+        self.created.append(path)
+        return evidence_id, path
+
     def create_evidence(self, target_binding=None, reviewed_at="2026-08-15T00:00:00Z"):
         evidence = {
             "schema_version": 1,
@@ -71,13 +80,31 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             ],
         }
         raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
-        evidence_id = hashlib.sha256(raw.encode("utf-8")).hexdigest()
-        directory = ROOT / "reviews" / "schedule-compatibility"
-        directory.mkdir(parents=True, exist_ok=True)
-        path = directory / f"{evidence_id}.yml"
-        path.write_text(raw, encoding="utf-8")
-        self.created.append(path)
-        return evidence_id, path
+        return self.write_evidence_raw(raw)
+
+    def create_evidence_with_unquoted_reviewed_at(self, reviewed_at_text: str):
+        evidence = {
+            "schema_version": 1,
+            "target_license": self.renderer.TARGET_LICENSE,
+            "target_license_artifact": copy.deepcopy(
+                self.review["target_license_artifact"]
+            ),
+            "reviewer": "compatibility-regression-test",
+            "reviewed_at": "REVIEWED_AT_PLACEHOLDER",
+            "conclusion": "compatible",
+            "sources": [
+                {
+                    "path": str(path.relative_to(ROOT)),
+                    "sha256": self.renderer.sha256(path),
+                }
+                for path in self.sources
+            ],
+        }
+        raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
+        marker = "reviewed_at: REVIEWED_AT_PLACEHOLDER\n"
+        self.assertIn(marker, raw)
+        raw = raw.replace(marker, f"reviewed_at: {reviewed_at_text}\n", 1)
+        return self.write_evidence_raw(raw)
 
     def complete_pointer(self, evidence_id):
         review = copy.deepcopy(self.review)
@@ -204,6 +231,7 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             "2026-08-15",
             "2026-08-15T00:00:00Z",
             "2026-08-15T00:00:00.123456+02:00",
+            "2026-08-15T23:59:60-23:59",
             date(2026, 8, 15),
             datetime(2026, 8, 15, 0, 0, tzinfo=timezone.utc),
         ]
@@ -217,6 +245,12 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             "2026-02-30",
             "2026-08-15T00:00:00",
             "2026-08-15 00:00:00Z",
+            "2026-08-15T24:00:00Z",
+            "2026-08-15T00:60:00Z",
+            "2026-08-15T00:00:61Z",
+            "2026-08-15T00:00:00+01:60",
+            "2026-08-15T00:00:00+00:99",
+            "2026-08-15T00:00:00+24:00",
             datetime(2026, 8, 15, 0, 0),
             20260815,
         ]
@@ -233,6 +267,20 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
         evidence_id, _ = self.create_evidence(reviewed_at="not-a-date")
         with self.assertRaisesRegex(ValueError, "valid ISO date or RFC 3339 timestamp"):
             self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_unquoted_yaml_timestamp_cannot_normalize_out_of_range_fields(self):
+        malformed = [
+            "2026-08-15T24:00:00Z",
+            "2026-08-15T00:00:00+01:60",
+            "2026-08-15T00:00:00+00:99",
+        ]
+        for reviewed_at in malformed:
+            with self.subTest(reviewed_at=reviewed_at):
+                evidence_id, _ = self.create_evidence_with_unquoted_reviewed_at(reviewed_at)
+                with self.assertRaisesRegex(
+                    ValueError, "valid ISO date or RFC 3339 timestamp"
+                ):
+                    self.validate_pointer(self.complete_pointer(evidence_id))
 
     def test_rendered_state_checker_accepts_pending_and_complete(self):
         pending_text, _ = self.renderer.render()
