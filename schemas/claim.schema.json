@@ -1,58 +1,48 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/ecl/schemas/claim.schema.json",
-  "title": "ECL atomic evidence claim",
+  "title": "ECL graph-native Claim ABox record",
   "type": "object",
-  "required": ["id", "subject", "predicate", "status", "confidence", "evidence"],
+  "required": ["@context", "iri", "id", "type", "subject", "predicate", "status", "provenance"],
   "properties": {
-    "@context": {"type": "string"},
+    "@context": {"type": "string", "minLength": 1},
+    "iri": {"type": "string", "pattern": "^ecl:CLAIM-[A-Z0-9-]+$"},
     "id": {"type": "string", "pattern": "^CLAIM-[A-Z0-9-]+$"},
-    "subject": {"type": "string"},
-    "predicate": {"type": "string", "minLength": 1},
-    "object": {"type": ["string", "null"]},
-    "literalValue": {},
+    "type": {"const": "Claim"},
+    "subject": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9_-]*$"},
+    "predicate": {"type": "string", "pattern": "^(ecl:[A-Za-z][A-Za-z0-9_-]*|https?://\\S+|urn:\\S+)$"},
+    "object": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9_-]*$"},
+    "literalValue": {"type": ["string", "number", "integer", "boolean"]},
     "status": {"enum": ["candidate", "accepted", "disputed", "rejected", "superseded"]},
-    "confidence": {"enum": ["established", "well-supported", "reasonable-inference", "disputed", "insufficient", "rejected"]},
+    "claimConfidence": {"enum": ["established", "well-supported", "reasonable-inference", "disputed", "insufficient", "rejected"]},
     "observedAt": {"type": "string", "format": "date-time"},
-    "validFrom": {"type": ["string", "null"], "format": "date"},
-    "validTo": {"type": ["string", "null"], "format": "date"},
-    "supportsVariables": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["variable", "direction"],
-        "properties": {
-          "variable": {"enum": ["P", "A", "V_ep", "L", "O", "U", "C", "S", "R", "Ecol"]},
-          "direction": {"enum": ["up", "down", "mixed", "unknown"]},
-          "rationale": {"type": "string"}
-        },
-        "additionalProperties": false
-      }
-    },
-    "affectedCriteria": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "evidence": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": ["evidenceId", "locator", "grade", "stance"],
-        "properties": {
-          "evidenceId": {"type": "string"},
-          "publisher": {"type": "string"},
-          "title": {"type": "string"},
-          "locator": {"type": "string"},
-          "publicationDate": {"type": ["string", "null"], "format": "date"},
-          "retrievedAt": {"type": ["string", "null"], "format": "date-time"},
-          "contentHash": {"type": ["string", "null"]},
-          "grade": {"enum": ["E0", "E1", "E2", "E3"]},
-          "stance": {"enum": ["supports", "contradicts", "context"]},
-          "notes": {"type": "string"}
-        },
-        "additionalProperties": false
-      }
-    },
-    "supersedes": {"type": ["string", "null"]},
+    "asOf": {"type": "string", "format": "date"},
+    "validFrom": {"type": "string", "format": "date"},
+    "validTo": {"type": "string", "format": "date"},
+    "evidenceFor": {"type": "array", "items": {"type": "string", "pattern": "^ecl:EVIDENCE-[A-Z0-9-]+$"}, "uniqueItems": true},
+    "evidenceAgainst": {"type": "array", "items": {"type": "string", "pattern": "^ecl:EVIDENCE-[A-Z0-9-]+$"}, "uniqueItems": true},
+    "supersedes": {"type": "string", "pattern": "^ecl:CLAIM-[A-Z0-9-]+$"},
+    "affectedVariables": {"type": "array", "items": {"enum": ["ecl:P", "ecl:A", "ecl:V_ep", "ecl:L", "ecl:O", "ecl:U", "ecl:C", "ecl:S", "ecl:R", "ecl:Ecol"]}, "uniqueItems": true},
+    "affectedCriteria": {"type": "array", "items": {"enum": ["ecl:ECL5_1", "ecl:ECL5_2", "ecl:ECL5_3", "ecl:ECL5_4", "ecl:ECL5_5", "ecl:ECL5_6", "ecl:ECL5_7"]}, "uniqueItems": true},
+    "provenance": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
     "notes": {"type": "string"}
   },
+  "oneOf": [
+    {"required": ["object"], "not": {"required": ["literalValue"]}},
+    {"required": ["literalValue"], "not": {"required": ["object"]}}
+  ],
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "accepted"}}, "required": ["status"]},
+      "then": {"required": ["evidenceFor"], "properties": {"evidenceFor": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["candidate", "accepted", "disputed"]}}, "required": ["status"]},
+      "then": {"anyOf": [
+        {"required": ["evidenceFor"], "properties": {"evidenceFor": {"minItems": 1}}},
+        {"required": ["evidenceAgainst"], "properties": {"evidenceAgainst": {"minItems": 1}}}
+      ]}
+    }
+  ],
   "additionalProperties": false
 }
