@@ -101,10 +101,18 @@ ecl:StateShape a sh:NodeShape ;
             PREFIX ecl: <urn:ecl:>
             SELECT $this ?p WHERE {
               $this ?p ?value .
+              BIND(REPLACE(STR(?p), "^.*[:/#]", "") AS ?localName)
+              BIND(REPLACE(LCASE(?localName), "[-_]+", "") AS ?normalizedName)
               FILTER (
                 ?p = ecl:outcome ||
                 ?p = ecl:status ||
-                REGEX(STR(?p), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i")
+                CONTAINS(?normalizedName, "currentgovernance") ||
+                CONTAINS(?normalizedName, "governancestatus") ||
+                CONTAINS(?normalizedName, "governanceoutcome") ||
+                CONTAINS(?normalizedName, "restrictionstatus") ||
+                CONTAINS(?normalizedName, "restrictedstatus") ||
+                CONTAINS(?normalizedName, "provisionaloutcome") ||
+                STRSTARTS(?normalizedName, "tier")
               )
             }
         """
@@ -174,6 +182,7 @@ ecl:ClaimShape a sh:NodeShape ;
     sh:property [ sh:path ecl:validTo ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:evidenceFor ; sh:class ecl:EvidenceItem ] ;
     sh:property [ sh:path ecl:evidenceAgainst ; sh:class ecl:EvidenceItem ] ;
+    sh:property [ sh:path ecl:supersedes ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class ecl:Claim ] ;
     sh:property [ sh:path ecl:provenance ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
@@ -228,6 +237,19 @@ ecl:ClaimShape a sh:NodeShape ;
     ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
+        sh:message "Claim supersedes must resolve to a Claim identity." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this ?target WHERE {
+              $this ecl:supersedes ?target .
+              FILTER NOT EXISTS {
+                ?target a ecl:Claim ; ecl:stableId ?targetId .
+              }
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
         sh:message "Internal Claim subjects and IRI objects must resolve to ABox identities." ;
         sh:select """
             PREFIX ecl: <urn:ecl:>
@@ -261,9 +283,17 @@ ecl:ClaimShape a sh:NodeShape ;
             SELECT $this ?predicate ?object WHERE {
               $this ecl:predicate ?predicate .
               OPTIONAL { $this ecl:object ?object }
+              BIND(REPLACE(STR(?predicate), "^.*[:/#]", "") AS ?localName)
+              BIND(REPLACE(LCASE(?localName), "[-_]+", "") AS ?normalizedName)
               FILTER (
                 ?predicate = ecl:outcome ||
-                REGEX(STR(?predicate), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i") ||
+                CONTAINS(?normalizedName, "currentgovernance") ||
+                CONTAINS(?normalizedName, "governancestatus") ||
+                CONTAINS(?normalizedName, "governanceoutcome") ||
+                CONTAINS(?normalizedName, "restrictionstatus") ||
+                CONTAINS(?normalizedName, "restrictedstatus") ||
+                CONTAINS(?normalizedName, "provisionaloutcome") ||
+                STRSTARTS(?normalizedName, "tier") ||
                 (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
               )
             }
@@ -285,6 +315,7 @@ ecl:EvidenceItemShape a sh:NodeShape ;
     ] ;
     sh:property [ sh:path ecl:publicationDate ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:retrievedAt ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
+    sh:property [ sh:path ecl:supersedes ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class ecl:EvidenceItem ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "EvidenceItem stableId and IRI must identify the same EvidenceItem." ;
@@ -293,6 +324,19 @@ ecl:EvidenceItemShape a sh:NodeShape ;
             SELECT $this WHERE {
               $this ecl:stableId ?id .
               FILTER (STR($this) != CONCAT("urn:ecl:", STR(?id)))
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "EvidenceItem supersedes must resolve to an EvidenceItem identity." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this ?target WHERE {
+              $this ecl:supersedes ?target .
+              FILTER NOT EXISTS {
+                ?target a ecl:EvidenceItem ; ecl:stableId ?targetId .
+              }
             }
         """
     ] .
