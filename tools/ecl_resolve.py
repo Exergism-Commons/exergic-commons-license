@@ -14,6 +14,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -33,6 +34,7 @@ REVIEWED_MECHANISM_FILENAMES = {
     "incorporation_spec": "VERSIONING.md",
     "bundle_schema": "bundle.schema.json",
 }
+REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -63,7 +65,7 @@ def major_from_constraint(value: str) -> int | None:
 
 
 def valid_review_id(value: str) -> bool:
-    return bool(value) and all(char.isalnum() or char in "._-" for char in value)
+    return REVIEW_ID_RE.fullmatch(value) is not None
 
 
 def validate_file_reference(
@@ -72,15 +74,42 @@ def validate_file_reference(
     raw_path = component.get("path")
     if not isinstance(raw_path, str) or not raw_path:
         raise ValueError(f"{label} is missing path")
-    path = root / raw_path
+    if "\\" in raw_path or raw_path.startswith("/"):
+        raise ValueError(f"{label} path must be a repository-relative POSIX path")
+
+    segments = raw_path.split("/")
+    if any(segment in {"", ".", ".."} for segment in segments):
+        raise ValueError(f"{label} path contains an unsafe path segment")
+
+    try:
+        resolved_root = root.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise ValueError(f"repository root does not exist: {root}") from exc
+
+    path = root
+    for segment in segments:
+        path = path / segment
+        if path.is_symlink():
+            raise ValueError(f"{label} must not traverse symbolic links: {path}")
+
     if not path.is_file():
         raise ValueError(f"missing {label}: {path}")
+
+    try:
+        resolved_path = path.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise ValueError(f"missing {label}: {path}") from exc
+    if not resolved_path.is_relative_to(resolved_root):
+        raise ValueError(f"{label} resolves outside repository root: {path}")
+    if not resolved_path.is_file():
+        raise ValueError(f"{label} must be a regular file: {path}")
+
     expected = component.get("sha256")
     if not isinstance(expected, str) or not expected:
         raise ValueError(f"{label} is missing sha256")
-    if sha256(path) != expected:
+    if sha256(resolved_path) != expected:
         raise ValueError(f"SHA-256 mismatch for {path}")
-    return path
+    return resolved_path
 
 
 def validate_component(root: Path, component: dict[str, Any]) -> None:
