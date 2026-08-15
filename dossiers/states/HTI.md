@@ -40,6 +40,16 @@ Scope follows the Prime-Minister-created Security Task Force, materially partici
 
 Independent investigation/prosecution, targeting/civilian-harm safeguards, compliant redesign/termination and effective judicial accountability.
 
-## 7. Procedural history
+## 7. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The State-linked drone/summary-execution evidence, BINUH attribution to the Prime-Minister-created Task Force, contractor participation, judicial-unit counter-evidence, non-imputation of gang violence and removal triggers are reflected in §§1–6 above.
+- The tranche names BINUH/UN/rights reporting but gives no exact report or communication locator for the drone programme or the 2026 specialized judicial units. Repository search in this pass found no separate precise locator. No missing URL is reconstructed from memory or inference.
+- Issue #72 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+Exact source-locator recovery remains an evidence-curation gap. No Claim status, Evidence grade, `asOf`, contractor relation, attribution edge or governance outcome is created or changed by this absorption record.
+
+## 8. Procedural history
 
 Issue #72 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
