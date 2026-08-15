@@ -23,18 +23,12 @@
   ],
   "properties": {
     "schema_version": {"const": 1},
-    "review_id": {"type": "string", "minLength": 1},
+    "review_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
     "status": {"const": "complete"},
     "license_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "review_spec": {
-      "$ref": "#/$defs/reviewSpecComponent"
-    },
-    "incorporation_spec": {
-      "$ref": "#/$defs/incorporationSpecComponent"
-    },
-    "bundle_schema": {
-      "$ref": "#/$defs/bundleSchemaComponent"
-    },
+    "review_spec": {"$ref": "#/$defs/reviewSpecSnapshot"},
+    "incorporation_spec": {"$ref": "#/$defs/incorporationSpecSnapshot"},
+    "bundle_schema": {"$ref": "#/$defs/bundleSchemaSnapshot"},
     "jurisdictions": {
       "type": "object",
       "required": ["eu_software", "spain", "united_states", "united_kingdom", "cross_border"],
@@ -89,7 +83,7 @@
       "type": "string",
       "enum": ["resolved", "accepted-risk", "not-applicable"]
     },
-    "immutableComponent": {
+    "immutableSnapshot": {
       "type": "object",
       "required": ["path", "sha256"],
       "properties": {
@@ -98,22 +92,22 @@
       },
       "additionalProperties": false
     },
-    "reviewSpecComponent": {
+    "reviewSpecSnapshot": {
       "allOf": [
-        {"$ref": "#/$defs/immutableComponent"},
-        {"properties": {"path": {"const": "spec/LEGAL-ADVERSARIAL-REVIEW.md"}}}
+        {"$ref": "#/$defs/immutableSnapshot"},
+        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9._-]+/LEGAL-ADVERSARIAL-REVIEW\\.md$"}}}
       ]
     },
-    "incorporationSpecComponent": {
+    "incorporationSpecSnapshot": {
       "allOf": [
-        {"$ref": "#/$defs/immutableComponent"},
-        {"properties": {"path": {"const": "spec/VERSIONING.md"}}}
+        {"$ref": "#/$defs/immutableSnapshot"},
+        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9._-]+/VERSIONING\\.md$"}}}
       ]
     },
-    "bundleSchemaComponent": {
+    "bundleSchemaSnapshot": {
       "allOf": [
-        {"$ref": "#/$defs/immutableComponent"},
-        {"properties": {"path": {"const": "schemas/bundle.schema.json"}}}
+        {"$ref": "#/$defs/immutableSnapshot"},
+        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9._-]+/bundle\\.schema\\.json$"}}}
       ]
     }
   },
