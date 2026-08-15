@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "id": "PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "type": "Project",
+  "name": "Operation Epic Fury — Minab school targeting chain",
+  "aliases": [
+    "Epic Fury Minab targeting chain"
+  ],
+  "dossier": "../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual",
+  "reviewReason": "Project identity preserves the established semantic IRI already referenced by the State pilot; governance remains in the canonical project dossier and review procedure."
+}
