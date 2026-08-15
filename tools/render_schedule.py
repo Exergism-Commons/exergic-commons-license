@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -29,6 +31,10 @@ REFERENCE_STATUSES = {
     "ready-by-state-scope-reference",
     "ready-by-project-reference",
 }
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+RFC3339_RE = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
+)
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -187,6 +193,53 @@ def assert_exact_source_bindings(
         )
 
 
+def validate_reviewed_at(value: Any) -> None:
+    """Accept ISO dates or timezone-aware RFC 3339 review timestamps.
+
+    PyYAML may materialize unquoted YAML date/timestamp scalars as ``date`` or
+    ``datetime`` objects, so those semantic scalar types are accepted directly.
+    String values are validated lexically and semantically rather than merely
+    checked for non-emptiness.
+    """
+
+    if isinstance(value, datetime):
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError(
+                "Schedule compatibility evidence reviewed_at timestamp must include a timezone"
+            )
+        return
+    if isinstance(value, date):
+        return
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("Schedule compatibility evidence requires reviewed_at")
+
+    text = value.strip()
+    if DATE_RE.fullmatch(text):
+        try:
+            date.fromisoformat(text)
+        except ValueError as exc:
+            raise ValueError(
+                "Schedule compatibility evidence reviewed_at must be a valid ISO date or RFC 3339 timestamp"
+            ) from exc
+        return
+
+    if not RFC3339_RE.fullmatch(text):
+        raise ValueError(
+            "Schedule compatibility evidence reviewed_at must be a valid ISO date or RFC 3339 timestamp"
+        )
+    normalized = text[:-1] + "+00:00" if text.endswith("Z") else text
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ValueError(
+            "Schedule compatibility evidence reviewed_at must be a valid ISO date or RFC 3339 timestamp"
+        ) from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError(
+            "Schedule compatibility evidence reviewed_at timestamp must include a timezone"
+        )
+
+
 def load_content_addressed_compatibility_evidence(
     pointer: dict[str, Any], sources: list[Path], target_license: str
 ) -> dict[str, Any]:
@@ -223,11 +276,9 @@ def load_content_addressed_compatibility_evidence(
     validate_target_license_artifact(evidence)
 
     reviewer = evidence.get("reviewer")
-    reviewed_at = evidence.get("reviewed_at")
     if not isinstance(reviewer, str) or not reviewer.strip():
         raise ValueError("Schedule compatibility evidence requires reviewer")
-    if not isinstance(reviewed_at, str) or not reviewed_at.strip():
-        raise ValueError("Schedule compatibility evidence requires reviewed_at")
+    validate_reviewed_at(evidence.get("reviewed_at"))
     if evidence.get("conclusion") != "compatible":
         raise ValueError("Schedule compatibility evidence conclusion must be compatible")
 
