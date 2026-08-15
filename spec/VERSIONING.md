@@ -262,7 +262,11 @@ A bundle may be marked `operative: true` only when all required release gates ar
 - hashes match;
 - Schedule provenance resolves to reviewed governance decisions;
 - required CI/integrity checks pass;
-- legal/internal release review required by project policy is complete;
+- the legal adversarial review required by [`LEGAL-ADVERSARIAL-REVIEW.md`](LEGAL-ADVERSARIAL-REVIEW.md) is complete for the exact release-candidate text and Schedule mechanism;
+- no unresolved legal-review `BLOCKER` remains, and every `MAJOR` finding is resolved, narrowed or explicitly accepted as a documented jurisdictional limitation/risk under that review process;
+- any separate internal release review required by project policy is complete; and
 - the bundle manifest is itself immutable/versioned.
+
+A maintainer self-review, AI review, automated check or general community approval does not by itself satisfy the independent qualified legal-review minimum defined by `LEGAL-ADVERSARIAL-REVIEW.md`.
 
 Until those conditions are met, the artifact remains draft/candidate and MUST NOT be surfaced as stable by ECL tooling.
