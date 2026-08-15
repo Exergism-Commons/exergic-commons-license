@@ -42,6 +42,15 @@ jobs:
           grep -q "State apparatus entries — R" build/ECL-RP-0.5-GENERATED-DRAFT.md
           grep -q "Direct Restricted Projects" build/ECL-RP-0.5-GENERATED-DRAFT.md
 
+      - name: Guard target-License compatibility label
+        run: |
+          grep -q "Target working License: \*\*ECL-0.3-DRAFT\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
+          grep -q "Compatibility status: \*\*NOT YET VALIDATED for ECL-0.3-DRAFT\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
+          if grep -q "Intended compatibility: \*\*ECL-0.3-DRAFT only\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md; then
+            echo "renderer falsely advertised ECL-0.3-DRAFT compatibility before source revalidation" >&2
+            exit 1
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: ecl-schedule-generated-draft
