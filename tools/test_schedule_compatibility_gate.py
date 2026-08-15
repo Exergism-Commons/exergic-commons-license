@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Regression coverage for CODEX-0.3-025 exact License compatibility binding."""
+
 from __future__ import annotations
 
 import copy
