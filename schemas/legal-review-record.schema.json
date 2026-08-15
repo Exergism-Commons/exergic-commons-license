@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ecl:schema:legal-review-record",
+  "title": "Immutable completed ECL legal-review gate record",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "review_id",
+    "status",
+    "license_sha256",
+    "review_spec",
+    "jurisdictions",
+    "attack_surfaces",
+    "qualified_independent_reviews",
+    "qualified_adversarial_reviews",
+    "unresolved_blockers",
+    "unresolved_majors",
+    "undispositioned_material_findings",
+    "delta_review_complete",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "review_id": {"type": "string", "minLength": 1},
+    "status": {"const": "complete"},
+    "license_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "review_spec": {"$ref": "#/$defs/immutableComponent"},
+    "jurisdictions": {
+      "type": "object",
+      "required": ["eu_software", "spain", "united_states", "united_kingdom", "cross_border"],
+      "properties": {
+        "eu_software": {"const": "complete"},
+        "spain": {"const": "complete"},
+        "united_states": {"const": "complete"},
+        "united_kingdom": {"const": "complete"},
+        "cross_border": {"const": "complete"}
+      },
+      "additionalProperties": false
+    },
+    "attack_surfaces": {
+      "type": "object",
+      "required": [
+        "LAR-01", "LAR-02", "LAR-03", "LAR-04",
+        "LAR-05", "LAR-06", "LAR-07", "LAR-08",
+        "LAR-09", "LAR-10", "LAR-11", "LAR-12",
+        "LAR-13", "LAR-14", "LAR-15", "LAR-16"
+      ],
+      "properties": {
+        "LAR-01": {"$ref": "#/$defs/disposition"},
+        "LAR-02": {"$ref": "#/$defs/disposition"},
+        "LAR-03": {"$ref": "#/$defs/disposition"},
+        "LAR-04": {"$ref": "#/$defs/disposition"},
+        "LAR-05": {"$ref": "#/$defs/disposition"},
+        "LAR-06": {"$ref": "#/$defs/disposition"},
+        "LAR-07": {"$ref": "#/$defs/disposition"},
+        "LAR-08": {"$ref": "#/$defs/disposition"},
+        "LAR-09": {"$ref": "#/$defs/disposition"},
+        "LAR-10": {"$ref": "#/$defs/disposition"},
+        "LAR-11": {"$ref": "#/$defs/disposition"},
+        "LAR-12": {"$ref": "#/$defs/disposition"},
+        "LAR-13": {"$ref": "#/$defs/disposition"},
+        "LAR-14": {"$ref": "#/$defs/disposition"},
+        "LAR-15": {"$ref": "#/$defs/disposition"},
+        "LAR-16": {"$ref": "#/$defs/disposition"}
+      },
+      "additionalProperties": false
+    },
+    "qualified_independent_reviews": {"type": "integer", "minimum": 2},
+    "qualified_adversarial_reviews": {"type": "integer", "minimum": 1},
+    "unresolved_blockers": {"const": 0},
+    "unresolved_majors": {"const": 0},
+    "undispositioned_material_findings": {"const": 0},
+    "delta_review_complete": {"const": true},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "disposition": {
+      "type": "string",
+      "enum": ["resolved", "accepted-risk", "not-applicable"]
+    },
+    "immutableComponent": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
