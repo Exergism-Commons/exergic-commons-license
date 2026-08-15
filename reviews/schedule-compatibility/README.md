@@ -20,12 +20,18 @@ target_license_artifact:
   path: "versions/licenses/ECL-0.3-DRAFT.md"
   sha256: "<exact target License SHA-256>"
 reviewer: "<identity of compatibility reviewer>"
-reviewed_at: "<timestamp/date>"
+reviewed_at: "2026-08-15T00:00:00Z"
 conclusion: compatible
 sources:
   - path: "<exact renderer-consumed source path>"
     sha256: "<exact source SHA-256>"
 ```
+
+`reviewed_at` must be either a valid ISO calendar date (`YYYY-MM-DD`) or a
+valid RFC 3339 timestamp with an explicit timezone (`Z` or `±HH:MM`). Unquoted
+YAML date/timestamp scalars are also accepted when PyYAML materializes them as
+`date` or timezone-aware `datetime` values. Malformed dates, arbitrary strings,
+and timezone-less timestamps are rejected.
 
 The `sources` set must exactly equal every frozen clause source consumed by
 `tools/render_schedule.py`: no missing, extra, duplicate or stale bindings are
