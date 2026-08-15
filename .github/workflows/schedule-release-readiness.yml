@@ -2,9 +2,19 @@ name: Schedule release readiness
 
 on:
   push:
-    paths: ["registry/**", "tools/render_schedule.py", ".github/workflows/schedule-release-readiness.yml"]
+    paths:
+      - "registry/**"
+      - "tools/render_schedule.py"
+      - "LICENSE"
+      - "versions/licenses/**"
+      - ".github/workflows/schedule-release-readiness.yml"
   pull_request:
-    paths: ["registry/**", "tools/render_schedule.py", ".github/workflows/schedule-release-readiness.yml"]
+    paths:
+      - "registry/**"
+      - "tools/render_schedule.py"
+      - "LICENSE"
+      - "versions/licenses/**"
+      - ".github/workflows/schedule-release-readiness.yml"
   workflow_dispatch:
 
 permissions:
