@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-FRA-TRACKS-NICE-ALGORITHMIC-CCTV",
+  "id": "CLAIM-FRA-TRACKS-NICE-ALGORITHMIC-CCTV",
+  "type": "Claim",
+  "subject": "ecl:STATE-FRA",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+  "status": "accepted",
+  "asOf": "2026-08-11",
+  "evidenceFor": ["ecl:EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11"],
+  "provenance": ["../../dossiers/states/FRA.md", "../../dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "Historical/remediation review-dependency edge. Tracking a removed project preserves audit history and does not imply current French operation or restriction."
+}

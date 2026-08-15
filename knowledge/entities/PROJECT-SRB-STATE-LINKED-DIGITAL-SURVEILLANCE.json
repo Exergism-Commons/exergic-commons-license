@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
+  "id": "PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
+  "type": "Project",
+  "name": "Serbia State-linked digital-surveillance campaign",
+  "dossier": "../../dossiers/projects/SRB-STATE-LINKED-DIGITAL-SURVEILLANCE.md",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical project identity for the scoped Serbia digital-surveillance review object; it does not imply supplier, agency-wide or State-wide governance inheritance."
+}

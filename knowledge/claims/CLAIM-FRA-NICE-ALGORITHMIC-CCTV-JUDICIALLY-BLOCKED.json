@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED",
+  "id": "CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED",
+  "type": "Claim",
+  "subject": "ecl:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+  "predicate": "ecl:status",
+  "literalValue": "judicially-blocked-not-authorized",
+  "status": "accepted",
+  "claimConfidence": "established",
+  "asOf": "2026-01-30",
+  "evidenceFor": ["ecl:EVIDENCE-FRA-CONSEIL-ETAT-NICE-CCTV-2026-01-30"],
+  "provenance": ["../../dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md", "../../dossiers/states/FRA.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "Operational/legal project-status proposition only: the reviewed Nice algorithmic CCTV processing was held not authorized under then-current law. This is not an ECL governance outcome and says nothing about distinct French VSA deployments."
+}

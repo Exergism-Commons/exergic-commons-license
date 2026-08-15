@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
+  "id": "PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
+  "type": "Project",
+  "name": "Udbetaling Danmark / ATP automated fraud-risk profiling systems",
+  "dossier": "../../dossiers/projects/DNK-UD-ATP-FRAUD-PROFILING.md",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical project identity derived from the already-reviewed Denmark system-specific scope; governance remains in project/State dossiers and review procedure."
+}

@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+  "id": "PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+  "type": "Project",
+  "name": "Nice algorithmic public-street CCTV processing at school entrances",
+  "dossier": "../../dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical remediation-history project identity for the Nice system expressly removed from the France scoped finding after judicial blockage."
+}

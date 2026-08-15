@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "issue": 217,
+  "sourceReview": "reviews/2026/adversarial/scoped/tranche-01.md",
+  "projectDossiers": [
+    {
+      "dossierId": "ECL-PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
+      "path": "dossiers/projects/DNK-UD-ATP-FRAUD-PROFILING.md",
+      "reason": "Denmark's reviewed S scope is explicitly system-specific; projectization preserves that bounded object without making ATP/Udbetaling Danmark generally restricted."
+    },
+    {
+      "dossierId": "ECL-PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
+      "path": "dossiers/projects/SRB-STATE-LINKED-DIGITAL-SURVEILLANCE.md",
+      "reason": "Serbia's reviewed scope explicitly identifies a State-linked spyware/mobile-forensic surveillance campaign while preserving supplier and agency-wide exclusions."
+    },
+    {
+      "dossierId": "ECL-PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+      "path": "dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md",
+      "reason": "The France review explicitly identifies the Nice system and its judicial removal, making it a high-value remediation-history project object."
+    }
+  ],
+  "identities": [
+    {"id": "PROJECT-DNK-UD-ATP-FRAUD-PROFILING", "dossier": "dossiers/projects/DNK-UD-ATP-FRAUD-PROFILING.md"},
+    {"id": "PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE", "dossier": "dossiers/projects/SRB-STATE-LINKED-DIGITAL-SURVEILLANCE.md"},
+    {"id": "PROJECT-FRA-NICE-ALGORITHMIC-CCTV", "dossier": "dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md"}
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-DNK-TRACKS-UD-ATP-FRAUD-PROFILING",
+      "predicate": "ecl:tracks",
+      "subject": "STATE-DNK",
+      "object": "PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
+      "reason": "Explicit review dependency from the canonical Denmark system-specific scope."
+    },
+    {
+      "id": "CLAIM-SRB-TRACKS-STATE-LINKED-DIGITAL-SURVEILLANCE",
+      "predicate": "ecl:tracks",
+      "subject": "STATE-SRB",
+      "object": "PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
+      "reason": "Explicit review dependency from the canonical Serbia digital-surveillance scope."
+    },
+    {
+      "id": "CLAIM-FRA-TRACKS-NICE-ALGORITHMIC-CCTV",
+      "predicate": "ecl:tracks",
+      "subject": "STATE-FRA",
+      "object": "PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+      "reason": "Preserves the explicitly reviewed Nice remediation/removal dependency without implying current restriction."
+    },
+    {
+      "id": "CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED",
+      "predicate": "ecl:status",
+      "subject": "PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+      "literalValue": "judicially-blocked-not-authorized",
+      "reason": "Direct narrow project-status proposition from the 2026-01-30 Conseil d'Etat judicial record; not an ECL governance outcome."
+    }
+  ],
+  "evidence": [
+    {"id": "EVIDENCE-DNK-UD-ATP-PROJECT-DOSSIER-2026-08-11", "kind": "canonical-dossier"},
+    {"id": "EVIDENCE-SRB-DIGITAL-SURVEILLANCE-PROJECT-DOSSIER-2026-08-11", "kind": "canonical-dossier"},
+    {"id": "EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11", "kind": "canonical-dossier"},
+    {"id": "EVIDENCE-FRA-CONSEIL-ETAT-NICE-CCTV-2026-01-30", "kind": "judicial-decision", "grade": "E3"}
+  ],
+  "deferred": [
+    {
+      "candidateId": "PROJECT-FRA-NATIONAL-LAW-ENFORCEMENT-VSA",
+      "reason": "insufficient exact deployment boundary: current repository text combines existing/authorized systems, proposed continuation and legislative extensions without one stable project identity"
+    }
+  ]
+}

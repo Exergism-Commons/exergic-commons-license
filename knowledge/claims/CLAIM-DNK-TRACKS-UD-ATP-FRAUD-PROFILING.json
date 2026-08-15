@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-DNK-TRACKS-UD-ATP-FRAUD-PROFILING",
+  "id": "CLAIM-DNK-TRACKS-UD-ATP-FRAUD-PROFILING",
+  "type": "Claim",
+  "subject": "ecl:STATE-DNK",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
+  "status": "accepted",
+  "asOf": "2026-08-11",
+  "evidenceFor": ["ecl:EVIDENCE-DNK-UD-ATP-PROJECT-DOSSIER-2026-08-11"],
+  "provenance": ["../../dossiers/states/DNK.md", "../../dossiers/projects/DNK-UD-ATP-FRAUD-PROFILING.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "Curated review-dependency edge only. Tracking the project family does not copy Denmark's governance outcome onto the Project or imply all ATP/Udbetaling Danmark systems are included."
+}
