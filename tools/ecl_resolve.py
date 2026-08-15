@@ -325,7 +325,10 @@ def resolve_follow(policy: dict[str, Any], root: Path, allow_draft: bool) -> dic
     bundle_ref = channel.get("bundle")
     if not isinstance(bundle_ref, str) or not bundle_ref:
         raise ValueError(f"channel {channel_name!r} does not resolve an immutable bundle")
-    bundle = load_json(root / "releases" / "bundles" / f"{bundle_ref}.json")
+    path = root / "releases" / "bundles" / f"{bundle_ref}.json"
+    bundle = load_json(path)
+    if bundle.get("bundle") != bundle_ref:
+        raise ValueError(f"bundle manifest identity mismatch in {path}")
     if not bundle.get("operative") and not allow_draft:
         raise ValueError(f"bundle {bundle_ref!r} is non-operative/draft")
 
