@@ -114,6 +114,33 @@ last_reviewed: {last}
             self.assertNotIn("reviewDue", merged)
             self.assertEqual(merged["reviewClass"], "manual")
 
+    def test_v1_synthetic_due_uses_stored_review_date_when_dossier_changes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "AAA.md"
+            path.write_text(self.dossier_text(last="2026-08-11"), encoding="utf-8")
+            old_dossier = MODULE.load_dossiers(root, require_195=False)[0]
+            existing = {
+                **MODULE.projection(old_dossier),
+                "aliases": ["AAA"],
+                "reviewDue": MODULE.synthetic_v1_due(old_dossier),
+                "reviewClass": "manual",
+            }
+            old_hash = MODULE.phash(existing)
+
+            path.write_text(self.dossier_text(last="2026-08-12"), encoding="utf-8")
+            current_dossier = MODULE.load_dossiers(root, require_195=False)[0]
+            merged = MODULE.merge(
+                current_dossier,
+                existing,
+                old_hash,
+                cleanup_v1=True,
+            )
+
+            self.assertNotIn("reviewDue", merged)
+            self.assertEqual(merged["lastSubstantiveReview"], "2026-08-12")
+            self.assertEqual(merged["reviewClass"], "manual")
+
     def test_partial_v1_apply_defers_manifest_promotion_until_full_cleanup(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
