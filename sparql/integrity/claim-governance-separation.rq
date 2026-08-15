@@ -5,20 +5,21 @@ WHERE {
   ?claim a ecl:Claim ; ecl:predicate ?predicate .
   OPTIONAL { ?claim ecl:object ?object . }
 
-  # Compare a separator-normalized local name so governance__status,
-  # governance-status-code, restriction_status, etc. cannot bypass the guard.
-  BIND(REPLACE(STR(?predicate), "^.*[:/#]", "") AS ?localName)
-  BIND(REPLACE(LCASE(?localName), "[-_]+", "") AS ?normalizedName)
+  # Normalize the complete predicate IRI instead of discarding path segments.
+  # This catches equivalent spellings such as governance__status,
+  # governance-status-code, and https://host/governance/status.
+  BIND(LCASE(STR(?predicate)) AS ?predicateText)
+  BIND(REPLACE(?predicateText, "[^a-z0-9]+", "") AS ?normalizedPredicate)
 
   FILTER (
     ?predicate = ecl:outcome ||
-    CONTAINS(?normalizedName, "currentgovernance") ||
-    CONTAINS(?normalizedName, "governancestatus") ||
-    CONTAINS(?normalizedName, "governanceoutcome") ||
-    CONTAINS(?normalizedName, "restrictionstatus") ||
-    CONTAINS(?normalizedName, "restrictedstatus") ||
-    CONTAINS(?normalizedName, "provisionaloutcome") ||
-    STRSTARTS(?normalizedName, "tier") ||
+    CONTAINS(?normalizedPredicate, "currentgovernance") ||
+    CONTAINS(?normalizedPredicate, "governancestatus") ||
+    CONTAINS(?normalizedPredicate, "governanceoutcome") ||
+    CONTAINS(?normalizedPredicate, "restrictionstatus") ||
+    CONTAINS(?normalizedPredicate, "restrictedstatus") ||
+    CONTAINS(?normalizedPredicate, "provisionaloutcome") ||
+    REGEX(?predicateText, "(^|[:/#?&._-])tier([:/#?&._=-]|$)") ||
     (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
   )
 }
