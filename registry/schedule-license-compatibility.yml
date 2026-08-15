@@ -1,5 +1,8 @@
-schema_version: 1
+schema_version: 2
 target_license: "ECL-0.3-DRAFT"
+target_license_artifact:
+  path: "versions/licenses/ECL-0.3-DRAFT.md"
+  sha256: "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d"
 status: pending
 review_id: null
 sources: []
@@ -7,6 +10,9 @@ note: >-
   The frozen Schedule clause sources were prepared against ECL-0.2-DRAFT.
   Do not mark this record complete or populate ECL-0.3-DRAFT source bindings
   until an explicit compatibility revalidation has reviewed the exact source
-  files against the current ECL-0.3-DRAFT semantics. A complete record must
-  bind every renderer-consumed frozen clause source by repository-relative path
-  and SHA-256; the renderer rejects incomplete, stale or partial bindings.
+  files against the exact target License artifact identified above. The
+  working root LICENSE must remain byte-identical to that frozen target
+  artifact. A complete record must bind every renderer-consumed frozen clause
+  source by repository-relative path and SHA-256; the renderer rejects an
+  altered target License artifact, working/frozen License drift, and incomplete,
+  stale, partial, duplicate or extra source bindings.
