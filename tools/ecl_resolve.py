@@ -50,6 +50,14 @@ CANONICAL_EMPTY_BUNDLES: dict[str, dict[str, Any]] = {
         },
     }
 }
+RESERVED_FALLBACK_IDENTITIES: dict[str, set[str]] = {
+    key: {
+        registered[component_name][key]
+        for registered in CANONICAL_EMPTY_BUNDLES.values()
+        for component_name in ("license", "schedule")
+    }
+    for key in ("ref", "path", "sha256")
+}
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -83,22 +91,23 @@ def valid_review_id(value: str) -> bool:
     return REVIEW_ID_RE.fullmatch(value) is not None
 
 
-def _uses_reserved_fallback_component(
-    actual: Any, expected: dict[str, Any]
-) -> bool:
+def _uses_reserved_fallback_identity(actual: Any) -> bool:
     if not isinstance(actual, dict):
         return False
-    return any(actual.get(key) == expected[key] for key in ("ref", "path", "sha256"))
+    return any(
+        actual.get(key) in RESERVED_FALLBACK_IDENTITIES[key]
+        for key in ("ref", "path", "sha256")
+    )
 
 
 def validate_bundle_identity(bundle: dict[str, Any]) -> None:
     """Enforce semantic identity for canonical empty-Schedule fallback Bundles.
 
     Empty fallback identities are intentionally opt-in rather than generative.
-    Their identifiers and their reserved License/Schedule components are a single
-    indivisible identity: neither side may be borrowed by an ordinary Bundle.
-    A new fallback is invalid until its exact state is registered here and in the
-    Bundle schema.
+    Their identifiers and every reserved component identity are a single
+    indivisible namespace: no reserved ref, path, or hash may be borrowed in
+    either the License or Schedule slot of an ordinary Bundle. A new fallback is
+    invalid until its exact state is registered here and in the Bundle schema.
     """
 
     bundle_ref = bundle.get("bundle")
@@ -124,15 +133,12 @@ def validate_bundle_identity(bundle: dict[str, Any]) -> None:
     if "@RP-EMPTY-" in bundle_ref:
         raise ValueError(f"unsupported canonical empty fallback bundle: {bundle_ref}")
 
-    for registered_ref, registered in CANONICAL_EMPTY_BUNDLES.items():
-        for component_name in ("license", "schedule"):
-            if _uses_reserved_fallback_component(
-                bundle.get(component_name), registered[component_name]
-            ):
-                raise ValueError(
-                    f"bundle {bundle_ref} uses reserved canonical empty fallback "
-                    f"{component_name} identity from {registered_ref}"
-                )
+    for component_name in ("license", "schedule"):
+        if _uses_reserved_fallback_identity(bundle.get(component_name)):
+            raise ValueError(
+                f"bundle {bundle_ref} uses reserved canonical empty fallback "
+                f"identity in {component_name} slot"
+            )
 
 
 def validate_file_reference(
