@@ -44,7 +44,17 @@ Individualized protection screening, asylum access, independent detention oversi
 
 - https://www.amnesty.org/en/location/americas/central-america-and-the-caribbean/dominican-republic/report-dominican-republic/
 - https://migracion.gob.do/en/dgm-deports-99268-undocumented-immigrants-so-far-in-2026-of-which-31310-correspond-to-the-month-of-march/
+- https://migracion.gob.do/en/immigration-deports-27540-undocumented-immigrants-in-april-total-reaches-126790-in-2026/
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **absorbed / otherwise already represented**. The tranche's substantive migration-enforcement evidence, DGM counter-position, attribution boundary and removal triggers were already reflected in §§2–6. This pass restores the exact April 2026 DGM source locator supporting the `126,790 through April` figure, which previously lived only in the historical tranche.
+- Issue #49 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+No Claim status, Evidence grade, `asOf`, actor relationship or governance outcome is created or changed by this absorption.
+
+## 9. Procedural history
 
 Issue #49 · `../../reviews/2026/adversarial/scoped/tranche-03.md`
