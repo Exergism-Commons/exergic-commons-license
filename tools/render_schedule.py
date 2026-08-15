@@ -131,6 +131,38 @@ def schedule_clause_source_paths() -> list[Path]:
     return paths
 
 
+def schedule_renderer_control_paths() -> list[Path]:
+    """Return non-clause inputs that can change which frozen clauses are emitted."""
+
+    paths = [REG / "states.yml"]
+    paths.extend(sorted(REG.glob("state-outcome-overrides*.yml")))
+    status_override = REG / "schedule-status-overrides.yml"
+    if status_override.exists():
+        paths.append(status_override)
+
+    # Compatibility evidence also binds the implementation whose selection
+    # semantics consume the data above. A renderer-code change therefore cannot
+    # silently reuse evidence reviewed against an earlier algorithm.
+    paths.append(Path(__file__).resolve())
+    return paths
+
+
+def schedule_compatibility_input_paths() -> list[Path]:
+    """Return the complete byte-exact input set a compatibility review must bind."""
+
+    result: list[Path] = []
+    seen: set[Path] = set()
+    for path in schedule_clause_source_paths() + schedule_renderer_control_paths():
+        resolved = path.resolve()
+        if resolved in seen:
+            continue
+        if not path.is_file():
+            raise ValueError(f"missing Schedule renderer compatibility input: {path}")
+        seen.add(resolved)
+        result.append(path)
+    return result
+
+
 def validate_target_license_artifact(review: dict[str, Any]) -> None:
     """Bind compatibility evidence to exact frozen and working License bytes."""
 
@@ -277,6 +309,12 @@ def validate_evidence_yaml_node(node: Node, seen_nodes: set[int] | None = None) 
                 raise ValueError("Schedule compatibility evidence must not use YAML merge keys")
             if key_node.tag != STANDARD_STRING_TAG:
                 raise ValueError("Schedule compatibility evidence keys must use the YAML string tag")
+
+            # Key nodes participate in the same object-identity graph as values.
+            # Visiting them closes aliases that reuse a previously anchored
+            # scalar as a mapping key (or vice versa).
+            validate_evidence_yaml_node(key_node, seen_nodes)
+
             if key in seen_keys:
                 raise ValueError(f"duplicate Schedule compatibility evidence key: {key}")
             seen_keys.add(key)
@@ -376,7 +414,7 @@ def validate_compatibility_review(sources: list[Path], target_license: str) -> b
 
     The mutable registry is only a pointer. A complete state is accepted only
     when it resolves to a content-addressed evidence record whose own bytes bind
-    the exact target License artifact and complete renderer source set.
+    the exact target License artifact and complete renderer input set.
     """
 
     if not COMPATIBILITY_REVIEW.is_file():
@@ -409,15 +447,15 @@ def validate_compatibility_review(sources: list[Path], target_license: str) -> b
 def compatibility_status(
     target_license: str = TARGET_LICENSE,
 ) -> tuple[set[str], list[Path], bool]:
-    """Validate source declarations and explicit revalidation for a target License."""
+    """Validate clause declarations and exact-input revalidation for a target License."""
 
     declarations: set[str] = set()
     incompatible: list[Path] = []
-    sources = schedule_clause_source_paths()
-    if not sources:
+    clause_sources = schedule_clause_source_paths()
+    if not clause_sources:
         raise ValueError("no frozen Schedule clause sources found")
 
-    for path in sources:
+    for path in clause_sources:
         data = load_yaml(path)
         declared = data.get("compatible_license")
         if not isinstance(declared, str) or not declared.strip():
@@ -427,7 +465,9 @@ def compatibility_status(
         if declared != target_license:
             incompatible.append(path)
 
-    review_complete = validate_compatibility_review(sources, target_license)
+    review_complete = validate_compatibility_review(
+        schedule_compatibility_input_paths(), target_license
+    )
     if review_complete and incompatible:
         raise ValueError(
             "complete Schedule compatibility review conflicts with source compatible_license declarations"
@@ -552,9 +592,9 @@ def render() -> tuple[str, dict[str, int]]:
             ">",
             f"> Frozen clause inputs currently declare compatibility with: **{declared_text}**.",
             ">",
-            "> Explicit content-addressed License-and-source compatibility revalidation: **PENDING**.",
+            "> Explicit content-addressed License-and-renderer-input compatibility revalidation: **PENDING**.",
             ">",
-            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and a content-addressed evidence record binds both the exact target License artifact and complete source set by SHA-256.",
+            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and a content-addressed evidence record binds the exact target License artifact plus the complete renderer clause/control/code input set by SHA-256.",
         ]
     else:
         compatibility_lines = [
@@ -562,7 +602,7 @@ def render() -> tuple[str, dict[str, int]]:
             ">",
             f"> Exact target License artifact: **{TARGET_LICENSE_ARTIFACT.relative_to(ROOT)}** (`{sha256(TARGET_LICENSE_ARTIFACT)}`).",
             ">",
-            "> Exact target License artifact and frozen clause source set: **compatibility revalidation complete and SHA-256-bound by immutable evidence**.",
+            "> Exact target License artifact and complete renderer input set: **compatibility revalidation complete and SHA-256-bound by immutable evidence**.",
         ]
 
     lines: list[str] = [
