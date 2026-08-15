@@ -7,6 +7,6 @@ WHERE {
   FILTER (
     ?predicate = ecl:outcome ||
     REGEX(STR(?predicate), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i") ||
-    EXISTS { ?object a ecl:GovernanceOutcome }
+    (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
   )
 }
