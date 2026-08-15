@@ -52,7 +52,7 @@ Reform of abusive terrorism/expression offences; release/remedy; independent rev
 Reviewed for ECL 1.0 normalization on 2026-08-15:
 
 - `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. Its substantive current evidence, counter-evidence, narrowing rationale and removal triggers are reflected in §§2–7 above; they are not duplicated as a second current finding.
-- Issue #3's earlier 2026-08-11 evidence-review comment — **historical-only / locator incomplete**. It records an earlier scoped concern involving arbitrary detention, unfair security prosecutions, travel bans and restrictions on dissent, and names `Amnesty Algeria 2025` plus a `UN HRC review` as its evidence baseline. That comment does not preserve precise locators for those two source references, so they are retained as review provenance rather than silently added to the current source list or used to broaden the current scope.
+- https://github.com/Papishushi/exergic-commons-license/issues/3#issuecomment-5248193077 — **historical-only / locator incomplete**. The earlier 2026-08-11 evidence-review comment records a scoped concern involving arbitrary detention, unfair security prosecutions, travel bans and restrictions on dissent, and names `Amnesty Algeria 2025` plus a `UN HRC review` as its evidence baseline. The comment does not preserve precise locators for those two underlying source references, so they are retained as review provenance rather than silently added to the current source list or used to broaden the current scope.
 
 This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
 
