@@ -61,7 +61,7 @@ State actors use `STATE-ISO3` stable IDs and `urn:ecl:STATE-ISO3` RDF IRIs. The 
 
 The migration **validates** `provisional_outcome` only to reject malformed dossier frontmatter. It never writes `R/S/U/N`, scope, tier, restriction status or an equivalent governance shortcut into the State Actor.
 
-Fields such as additional aliases, review clocks/reasons, tracked objects, monitor IDs and explicit semantic relations are curated ABox data and are preserved by regeneration. New records receive a neutral `manual` review class and a deterministic review-due seed; that clock is maintenance metadata, not a governance classification.
+Fields such as additional aliases, review clocks/reasons, tracked objects, monitor IDs and explicit semantic relations are curated ABox data and are preserved by regeneration. New records receive the neutral `manual` review class, but **no `reviewDue` date is invented**. Under `manual`, absence of `reviewDue` means no scheduled cadence has yet been curated; the living-review sweep therefore emits no timer-based signal. `hot`, `active` and `stable` classes require an explicit reviewed due date.
 
 `knowledge/generated/state-abox-manifest.json` contains only hashes of generator-owned projections. It is not JSON-LD, is not loaded into the ABox and is not a governance source. Its purpose is to detect a human edit to generator-owned fields so the migration fails with a conflict rather than silently overwriting it.
 
