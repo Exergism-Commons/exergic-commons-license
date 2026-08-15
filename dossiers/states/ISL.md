@@ -40,16 +40,20 @@ Scope follows only detention requests/orders/practices imposing pretrial isolati
 
 Legislative/procedural reform, verified substantial reduction, stronger safeguards and next UPR/CPT findings.
 
-## 7. Historical evidence absorption
+## 7. Sources
+
+- https://www.amnesty.org/en/documents/eur28/1243/2026/en/
+
+## 8. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-15:
 
-- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The July 2026 UPR concern, earlier evidence on disproportionate pretrial solitary confinement, judicial-authorization counter-evidence, narrow attribution and reform triggers are reflected in §§1–6 above.
-- The historical tranche identifies the Amnesty UPR submission and earlier detailed evidence but supplies no exact URL/document identifier for either. Repository search in this pass found only the tranche, the first-pass adjudication reference and this dossier, not a precise source locator. No citation is guessed.
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **absorbed / partial locator gap remains**. The July 2026 UPR concern, earlier evidence on disproportionate pretrial solitary confinement, judicial-authorization counter-evidence, narrow attribution and reform triggers are reflected in §§1–7 above.
+- The exact Amnesty UPR locator `EUR28/1243/2026` was recovered from `../../registry/schedule-state-s-freezes/batch-16b-isl-freeze.yml` and is now normalized into §7. The tranche's separate reference to earlier detailed evidence still lacks an exact historical locator in the reviewed provenance, so that narrower recovery gap remains open rather than being guessed.
 - Issue #76 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
 
-Exact source-locator recovery remains an evidence-curation gap. This record does not broaden the very narrow solitary-confinement scope or create/change structured Claim status, Evidence grade, `asOf`, actor relationship or governance outcome.
+Only the earlier detailed-evidence locator remains an evidence-curation gap. This record does not broaden the very narrow solitary-confinement scope or create/change structured Claim status, Evidence grade, `asOf`, actor relationship or governance outcome.
 
-## 8. Procedural history
+## 9. Procedural history
 
 Issue #76 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
