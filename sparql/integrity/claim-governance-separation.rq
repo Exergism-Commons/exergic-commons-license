@@ -5,21 +5,22 @@ WHERE {
   ?claim a ecl:Claim ; ecl:predicate ?predicate .
   OPTIONAL { ?claim ecl:object ?object . }
 
-  # Normalize the complete predicate IRI instead of discarding path segments.
-  # This catches equivalent spellings such as governance__status,
-  # governance-status-code, and https://host/governance/status.
+  # Normalize the semantic predicate IRI/path instead of only the final local
+  # name. For HTTP(S), strip scheme+authority first so a hostname cannot create
+  # a false governance match. Keep tier token-aware so "frontier" stays valid.
   BIND(LCASE(STR(?predicate)) AS ?predicateText)
-  BIND(REPLACE(?predicateText, "[^a-z0-9]+", "") AS ?normalizedPredicate)
+  BIND(REPLACE(?predicateText, "^[a-z][a-z0-9+.-]*://[^/]*", "") AS ?semanticPart)
+  BIND(REPLACE(?semanticPart, "[^a-z0-9]+", "") AS ?normalizedSemantic)
 
   FILTER (
     ?predicate = ecl:outcome ||
-    CONTAINS(?normalizedPredicate, "currentgovernance") ||
-    CONTAINS(?normalizedPredicate, "governancestatus") ||
-    CONTAINS(?normalizedPredicate, "governanceoutcome") ||
-    CONTAINS(?normalizedPredicate, "restrictionstatus") ||
-    CONTAINS(?normalizedPredicate, "restrictedstatus") ||
-    CONTAINS(?normalizedPredicate, "provisionaloutcome") ||
-    REGEX(?predicateText, "(^|[:/#?&._-])tier([:/#?&._=-]|$)") ||
+    CONTAINS(?normalizedSemantic, "currentgovernance") ||
+    CONTAINS(?normalizedSemantic, "governancestatus") ||
+    CONTAINS(?normalizedSemantic, "governanceoutcome") ||
+    CONTAINS(?normalizedSemantic, "restrictionstatus") ||
+    CONTAINS(?normalizedSemantic, "restrictedstatus") ||
+    CONTAINS(?normalizedSemantic, "provisionaloutcome") ||
+    REGEX(?semanticPart, "(^|[^a-z0-9])tier([a-z0-9]*)([^a-z0-9]|$)") ||
     (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
   )
 }
