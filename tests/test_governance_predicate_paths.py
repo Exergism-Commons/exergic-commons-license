@@ -18,18 +18,33 @@ class GovernancePredicatePathTests(unittest.TestCase):
         cls.shapes = Graph().parse(ROOT / "ontology" / "ecl.shacl.ttl", format="turtle")
         cls.ontology = Graph().parse(ROOT / "ontology" / "ecl.owl.ttl", format="turtle")
 
-    def test_http_path_governance_predicate_is_rejected_by_sparql_and_shacl(self):
+    @staticmethod
+    def claim_graph(predicate: URIRef, stable_id: str) -> Graph:
         graph = Graph()
-        claim = ECL["CLAIM-HTTP-PATH-GOVERNANCE"]
-        predicate = URIRef("https://example.invalid/governance/status")
+        claim = ECL[stable_id]
         graph.add((claim, RDF.type, ECL.Claim))
-        graph.add((claim, ECL.stableId, Literal("CLAIM-HTTP-PATH-GOVERNANCE")))
+        graph.add((claim, ECL.stableId, Literal(stable_id)))
         graph.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))
         graph.add((claim, ECL.predicate, predicate))
         graph.add((claim, ECL.literalValue, Literal("x")))
         graph.add((claim, ECL.status, Literal("rejected")))
         graph.add((claim, ECL.provenance, Literal("adversarial path-separator regression")))
+        return graph
 
+    def assert_claim_conforms(self, graph: Graph) -> None:
+        conforms, _, report = shacl_validate(
+            graph,
+            shacl_graph=self.shapes,
+            ont_graph=self.ontology,
+            inference="none",
+        )
+        self.assertTrue(conforms, report)
+
+    def test_http_path_governance_predicate_is_rejected_by_sparql_and_shacl(self):
+        graph = self.claim_graph(
+            URIRef("https://example.invalid/governance/status"),
+            "CLAIM-HTTP-PATH-GOVERNANCE",
+        )
         rows = list(graph.query(self.query))
         self.assertEqual(len(rows), 1)
 
@@ -43,11 +58,28 @@ class GovernancePredicatePathTests(unittest.TestCase):
         self.assertIn("Claim nodes may not encode governance", report)
 
     def test_generic_http_status_predicate_remains_allowed_by_claim_guard(self):
-        graph = Graph()
-        claim = ECL["CLAIM-HTTP-PATH-STATUS"]
-        graph.add((claim, RDF.type, ECL.Claim))
-        graph.add((claim, ECL.predicate, URIRef("https://example.invalid/project/status")))
+        graph = self.claim_graph(
+            URIRef("https://example.invalid/project/status"),
+            "CLAIM-HTTP-PATH-STATUS",
+        )
         self.assertEqual(list(graph.query(self.query)), [])
+        self.assert_claim_conforms(graph)
+
+    def test_frontier_token_does_not_trigger_tier_guard(self):
+        graph = self.claim_graph(
+            URIRef("https://example.invalid/project/frontier-status"),
+            "CLAIM-HTTP-FRONTIER-STATUS",
+        )
+        self.assertEqual(list(graph.query(self.query)), [])
+        self.assert_claim_conforms(graph)
+
+    def test_governance_hostname_alone_does_not_trigger_guard(self):
+        graph = self.claim_graph(
+            URIRef("https://governancestatus.example.invalid/project/value"),
+            "CLAIM-GOVERNANCE-HOSTNAME-ONLY",
+        )
+        self.assertEqual(list(graph.query(self.query)), [])
+        self.assert_claim_conforms(graph)
 
     def test_state_guard_uses_the_same_full_iri_normalization(self):
         graph = Graph()
