@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:AGENCY-USA-CENTCOM",
+  "id": "AGENCY-USA-CENTCOM",
+  "type": "Agency",
+  "name": "U.S. Central Command",
+  "aliases": ["CENTCOM", "USCENTCOM"],
+  "dossier": "../../dossiers/agencies/USA-CENTCOM.md",
+  "provenance": ["../../dossiers/agencies/USA-CENTCOM.md", "../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md", "https://www.defense.gov/About/combatantcommands/", "https://www.centcom.mil/ABOUT-US/COMPONENT-COMMANDS/"],
+  "lastSubstantiveReview": "2026-08-15",
+  "reviewClass": "manual",
+  "reviewReason": "Tranche 5 institutional identity/hierarchy; exact operational attribution remains Claim/Evidence data.",
+  "partOf": ["ecl:AGENCY-USA-DOD"]
+}

@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-USA-CENTCOM-OPERATES-EPIC-FURY-MINAB-TARGETING",
+  "id": "CLAIM-USA-CENTCOM-OPERATES-EPIC-FURY-MINAB-TARGETING",
+  "type": "Claim",
+  "subject": "ecl:AGENCY-USA-CENTCOM",
+  "predicate": "ecl:operates",
+  "object": "ecl:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-MINAB-CANONICAL-DOSSIER-2026-08-13"],
+  "provenance": ["../../dossiers/agencies/USA-CENTCOM.md", "../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md"],
+  "notes": "Accepted organizational-level operation of the narrowly defined Minab targeting-chain Project only. It does not identify a subordinate unit, person, weapon or technical system, does not generalize to unrelated Operation Epic Fury targets, and does not propagate operation/governance to DoD/USA."
+}

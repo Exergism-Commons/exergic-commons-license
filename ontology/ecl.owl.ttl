@@ -131,6 +131,11 @@ ecl:tracks a owl:ObjectProperty ;
     rdfs:range ecl:TrackedObject ;
     rdfs:comment "Explicitly curated tracking dependency. Tracking creates review relevance only, never inherited restriction."@en .
 
+ecl:partOf a owl:ObjectProperty ;
+    rdfs:domain ecl:Actor ;
+    rdfs:range ecl:Actor ;
+    rdfs:comment "Directly curated institutional containment. Only the asserted parent edge is semantic; no transitive, operational, culpability or governance inheritance is implied."@en .
+
 ecl:controls a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:Actor .
 ecl:controlledBy a owl:ObjectProperty ; owl:inverseOf ecl:controls ; rdfs:domain ecl:Actor ; rdfs:range ecl:Actor .
 ecl:participatesIn a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:Project .
@@ -180,6 +185,7 @@ ecl:previousRelease a owl:ObjectProperty ; rdfs:domain ecl:ReleaseArtifact ; rdf
 # Deliberate non-axioms / reasoning boundary:
 # - Claim nodes record reviewed propositions; they do not materialize their predicate as a direct subject triple.
 # - no owl:propertyChainAxiom is used for actor relationships;
+# - partOf is direct institutional context only: it is not transitive and does NOT entail controls, participatesIn, operates, tracks or governance;
 # - controls o participatesIn does NOT entail participatesIn;
 # - association with a Restricted actor does NOT infer a GovernanceOutcome;
 # - tracks is review/provenance metadata and does NOT infer participation or status;

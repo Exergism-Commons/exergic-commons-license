@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:AGENCY-USA-DHS",
+  "id": "AGENCY-USA-DHS",
+  "type": "Agency",
+  "name": "U.S. Department of Homeland Security",
+  "aliases": ["DHS", "Department of Homeland Security"],
+  "dossier": "../../dossiers/agencies/USA-DHS.md",
+  "provenance": ["../../dossiers/agencies/USA-DHS.md", "https://www.dhs.gov/media-contacts"],
+  "lastSubstantiveReview": "2026-08-15",
+  "reviewClass": "manual",
+  "reviewReason": "Tranche 5 institutional identity/hierarchy; no governance status is encoded.",
+  "partOf": ["ecl:STATE-USA"]
+}

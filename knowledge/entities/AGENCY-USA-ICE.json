@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:AGENCY-USA-ICE",
+  "id": "AGENCY-USA-ICE",
+  "type": "Agency",
+  "name": "U.S. Immigration and Customs Enforcement",
+  "aliases": ["ICE"],
+  "dossier": "../../dossiers/agencies/USA-ICE.md",
+  "provenance": ["../../dossiers/agencies/USA-ICE.md", "https://www.ice.gov/about-ice", "https://www.dhs.gov/media-contacts"],
+  "lastSubstantiveReview": "2026-08-15",
+  "reviewClass": "manual",
+  "reviewReason": "Tranche 5 institutional identity/hierarchy; no governance status is encoded.",
+  "partOf": ["ecl:AGENCY-USA-DHS"]
+}

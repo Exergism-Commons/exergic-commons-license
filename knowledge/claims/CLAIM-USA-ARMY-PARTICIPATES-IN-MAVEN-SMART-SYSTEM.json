@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-USA-ARMY-PARTICIPATES-IN-MAVEN-SMART-SYSTEM",
+  "id": "CLAIM-USA-ARMY-PARTICIPATES-IN-MAVEN-SMART-SYSTEM",
+  "type": "Claim",
+  "subject": "ecl:AGENCY-USA-ARMY",
+  "predicate": "ecl:participatesIn",
+  "object": "ecl:PROJECT-MAVEN-SMART-SYSTEM",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-MAVEN-CANONICAL-DOSSIER-2026-08-13"],
+  "provenance": ["../../dossiers/agencies/USA-ARMY.md", "../../dossiers/projects/MAVEN-SMART-SYSTEM.md"],
+  "notes": "Accepted Army-level project participation/customer proposition only. It does not identify a prohibited Maven deployment and does not propagate participation or governance to DoD/USA."
+}

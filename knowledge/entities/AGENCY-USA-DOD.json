@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:AGENCY-USA-DOD",
+  "id": "AGENCY-USA-DOD",
+  "type": "Agency",
+  "name": "U.S. Department of Defense",
+  "aliases": ["DoD", "DOD", "Department of War"],
+  "dossier": "../../dossiers/agencies/USA-DOD.md",
+  "provenance": ["../../dossiers/agencies/USA-DOD.md", "https://www.defense.gov/About/", "https://www.whitehouse.gov/presidential-actions/2025/09/restoring-the-united-states-department-of-war/"],
+  "lastSubstantiveReview": "2026-08-15",
+  "reviewClass": "manual",
+  "reviewReason": "Tranche 5 institutional identity/hierarchy; statutory identity retained while Department of War remains a secondary title.",
+  "partOf": ["ecl:STATE-USA"]
+}
