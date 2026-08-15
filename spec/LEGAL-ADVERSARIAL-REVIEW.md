@@ -25,7 +25,24 @@ A legal-review record MUST bind itself to immutable inputs, at minimum:
 
 Review of a moving branch is insufficient for the stable-release gate.
 
-Any material change to the grant, restrictions, definitions, Schedule incorporation, notice, termination, remedies, governing-law model, contributor-rights model or statutory-rights savings language invalidates the affected portion of prior review and requires recorded delta review.
+Before a qualified review record is finalized, the exact non-License mechanism inputs used by the review MUST be copied into a deterministic frozen namespace for that review:
+
+```text
+reviews/legal/inputs/<review_id>/
+  LEGAL-ADVERSARIAL-REVIEW.md
+  VERSIONING.md
+  bundle.schema.json
+
+reviews/legal/records/<review_id>.json
+```
+
+The review record MUST hash and reference those frozen copies. It MUST NOT rely on the future contents of the mutable canonical files at `spec/LEGAL-ADVERSARIAL-REVIEW.md`, `spec/VERSIONING.md`, or `schemas/bundle.schema.json` when validating an already completed historical review.
+
+The canonical files are the source from which a **new** review snapshot is prepared. Once a review is frozen, later legitimate edits to those canonical files MUST NOT invalidate the historical review. By contrast, absence, mutation, path substitution, or hash failure of a frozen input under `reviews/legal/inputs/<review_id>/` MUST make the affected review record fail machine validation.
+
+The exact candidate License remains independently bound by its content hash in both the Bundle and legal-review record; it need not be duplicated in the frozen-input directory.
+
+Any material change to the grant, restrictions, definitions, Schedule incorporation, notice, termination, remedies, governing-law model, contributor-rights model or statutory-rights savings language invalidates the affected portion of prior review and requires recorded delta review. A new review/delta-review snapshot MUST be frozen for the exact mechanism inputs actually reviewed.
 
 ## 3. Review principle
 
@@ -272,7 +289,21 @@ Where reviewers disagree, preserve dissent. A contested material issue MUST NOT 
 
 ## 8. Machine-verifiable immutable legal-review record
 
-A stable operative Bundle MUST contain a content-addressed reference to an immutable legal-review record.
+A stable operative Bundle MUST contain a content-addressed reference to an immutable legal-review record at:
+
+```text
+reviews/legal/records/<review_id>.json
+```
+
+The record MUST bind to the exact frozen mechanism inputs at:
+
+```text
+reviews/legal/inputs/<review_id>/LEGAL-ADVERSARIAL-REVIEW.md
+reviews/legal/inputs/<review_id>/VERSIONING.md
+reviews/legal/inputs/<review_id>/bundle.schema.json
+```
+
+and to the exact candidate License SHA-256 carried independently by the Bundle.
 
 Tooling is responsible only for machine-verifiable integrity/state. It MUST NOT pretend to determine whether a lawyer is competent, whether an authority is correctly interpreted or whether the substantive legal analysis is true.
 
@@ -280,6 +311,7 @@ The record consumed by release tooling MUST, at minimum, attest:
 
 - `status: complete`;
 - the exact candidate License SHA-256 it reviewed;
+- the exact SHA-256 of each frozen review/mechanism input;
 - all five required jurisdiction tracks are `complete`;
 - all `LAR-01` through `LAR-16` surfaces are dispositioned;
 - qualified independent review count is at least 2;
@@ -288,7 +320,9 @@ The record consumed by release tooling MUST, at minimum, attest:
 - unresolved/undispositioned material-finding count is 0; and
 - required delta review is complete for the shipped candidate.
 
-The Bundle manifest MUST content-address that record. Release tooling MUST refuse `operative: true` when the record is absent, its hash fails, its reviewed License hash differs from the Bundle License hash, or its machine-verifiable gate state is incomplete.
+The Bundle manifest MUST content-address that record. Release tooling MUST refuse `operative: true` when the record is absent, its hash fails, its reviewed License hash differs from the Bundle License hash, a required frozen input is absent or its hash fails, the record/input paths do not match the record's `review_id`, or its machine-verifiable gate state is incomplete.
+
+Release tooling MUST validate historical review inputs against their frozen per-review snapshots. It MUST NOT require those snapshots to match later mutable canonical files. A later project-specification change therefore does not silently invalidate an already reviewed historical Bundle; tampering with the frozen reviewed input does.
 
 Non-operative draft/candidate artifacts may exist without a completed legal-review record, but tooling MUST NOT surface them as stable/operative merely because a user allows draft resolution.
 
@@ -297,6 +331,7 @@ Non-operative draft/candidate artifacts may exist without a completed legal-revi
 The ECL 1.0 legal-review gate is complete only when all of the following are true:
 
 - exact release-candidate `LICENSE` is frozen/content-addressed;
+- exact non-License review/mechanism inputs have been copied into the deterministic frozen `reviews/legal/inputs/<review_id>/` namespace and content-addressed by the legal-review record;
 - all LAR-01 through LAR-16 have recorded dispositions;
 - **all five required jurisdiction tracks are complete**;
 - reviewer-independence/competence minimum is satisfied;
@@ -304,10 +339,11 @@ The ECL 1.0 legal-review gate is complete only when all of the following are tru
 - no `BLOCKER` remains unresolved;
 - every `MAJOR` is resolved, narrowed or explicitly accepted as a documented jurisdictional limitation/risk with reasoned decision;
 - every material amendment triggered by review has received required delta review;
-- the reviewed Schedule-incorporation mechanism is the one actually shipped;
+- the frozen reviewed Schedule-incorporation mechanism is the one actually shipped for that candidate;
 - remaining limitations and dissent are preserved;
-- an immutable machine-verifiable review record reflects those results; and
-- the exact operative Bundle content-addresses that review record and passes release-tool validation.
+- an immutable machine-verifiable review record reflects those results;
+- the exact operative Bundle content-addresses that review record; and
+- release-tool validation passes using the frozen review inputs rather than later mutable canonical project files.
 
 Completion means **reviewed against a defined threat model**, not `guaranteed enforceable everywhere`.
 
