@@ -29,7 +29,11 @@
 
     "name": "ecl:name",
     "aliases": {"@id": "ecl:alias", "@container": "@set"},
+    "iso3": "ecl:iso3",
     "dossier": "ecl:dossier",
+    "publicReviewIssue": {"@id": "ecl:publicReviewIssue", "@type": "@id"},
+    "trackedObjects": {"@id": "ecl:tracks", "@type": "@id", "@container": "@set"},
+    "monitorIds": {"@id": "ecl:monitorId", "@container": "@set"},
 
     "subject": {"@id": "ecl:subject", "@type": "@id"},
     "predicate": {"@id": "ecl:predicate", "@type": "@id"},
