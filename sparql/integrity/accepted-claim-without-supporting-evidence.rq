@@ -1,0 +1,10 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?claim
+WHERE {
+  ?claim a ecl:Claim ; ecl:status "accepted" .
+  FILTER NOT EXISTS {
+    ?claim ecl:evidenceFor ?evidence .
+    ?evidence a ecl:EvidenceItem ; ecl:stableId ?evidenceId .
+  }
+}

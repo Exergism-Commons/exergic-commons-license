@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-NLD-TRACKS-PROBATION-RISK-TOOLS",
+  "id": "CLAIM-NLD-TRACKS-PROBATION-RISK-TOOLS",
+  "type": "Claim",
+  "subject": "ecl:STATE-NLD",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-NLD-PROBATION-RISK-TOOLS",
+  "status": "accepted",
+  "asOf": "2026-08-14",
+  "evidenceFor": ["ecl:EVIDENCE-NLD-CANONICAL-DOSSIER-2026-08-14"],
+  "provenance": ["../../dossiers/states/NLD.md", "../entities/STATE-NLD.json"],
+  "notes": "Curated review-dependency claim only. It does not encode a governance outcome."
+}

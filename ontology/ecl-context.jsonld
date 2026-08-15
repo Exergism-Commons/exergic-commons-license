@@ -2,11 +2,9 @@
   "@context": {
     "ecl": "urn:ecl:",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
-
     "iri": "@id",
     "type": "@type",
     "id": "ecl:stableId",
-
     "Actor": "ecl:Actor",
     "State": "ecl:State",
     "Organization": "ecl:Organization",
@@ -26,7 +24,6 @@
     "LicenseRelease": "ecl:LicenseRelease",
     "ScheduleRelease": "ecl:ScheduleRelease",
     "ECLBundle": "ecl:ECLBundle",
-
     "name": "ecl:name",
     "aliases": {"@id": "ecl:alias", "@container": "@set"},
     "iso3": "ecl:iso3",
@@ -34,12 +31,10 @@
     "publicReviewIssue": {"@id": "ecl:publicReviewIssue", "@type": "@id"},
     "trackedObjects": {"@id": "ecl:tracks", "@type": "@id", "@container": "@set"},
     "monitorIds": {"@id": "ecl:monitorId", "@container": "@set"},
-
     "subject": {"@id": "ecl:subject", "@type": "@id"},
     "predicate": {"@id": "ecl:predicate", "@type": "@id"},
     "object": {"@id": "ecl:object", "@type": "@id"},
     "literalValue": "ecl:literalValue",
-
     "controls": {"@id": "ecl:controls", "@type": "@id"},
     "participatesIn": {"@id": "ecl:participatesIn", "@type": "@id"},
     "operates": {"@id": "ecl:operates", "@type": "@id"},
@@ -48,7 +43,6 @@
     "targetsOrAffects": {"@id": "ecl:targetsOrAffects", "@type": "@id"},
     "remediates": {"@id": "ecl:remediates", "@type": "@id"},
     "reviews": {"@id": "ecl:reviews", "@type": "@id"},
-
     "evidenceFor": {"@id": "ecl:evidenceFor", "@type": "@id", "@container": "@set"},
     "evidenceAgainst": {"@id": "ecl:evidenceAgainst", "@type": "@id", "@container": "@set"},
     "supersedes": {"@id": "ecl:supersedes", "@type": "@id"},
@@ -57,32 +51,38 @@
     "hasDecision": {"@id": "ecl:hasDecision", "@type": "@id"},
     "triggersReviewOf": {"@id": "ecl:triggersReviewOf", "@type": "@id", "@container": "@set"},
     "affectedVariable": {"@id": "ecl:affectedVariable", "@type": "@id", "@container": "@set"},
+    "affectedVariables": {"@id": "ecl:affectedVariable", "@type": "@id", "@container": "@set"},
     "affectedCriterion": {"@id": "ecl:affectedCriterion", "@type": "@id", "@container": "@set"},
+    "affectedCriteria": {"@id": "ecl:affectedCriterion", "@type": "@id", "@container": "@set"},
     "outcome": {"@id": "ecl:outcome", "@type": "@id"},
     "basedOnAssessment": {"@id": "ecl:basedOnAssessment", "@type": "@id"},
-
     "validFrom": {"@id": "ecl:validFrom", "@type": "xsd:date"},
     "validTo": {"@id": "ecl:validTo", "@type": "xsd:date"},
+    "asOf": {"@id": "ecl:asOf", "@type": "xsd:date"},
     "observedAt": {"@id": "ecl:observedAt", "@type": "xsd:dateTime"},
     "publicationDate": {"@id": "ecl:publicationDate", "@type": "xsd:date"},
     "retrievedAt": {"@id": "ecl:retrievedAt", "@type": "xsd:dateTime"},
     "evidenceGrade": "ecl:evidenceGrade",
     "claimConfidence": "ecl:claimConfidence",
     "status": "ecl:status",
+    "sourceLocator": "ecl:sourceLocator",
+    "publisher": "ecl:publisher",
+    "title": "ecl:title",
+    "sourceType": "ecl:sourceType",
+    "language": "ecl:language",
+    "contentHash": "ecl:contentHash",
+    "provenance": {"@id": "ecl:provenance", "@container": "@set"},
     "fingerprint": "ecl:fingerprint",
     "priority": "ecl:priority",
-
     "reviewDue": {"@id": "ecl:reviewDue", "@type": "xsd:date"},
     "lastSubstantiveReview": {"@id": "ecl:lastSubstantiveReview", "@type": "xsd:date"},
     "reviewClass": "ecl:reviewClass",
     "reviewReason": "ecl:reviewReason",
-
     "gitCommit": "ecl:gitCommit",
     "aboxSourceSha256": "ecl:aboxSourceSha256",
     "ontologySha256": "ecl:ontologySha256",
     "evidenceCutoff": {"@id": "ecl:evidenceCutoff", "@type": "xsd:date"},
     "createdAt": {"@id": "ecl:createdAt", "@type": "xsd:dateTime"},
-
     "releaseVersion": "ecl:releaseVersion",
     "releaseDate": {"@id": "ecl:releaseDate", "@type": "xsd:date"},
     "artifactPath": "ecl:artifactPath",

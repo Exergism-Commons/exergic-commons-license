@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-LBY-STATE-DOSSIER-2026-08-11",
+  "id": "EVIDENCE-LBY-STATE-DOSSIER-2026-08-11",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Libya canonical State dossier and adversarial attribution record",
+  "sourceLocator": "../../dossiers/states/LBY.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/states/LBY.md", "../../reviews/2026/adversarial/scoped/tranche-06.md"],
+  "notes": "Preserves the reviewed fragmentation/counter-attribution basis. Evidence grade intentionally absent."
+}

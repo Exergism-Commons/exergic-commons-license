@@ -1,2 +1,3 @@
 rdflib @ git+https://github.com/RDFLib/rdflib.git@607e086b11a9d0b465fd034351445200c694f90d
 pyshacl==0.40.0
+jsonschema>=4.23,<5

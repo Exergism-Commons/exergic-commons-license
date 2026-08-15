@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14",
+  "id": "EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "United States canonical State dossier",
+  "sourceLocator": "../../dossiers/states/USA.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/states/USA.md", "../entities/STATE-USA.json"],
+  "notes": "Repository-curated provenance for the pilot tracking edge. No E0-E3 grade is manufactured for the project's own synthesis."
+}

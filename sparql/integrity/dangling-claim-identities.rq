@@ -1,0 +1,13 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?claim ?target
+WHERE {
+  ?claim a ecl:Claim .
+  {
+    ?claim ecl:subject ?target .
+  } UNION {
+    ?claim ecl:object ?target .
+  }
+  FILTER (STRSTARTS(STR(?target), "urn:ecl:"))
+  FILTER NOT EXISTS { ?target ecl:stableId ?targetId . }
+}

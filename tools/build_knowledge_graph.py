@@ -15,15 +15,44 @@ from rdflib import Graph
 from rdflib.compare import to_canonical_graph
 
 
+def _canonical_source_iri(value: str) -> str:
+    if value.startswith("ecl:"):
+        return "urn:ecl:" + value.removeprefix("ecl:")
+    return value
+
+
 def iter_abox_files(root: Path) -> list[Path]:
     paths = sorted(set(root.rglob("*.json")) | set(root.rglob("*.jsonld")))
     result: list[Path] = []
+    seen_iris: dict[str, Path] = {}
+    seen_ids: dict[str, Path] = {}
     for path in paths:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise ValueError(f"cannot parse JSON-LD candidate {path}: {exc}") from exc
         if isinstance(data, dict) and "@context" in data and ("iri" in data or "@id" in data):
+            iri = data.get("iri", data.get("@id"))
+            if not isinstance(iri, str) or not iri:
+                raise ValueError(f"ABox source {path} has an invalid iri/@id")
+            canonical_iri = _canonical_source_iri(iri)
+            previous_iri = seen_iris.get(canonical_iri)
+            if previous_iri is not None:
+                raise ValueError(
+                    f"duplicate ABox IRI {canonical_iri}: {previous_iri} and {path}"
+                )
+            seen_iris[canonical_iri] = path
+
+            stable_id = data.get("id")
+            if stable_id is not None:
+                if not isinstance(stable_id, str) or not stable_id:
+                    raise ValueError(f"ABox source {path} has an invalid stable id")
+                previous_id = seen_ids.get(stable_id)
+                if previous_id is not None:
+                    raise ValueError(
+                        f"duplicate ABox stable id {stable_id}: {previous_id} and {path}"
+                    )
+                seen_ids[stable_id] = path
             result.append(path)
     return result
 

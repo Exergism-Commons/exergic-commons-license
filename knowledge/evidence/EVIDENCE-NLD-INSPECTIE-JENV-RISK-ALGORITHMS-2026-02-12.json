@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-NLD-INSPECTIE-JENV-RISK-ALGORITHMS-2026-02-12",
+  "id": "EVIDENCE-NLD-INSPECTIE-JENV-RISK-ALGORITHMS-2026-02-12",
+  "type": "EvidenceItem",
+  "publisher": "Inspectie Justitie en Veiligheid",
+  "title": "Rapport risicovol algoritmegebruik",
+  "sourceLocator": "https://www.inspectie-jenv.nl/documenten/2026/02/12/rapport-risicovol-algoritmegebruik",
+  "sourceType": "independent-oversight-finding",
+  "language": "nl",
+  "publicationDate": "2026-02-12",
+  "evidenceGrade": "E3",
+  "provenance": ["../../dossiers/states/NLD.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "E3 is curated for the narrow proposition directly reported by the independent Justice and Security Inspectorate; it is not a publisher-wide reputation score."
+}
