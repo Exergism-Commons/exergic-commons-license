@@ -114,6 +114,95 @@ last_reviewed: {last}
             self.assertNotIn("reviewDue", merged)
             self.assertEqual(merged["reviewClass"], "manual")
 
+    def test_partial_v1_apply_defers_manifest_promotion_until_full_cleanup(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dossier_root = root / "dossiers"
+            entity_root = root / "entities"
+            manifest = root / "manifest.json"
+            dossier_root.mkdir()
+            entity_root.mkdir()
+
+            dossier_root.joinpath("AAA.md").write_text(
+                self.dossier_text(iso3="AAA", entity="Alpha", issue=901),
+                encoding="utf-8",
+            )
+            dossier_root.joinpath("BBB.md").write_text(
+                self.dossier_text(iso3="BBB", entity="Beta", issue=902),
+                encoding="utf-8",
+            )
+            dossiers = {
+                d.iso3: d
+                for d in MODULE.load_dossiers(dossier_root, require_195=False)
+            }
+            hashes = {}
+            for iso3, dossier in dossiers.items():
+                record = {
+                    **MODULE.projection(dossier),
+                    "aliases": [iso3],
+                    "reviewDue": MODULE.synthetic_v1_due(dossier),
+                    "reviewClass": "manual",
+                }
+                entity_root.joinpath(f"STATE-{iso3}.json").write_text(
+                    MODULE.record_text(record),
+                    encoding="utf-8",
+                )
+                hashes[iso3] = MODULE.phash(record)
+            manifest.write_text(
+                MODULE.manifest_text(hashes, legacy=True),
+                encoding="utf-8",
+            )
+
+            summary, code = MODULE.migrate(
+                dossier_root,
+                entity_root,
+                manifest,
+                iso3="AAA",
+                require_195=False,
+            )
+            self.assertEqual(code, 0, summary.conflicts)
+            self.assertNotIn(
+                "reviewDue",
+                json.loads(
+                    entity_root.joinpath("STATE-AAA.json").read_text(
+                        encoding="utf-8"
+                    )
+                ),
+            )
+            self.assertIn(
+                "reviewDue",
+                json.loads(
+                    entity_root.joinpath("STATE-BBB.json").read_text(
+                        encoding="utf-8"
+                    )
+                ),
+            )
+            partial_manifest = json.loads(manifest.read_text(encoding="utf-8"))
+            self.assertEqual(partial_manifest["version"], MODULE.LEGACY_VERSION)
+            self.assertEqual(
+                partial_manifest["generator"],
+                MODULE.LEGACY_GENERATOR,
+            )
+
+            summary, code = MODULE.migrate(
+                dossier_root,
+                entity_root,
+                manifest,
+                require_195=False,
+            )
+            self.assertEqual(code, 0, summary.conflicts)
+            self.assertNotIn(
+                "reviewDue",
+                json.loads(
+                    entity_root.joinpath("STATE-BBB.json").read_text(
+                        encoding="utf-8"
+                    )
+                ),
+            )
+            final_manifest = json.loads(manifest.read_text(encoding="utf-8"))
+            self.assertEqual(final_manifest["version"], MODULE.VERSION)
+            self.assertEqual(final_manifest["generator"], MODULE.GENERATOR)
+
     def test_legacy_canonical_name_conflict_becomes_alias(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -182,6 +271,21 @@ class StateABoxRepositoryTests(unittest.TestCase):
             MODULE.guard(record, str(path))
             if record.get("reviewClass") == "manual" and "reviewReason" not in record:
                 self.assertNotIn("reviewDue", record, path)
+
+    def test_dossier_backed_manual_projects_do_not_invent_review_due(self):
+        entity_root = ROOT / "knowledge" / "entities"
+        for name in (
+            "PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS.json",
+            "PROJECT-MAVEN-SMART-SYSTEM.json",
+            "PROJECT-MITIGA-DETENTION.json",
+            "PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING.json",
+        ):
+            with self.subTest(name=name):
+                record = json.loads(
+                    entity_root.joinpath(name).read_text(encoding="utf-8")
+                )
+                self.assertEqual(record["reviewClass"], "manual")
+                self.assertNotIn("reviewDue", record)
 
     def test_manifest_has_all_195_generator_hashes(self):
         manifest = json.loads((ROOT / "knowledge" / "generated" / "state-abox-manifest.json").read_text(encoding="utf-8"))

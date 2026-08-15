@@ -90,8 +90,10 @@ def load_manifest(p:Path)->tuple[dict[str,str],bool]:
     if x.get("version")==LEGACY_VERSION and x.get("generator")==LEGACY_GENERATOR: return dict(hashes),True
     raise ValueError(f"{p}: unsupported manifest")
 
-def manifest_text(h:dict[str,str])->str:
-    return json.dumps({"version":VERSION,"generator":GENERATOR,"note":"Derived conflict-detection hashes only; not ABox data and not a governance source.","generatedProjectionSha256":dict(sorted(h.items()))},indent=2,ensure_ascii=False)+"\n"
+def manifest_text(h:dict[str,str], legacy:bool=False)->str:
+    version=LEGACY_VERSION if legacy else VERSION
+    generator=LEGACY_GENERATOR if legacy else GENERATOR
+    return json.dumps({"version":version,"generator":generator,"note":"Derived conflict-detection hashes only; not ABox data and not a governance source.","generatedProjectionSha256":dict(sorted(h.items()))},indent=2,ensure_ascii=False)+"\n"
 
 def ordered(r:dict[str,Any])->dict[str,Any]:
     order=("@context","iri","id","type","name","iso3","aliases","dossier","publicReviewIssue","lastSubstantiveReview","reviewDue","reviewClass","reviewReason","trackedObjects","monitorIds","controls","participatesIn","operates","deploys","materiallyBenefits","targetsOrAffects","remediates","reviews")
@@ -136,8 +138,8 @@ def scan(root:Path)->tuple[int,int,int,int]:
         if x.get("type")=="State": guard(x,str(p)); rs.append(x)
     return len(rs),len({x.get("iso3") for x in rs}),len({x.get("id") for x in rs}),len({x.get("dossier") for x in rs})
 
-def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,check:bool=False,dry_run:bool=False)->tuple[Summary,int]:
-    ds=load_dossiers(dossier_root); selected=ds
+def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,check:bool=False,dry_run:bool=False,require_195:bool=True)->tuple[Summary,int]:
+    ds=load_dossiers(dossier_root,require_195=require_195); selected=ds
     if iso3:
         iso3=iso3.upper(); selected=[d for d in ds if d.iso3==iso3]
         if not ISO_RE.fullmatch(iso3) or not selected: raise ValueError(f"unknown ISO3 {iso3!r}")
@@ -150,7 +152,11 @@ def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,
         if cur==text: s.unchanged.append(d.iso3)
         elif p.exists(): s.updated.append(d.iso3); writes.append((p,text))
         else: s.created.append(d.iso3); writes.append((p,text))
-    mt=manifest_text(next_hashes); mc=manifest.read_text(encoding="utf-8") if manifest.exists() else None
+    # A v1 manifest certifies that v1's synthetic review dates may still exist.
+    # A partial --iso3 pass cannot prove the rest of the corpus is clean, so it
+    # must remain v1. Only a full-corpus pass is allowed to promote to v2.
+    keep_legacy_manifest=cleanup_v1 and iso3 is not None
+    mt=manifest_text(next_hashes,legacy=keep_legacy_manifest); mc=manifest.read_text(encoding="utf-8") if manifest.exists() else None
     if not s.conflicts and mt!=mc: writes.append((manifest,mt))
     if not (check or dry_run) and not s.conflicts:
         for p,text in writes: p.parent.mkdir(parents=True,exist_ok=True); p.write_text(text,encoding="utf-8")
