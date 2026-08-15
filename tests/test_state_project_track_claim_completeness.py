@@ -25,9 +25,18 @@ def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def record_paths(root: Path, stem_glob: str = "*"):
+    return sorted(
+        [
+            *root.glob(f"{stem_glob}.json"),
+            *root.glob(f"{stem_glob}.jsonld"),
+        ]
+    )
+
+
 def records_by_iri(root: Path):
     records = {}
-    for path in sorted(root.glob("*.json")):
+    for path in record_paths(root):
         record = load_json(path)
         iri = record.get("iri")
         if iri:
@@ -42,11 +51,19 @@ class StateProjectTrackClaimCompletenessTests(unittest.TestCase):
     def setUpClass(cls):
         cls.entities = records_by_iri(ENTITIES)
         cls.evidence = records_by_iri(EVIDENCE)
-        cls.claim_paths = sorted(CLAIMS.glob("*.json"))
+        cls.claim_paths = record_paths(CLAIMS)
         cls.claims = [load_json(path) for path in cls.claim_paths]
+        cls.claims_by_id = {}
 
         cls.active_track_claims = defaultdict(list)
         for path, claim in zip(cls.claim_paths, cls.claims):
+            claim_id = claim.get("id")
+            if claim_id:
+                if claim_id in cls.claims_by_id:
+                    raise AssertionError(
+                        f"duplicate Claim id {claim_id}: {cls.claims_by_id[claim_id][0]} and {path}"
+                    )
+                cls.claims_by_id[claim_id] = (path, claim)
             if (
                 claim.get("type") == "Claim"
                 and claim.get("predicate") == "ecl:tracks"
@@ -55,7 +72,7 @@ class StateProjectTrackClaimCompletenessTests(unittest.TestCase):
                 cls.active_track_claims[(claim.get("subject"), claim.get("object"))].append((path, claim))
 
     def test_every_state_tracked_object_has_one_active_claim(self):
-        for state_path in sorted(ENTITIES.glob("STATE-*.json")):
+        for state_path in record_paths(ENTITIES, "STATE-*"):
             state = load_json(state_path)
             self.assertEqual(state.get("type"), "State", state_path)
             for target in state.get("trackedObjects", []):
@@ -121,13 +138,16 @@ class StateProjectTrackClaimCompletenessTests(unittest.TestCase):
             },
         )
         for claim_id in new_claims:
-            path = CLAIMS / f"{claim_id}.json"
-            self.assertTrue(path.is_file(), path)
-            claim = load_json(path)
-            self.assertEqual(claim["subject"], "ecl:STATE-USA")
-            self.assertEqual(claim["predicate"], "ecl:tracks")
-            self.assertEqual(claim["status"], "accepted")
-            self.assertEqual(claim["evidenceFor"], ["ecl:EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14"])
+            self.assertIn(claim_id, self.claims_by_id, claim_id)
+            claim_path, claim = self.claims_by_id[claim_id]
+            self.assertEqual(claim["subject"], "ecl:STATE-USA", claim_path)
+            self.assertEqual(claim["predicate"], "ecl:tracks", claim_path)
+            self.assertEqual(claim["status"], "accepted", claim_path)
+            self.assertEqual(
+                claim["evidenceFor"],
+                ["ecl:EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14"],
+                claim_path,
+            )
 
 
 if __name__ == "__main__":
