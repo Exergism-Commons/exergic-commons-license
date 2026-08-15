@@ -27,9 +27,9 @@ def load_module(name: str, relative: str):
 
 class ScheduleCompatibilityGateTests(unittest.TestCase):
     def setUp(self):
-        self.renderer = load_module("render_schedule_pass18", "tools/render_schedule.py")
+        self.renderer = load_module("render_schedule_pass19", "tools/render_schedule.py")
         self.checker = load_module(
-            "check_schedule_compatibility_pass18",
+            "check_schedule_compatibility_pass19",
             "tools/check_schedule_compatibility_output.py",
         )
         self.sources = self.renderer.schedule_clause_source_paths()
@@ -105,6 +105,58 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             f"reviewed_at: {first}\nreviewed_at: {second}\n",
             1,
         )
+        return self.write_evidence_raw(raw)
+
+    def create_evidence_with_nested_duplicate_target_path(self):
+        evidence = self.evidence_template(reviewed_at="2026-08-15T00:00:00Z")
+        raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
+        target_path = self.review["target_license_artifact"]["path"]
+        marker = f"target_license_artifact:\n  path: {target_path}\n"
+        self.assertIn(marker, raw)
+        raw = raw.replace(
+            marker,
+            "target_license_artifact:\n"
+            "  path: stale/or-misleading-license.md\n"
+            f"  path: {target_path}\n",
+            1,
+        )
+        return self.write_evidence_raw(raw)
+
+    def create_evidence_with_nested_merge_key(self):
+        evidence = self.evidence_template(reviewed_at="2026-08-15T00:00:00Z")
+        raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
+        target_path = self.review["target_license_artifact"]["path"]
+        marker = f"target_license_artifact:\n  path: {target_path}\n"
+        self.assertIn(marker, raw)
+        raw = raw.replace(
+            marker,
+            "target_license_artifact:\n"
+            "  <<: &target_defaults\n"
+            f"    path: {target_path}\n"
+            f"  path: {target_path}\n",
+            1,
+        )
+        return self.write_evidence_raw(raw)
+
+    def create_evidence_with_alias(self):
+        evidence = self.evidence_template(reviewed_at="2026-08-15T00:00:00Z")
+        raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
+        marker = "reviewer: compatibility-regression-test\n"
+        self.assertIn(marker, raw)
+        raw = raw.replace(
+            marker,
+            "reviewer: &reviewer compatibility-regression-test\n"
+            "alias_probe: *reviewer\n",
+            1,
+        )
+        return self.write_evidence_raw(raw)
+
+    def create_evidence_with_custom_tag(self):
+        evidence = self.evidence_template(reviewed_at="2026-08-15T00:00:00Z")
+        raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
+        marker = "reviewer: compatibility-regression-test\n"
+        self.assertIn(marker, raw)
+        raw = raw.replace(marker, "reviewer: !custom compatibility-regression-test\n", 1)
         return self.write_evidence_raw(raw)
 
     def complete_pointer(self, evidence_id):
@@ -239,7 +291,7 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             with self.subTest(value=value):
                 self.renderer.validate_reviewed_at(value)
 
-    def test_reviewed_at_rejects_malformed_or_timezone_less_values(self):
+    def test_reviewed_at_rejects_malformed_timezone_less_or_padded_values(self):
         rejected = [
             "not-a-date",
             "2026-02-30",
@@ -253,6 +305,9 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             "2026-08-15T00:00:00+01:60",
             "2026-08-15T00:00:00+00:99",
             "2026-08-15T00:00:00+24:00",
+            " 2026-08-15T00:00:00Z",
+            "2026-08-15T00:00:00Z ",
+            " 2026-08-15 ",
             datetime(2026, 8, 15, 0, 0),
             20260815,
         ]
@@ -294,8 +349,35 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
         ):
             self.validate_pointer(self.complete_pointer(evidence_id))
 
+    def test_nested_duplicate_keys_are_rejected_before_safe_load(self):
+        evidence_id, _ = self.create_evidence_with_nested_duplicate_target_path()
+        with self.assertRaisesRegex(
+            ValueError, "duplicate Schedule compatibility evidence key: path"
+        ):
+            self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_nested_merge_keys_are_rejected_before_safe_load(self):
+        evidence_id, _ = self.create_evidence_with_nested_merge_key()
+        with self.assertRaisesRegex(ValueError, "must not use YAML merge keys"):
+            self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_yaml_aliases_are_rejected_before_safe_load(self):
+        evidence_id, _ = self.create_evidence_with_alias()
+        with self.assertRaisesRegex(ValueError, "must not use YAML aliases"):
+            self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_custom_yaml_tags_are_rejected_before_safe_load(self):
+        evidence_id, _ = self.create_evidence_with_custom_tag()
+        with self.assertRaisesRegex(ValueError, "unsupported YAML tag"):
+            self.validate_pointer(self.complete_pointer(evidence_id))
+
     def test_complete_evidence_rejects_impossible_leap_second(self):
         evidence_id, _ = self.create_evidence(reviewed_at="2026-08-15T12:34:60Z")
+        with self.assertRaisesRegex(ValueError, "valid ISO date or RFC 3339 timestamp"):
+            self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_complete_evidence_rejects_quoted_timestamp_whitespace(self):
+        evidence_id, _ = self.create_evidence(reviewed_at=" 2026-08-15T00:00:00Z ")
         with self.assertRaisesRegex(ValueError, "valid ISO date or RFC 3339 timestamp"):
             self.validate_pointer(self.complete_pointer(evidence_id))
 
