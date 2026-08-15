@@ -27,9 +27,9 @@ def load_module(name: str, relative: str):
 
 class ScheduleCompatibilityGateTests(unittest.TestCase):
     def setUp(self):
-        self.renderer = load_module("render_schedule_pass17", "tools/render_schedule.py")
+        self.renderer = load_module("render_schedule_pass18", "tools/render_schedule.py")
         self.checker = load_module(
-            "check_schedule_compatibility_pass17",
+            "check_schedule_compatibility_pass18",
             "tools/check_schedule_compatibility_output.py",
         )
         self.sources = self.renderer.schedule_clause_source_paths()
@@ -61,12 +61,12 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
         self.created.append(path)
         return evidence_id, path
 
-    def create_evidence(self, target_binding=None, reviewed_at="2026-08-15T00:00:00Z"):
-        evidence = {
+    def evidence_template(self, reviewed_at="REVIEWED_AT_PLACEHOLDER"):
+        return {
             "schema_version": 1,
             "target_license": self.renderer.TARGET_LICENSE,
             "target_license_artifact": copy.deepcopy(
-                target_binding or self.review["target_license_artifact"]
+                self.review["target_license_artifact"]
             ),
             "reviewer": "compatibility-regression-test",
             "reviewed_at": reviewed_at,
@@ -79,31 +79,32 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
                 for path in self.sources
             ],
         }
+
+    def create_evidence(self, target_binding=None, reviewed_at="2026-08-15T00:00:00Z"):
+        evidence = self.evidence_template(reviewed_at=reviewed_at)
+        if target_binding is not None:
+            evidence["target_license_artifact"] = copy.deepcopy(target_binding)
         raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
         return self.write_evidence_raw(raw)
 
     def create_evidence_with_unquoted_reviewed_at(self, reviewed_at_text: str):
-        evidence = {
-            "schema_version": 1,
-            "target_license": self.renderer.TARGET_LICENSE,
-            "target_license_artifact": copy.deepcopy(
-                self.review["target_license_artifact"]
-            ),
-            "reviewer": "compatibility-regression-test",
-            "reviewed_at": "REVIEWED_AT_PLACEHOLDER",
-            "conclusion": "compatible",
-            "sources": [
-                {
-                    "path": str(path.relative_to(ROOT)),
-                    "sha256": self.renderer.sha256(path),
-                }
-                for path in self.sources
-            ],
-        }
+        evidence = self.evidence_template()
         raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
         marker = "reviewed_at: REVIEWED_AT_PLACEHOLDER\n"
         self.assertIn(marker, raw)
         raw = raw.replace(marker, f"reviewed_at: {reviewed_at_text}\n", 1)
+        return self.write_evidence_raw(raw)
+
+    def create_evidence_with_duplicate_reviewed_at(self, first: str, second: str):
+        evidence = self.evidence_template()
+        raw = yaml.safe_dump(evidence, sort_keys=False, allow_unicode=True)
+        marker = "reviewed_at: REVIEWED_AT_PLACEHOLDER\n"
+        self.assertIn(marker, raw)
+        raw = raw.replace(
+            marker,
+            f"reviewed_at: {first}\nreviewed_at: {second}\n",
+            1,
+        )
         return self.write_evidence_raw(raw)
 
     def complete_pointer(self, evidence_id):
@@ -231,7 +232,6 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             "2026-08-15",
             "2026-08-15T00:00:00Z",
             "2026-08-15T00:00:00.123456+02:00",
-            "2026-08-15T23:59:60-23:59",
             date(2026, 8, 15),
             datetime(2026, 8, 15, 0, 0, tzinfo=timezone.utc),
         ]
@@ -247,6 +247,8 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             "2026-08-15 00:00:00Z",
             "2026-08-15T24:00:00Z",
             "2026-08-15T00:60:00Z",
+            "2026-08-15T00:00:60Z",
+            "2026-08-15T12:34:60Z",
             "2026-08-15T00:00:61Z",
             "2026-08-15T00:00:00+01:60",
             "2026-08-15T00:00:00+00:99",
@@ -281,6 +283,21 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
                     ValueError, "valid ISO date or RFC 3339 timestamp"
                 ):
                     self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_duplicate_reviewed_at_keys_are_rejected_before_safe_load(self):
+        evidence_id, _ = self.create_evidence_with_duplicate_reviewed_at(
+            "2026-08-15T00:00:00Z",
+            "2026-08-15T00:00:00+01:60",
+        )
+        with self.assertRaisesRegex(
+            ValueError, "duplicate Schedule compatibility evidence key: reviewed_at"
+        ):
+            self.validate_pointer(self.complete_pointer(evidence_id))
+
+    def test_complete_evidence_rejects_impossible_leap_second(self):
+        evidence_id, _ = self.create_evidence(reviewed_at="2026-08-15T12:34:60Z")
+        with self.assertRaisesRegex(ValueError, "valid ISO date or RFC 3339 timestamp"):
+            self.validate_pointer(self.complete_pointer(evidence_id))
 
     def test_rendered_state_checker_accepts_pending_and_complete(self):
         pending_text, _ = self.renderer.render()
