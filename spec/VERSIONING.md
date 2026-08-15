@@ -103,9 +103,11 @@ Canonical display form SHOULD be similar to:
 ECL-1.0.0@RP-2026.10.02.1
 ```
 
-A bundle manifest MUST contain immutable identifiers and SHA-256 hashes for both components.
+Every Bundle manifest MUST contain immutable identifiers and SHA-256 hashes for its License and Schedule components.
 
-This is the unit that downstream tooling, SBOMs, archives and compliance records should resolve.
+An `operative: true` Bundle MUST additionally content-address the immutable completed legal-review record required by [`LEGAL-ADVERSARIAL-REVIEW.md`](LEGAL-ADVERSARIAL-REVIEW.md). That review record binds the exact candidate License plus the exact reviewed incorporation/versioning model and Bundle schema. A non-operative draft/candidate MAY omit the legal-review component, but it remains explicitly non-operative.
+
+This Bundle identity is the unit that downstream tooling, SBOMs, archives and compliance records should resolve.
 
 ## 8. Publisher policy versus resolved legal state
 
@@ -126,18 +128,23 @@ channel = "stable-1"
 
 ### `ecl.lock`
 
-Records exactly what was resolved for a particular software release.
+Records exactly what was resolved for a particular software release, including whether that resolved Bundle is operative.
 
-Example:
+Example of an operative lock:
 
 ```toml
 bundle = "ECL-1.0.2@RP-2026.10.02.1"
+operative = true
 license = "ECL-1.0.2"
 license_sha256 = "..."
 schedule = "ECL-RP-2026.10.02.1"
 schedule_sha256 = "..."
+legal_review = "ECL-1.0.2-legal-review-1"
+legal_review_sha256 = "..."
 resolved_at = "2026-10-03T09:10:00Z"
 ```
+
+A lock produced through an explicit draft-resolution path MUST carry `operative = false`; omitting a completed legal-review record does not turn that draft into a stable/operative Bundle.
 
 A published software release SHOULD preserve its exact lock information or equivalent immutable metadata.
 
@@ -168,7 +175,7 @@ Resolves the newest stable ECL line. A change across an ECL MAJOR version MUST r
 
 ### 9.4 Draft/candidate channels
 
-Draft or candidate channels are explicitly non-operative unless and until a particular artifact is formally released and incorporated. Tooling MUST refuse to present a draft/candidate bundle as stable.
+Draft or candidate channels are explicitly non-operative unless and until a particular artifact is formally released and incorporated. Tooling MUST refuse to present a draft/candidate bundle as stable. If tooling provides an explicit draft-resolution escape hatch for testing, the resulting lock MUST preserve `operative = false`.
 
 ## 10. Mutable channels, immutable targets
 
@@ -249,6 +256,7 @@ For an exact software release:
 exact ECLBundle manifest
     -> exact LicenseRelease
     -> exact ScheduleRelease
+    -> immutable legal-review record when operative
 ```
 
 No mutable channel, registry, dossier, ticket or current Web view may override the exact immutable artifacts recorded in an already resolved bundle.
@@ -262,7 +270,16 @@ A bundle may be marked `operative: true` only when all required release gates ar
 - hashes match;
 - Schedule provenance resolves to reviewed governance decisions;
 - required CI/integrity checks pass;
-- legal/internal release review required by project policy is complete;
+- the legal adversarial review required by [`LEGAL-ADVERSARIAL-REVIEW.md`](LEGAL-ADVERSARIAL-REVIEW.md) is complete for the exact release-candidate text and Schedule-incorporation mechanism;
+- the Bundle content-addresses that completed immutable legal-review record;
+- the legal-review record binds the exact License hash, exact reviewed `VERSIONING.md` incorporation model and exact reviewed Bundle schema;
+- no unresolved legal-review `BLOCKER` remains, and every `MAJOR` finding is resolved, narrowed or explicitly accepted as a documented jurisdictional limitation/risk under that review process;
+- every required minimum jurisdiction track and every mandatory legal attack surface has a recorded disposition;
+- any separate internal release review required by project policy is complete; and
 - the bundle manifest is itself immutable/versioned.
+
+Release tooling MUST reject `operative: true` when the legal-review record is absent, its content hash fails, it targets a different License or reviewed incorporation artifact, or its machine-verifiable gate state is incomplete.
+
+A maintainer self-review, AI review, automated check or general community approval does not by itself satisfy the independent qualified legal-review minimum defined by `LEGAL-ADVERSARIAL-REVIEW.md`.
 
 Until those conditions are met, the artifact remains draft/candidate and MUST NOT be surfaced as stable by ECL tooling.

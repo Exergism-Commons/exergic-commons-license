@@ -10,9 +10,19 @@
     "operative": {"type": "boolean"},
     "license": {"$ref": "#/$defs/immutableComponent"},
     "schedule": {"$ref": "#/$defs/immutableComponent"},
+    "legal_review": {"$ref": "#/$defs/immutableComponent"},
     "knowledge_snapshot": {"type": ["string", "null"]},
     "released_at": {"type": "string", "format": "date-time"}
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"operative": {"const": true}},
+        "required": ["operative"]
+      },
+      "then": {"required": ["legal_review"]}
+    }
+  ],
   "$defs": {
     "immutableComponent": {
       "type": "object",
