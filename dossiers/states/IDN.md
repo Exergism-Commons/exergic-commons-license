@@ -40,16 +40,23 @@ Scope follows specific protest-criminalization, coordinated deceptive/intimidato
 
 Accountability/cessation of deception campaigns, protection of peaceful protest, rejection/remediation of abusive military expansion and effective investigation of Papua/extractive abuses.
 
-## 7. Historical evidence absorption
+## 7. Sources
+
+- https://www.amnesty.org/en/documents/asa21/1300/2026/en/
+- https://www.amnesty.org/en/documents/asa21/0624/2026/en/
+
+These locators are retained for the named Khariq Anhar peaceful-expression/prosecution project represented in the Schedule freeze; they do not establish the dossier's other military/deception, counterterrorism or Papua/extractive propositions by themselves.
+
+## 8. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-15:
 
-- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The protest-criminalization evidence, military-connected deception/intimidation concern, UN scrutiny, release/acquittal counter-evidence, implementation boundary for military powers and Papua/extractive attribution rule are reflected in §§1–6 above.
-- The historical tranche names Amnesty and UN Special Procedures evidence and the 2026 release/acquittal developments but gives no exact URLs/communication identifiers for this case. Repository search in this pass found no independent precise locator beyond the tranche/dossier text. No source or relationship is reconstructed by inference.
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **absorbed / partial locator gap remains**. The protest-criminalization evidence, military-connected deception/intimidation concern, UN scrutiny, release/acquittal counter-evidence, implementation boundary for military powers and Papua/extractive attribution rule are reflected in §§1–7 above.
+- Exact Amnesty locators for the named Khariq Anhar protest/expression prosecution project were recovered from `../../registry/schedule-state-s-freezes/batch-10b-idn-freeze.yml` and normalized into §7. The tranche's separate military-connected deception/intimidation, UN Special Procedures, broader release/acquittal cohort and Papua/extractive propositions still lack exact historical locators in the reviewed provenance; those narrower gaps remain open rather than being reconstructed by inference.
 - Issue #78 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
 
-Exact source-locator recovery remains an evidence-curation gap. This record does not convert draft legal authority into a restricted project, broaden Papua/extractive attribution or create/change structured Claims, EvidenceItems, grades, `asOf`, actor relationships or governance outcomes.
+Only the remaining proposition-specific historical locators are evidence-curation gaps. This record does not convert draft legal authority into a restricted project, broaden Papua/extractive attribution or create/change structured Claims, EvidenceItems, grades, `asOf`, actor relationships or governance outcomes.
 
-## 8. Procedural history
+## 9. Procedural history
 
 Issue #78 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
