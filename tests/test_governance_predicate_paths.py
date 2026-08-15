@@ -28,7 +28,22 @@ class GovernancePredicatePathTests(unittest.TestCase):
         graph.add((claim, ECL.predicate, predicate))
         graph.add((claim, ECL.literalValue, Literal("x")))
         graph.add((claim, ECL.status, Literal("rejected")))
-        graph.add((claim, ECL.provenance, Literal("adversarial path-separator regression")))
+        graph.add((claim, ECL.provenance, Literal("adversarial IRI-separator regression")))
+        return graph
+
+    @staticmethod
+    def state_graph(predicate: URIRef) -> Graph:
+        graph = Graph()
+        state = ECL["STATE-TST"]
+        graph.add((state, RDF.type, ECL.State))
+        graph.add((state, ECL.stableId, Literal("STATE-TST")))
+        graph.add((state, ECL.name, Literal("Test State")))
+        graph.add((state, ECL.iso3, Literal("TST")))
+        graph.add((state, ECL.dossier, Literal("../../dossiers/states/TST.md")))
+        graph.add((state, ECL.publicReviewIssue, URIRef("https://example.invalid/review/1")))
+        graph.add((state, ECL.lastSubstantiveReview, Literal("2026-08-15", datatype=XSD.date)))
+        graph.add((state, ECL.reviewClass, Literal("manual")))
+        graph.add((state, predicate, Literal("x")))
         return graph
 
     def assert_claim_conforms(self, graph: Graph) -> None:
@@ -40,11 +55,8 @@ class GovernancePredicatePathTests(unittest.TestCase):
         )
         self.assertTrue(conforms, report)
 
-    def test_http_path_governance_predicate_is_rejected_by_sparql_and_shacl(self):
-        graph = self.claim_graph(
-            URIRef("https://example.invalid/governance/status"),
-            "CLAIM-HTTP-PATH-GOVERNANCE",
-        )
+    def assert_claim_rejected(self, predicate: str, stable_id: str) -> None:
+        graph = self.claim_graph(URIRef(predicate), stable_id)
         rows = list(graph.query(self.query))
         self.assertEqual(len(rows), 1)
 
@@ -56,6 +68,24 @@ class GovernancePredicatePathTests(unittest.TestCase):
         )
         self.assertFalse(conforms, report)
         self.assertIn("Claim nodes may not encode governance", report)
+
+    def test_http_path_governance_predicate_is_rejected_by_sparql_and_shacl(self):
+        self.assert_claim_rejected(
+            "https://example.invalid/governance/status",
+            "CLAIM-HTTP-PATH-GOVERNANCE",
+        )
+
+    def test_http_fragment_governance_predicate_is_rejected_by_sparql_and_shacl(self):
+        self.assert_claim_rejected(
+            "https://example.invalid#governance-status",
+            "CLAIM-HTTP-FRAGMENT-GOVERNANCE",
+        )
+
+    def test_http_query_governance_predicate_is_rejected_by_sparql_and_shacl(self):
+        self.assert_claim_rejected(
+            "https://example.invalid?kind=governance/status",
+            "CLAIM-HTTP-QUERY-GOVERNANCE",
+        )
 
     def test_generic_http_status_predicate_remains_allowed_by_claim_guard(self):
         graph = self.claim_graph(
@@ -81,27 +111,26 @@ class GovernancePredicatePathTests(unittest.TestCase):
         self.assertEqual(list(graph.query(self.query)), [])
         self.assert_claim_conforms(graph)
 
-    def test_state_guard_uses_the_same_full_iri_normalization(self):
-        graph = Graph()
-        state = ECL["STATE-TST"]
-        graph.add((state, RDF.type, ECL.State))
-        graph.add((state, ECL.stableId, Literal("STATE-TST")))
-        graph.add((state, ECL.name, Literal("Test State")))
-        graph.add((state, ECL.iso3, Literal("TST")))
-        graph.add((state, ECL.dossier, Literal("../../dossiers/states/TST.md")))
-        graph.add((state, ECL.publicReviewIssue, URIRef("https://example.invalid/review/1")))
-        graph.add((state, ECL.lastSubstantiveReview, Literal("2026-08-15", datatype=XSD.date)))
-        graph.add((state, ECL.reviewClass, Literal("manual")))
-        graph.add((state, URIRef("https://example.invalid/governance/status"), Literal("x")))
-
-        conforms, _, report = shacl_validate(
-            graph,
-            shacl_graph=self.shapes,
-            ont_graph=self.ontology,
-            inference="none",
+    def test_state_guard_preserves_path_query_and_fragment_semantics(self):
+        predicates = (
+            "https://example.invalid/governance/status",
+            "https://example.invalid#governance-status",
+            "https://example.invalid?kind=governance/status",
         )
-        self.assertFalse(conforms, report)
-        self.assertIn("Governance/tier/restriction status must never live directly", report)
+        for predicate in predicates:
+            with self.subTest(predicate=predicate):
+                graph = self.state_graph(URIRef(predicate))
+                conforms, _, report = shacl_validate(
+                    graph,
+                    shacl_graph=self.shapes,
+                    ont_graph=self.ontology,
+                    inference="none",
+                )
+                self.assertFalse(conforms, report)
+                self.assertIn(
+                    "Governance/tier/restriction status must never live directly",
+                    report,
+                )
 
 
 if __name__ == "__main__":
