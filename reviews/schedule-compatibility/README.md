@@ -30,8 +30,12 @@ sources:
 `reviewed_at` must be either a valid ISO calendar date (`YYYY-MM-DD`) or a
 valid RFC 3339 timestamp with an explicit timezone (`Z` or `±HH:MM`). Unquoted
 YAML date/timestamp scalars are also accepted when PyYAML materializes them as
-`date` or timezone-aware `datetime` values. Malformed dates, arbitrary strings,
-and timezone-less timestamps are rejected. This parsing rule is part of the
+`date` or timezone-aware `datetime` values. The renderer validates the original
+YAML scalar lexically **before** PyYAML timestamp construction, including
+explicit clock/offset field ranges, so malformed inputs such as `24:00:00Z`,
+`+01:60`, or `+00:99` cannot be normalized into apparently valid values.
+Malformed dates, arbitrary strings, out-of-range clock/offset fields, and
+timezone-less timestamps are rejected. This parsing rule is part of the
 compatibility gate itself and is regression-tested through the same
 content-addressed evidence path used by a future `complete` state.
 
