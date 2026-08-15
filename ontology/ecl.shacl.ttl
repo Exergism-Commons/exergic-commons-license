@@ -240,14 +240,18 @@ ecl:StateMappingUniquenessShape a sh:NodeShape ;
     sh:targetClass ecl:State ;
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "State ISO3 and dossier mappings must be one-to-one." ;
+        sh:message "State ISO3 and dossier mappings must be one-to-one among State actors." ;
         sh:select """
             PREFIX ecl: <urn:ecl:>
             SELECT $this WHERE {
               {
-                $this ecl:iso3 ?v . ?other ecl:iso3 ?v . FILTER (?other != $this)
+                $this ecl:iso3 ?v .
+                ?other a ecl:State ; ecl:iso3 ?v .
+                FILTER (?other != $this)
               } UNION {
-                $this ecl:dossier ?v . ?other ecl:dossier ?v . FILTER (?other != $this)
+                $this ecl:dossier ?v .
+                ?other a ecl:State ; ecl:dossier ?v .
+                FILTER (?other != $this)
               }
             }
         """
