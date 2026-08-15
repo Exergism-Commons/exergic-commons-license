@@ -45,7 +45,17 @@ Implementation of Resolution 310, compliance with ADPF 635, independent prosecut
 - https://noticias.stf.jus.br/postsnoticias/stf-determina-ao-governo-do-rj-que-apresente-imagens-de-operacao-nos-complexos-do-alemao-e-da-penha/
 - https://www.cnmp.mp.br/portal/component/normas/norma/11739
 - https://www.hrw.org/news/2026/02/04/brazil-revamp-public-security-policies
+- https://www.hrw.org/news/2026/05/08/brazil-needs-independent-investigations-into-police-abuse
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **absorbed / otherwise already represented**. The tranche's Rio-operation evidence, structural-disparity concern, STF/ADPF 635 and Resolution 310 counter-evidence, federal attribution boundary and removal triggers were already reflected in §§2–6; this pass additionally restores the HRW independent-investigations source locator that previously lived only in the historical tranche.
+- Issue #24 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #24 · `../../reviews/2026/adversarial/scoped/tranche-02.md`

@@ -44,6 +44,15 @@ Mandatory review after Bahrain's CAT follow-up due 28 November 2026; independent
 
 - https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=%2F0aLqb%2BD86wFVEqMSMj7marJZz7q6eZ6uue7ppBVcvL3oDOFbTK%2F91v4HcvhDP%2FDvPnT%2BfyBG2imgEaPIfezcQ%3D%3D
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. The current dossier contains the tranche's substantive CAT evidence, credited reforms/counter-institutions, attribution boundary and mandatory follow-up trigger.
+- Issue #13 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #13 · `../../reviews/2026/adversarial/scoped/tranche-02.md`

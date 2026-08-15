@@ -46,6 +46,15 @@ Independent investigation outcomes, prosecution/remedy where warranted, use-of-f
 - https://www.amnesty.org/en/location/africa/southern-africa/angola/report-angola/
 - https://www.hrw.org/world-report/2026/country-chapters/angola
 
-## 8. Procedural history
+## 8. Historical evidence absorption
 
-Issue #5 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. Its substantive current evidence, counter-evidence, attribution narrowing and remediation triggers are reflected in §§2–7 above.
+- https://github.com/Papishushi/exergic-commons-license/issues/5#issuecomment-5248203761 — **historical-only / locator incomplete**. The earlier adjudication comment points to the former `STATE-ADJUDICATION-2026.md` row #5. That legacy filename no longer resolves in the repository; the surviving first-pass adjudication is `../../reviews/2026/initial-adjudication.md` row #5. The issue comment adds no independent source locator or substantive evidence beyond that first-pass surface, so it is retained as provenance rather than duplicated into the current source list.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
+
+Issue #5 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-02.md`

@@ -45,7 +45,17 @@ Decriminalization/non-use of defamation against protected journalism, effective 
 - https://www.ohr.int/69th-report-of-the-high-representative-for-implementation-of-the-peace-agreement-on-bosnia-and-herzegovina-to-the-secretary-general-of-the-un-/
 - https://www.coe.int/en/web/sarajevo/constitutional-justice
 - https://www.coe.int/en/web/sarajevo/media-freedom-bih
+- https://www.coe.int/ca/web/commissioner/-/bosnia-and-herzegovina-politicians-in-republika-srpska-should-refrain-from-hateful-speech
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **absorbed / otherwise already represented**. The tranche's Republika Srpska-specific evidence, national counter-institutions, attribution exclusions and removal triggers were already reflected in §§2–6; this pass additionally restores the exact Council of Europe Commissioner source locator that previously lived only in the historical tranche.
+- Issue #22 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #22 · `../../reviews/2026/adversarial/scoped/tranche-02.md`

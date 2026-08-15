@@ -46,6 +46,15 @@ Digital Code reform, independent remedy in Sossoukpè/comparable cases, proporti
 - https://www.amnesty.org/en/location/africa/west-and-central-africa/benin/report-benin/
 - https://www.frontlinedefenders.org/en/case/one-year-after-his-arrest-human-rights-defender-hugues-comlan-sosoukpe-remains-custody
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. The narrowed Digital Code/HAAC/CRIET evidence, the lifted media suspensions, fair-trial uncertainty and removal trigger are reflected in §§2–7 above.
+- Issue #19 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #19 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
