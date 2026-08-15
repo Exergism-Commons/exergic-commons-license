@@ -91,16 +91,24 @@ ecl:priority a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:rationale a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:validFrom a owl:DatatypeProperty ; rdfs:range xsd:date .
 ecl:validTo a owl:DatatypeProperty ; rdfs:range xsd:date .
+ecl:asOf a owl:DatatypeProperty ; rdfs:range xsd:date .
 ecl:observedAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime .
 ecl:publicationDate a owl:DatatypeProperty ; rdfs:range xsd:date .
 ecl:retrievedAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime .
-ecl:evidenceGrade a owl:DatatypeProperty ; rdfs:range xsd:string .
-ecl:claimConfidence a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:evidenceGrade a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:claimConfidence a owl:DatatypeProperty ; rdfs:domain ecl:Claim ; rdfs:range xsd:string .
 ecl:reviewDue a owl:DatatypeProperty ; rdfs:range xsd:date .
 ecl:lastSubstantiveReview a owl:DatatypeProperty ; rdfs:range xsd:date .
 ecl:reviewClass a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:reviewReason a owl:DatatypeProperty ; rdfs:range xsd:string .
-ecl:literalValue a owl:DatatypeProperty .
+ecl:literalValue a owl:DatatypeProperty ; rdfs:domain ecl:Claim .
+ecl:sourceLocator a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:publisher a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:title a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:sourceType a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:language a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:contentHash a owl:DatatypeProperty ; rdfs:domain ecl:EvidenceItem ; rdfs:range xsd:string .
+ecl:provenance a owl:DatatypeProperty ; rdfs:range xsd:string .
 
 # -----------------------------------------------------------------------------
 # Graph relationships
@@ -170,6 +178,7 @@ ecl:usesScheduleRelease a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:doma
 ecl:previousRelease a owl:ObjectProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range ecl:ReleaseArtifact .
 
 # Deliberate non-axioms / reasoning boundary:
+# - Claim nodes record reviewed propositions; they do not materialize their predicate as a direct subject triple.
 # - no owl:propertyChainAxiom is used for actor relationships;
 # - controls o participatesIn does NOT entail participatesIn;
 # - association with a Restricted actor does NOT infer a GovernanceOutcome;
