@@ -38,8 +38,8 @@
       "type": "object",
       "required": ["ref", "path", "sha256"],
       "properties": {
-        "ref": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
-        "path": {"type": "string", "pattern": "^reviews/legal/records/[A-Za-z0-9._-]+\\.json$"},
+        "ref": {"type": "string", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$"},
+        "path": {"type": "string", "pattern": "^reviews/legal/records/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?\\.json$"},
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       },
       "additionalProperties": false
