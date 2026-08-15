@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml
-from yaml.nodes import MappingNode, ScalarNode
+from yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 ROOT = Path(__file__).resolve().parents[1]
 REG = ROOT / "registry"
@@ -41,6 +41,15 @@ RFC3339_RE = re.compile(
     r"(?:\.\d+)?"
     r"(?P<zone>Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
 )
+STANDARD_MAPPING_TAG = "tag:yaml.org,2002:map"
+STANDARD_SEQUENCE_TAG = "tag:yaml.org,2002:seq"
+ALLOWED_SCALAR_TAGS = {
+    "tag:yaml.org,2002:str",
+    "tag:yaml.org,2002:int",
+    "tag:yaml.org,2002:bool",
+    "tag:yaml.org,2002:null",
+    "tag:yaml.org,2002:timestamp",
+}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -200,14 +209,14 @@ def assert_exact_source_bindings(
 
 
 def validate_reviewed_at(value: Any) -> None:
-    """Accept ISO dates or timezone-aware RFC 3339 review timestamps.
+    """Accept exact ISO dates or timezone-aware RFC 3339 review timestamps.
 
     PyYAML may materialize unquoted YAML date/timestamp scalars as ``date`` or
     ``datetime`` objects, so those semantic scalar types are accepted directly.
-    String values are validated lexically and semantically rather than merely
-    checked for non-emptiness. RFC 3339 clock and offset fields are range-bound
-    before any YAML timestamp constructor can normalize malformed input. Leap
-    seconds are intentionally rejected rather than relying on a mutable table of
+    String values are validated lexically and semantically without trimming or
+    other normalization. RFC 3339 clock and offset fields are range-bound before
+    any YAML timestamp constructor can normalize malformed input. Leap seconds
+    are intentionally rejected rather than relying on a mutable table of
     historical UTC insertion instants.
     """
 
@@ -219,10 +228,10 @@ def validate_reviewed_at(value: Any) -> None:
         return
     if isinstance(value, date):
         return
-    if not isinstance(value, str) or not value.strip():
+    if not isinstance(value, str) or not value:
         raise ValueError("Schedule compatibility evidence requires reviewed_at")
 
-    text = value.strip()
+    text = value
     if DATE_RE.fullmatch(text):
         try:
             date.fromisoformat(text)
@@ -245,29 +254,65 @@ def validate_reviewed_at(value: Any) -> None:
         ) from exc
 
 
+def validate_evidence_yaml_node(node: Node, seen_nodes: set[int] | None = None) -> None:
+    """Require an unambiguous, alias-free standard YAML subset for evidence."""
+
+    if seen_nodes is None:
+        seen_nodes = set()
+    node_id = id(node)
+    if node_id in seen_nodes:
+        raise ValueError("Schedule compatibility evidence must not use YAML aliases")
+    seen_nodes.add(node_id)
+
+    if isinstance(node, MappingNode):
+        if node.tag != STANDARD_MAPPING_TAG:
+            raise ValueError("Schedule compatibility evidence mapping uses an unsupported YAML tag")
+        seen_keys: set[str] = set()
+        for key_node, value_node in node.value:
+            if not isinstance(key_node, ScalarNode):
+                raise ValueError("Schedule compatibility evidence keys must be scalar")
+            key = key_node.value
+            if key == "<<" or key_node.tag == "tag:yaml.org,2002:merge":
+                raise ValueError("Schedule compatibility evidence must not use YAML merge keys")
+            if key_node.tag not in ALLOWED_SCALAR_TAGS:
+                raise ValueError("Schedule compatibility evidence key uses an unsupported YAML tag")
+            if key in seen_keys:
+                raise ValueError(f"duplicate Schedule compatibility evidence key: {key}")
+            seen_keys.add(key)
+            validate_evidence_yaml_node(value_node, seen_nodes)
+        return
+
+    if isinstance(node, SequenceNode):
+        if node.tag != STANDARD_SEQUENCE_TAG:
+            raise ValueError("Schedule compatibility evidence sequence uses an unsupported YAML tag")
+        for item in node.value:
+            validate_evidence_yaml_node(item, seen_nodes)
+        return
+
+    if isinstance(node, ScalarNode):
+        if node.tag not in ALLOWED_SCALAR_TAGS:
+            raise ValueError("Schedule compatibility evidence scalar uses an unsupported YAML tag")
+        return
+
+    raise ValueError("Schedule compatibility evidence contains an unsupported YAML node")
+
+
 def reviewed_at_lexical_value(path: Path) -> str:
-    """Validate root evidence structure and return the original reviewed_at scalar."""
+    """Validate the complete evidence tree and return the original reviewed_at scalar."""
 
     text = path.read_text(encoding="utf-8")
     document = yaml.compose(text)
     if not isinstance(document, MappingNode):
         raise ValueError(f"{path}: expected mapping at document root")
+    validate_evidence_yaml_node(document)
 
-    seen: set[str] = set()
     reviewed_at_node: ScalarNode | None = None
     for key_node, value_node in document.value:
-        if not isinstance(key_node, ScalarNode):
-            raise ValueError("Schedule compatibility evidence keys must be scalar")
-        key = key_node.value
-        if key == "<<":
-            raise ValueError("Schedule compatibility evidence must not use YAML merge keys")
-        if key in seen:
-            raise ValueError(f"duplicate Schedule compatibility evidence key: {key}")
-        seen.add(key)
-        if key == "reviewed_at":
+        if key_node.value == "reviewed_at":
             if not isinstance(value_node, ScalarNode):
                 raise ValueError("Schedule compatibility evidence requires scalar reviewed_at")
             reviewed_at_node = value_node
+            break
 
     if reviewed_at_node is None:
         raise ValueError("Schedule compatibility evidence requires reviewed_at")
@@ -300,8 +345,8 @@ def load_content_addressed_compatibility_evidence(
     if sha256(evidence_path) != evidence_id:
         raise ValueError("Schedule compatibility evidence content hash does not match review id")
 
-    # Inspect the original YAML mapping before safe_load can collapse duplicate
-    # keys or normalize malformed timestamp offsets into different values.
+    # Inspect the complete original YAML tree before safe_load can collapse
+    # duplicate/merge keys, resolve aliases, or normalize timestamp fields.
     validate_reviewed_at(reviewed_at_lexical_value(evidence_path))
     evidence = load_yaml(evidence_path)
     if evidence.get("schema_version") != 1:
