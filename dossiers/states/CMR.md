@@ -46,6 +46,15 @@ Release/remedy for remaining peaceful political detainees, independent investiga
 - https://www.amnesty.org/en/location/africa/west-and-central-africa/cameroon/report-cameroon/
 - https://www.amnesty.org/en/latest/news/2025/01/cameroon-dorgelesse-detention-protest/
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. The post-election force/detention evidence, legacy MRC military-court cases, Marafa review, judicial/accountability counter-evidence, non-State attribution boundary and removal triggers are reflected in §§2–7 above.
+- Issue #31 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #31 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
