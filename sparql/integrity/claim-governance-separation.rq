@@ -4,9 +4,21 @@ SELECT ?claim ?predicate ?object
 WHERE {
   ?claim a ecl:Claim ; ecl:predicate ?predicate .
   OPTIONAL { ?claim ecl:object ?object . }
+
+  # Compare a separator-normalized local name so governance__status,
+  # governance-status-code, restriction_status, etc. cannot bypass the guard.
+  BIND(REPLACE(STR(?predicate), "^.*[:/#]", "") AS ?localName)
+  BIND(REPLACE(LCASE(?localName), "[-_]+", "") AS ?normalizedName)
+
   FILTER (
     ?predicate = ecl:outcome ||
-    REGEX(STR(?predicate), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i") ||
+    CONTAINS(?normalizedName, "currentgovernance") ||
+    CONTAINS(?normalizedName, "governancestatus") ||
+    CONTAINS(?normalizedName, "governanceoutcome") ||
+    CONTAINS(?normalizedName, "restrictionstatus") ||
+    CONTAINS(?normalizedName, "restrictedstatus") ||
+    CONTAINS(?normalizedName, "provisionaloutcome") ||
+    STRSTARTS(?normalizedName, "tier") ||
     (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
   )
 }
