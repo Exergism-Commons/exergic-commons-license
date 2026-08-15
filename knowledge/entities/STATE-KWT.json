@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KWT",
+  "id": "STATE-KWT",
+  "type": "State",
+  "name": "Kuwait",
+  "iso3": "KWT",
+  "aliases": [
+    "KWT"
+  ],
+  "dossier": "../../dossiers/states/KWT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/90",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

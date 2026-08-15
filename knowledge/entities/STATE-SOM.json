@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SOM",
+  "id": "STATE-SOM",
+  "type": "State",
+  "name": "Somalia",
+  "iso3": "SOM",
+  "aliases": [
+    "SOM"
+  ],
+  "dossier": "../../dossiers/states/SOM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/161",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

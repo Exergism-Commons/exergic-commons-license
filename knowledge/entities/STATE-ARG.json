@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ARG",
+  "id": "STATE-ARG",
+  "type": "State",
+  "name": "Argentina",
+  "iso3": "ARG",
+  "aliases": [
+    "ARG"
+  ],
+  "dossier": "../../dossiers/states/ARG.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/7",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

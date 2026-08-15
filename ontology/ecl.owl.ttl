@@ -41,9 +41,6 @@ ecl:ExergicVariable a owl:Class .
 ecl:ECLCriterion a owl:Class .
 ecl:GovernanceOutcome a owl:Class .
 
-# These disjointness axioms catch category mistakes without asserting political or
-# legal conclusions. Agency and Institution intentionally remain subclasses of
-# Organization and are therefore not disjoint from it.
 [] a owl:AllDisjointClasses ;
     owl:members ( ecl:State ecl:Organization ecl:Person ecl:Project ecl:Deployment ) .
 
@@ -85,7 +82,9 @@ ecl:OutcomeN a ecl:GovernanceOutcome ; rdfs:label "No current ECL-relevant basis
 ecl:stableId a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:range xsd:string .
 ecl:name a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:alias a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:iso3 a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ecl:State ; rdfs:range xsd:string .
 ecl:dossier a owl:DatatypeProperty ; rdfs:range xsd:string .
+ecl:monitorId a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:status a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:fingerprint a owl:DatatypeProperty ; rdfs:range xsd:string .
 ecl:priority a owl:DatatypeProperty ; rdfs:range xsd:string .
@@ -113,6 +112,16 @@ ecl:subject a owl:ObjectProperty ;
 
 ecl:predicate a owl:ObjectProperty ; rdfs:domain ecl:Claim .
 ecl:object a owl:ObjectProperty ; rdfs:domain ecl:Claim .
+
+ecl:publicReviewIssue a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain ecl:State ;
+    rdfs:range owl:Thing ;
+    rdfs:comment "Public GitHub review surface for a State dossier. It is provenance/review metadata, not a governance database."@en .
+
+ecl:tracks a owl:ObjectProperty ;
+    rdfs:domain ecl:TrackedObject ;
+    rdfs:range ecl:TrackedObject ;
+    rdfs:comment "Explicitly curated tracking dependency. Tracking creates review relevance only, never inherited restriction."@en .
 
 ecl:controls a owl:ObjectProperty ; rdfs:domain ecl:Actor ; rdfs:range ecl:Actor .
 ecl:controlledBy a owl:ObjectProperty ; owl:inverseOf ecl:controls ; rdfs:domain ecl:Actor ; rdfs:range ecl:Actor .
@@ -160,8 +169,10 @@ ecl:usesLicenseRelease a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domai
 ecl:usesScheduleRelease a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ecl:ECLBundle ; rdfs:range ecl:ScheduleRelease .
 ecl:previousRelease a owl:ObjectProperty ; rdfs:domain ecl:ReleaseArtifact ; rdfs:range ecl:ReleaseArtifact .
 
-# Deliberate non-axioms:
+# Deliberate non-axioms / reasoning boundary:
+# - no owl:propertyChainAxiom is used for actor relationships;
 # - controls o participatesIn does NOT entail participatesIn;
 # - association with a Restricted actor does NOT infer a GovernanceOutcome;
+# - tracks is review/provenance metadata and does NOT infer participation or status;
 # - Exergism scores do NOT infer OutcomeR/OutcomeS/OutcomeU/OutcomeN;
 # - graph reachability may trigger review in tooling, never inherited restriction.

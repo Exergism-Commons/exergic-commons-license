@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SAU",
+  "id": "STATE-SAU",
+  "type": "State",
+  "name": "Saudi Arabia",
+  "iso3": "SAU",
+  "aliases": [
+    "SAU"
+  ],
+  "dossier": "../../dossiers/states/SAU.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/152",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

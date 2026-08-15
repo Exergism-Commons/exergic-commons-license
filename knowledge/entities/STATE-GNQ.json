@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-GNQ",
+  "id": "STATE-GNQ",
+  "type": "State",
+  "name": "Equatorial Guinea",
+  "iso3": "GNQ",
+  "aliases": [
+    "GNQ"
+  ],
+  "dossier": "../../dossiers/states/GNQ.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/53",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-HUN",
+  "id": "STATE-HUN",
+  "type": "State",
+  "name": "Hungary",
+  "iso3": "HUN",
+  "aliases": [
+    "HUN"
+  ],
+  "dossier": "../../dossiers/states/HUN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/75",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

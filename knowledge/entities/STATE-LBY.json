@@ -1,0 +1,18 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LBY",
+  "id": "STATE-LBY",
+  "type": "State",
+  "name": "Libya",
+  "iso3": "LBY",
+  "aliases": [
+    "LBY"
+  ],
+  "dossier": "../../dossiers/states/LBY.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/97",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual",
+  "trackedObjects": [
+    "ecl:PROJECT-MITIGA-DETENTION"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LTU",
+  "id": "STATE-LTU",
+  "type": "State",
+  "name": "Lithuania",
+  "iso3": "LTU",
+  "aliases": [
+    "LTU"
+  ],
+  "dossier": "../../dossiers/states/LTU.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/99",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

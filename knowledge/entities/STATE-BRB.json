@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BRB",
+  "id": "STATE-BRB",
+  "type": "State",
+  "name": "Barbados",
+  "iso3": "BRB",
+  "aliases": [
+    "BRB"
+  ],
+  "dossier": "../../dossiers/states/BRB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/15",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

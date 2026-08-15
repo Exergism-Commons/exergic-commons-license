@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BWA",
+  "id": "STATE-BWA",
+  "type": "State",
+  "name": "Botswana",
+  "iso3": "BWA",
+  "aliases": [
+    "BWA"
+  ],
+  "dossier": "../../dossiers/states/BWA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/23",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

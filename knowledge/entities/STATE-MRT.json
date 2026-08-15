@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MRT",
+  "id": "STATE-MRT",
+  "type": "State",
+  "name": "Mauritania",
+  "iso3": "MRT",
+  "aliases": [
+    "MRT"
+  ],
+  "dossier": "../../dossiers/states/MRT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/108",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

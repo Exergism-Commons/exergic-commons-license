@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CHE",
+  "id": "STATE-CHE",
+  "type": "State",
+  "name": "Switzerland",
+  "iso3": "CHE",
+  "aliases": [
+    "CHE"
+  ],
+  "dossier": "../../dossiers/states/CHE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/170",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

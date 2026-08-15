@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LVA",
+  "id": "STATE-LVA",
+  "type": "State",
+  "name": "Latvia",
+  "iso3": "LVA",
+  "aliases": [
+    "LVA"
+  ],
+  "dossier": "../../dossiers/states/LVA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/93",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-JOR",
+  "id": "STATE-JOR",
+  "type": "State",
+  "name": "Jordan",
+  "iso3": "JOR",
+  "aliases": [
+    "JOR"
+  ],
+  "dossier": "../../dossiers/states/JOR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/86",
+  "lastSubstantiveReview": "2026-08-12",
+  "reviewClass": "manual"
+}

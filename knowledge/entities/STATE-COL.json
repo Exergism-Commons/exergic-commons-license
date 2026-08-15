@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-COL",
+  "id": "STATE-COL",
+  "type": "State",
+  "name": "Colombia",
+  "iso3": "COL",
+  "aliases": [
+    "COL"
+  ],
+  "dossier": "../../dossiers/states/COL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/37",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewClass": "manual"
+}

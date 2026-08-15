@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ISL",
+  "id": "STATE-ISL",
+  "type": "State",
+  "name": "Iceland",
+  "iso3": "ISL",
+  "aliases": [
+    "ISL"
+  ],
+  "dossier": "../../dossiers/states/ISL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/76",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

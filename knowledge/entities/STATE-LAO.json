@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LAO",
+  "id": "STATE-LAO",
+  "type": "State",
+  "name": "Laos",
+  "iso3": "LAO",
+  "aliases": [
+    "LAO"
+  ],
+  "dossier": "../../dossiers/states/LAO.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/92",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewClass": "manual"
+}

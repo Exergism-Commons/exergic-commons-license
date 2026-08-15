@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MLI",
+  "id": "STATE-MLI",
+  "type": "State",
+  "name": "Mali",
+  "iso3": "MLI",
+  "aliases": [
+    "MLI"
+  ],
+  "dossier": "../../dossiers/states/MLI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/105",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

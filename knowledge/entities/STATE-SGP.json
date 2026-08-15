@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SGP",
+  "id": "STATE-SGP",
+  "type": "State",
+  "name": "Singapore",
+  "iso3": "SGP",
+  "aliases": [
+    "SGP"
+  ],
+  "dossier": "../../dossiers/states/SGP.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/157",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

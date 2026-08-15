@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SEN",
+  "id": "STATE-SEN",
+  "type": "State",
+  "name": "Senegal",
+  "iso3": "SEN",
+  "aliases": [
+    "SEN"
+  ],
+  "dossier": "../../dossiers/states/SEN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/153",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

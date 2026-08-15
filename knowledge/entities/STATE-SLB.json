@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SLB",
+  "id": "STATE-SLB",
+  "type": "State",
+  "name": "Solomon Islands",
+  "iso3": "SLB",
+  "aliases": [
+    "SLB"
+  ],
+  "dossier": "../../dossiers/states/SLB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/160",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

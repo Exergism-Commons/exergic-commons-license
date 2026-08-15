@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TCD",
+  "id": "STATE-TCD",
+  "type": "State",
+  "name": "Chad",
+  "iso3": "TCD",
+  "aliases": [
+    "TCD"
+  ],
+  "dossier": "../../dossiers/states/TCD.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/34",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

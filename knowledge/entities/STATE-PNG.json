@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PNG",
+  "id": "STATE-PNG",
+  "type": "State",
+  "name": "Papua New Guinea",
+  "iso3": "PNG",
+  "aliases": [
+    "PNG"
+  ],
+  "dossier": "../../dossiers/states/PNG.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/135",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

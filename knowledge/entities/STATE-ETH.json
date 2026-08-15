@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ETH",
+  "id": "STATE-ETH",
+  "type": "State",
+  "name": "Ethiopia",
+  "iso3": "ETH",
+  "aliases": [
+    "ETH"
+  ],
+  "dossier": "../../dossiers/states/ETH.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/57",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

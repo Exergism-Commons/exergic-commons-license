@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-NAM",
+  "id": "STATE-NAM",
+  "type": "State",
+  "name": "Namibia",
+  "iso3": "NAM",
+  "aliases": [
+    "NAM"
+  ],
+  "dossier": "../../dossiers/states/NAM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/119",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

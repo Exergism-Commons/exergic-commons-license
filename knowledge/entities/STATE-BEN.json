@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BEN",
+  "id": "STATE-BEN",
+  "type": "State",
+  "name": "Benin",
+  "iso3": "BEN",
+  "aliases": [
+    "BEN"
+  ],
+  "dossier": "../../dossiers/states/BEN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/19",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ITA",
+  "id": "STATE-ITA",
+  "type": "State",
+  "name": "Italy",
+  "iso3": "ITA",
+  "aliases": [
+    "ITA"
+  ],
+  "dossier": "../../dossiers/states/ITA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/83",
+  "lastSubstantiveReview": "2026-08-12",
+  "reviewClass": "manual"
+}

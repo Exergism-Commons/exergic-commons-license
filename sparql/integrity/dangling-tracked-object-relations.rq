@@ -1,0 +1,19 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?subject ?predicate ?object WHERE {
+  VALUES ?predicate {
+    ecl:tracks
+    ecl:controls
+    ecl:controlledBy
+    ecl:participatesIn
+    ecl:operates
+    ecl:deploys
+    ecl:materiallyBenefits
+    ecl:targetsOrAffects
+    ecl:remediates
+    ecl:reviews
+  }
+  ?subject ?predicate ?object .
+  FILTER (STRSTARTS(STR(?object), "urn:ecl:"))
+  FILTER NOT EXISTS { ?object ecl:stableId ?stableId . }
+}

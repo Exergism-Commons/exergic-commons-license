@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-RUS",
+  "id": "STATE-RUS",
+  "type": "State",
+  "name": "Russia",
+  "iso3": "RUS",
+  "aliases": [
+    "RUS"
+  ],
+  "dossier": "../../dossiers/states/RUS.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/144",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

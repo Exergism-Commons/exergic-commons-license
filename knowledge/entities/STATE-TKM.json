@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TKM",
+  "id": "STATE-TKM",
+  "type": "State",
+  "name": "Turkmenistan",
+  "iso3": "TKM",
+  "aliases": [
+    "TKM"
+  ],
+  "dossier": "../../dossiers/states/TKM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/181",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KHM",
+  "id": "STATE-KHM",
+  "type": "State",
+  "name": "Cambodia",
+  "iso3": "KHM",
+  "aliases": [
+    "KHM"
+  ],
+  "dossier": "../../dossiers/states/KHM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/30",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

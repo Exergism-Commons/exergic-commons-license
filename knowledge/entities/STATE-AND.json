@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-AND",
+  "id": "STATE-AND",
+  "type": "State",
+  "name": "Andorra",
+  "iso3": "AND",
+  "aliases": [
+    "AND"
+  ],
+  "dossier": "../../dossiers/states/AND.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/4",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

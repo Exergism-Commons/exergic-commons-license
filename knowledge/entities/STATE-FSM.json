@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-FSM",
+  "id": "STATE-FSM",
+  "type": "State",
+  "name": "Micronesia",
+  "iso3": "FSM",
+  "aliases": [
+    "FSM"
+  ],
+  "dossier": "../../dossiers/states/FSM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/111",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

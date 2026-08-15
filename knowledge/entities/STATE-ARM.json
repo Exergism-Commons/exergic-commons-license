@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ARM",
+  "id": "STATE-ARM",
+  "type": "State",
+  "name": "Armenia",
+  "iso3": "ARM",
+  "aliases": [
+    "ARM"
+  ],
+  "dossier": "../../dossiers/states/ARM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/8",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

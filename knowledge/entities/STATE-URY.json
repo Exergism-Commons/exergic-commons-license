@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-URY",
+  "id": "STATE-URY",
+  "type": "State",
+  "name": "Uruguay",
+  "iso3": "URY",
+  "aliases": [
+    "URY"
+  ],
+  "dossier": "../../dossiers/states/URY.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/188",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

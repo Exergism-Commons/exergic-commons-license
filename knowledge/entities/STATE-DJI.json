@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-DJI",
+  "id": "STATE-DJI",
+  "type": "State",
+  "name": "Djibouti",
+  "iso3": "DJI",
+  "aliases": [
+    "DJI"
+  ],
+  "dossier": "../../dossiers/states/DJI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/47",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

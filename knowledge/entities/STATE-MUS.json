@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MUS",
+  "id": "STATE-MUS",
+  "type": "State",
+  "name": "Mauritius",
+  "iso3": "MUS",
+  "aliases": [
+    "MUS"
+  ],
+  "dossier": "../../dossiers/states/MUS.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/109",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

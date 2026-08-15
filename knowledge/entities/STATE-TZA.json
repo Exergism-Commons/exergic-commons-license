@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TZA",
+  "id": "STATE-TZA",
+  "type": "State",
+  "name": "Tanzania",
+  "iso3": "TZA",
+  "aliases": [
+    "TZA"
+  ],
+  "dossier": "../../dossiers/states/TZA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/173",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-GUY",
+  "id": "STATE-GUY",
+  "type": "State",
+  "name": "Guyana",
+  "iso3": "GUY",
+  "aliases": [
+    "GUY"
+  ],
+  "dossier": "../../dossiers/states/GUY.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/71",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

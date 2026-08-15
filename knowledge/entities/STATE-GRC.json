@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-GRC",
+  "id": "STATE-GRC",
+  "type": "State",
+  "name": "Greece",
+  "iso3": "GRC",
+  "aliases": [
+    "GRC"
+  ],
+  "dossier": "../../dossiers/states/GRC.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/66",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewClass": "manual"
+}

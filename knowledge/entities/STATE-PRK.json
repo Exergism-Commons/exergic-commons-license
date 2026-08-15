@@ -3,9 +3,16 @@
   "iri": "ecl:STATE-PRK",
   "id": "STATE-PRK",
   "type": "State",
-  "name": "North Korea (DPRK)",
-  "aliases": ["PRK", "DPRK", "Democratic People's Republic of Korea"],
+  "name": "North Korea",
+  "iso3": "PRK",
+  "aliases": [
+    "PRK",
+    "DPRK",
+    "Democratic People's Republic of Korea",
+    "North Korea (DPRK)"
+  ],
   "dossier": "../../dossiers/states/PRK.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/127",
   "lastSubstantiveReview": "2026-08-14",
   "reviewDue": "2026-09-14",
   "reviewClass": "active",

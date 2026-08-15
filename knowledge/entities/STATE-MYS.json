@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MYS",
+  "id": "STATE-MYS",
+  "type": "State",
+  "name": "Malaysia",
+  "iso3": "MYS",
+  "aliases": [
+    "MYS"
+  ],
+  "dossier": "../../dossiers/states/MYS.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/103",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

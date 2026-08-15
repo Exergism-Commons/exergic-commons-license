@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SWZ",
+  "id": "STATE-SWZ",
+  "type": "State",
+  "name": "Eswatini",
+  "iso3": "SWZ",
+  "aliases": [
+    "SWZ"
+  ],
+  "dossier": "../../dossiers/states/SWZ.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/56",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

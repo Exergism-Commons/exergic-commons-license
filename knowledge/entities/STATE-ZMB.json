@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ZMB",
+  "id": "STATE-ZMB",
+  "type": "State",
+  "name": "Zambia",
+  "iso3": "ZMB",
+  "aliases": [
+    "ZMB"
+  ],
+  "dossier": "../../dossiers/states/ZMB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/194",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

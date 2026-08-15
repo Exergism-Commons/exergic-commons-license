@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SYR",
+  "id": "STATE-SYR",
+  "type": "State",
+  "name": "Syria",
+  "iso3": "SYR",
+  "aliases": [
+    "SYR"
+  ],
+  "dossier": "../../dossiers/states/SYR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/171",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

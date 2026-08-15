@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-IRL",
+  "id": "STATE-IRL",
+  "type": "State",
+  "name": "Ireland",
+  "iso3": "IRL",
+  "aliases": [
+    "IRL"
+  ],
+  "dossier": "../../dossiers/states/IRL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/81",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

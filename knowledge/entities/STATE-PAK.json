@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PAK",
+  "id": "STATE-PAK",
+  "type": "State",
+  "name": "Pakistan",
+  "iso3": "PAK",
+  "aliases": [
+    "PAK"
+  ],
+  "dossier": "../../dossiers/states/PAK.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/131",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

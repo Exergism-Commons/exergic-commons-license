@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-IRN",
+  "id": "STATE-IRN",
+  "type": "State",
+  "name": "Iran",
+  "iso3": "IRN",
+  "aliases": [
+    "IRN"
+  ],
+  "dossier": "../../dossiers/states/IRN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/79",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

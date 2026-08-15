@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MHL",
+  "id": "STATE-MHL",
+  "type": "State",
+  "name": "Marshall Islands",
+  "iso3": "MHL",
+  "aliases": [
+    "MHL"
+  ],
+  "dossier": "../../dossiers/states/MHL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/107",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

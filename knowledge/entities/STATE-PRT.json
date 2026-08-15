@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PRT",
+  "id": "STATE-PRT",
+  "type": "State",
+  "name": "Portugal",
+  "iso3": "PRT",
+  "aliases": [
+    "PRT"
+  ],
+  "dossier": "../../dossiers/states/PRT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/140",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

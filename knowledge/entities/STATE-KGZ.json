@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KGZ",
+  "id": "STATE-KGZ",
+  "type": "State",
+  "name": "Kyrgyzstan",
+  "iso3": "KGZ",
+  "aliases": [
+    "KGZ"
+  ],
+  "dossier": "../../dossiers/states/KGZ.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/91",
+  "lastSubstantiveReview": "2026-08-12",
+  "reviewClass": "manual"
+}

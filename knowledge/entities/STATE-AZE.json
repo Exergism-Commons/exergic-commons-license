@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-AZE",
+  "id": "STATE-AZE",
+  "type": "State",
+  "name": "Azerbaijan",
+  "iso3": "AZE",
+  "aliases": [
+    "AZE"
+  ],
+  "dossier": "../../dossiers/states/AZE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/11",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

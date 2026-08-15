@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-COD",
+  "id": "STATE-COD",
+  "type": "State",
+  "name": "Democratic Republic of the Congo",
+  "iso3": "COD",
+  "aliases": [
+    "COD"
+  ],
+  "dossier": "../../dossiers/states/COD.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/45",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

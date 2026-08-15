@@ -85,12 +85,20 @@ def build_signal(entity: dict[str, Any], today: dt.date) -> dict[str, Any] | Non
     if not isinstance(subject, str) or not subject:
         raise ValueError(f"{entity.get('_path')}: missing stable id")
 
-    due = parse_date(entity.get("reviewDue"), f"{subject}.reviewDue")
+    review_class = str(entity.get("reviewClass", "manual"))
+    raw_due = entity.get("reviewDue")
+    if raw_due is None:
+        # `manual` means no scheduled cadence has been curated yet. Absence is
+        # uncertainty, not a date to invent. Scheduled classes remain strict.
+        if review_class == "manual":
+            return None
+        raise ValueError(f"{subject}.reviewDue is required for reviewClass={review_class}")
+
+    due = parse_date(raw_due, f"{subject}.reviewDue")
     if due > today:
         return None
 
-    review_class = entity.get("reviewClass", "manual")
-    priority = PRIORITY_BY_CLASS.get(str(review_class), "P3")
+    priority = PRIORITY_BY_CLASS.get(review_class, "P3")
     fp = fingerprint(subject, due)
     signal_id = f"ECL-UPD-REVIEW-DUE-{subject}-{due.isoformat()}"
 

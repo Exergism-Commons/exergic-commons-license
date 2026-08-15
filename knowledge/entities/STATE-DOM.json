@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-DOM",
+  "id": "STATE-DOM",
+  "type": "State",
+  "name": "Dominican Republic",
+  "iso3": "DOM",
+  "aliases": [
+    "DOM"
+  ],
+  "dossier": "../../dossiers/states/DOM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/49",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

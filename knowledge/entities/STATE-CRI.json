@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CRI",
+  "id": "STATE-CRI",
+  "type": "State",
+  "name": "Costa Rica",
+  "iso3": "CRI",
+  "aliases": [
+    "CRI"
+  ],
+  "dossier": "../../dossiers/states/CRI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/39",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ZAF",
+  "id": "STATE-ZAF",
+  "type": "State",
+  "name": "South Africa",
+  "iso3": "ZAF",
+  "aliases": [
+    "ZAF"
+  ],
+  "dossier": "../../dossiers/states/ZAF.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/162",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

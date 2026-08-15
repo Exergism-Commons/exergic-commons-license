@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BRN",
+  "id": "STATE-BRN",
+  "type": "State",
+  "name": "Brunei",
+  "iso3": "BRN",
+  "aliases": [
+    "BRN"
+  ],
+  "dossier": "../../dossiers/states/BRN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/25",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

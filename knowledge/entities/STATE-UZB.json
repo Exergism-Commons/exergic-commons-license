@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-UZB",
+  "id": "STATE-UZB",
+  "type": "State",
+  "name": "Uzbekistan",
+  "iso3": "UZB",
+  "aliases": [
+    "UZB"
+  ],
+  "dossier": "../../dossiers/states/UZB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/189",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

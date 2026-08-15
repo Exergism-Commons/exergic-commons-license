@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SLV",
+  "id": "STATE-SLV",
+  "type": "State",
+  "name": "El Salvador",
+  "iso3": "SLV",
+  "aliases": [
+    "SLV"
+  ],
+  "dossier": "../../dossiers/states/SLV.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/52",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

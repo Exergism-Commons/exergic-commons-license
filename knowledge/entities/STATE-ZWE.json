@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ZWE",
+  "id": "STATE-ZWE",
+  "type": "State",
+  "name": "Zimbabwe",
+  "iso3": "ZWE",
+  "aliases": [
+    "ZWE"
+  ],
+  "dossier": "../../dossiers/states/ZWE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/195",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-DZA",
+  "id": "STATE-DZA",
+  "type": "State",
+  "name": "Algeria",
+  "iso3": "DZA",
+  "aliases": [
+    "DZA"
+  ],
+  "dossier": "../../dossiers/states/DZA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/3",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-STP",
+  "id": "STATE-STP",
+  "type": "State",
+  "name": "São Tomé and Príncipe",
+  "iso3": "STP",
+  "aliases": [
+    "STP"
+  ],
+  "dossier": "../../dossiers/states/STP.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/151",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

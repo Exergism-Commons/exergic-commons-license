@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-IND",
+  "id": "STATE-IND",
+  "type": "State",
+  "name": "India",
+  "iso3": "IND",
+  "aliases": [
+    "IND"
+  ],
+  "dossier": "../../dossiers/states/IND.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/77",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

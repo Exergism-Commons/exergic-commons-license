@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-NER",
+  "id": "STATE-NER",
+  "type": "State",
+  "name": "Niger",
+  "iso3": "NER",
+  "aliases": [
+    "NER"
+  ],
+  "dossier": "../../dossiers/states/NER.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/125",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

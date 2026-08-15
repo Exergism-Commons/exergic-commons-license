@@ -6,7 +6,34 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from rdflib import Graph
+from rdflib import Dataset, Graph
+
+
+QUAD_FORMATS = {"nquads", "trig"}
+
+
+def graph_format(path: Path) -> str | None:
+    return {
+        ".ttl": "turtle",
+        ".nt": "nt",
+        ".nq": "nquads",
+        ".trig": "trig",
+        ".jsonld": "json-ld",
+        ".json": "json-ld",
+    }.get(path.suffix.lower())
+
+
+def load_query_graph(path: Path) -> Graph | Dataset:
+    """Load triples or quads into a query view that includes every context."""
+    fmt = graph_format(path)
+    if fmt in QUAD_FORMATS:
+        dataset = Dataset(default_union=True)
+        dataset.parse(path, format=fmt)
+        return dataset
+
+    graph = Graph()
+    graph.parse(path, format=fmt)
+    return graph
 
 
 def main() -> int:
@@ -15,8 +42,7 @@ def main() -> int:
     parser.add_argument("query_dir", type=Path, nargs="?", default=Path("sparql/integrity"))
     args = parser.parse_args()
 
-    graph = Graph()
-    graph.parse(args.graph, format="turtle")
+    graph = load_query_graph(args.graph)
 
     failed = False
     queries = sorted(args.query_dir.glob("*.rq"))

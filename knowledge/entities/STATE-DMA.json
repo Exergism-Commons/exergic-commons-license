@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-DMA",
+  "id": "STATE-DMA",
+  "type": "State",
+  "name": "Dominica",
+  "iso3": "DMA",
+  "aliases": [
+    "DMA"
+  ],
+  "dossier": "../../dossiers/states/DMA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/48",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

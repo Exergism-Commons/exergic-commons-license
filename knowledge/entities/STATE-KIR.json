@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KIR",
+  "id": "STATE-KIR",
+  "type": "State",
+  "name": "Kiribati",
+  "iso3": "KIR",
+  "aliases": [
+    "KIR"
+  ],
+  "dossier": "../../dossiers/states/KIR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/89",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

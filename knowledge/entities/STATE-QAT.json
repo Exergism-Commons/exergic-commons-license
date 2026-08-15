@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-QAT",
+  "id": "STATE-QAT",
+  "type": "State",
+  "name": "Qatar",
+  "iso3": "QAT",
+  "aliases": [
+    "QAT"
+  ],
+  "dossier": "../../dossiers/states/QAT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/141",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

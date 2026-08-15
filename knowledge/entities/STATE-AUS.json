@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-AUS",
+  "id": "STATE-AUS",
+  "type": "State",
+  "name": "Australia",
+  "iso3": "AUS",
+  "aliases": [
+    "AUS"
+  ],
+  "dossier": "../../dossiers/states/AUS.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/9",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

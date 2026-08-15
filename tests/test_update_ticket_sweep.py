@@ -15,16 +15,18 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 class UpdateTicketSweepTests(unittest.TestCase):
     def entity(self, review_due="2026-09-01", review_class="hot"):
-        return {
+        entity = {
             "iri": "ecl:STATE-TEST",
             "id": "STATE-TEST",
             "name": "Test State",
             "dossier": "../../dossiers/states/TST.md",
             "lastSubstantiveReview": "2026-08-14",
-            "reviewDue": review_due,
             "reviewClass": review_class,
             "reviewReason": "test",
         }
+        if review_due is not None:
+            entity["reviewDue"] = review_due
+        return entity
 
     def test_future_review_does_not_fire(self):
         today = MODULE.dt.date(2026, 8, 14)
@@ -44,6 +46,15 @@ class UpdateTicketSweepTests(unittest.TestCase):
         today = MODULE.dt.date(2026, 9, 1)
         signal = MODULE.build_signal(self.entity(review_class="stable"), today)
         self.assertEqual(signal["priority"], "P3")
+
+    def test_manual_without_due_is_unscheduled_not_an_error(self):
+        today = MODULE.dt.date(2026, 9, 1)
+        self.assertIsNone(MODULE.build_signal(self.entity(review_due=None, review_class="manual"), today))
+
+    def test_scheduled_class_without_due_is_invalid(self):
+        today = MODULE.dt.date(2026, 9, 1)
+        with self.assertRaisesRegex(ValueError, "reviewDue is required"):
+            MODULE.build_signal(self.entity(review_due=None, review_class="hot"), today)
 
     def test_load_entities_is_deterministic(self):
         with tempfile.TemporaryDirectory() as tmp:

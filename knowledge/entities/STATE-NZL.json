@@ -4,8 +4,12 @@
   "id": "STATE-NZL",
   "type": "State",
   "name": "New Zealand",
-  "aliases": ["NZL"],
+  "iso3": "NZL",
+  "aliases": [
+    "NZL"
+  ],
   "dossier": "../../dossiers/states/NZL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/123",
   "lastSubstantiveReview": "2026-08-14",
   "reviewDue": "2026-11-14",
   "reviewClass": "stable",

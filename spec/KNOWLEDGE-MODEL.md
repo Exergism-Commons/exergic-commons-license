@@ -7,15 +7,18 @@
 ECL uses a semantic stack with strict separation of concerns:
 
 ```text
+Dossiers          -> current human governance synthesis
 OWL 2 TBox        -> domain semantics and safe inference
-JSON-LD ABox      -> Git-native individuals/facts/records
-SHACL Shapes      -> repository/data validity constraints
-RDF Dataset       -> derived common graph model
-SPARQL            -> integrity, dependency and review queries
+JSON-LD ABox      -> Git-native individuals/facts/events
+SHACL Shapes      -> canonical repository/data validity constraints
+RDF Dataset       -> derived common graph/index model
+SPARQL            -> derived integrity, dependency and review queries
+GitHub issues     -> public review/provenance surface, never the database
+Schedules         -> immutable legal/release artifacts when incorporated
 Governance rules  -> procedural escalation; never hidden ontology law
 ```
 
-The canonical editable records remain in Git. Any RDF database/triplestore is a disposable index and MUST be reconstructible from repository sources.
+The canonical editable semantic records remain in Git. Any RDF database/triplestore is a disposable index and MUST be reconstructible from repository sources. Governance synthesis remains in dossiers until an explicit reviewed decision/release procedure says otherwise.
 
 ## 2. OWL TBox
 
@@ -35,7 +38,7 @@ OWL MUST NOT encode governance shortcuts such as:
 restricted(P) and participatesIn(A,P) -> restricted(A)
 ```
 
-or any score-to-tier function.
+or any score-to-tier function. ECL deliberately defines no actor-relation `owl:propertyChainAxiom` that can propagate participation, culpability or governance status.
 
 Graph reachability can create a **review dependency** in tooling but never inherited guilt/designation.
 
@@ -48,9 +51,11 @@ Each record separates:
 - an RDF IRI such as `urn:ecl:STATE-USA`; and
 - a human/tooling stable ID such as `STATE-USA`.
 
-The stable ID remains convenient for tickets and files; the IRI prevents path-relative RDF identity drift.
+The State dossier's governance identifier remains `ECL-STATE-USA`. That dossier ID, the semantic stable ID and the RDF IRI are deterministic but serve different layers.
 
-ABox records SHOULD remain small and reviewable in ordinary Git diffs.
+ABox records SHOULD remain small and reviewable in ordinary Git diffs. A State Actor may contain semantic identity, provenance, review-clock metadata and explicitly curated relations; it MUST NOT contain `R/S/U/N`, tier, restriction status or an equivalent direct governance classification.
+
+Review clocks preserve uncertainty. `hot`, `active` and `stable` identify scheduled review classes and therefore require an explicit `reviewDue`. `manual` means no automatic cadence is asserted; `reviewDue` may be absent until a reviewer curates one. Tooling MUST NOT synthesize a due date merely to satisfy a schema.
 
 ## 4. Claims as first-class individuals
 
@@ -64,9 +69,12 @@ A claim can carry:
 - temporal validity;
 - supporting and contrary evidence;
 - status (`candidate`, `accepted`, `disputed`, `rejected`, `superseded`);
-- affected Exergism variables / ECL criteria when reviewed.
+- affected Exergism variables / ECL criteria when reviewed;
+- provenance to the dossier and underlying evidence.
 
 This explicit claim-node pattern is preferred over relying on RDF-star/OWL 1.2-only features until the project deliberately adopts them.
+
+The 195-State identity migration intentionally does **not** NLP-convert dossier prose into claims. A structured fact is added only when it is sufficiently explicit and reviewable; uncertainty is preserved rather than converted into a guessed triple.
 
 ## 5. SHACL
 
@@ -75,6 +83,11 @@ This explicit claim-node pattern is preferred over relying on RDF-star/OWL 1.2-o
 Examples:
 
 - every tracked object has exactly one stable ID/name/dossier;
+- every State has exactly one ISO3, dossier mapping and public-review IRI;
+- State stable ID / IRI / ISO3 / dossier paths agree;
+- State ISO3 and dossier mappings are one-to-one;
+- scheduled review classes require an explicit due date while `manual` may remain unscheduled;
+- no State carries a direct governance/tier/restriction-status predicate or direct GovernanceOutcome relation;
 - every active claim has an exact subject/predicate and evidence basis;
 - evidence grades are from the allowed `E0-E3` set;
 - update cases have fingerprints/priorities;
@@ -85,9 +98,9 @@ A SHACL failure is a repository-integrity failure, not a moral/legal inference.
 
 ## 6. Derived RDF and SPARQL
 
-`tools/build_knowledge_graph.py` parses ABox JSON-LD and the OWL TBox and emits a rebuildable RDF dataset.
+`tools/build_knowledge_graph.py` parses ABox JSON-LD and the OWL TBox and emits rebuildable RDF. Human-readable Turtle remains available, while canonicalized sorted N-Triples provide a byte-deterministic build target and RDF digest.
 
-`tools/run_sparql_checks.py` executes integrity queries under `sparql/integrity/`; any returned row is a CI failure.
+`tools/run_sparql_checks.py` executes integrity queries under `sparql/integrity/`; any returned row is a CI failure. The State corpus queries assert exact cardinality, unique mappings, identifier consistency and the governance-separation guardrails.
 
 SPARQL is also the intended mechanism for later dependency queries such as:
 
@@ -106,19 +119,26 @@ Three forms of inference must remain distinct:
 2. **validation** — SHACL constraints over repository records;
 3. **governance inference** — explicit review procedure implemented/documented outside the ontology.
 
-Only the third can lead toward an ECL governance decision, and even then only through the defined review process.
+Only the third can lead toward an ECL governance decision, and even then only through the defined review process. A relation such as `controls`, `tracks`, `participatesIn`, `operates` or `deploys` is evidence/review structure, never inherited restriction.
 
 ## 8. Reproducibility
 
-The RDF store is never the authoritative history. A `KnowledgeSnapshot` binds:
+The RDF store is never the authoritative history. A `KnowledgeSnapshot` can bind:
 
 - Git commit;
 - canonical ABox source digest;
 - ontology digest;
-- evidence cutoff.
+- evidence cutoff;
+- deterministic RDF digest.
 
 Thus a reviewer can delete the generated RDF/triplestore and rebuild the same knowledge state from Git.
 
+For State identities, `knowledge/generated/state-abox-manifest.json` additionally hashes the generator-owned projection of every ISO3. It is conflict-detection metadata, not ABox data and not governance.
+
 ## 9. Current implementation boundary
 
-The current branch contains a five-State pilot ABox. The 195-State migration begins only after the ontology/shapes/update/versioning architecture is adopted and CI is green.
+The Git-native ABox now contains **195 State Actors**, one for every canonical `dossiers/states/ISO3.md` dossier. The migration is generated and checked by `tools/migrate_state_abox.py` and CI requires 195 unique State IRIs, stable IDs, ISO3 values and dossier mappings.
+
+This completes the State **identity/provenance** migration only. It does not imply that all 195 dossiers have complete formal Exergism assessments, fully normalized Claim/EvidenceItem graphs or accepted machine-readable GovernanceDecision records. Those are separate reviewed migrations and must not be fabricated merely to fill the graph.
+
+Generator-owned State fields are reconstructed from dossier frontmatter; curated aliases, review clocks, tracked objects, monitors and semantic relations are preserved. New States default to `reviewClass: manual` without inventing a `reviewDue`; a due date appears only when the repository contains a curated cadence. The generator validates `provisional_outcome` but never materializes it into the Actor.

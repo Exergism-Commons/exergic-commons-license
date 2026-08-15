@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SDN",
+  "id": "STATE-SDN",
+  "type": "State",
+  "name": "Sudan",
+  "iso3": "SDN",
+  "aliases": [
+    "SDN"
+  ],
+  "dossier": "../../dossiers/states/SDN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/167",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

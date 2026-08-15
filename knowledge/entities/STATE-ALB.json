@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ALB",
+  "id": "STATE-ALB",
+  "type": "State",
+  "name": "Albania",
+  "iso3": "ALB",
+  "aliases": [
+    "ALB"
+  ],
+  "dossier": "../../dossiers/states/ALB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/2",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

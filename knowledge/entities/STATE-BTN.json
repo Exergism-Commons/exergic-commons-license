@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BTN",
+  "id": "STATE-BTN",
+  "type": "State",
+  "name": "Bhutan",
+  "iso3": "BTN",
+  "aliases": [
+    "BTN"
+  ],
+  "dossier": "../../dossiers/states/BTN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/20",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

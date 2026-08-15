@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CPV",
+  "id": "STATE-CPV",
+  "type": "State",
+  "name": "Cabo Verde",
+  "iso3": "CPV",
+  "aliases": [
+    "CPV"
+  ],
+  "dossier": "../../dossiers/states/CPV.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/29",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

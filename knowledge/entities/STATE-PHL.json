@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PHL",
+  "id": "STATE-PHL",
+  "type": "State",
+  "name": "Philippines",
+  "iso3": "PHL",
+  "aliases": [
+    "PHL"
+  ],
+  "dossier": "../../dossiers/states/PHL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/138",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewClass": "manual"
+}

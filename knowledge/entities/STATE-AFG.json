@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-AFG",
+  "id": "STATE-AFG",
+  "type": "State",
+  "name": "Afghanistan",
+  "iso3": "AFG",
+  "aliases": [
+    "AFG"
+  ],
+  "dossier": "../../dossiers/states/AFG.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/1",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

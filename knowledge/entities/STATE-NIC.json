@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-NIC",
+  "id": "STATE-NIC",
+  "type": "State",
+  "name": "Nicaragua",
+  "iso3": "NIC",
+  "aliases": [
+    "NIC"
+  ],
+  "dossier": "../../dossiers/states/NIC.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/124",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

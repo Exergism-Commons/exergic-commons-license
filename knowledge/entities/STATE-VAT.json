@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-VAT",
+  "id": "STATE-VAT",
+  "type": "State",
+  "name": "Holy See",
+  "iso3": "VAT",
+  "aliases": [
+    "VAT"
+  ],
+  "dossier": "../../dossiers/states/VAT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/73",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

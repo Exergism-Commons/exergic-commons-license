@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SUR",
+  "id": "STATE-SUR",
+  "type": "State",
+  "name": "Suriname",
+  "iso3": "SUR",
+  "aliases": [
+    "SUR"
+  ],
+  "dossier": "../../dossiers/states/SUR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/168",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BRA",
+  "id": "STATE-BRA",
+  "type": "State",
+  "name": "Brazil",
+  "iso3": "BRA",
+  "aliases": [
+    "BRA"
+  ],
+  "dossier": "../../dossiers/states/BRA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/24",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

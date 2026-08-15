@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CHN",
+  "id": "STATE-CHN",
+  "type": "State",
+  "name": "China",
+  "iso3": "CHN",
+  "aliases": [
+    "CHN"
+  ],
+  "dossier": "../../dossiers/states/CHN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/36",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

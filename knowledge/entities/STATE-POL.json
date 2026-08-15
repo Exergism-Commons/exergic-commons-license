@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-POL",
+  "id": "STATE-POL",
+  "type": "State",
+  "name": "Poland",
+  "iso3": "POL",
+  "aliases": [
+    "POL"
+  ],
+  "dossier": "../../dossiers/states/POL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/139",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

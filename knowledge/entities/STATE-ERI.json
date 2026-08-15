@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ERI",
+  "id": "STATE-ERI",
+  "type": "State",
+  "name": "Eritrea",
+  "iso3": "ERI",
+  "aliases": [
+    "ERI"
+  ],
+  "dossier": "../../dossiers/states/ERI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/54",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

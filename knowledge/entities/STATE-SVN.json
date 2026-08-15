@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SVN",
+  "id": "STATE-SVN",
+  "type": "State",
+  "name": "Slovenia",
+  "iso3": "SVN",
+  "aliases": [
+    "SVN"
+  ],
+  "dossier": "../../dossiers/states/SVN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/159",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

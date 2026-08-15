@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-MAVEN-SMART-SYSTEM",
+  "id": "PROJECT-MAVEN-SMART-SYSTEM",
+  "type": "Project",
+  "name": "Maven Smart System",
+  "dossier": "../../dossiers/projects/MAVEN-SMART-SYSTEM.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Project identity is synchronized from its canonical project dossier; governance remains in that dossier and review procedure."
+}

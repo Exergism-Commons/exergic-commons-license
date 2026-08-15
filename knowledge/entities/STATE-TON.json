@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TON",
+  "id": "STATE-TON",
+  "type": "State",
+  "name": "Tonga",
+  "iso3": "TON",
+  "aliases": [
+    "TON"
+  ],
+  "dossier": "../../dossiers/states/TON.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/177",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-UKR",
+  "id": "STATE-UKR",
+  "type": "State",
+  "name": "Ukraine",
+  "iso3": "UKR",
+  "aliases": [
+    "UKR"
+  ],
+  "dossier": "../../dossiers/states/UKR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/184",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewClass": "manual"
+}

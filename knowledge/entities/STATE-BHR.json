@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BHR",
+  "id": "STATE-BHR",
+  "type": "State",
+  "name": "Bahrain",
+  "iso3": "BHR",
+  "aliases": [
+    "BHR"
+  ],
+  "dossier": "../../dossiers/states/BHR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/13",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

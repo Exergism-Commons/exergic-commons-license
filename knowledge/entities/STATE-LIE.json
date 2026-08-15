@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LIE",
+  "id": "STATE-LIE",
+  "type": "State",
+  "name": "Liechtenstein",
+  "iso3": "LIE",
+  "aliases": [
+    "LIE"
+  ],
+  "dossier": "../../dossiers/states/LIE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/98",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

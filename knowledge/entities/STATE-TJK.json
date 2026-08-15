@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TJK",
+  "id": "STATE-TJK",
+  "type": "State",
+  "name": "Tajikistan",
+  "iso3": "TJK",
+  "aliases": [
+    "TJK"
+  ],
+  "dossier": "../../dossiers/states/TJK.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/172",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CAF",
+  "id": "STATE-CAF",
+  "type": "State",
+  "name": "Central African Republic",
+  "iso3": "CAF",
+  "aliases": [
+    "CAF"
+  ],
+  "dossier": "../../dossiers/states/CAF.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/33",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual"
+}

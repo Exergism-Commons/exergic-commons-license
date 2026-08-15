@@ -30,6 +30,97 @@ ecl:TrackedObjectShape a sh:NodeShape ;
         sh:minLength 1
     ] .
 
+# State identity/provenance is deliberately narrower than governance. A State
+# actor must identify the dossier and public review surface, but may not carry a
+# GovernanceOutcome or a governance/tier/restriction-status-like predicate.
+ecl:StateShape a sh:NodeShape ;
+    sh:targetClass ecl:State ;
+    sh:property [
+        sh:path ecl:stableId ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^STATE-[A-Z]{3}$"
+    ] ;
+    sh:property [
+        sh:path ecl:iso3 ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^[A-Z]{3}$"
+    ] ;
+    sh:property [
+        sh:path ecl:dossier ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$"
+    ] ;
+    sh:property [
+        sh:path ecl:publicReviewIssue ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI
+    ] ;
+    sh:property [
+        sh:path ecl:lastSubstantiveReview ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date
+    ] ;
+    sh:property [
+        sh:path ecl:reviewDue ;
+        sh:maxCount 1 ; sh:datatype xsd:date
+    ] ;
+    sh:property [
+        sh:path ecl:reviewClass ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( "hot" "active" "stable" "manual" )
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Non-manual State review classes require an explicit reviewDue date." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this WHERE {
+              $this ecl:reviewClass ?class .
+              FILTER (?class != "manual")
+              FILTER NOT EXISTS { $this ecl:reviewDue ?due }
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "State stableId, IRI, ISO3 and dossier path must describe the same ISO3." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this WHERE {
+              $this ecl:stableId ?id ; ecl:iso3 ?iso ; ecl:dossier ?dossier .
+              FILTER (
+                STR(?id) != CONCAT("STATE-", STR(?iso)) ||
+                STR($this) != CONCAT("urn:ecl:STATE-", STR(?iso)) ||
+                !STRENDS(STR(?dossier), CONCAT("/", STR(?iso), ".md"))
+              )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Governance/tier/restriction status must never live directly on a State identity actor." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this ?p WHERE {
+              $this ?p ?value .
+              FILTER (
+                ?p = ecl:outcome ||
+                ?p = ecl:status ||
+                REGEX(STR(?p), "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$", "i")
+              )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A State relationship must never point directly to a GovernanceOutcome." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this ?p ?value WHERE {
+              $this ?p ?value .
+              ?value a ecl:GovernanceOutcome .
+            }
+        """
+    ] .
+
 ecl:ReviewClockShape a sh:NodeShape ;
     sh:targetSubjectsOf ecl:reviewDue ;
     sh:property [ sh:path ecl:reviewDue ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
@@ -39,6 +130,17 @@ ecl:ReviewClockShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:in ( "hot" "active" "stable" "manual" )
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "reviewDue must not predate lastSubstantiveReview." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this WHERE {
+              $this ecl:reviewDue ?due ; ecl:lastSubstantiveReview ?last .
+              FILTER (?due < ?last)
+            }
+        """
     ] .
 
 ecl:ClaimShape a sh:NodeShape ;
@@ -136,10 +238,33 @@ ecl:StableIdUniquenessShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "ecl:stableId must be globally unique." ;
         sh:select """
+            PREFIX ecl: <urn:ecl:>
             SELECT $this WHERE {
               $this ecl:stableId ?id .
               ?other ecl:stableId ?id .
               FILTER (?other != $this)
+            }
+        """
+    ] .
+
+# State-specific uniqueness is structural repository validity, not OWL identity.
+ecl:StateMappingUniquenessShape a sh:NodeShape ;
+    sh:targetClass ecl:State ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "State ISO3 and dossier mappings must be one-to-one among State actors." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this WHERE {
+              {
+                $this ecl:iso3 ?v .
+                ?other a ecl:State ; ecl:iso3 ?v .
+                FILTER (?other != $this)
+              } UNION {
+                $this ecl:dossier ?v .
+                ?other a ecl:State ; ecl:dossier ?v .
+                FILTER (?other != $this)
+              }
             }
         """
     ] .

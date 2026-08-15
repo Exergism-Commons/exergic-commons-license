@@ -1,0 +1,27 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?kind ?value ?count WHERE {
+  {
+    SELECT ("iso3" AS ?kind) ?value (COUNT(DISTINCT ?state) AS ?count) WHERE {
+      ?state a ecl:State ; ecl:iso3 ?value .
+    }
+    GROUP BY ?value
+    HAVING (COUNT(DISTINCT ?state) != 1)
+  }
+  UNION
+  {
+    SELECT ("dossier" AS ?kind) ?value (COUNT(DISTINCT ?state) AS ?count) WHERE {
+      ?state a ecl:State ; ecl:dossier ?value .
+    }
+    GROUP BY ?value
+    HAVING (COUNT(DISTINCT ?state) != 1)
+  }
+  UNION
+  {
+    SELECT ("stableId" AS ?kind) ?value (COUNT(DISTINCT ?state) AS ?count) WHERE {
+      ?state a ecl:State ; ecl:stableId ?value .
+    }
+    GROUP BY ?value
+    HAVING (COUNT(DISTINCT ?state) != 1)
+  }
+}
