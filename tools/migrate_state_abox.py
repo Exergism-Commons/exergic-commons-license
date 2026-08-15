@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import Any
 
 STATE_RE=re.compile(r"^[A-Z]{3}\.md$"); ISO_RE=re.compile(r"^[A-Z]{3}$")
-OUTCOMES={"R","S","U","N"}; VERSION=1; GENERATOR="tools/migrate_state_abox.py:v1"
+OUTCOMES={"R","S","U","N"}; VERSION=2; GENERATOR="tools/migrate_state_abox.py:v2"
+LEGACY_VERSION=1; LEGACY_GENERATOR="tools/migrate_state_abox.py:v1"
 OWNED=("@context","iri","id","type","name","iso3","dossier","publicReviewIssue","lastSubstantiveReview")
 FORBIDDEN=re.compile(r"current[-_]?governance|governance[-_]?(status|outcome)|restriction[-_]?status|restricted[-_]?status|tier|provisional[-_]?outcome|(^|[-_])outcome($|[-_])|inherit.*restrict|restrict.*inherit",re.I)
 
@@ -42,7 +43,7 @@ def frontmatter(text:str)->dict[str,str]:
 
 def date(v:str,label:str)->dt.date:
     try: return dt.date.fromisoformat(v)
-    except ValueError as e: raise ValueError(f"{label}: invalid ISO date {v!r}") from e
+    except (TypeError,ValueError) as e: raise ValueError(f"{label}: invalid ISO date {v!r}") from e
 
 def load_dossiers(root:Path, require_195:bool=True)->list[Dossier]:
     paths=[p for p in sorted(root.glob("*.md")) if STATE_RE.fullmatch(p.name)]
@@ -81,11 +82,13 @@ def read_obj(p:Path)->dict[str,Any]:
     if not isinstance(x,dict): raise ValueError(f"{p}: expected JSON object")
     return x
 
-def load_manifest(p:Path)->dict[str,str]:
-    if not p.exists(): return {}
-    x=read_obj(p)
-    if x.get("version")!=VERSION or x.get("generator")!=GENERATOR or not isinstance(x.get("generatedProjectionSha256"),dict): raise ValueError(f"{p}: unsupported manifest")
-    return dict(x["generatedProjectionSha256"])
+def load_manifest(p:Path)->tuple[dict[str,str],bool]:
+    if not p.exists(): return {},False
+    x=read_obj(p); hashes=x.get("generatedProjectionSha256")
+    if not isinstance(hashes,dict): raise ValueError(f"{p}: unsupported manifest")
+    if x.get("version")==VERSION and x.get("generator")==GENERATOR: return dict(hashes),False
+    if x.get("version")==LEGACY_VERSION and x.get("generator")==LEGACY_GENERATOR: return dict(hashes),True
+    raise ValueError(f"{p}: unsupported manifest")
 
 def manifest_text(h:dict[str,str])->str:
     return json.dumps({"version":VERSION,"generator":GENERATOR,"note":"Derived conflict-detection hashes only; not ABox data and not a governance source.","generatedProjectionSha256":dict(sorted(h.items()))},indent=2,ensure_ascii=False)+"\n"
@@ -96,10 +99,13 @@ def ordered(r:dict[str,Any])->dict[str,Any]:
 
 def record_text(r:dict[str,Any])->str: return json.dumps(ordered(r),indent=2,ensure_ascii=False)+"\n"
 
-def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None)->dict[str,Any]:
+def synthetic_v1_due(d:Dossier)->str:
+    return (date(d.last_reviewed,"last")+dt.timedelta(days=90)).isoformat()
+
+def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None, cleanup_v1:bool=False)->dict[str,Any]:
     want=projection(d)
     if old is None:
-        return {**want,"aliases":[d.iso3],"reviewDue":(date(d.last_reviewed,"last")+dt.timedelta(days=90)).isoformat(),"reviewClass":"manual"}
+        return {**want,"aliases":[d.iso3],"reviewClass":"manual"}
     guard(old,d.iso3); legacy_name=None
     if old_hash is not None and phash(old)!=old_hash: raise ValueError(f"{d.iso3}: generator-owned fields changed since manifest")
     if old_hash is None:
@@ -107,12 +113,20 @@ def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None)->dict[str,Any]:
             if k not in old or old[k]==v: continue
             if k=="name": legacy_name=str(old[k]); continue
             raise ValueError(f"{d.iso3}: legacy {k} conflicts with dossier-derived value")
-    out=dict(old); out.update(want); out.setdefault("aliases",[d.iso3]); out.setdefault("reviewDue",(date(d.last_reviewed,"last")+dt.timedelta(days=90)).isoformat()); out.setdefault("reviewClass","manual")
+    out=dict(old)
+    # v1 invented a +90-day date for every newly generated manual State. Remove
+    # only that exact synthetic pattern while upgrading the v1 manifest. Future
+    # v2 runs preserve any manually curated reviewDue, including on manual class.
+    if cleanup_v1 and out.get("reviewClass")=="manual" and not out.get("reviewReason") and out.get("reviewDue")==synthetic_v1_due(d):
+        out.pop("reviewDue",None)
+    out.update(want); out.setdefault("aliases",[d.iso3]); out.setdefault("reviewClass","manual")
     if legacy_name and legacy_name!=d.entity and legacy_name not in out["aliases"]: out["aliases"].append(legacy_name)
     if d.iso3 not in out["aliases"]: out["aliases"].insert(0,d.iso3)
     if not isinstance(out["aliases"],list) or not out["aliases"]: raise ValueError(f"{d.iso3}: aliases must be non-empty list")
     if out["reviewClass"] not in {"hot","active","stable","manual"}: raise ValueError(f"{d.iso3}: invalid reviewClass")
-    if date(str(out["reviewDue"]),f"{d.iso3}.reviewDue")<date(d.last_reviewed,f"{d.iso3}.last_reviewed"): raise ValueError(f"{d.iso3}: reviewDue predates last review")
+    due=out.get("reviewDue")
+    if due is None and out["reviewClass"]!="manual": raise ValueError(f"{d.iso3}: non-manual reviewClass requires reviewDue")
+    if due is not None and date(str(due),f"{d.iso3}.reviewDue")<date(d.last_reviewed,f"{d.iso3}.last_reviewed"): raise ValueError(f"{d.iso3}: reviewDue predates last review")
     guard(out,d.iso3); return out
 
 def scan(root:Path)->tuple[int,int,int,int]:
@@ -127,10 +141,10 @@ def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,
     if iso3:
         iso3=iso3.upper(); selected=[d for d in ds if d.iso3==iso3]
         if not ISO_RE.fullmatch(iso3) or not selected: raise ValueError(f"unknown ISO3 {iso3!r}")
-    hashes=load_manifest(manifest); next_hashes=dict(hashes); s=Summary(len(ds),len(selected)); writes=[]
+    hashes,cleanup_v1=load_manifest(manifest); next_hashes=dict(hashes); s=Summary(len(ds),len(selected)); writes=[]
     for d in selected:
         p=entity_root/f"STATE-{d.iso3}.json"; old=read_obj(p) if p.exists() else None
-        try: new=merge(d,old,hashes.get(d.iso3)); guard(new,d.iso3)
+        try: new=merge(d,old,hashes.get(d.iso3),cleanup_v1); guard(new,d.iso3)
         except ValueError as e: s.conflicts.append(str(e)); continue
         next_hashes[d.iso3]=phash(new); text=record_text(new); cur=p.read_text(encoding="utf-8") if p.exists() else None
         if cur==text: s.unchanged.append(d.iso3)
