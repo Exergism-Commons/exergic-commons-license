@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BGR",
+  "id": "STATE-BGR",
+  "type": "State",
+  "name": "Bulgaria",
+  "iso3": "BGR",
+  "aliases": [
+    "BGR"
+  ],
+  "dossier": "../../dossiers/states/BGR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/26",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-11-12",
+  "reviewClass": "manual"
+}

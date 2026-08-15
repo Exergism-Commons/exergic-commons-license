@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-AGO",
+  "id": "STATE-AGO",
+  "type": "State",
+  "name": "Angola",
+  "iso3": "AGO",
+  "aliases": [
+    "AGO"
+  ],
+  "dossier": "../../dossiers/states/AGO.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/5",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KOR",
+  "id": "STATE-KOR",
+  "type": "State",
+  "name": "South Korea",
+  "iso3": "KOR",
+  "aliases": [
+    "KOR"
+  ],
+  "dossier": "../../dossiers/states/KOR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/163",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

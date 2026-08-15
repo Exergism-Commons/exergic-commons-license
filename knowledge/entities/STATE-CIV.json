@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CIV",
+  "id": "STATE-CIV",
+  "type": "State",
+  "name": "Côte d'Ivoire",
+  "iso3": "CIV",
+  "aliases": [
+    "CIV"
+  ],
+  "dossier": "../../dossiers/states/CIV.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/40",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

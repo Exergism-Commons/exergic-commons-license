@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MAR",
+  "id": "STATE-MAR",
+  "type": "State",
+  "name": "Morocco",
+  "iso3": "MAR",
+  "aliases": [
+    "MAR"
+  ],
+  "dossier": "../../dossiers/states/MAR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/116",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

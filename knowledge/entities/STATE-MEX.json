@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MEX",
+  "id": "STATE-MEX",
+  "type": "State",
+  "name": "Mexico",
+  "iso3": "MEX",
+  "aliases": [
+    "MEX"
+  ],
+  "dossier": "../../dossiers/states/MEX.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/110",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

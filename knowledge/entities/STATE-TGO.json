@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TGO",
+  "id": "STATE-TGO",
+  "type": "State",
+  "name": "Togo",
+  "iso3": "TGO",
+  "aliases": [
+    "TGO"
+  ],
+  "dossier": "../../dossiers/states/TGO.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/176",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

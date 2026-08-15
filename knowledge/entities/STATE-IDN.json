@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-IDN",
+  "id": "STATE-IDN",
+  "type": "State",
+  "name": "Indonesia",
+  "iso3": "IDN",
+  "aliases": [
+    "IDN"
+  ],
+  "dossier": "../../dossiers/states/IDN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/78",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

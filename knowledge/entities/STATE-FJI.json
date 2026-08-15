@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-FJI",
+  "id": "STATE-FJI",
+  "type": "State",
+  "name": "Fiji",
+  "iso3": "FJI",
+  "aliases": [
+    "FJI"
+  ],
+  "dossier": "../../dossiers/states/FJI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/58",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-JAM",
+  "id": "STATE-JAM",
+  "type": "State",
+  "name": "Jamaica",
+  "iso3": "JAM",
+  "aliases": [
+    "JAM"
+  ],
+  "dossier": "../../dossiers/states/JAM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/84",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

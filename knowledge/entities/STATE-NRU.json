@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-NRU",
+  "id": "STATE-NRU",
+  "type": "State",
+  "name": "Nauru",
+  "iso3": "NRU",
+  "aliases": [
+    "NRU"
+  ],
+  "dossier": "../../dossiers/states/NRU.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/120",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

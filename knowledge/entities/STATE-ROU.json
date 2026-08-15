@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ROU",
+  "id": "STATE-ROU",
+  "type": "State",
+  "name": "Romania",
+  "iso3": "ROU",
+  "aliases": [
+    "ROU"
+  ],
+  "dossier": "../../dossiers/states/ROU.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/143",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

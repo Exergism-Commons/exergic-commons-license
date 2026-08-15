@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ARE",
+  "id": "STATE-ARE",
+  "type": "State",
+  "name": "United Arab Emirates",
+  "iso3": "ARE",
+  "aliases": [
+    "ARE"
+  ],
+  "dossier": "../../dossiers/states/ARE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/185",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

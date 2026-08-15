@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BOL",
+  "id": "STATE-BOL",
+  "type": "State",
+  "name": "Bolivia",
+  "iso3": "BOL",
+  "aliases": [
+    "BOL"
+  ],
+  "dossier": "../../dossiers/states/BOL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/21",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

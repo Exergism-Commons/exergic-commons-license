@@ -4,8 +4,12 @@
   "id": "STATE-JPN",
   "type": "State",
   "name": "Japan",
-  "aliases": ["JPN"],
+  "iso3": "JPN",
+  "aliases": [
+    "JPN"
+  ],
   "dossier": "../../dossiers/states/JPN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/85",
   "lastSubstantiveReview": "2026-08-14",
   "reviewDue": "2026-09-01",
   "reviewClass": "hot",

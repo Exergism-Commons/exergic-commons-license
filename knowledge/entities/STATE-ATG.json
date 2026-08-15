@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ATG",
+  "id": "STATE-ATG",
+  "type": "State",
+  "name": "Antigua and Barbuda",
+  "iso3": "ATG",
+  "aliases": [
+    "ATG"
+  ],
+  "dossier": "../../dossiers/states/ATG.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/6",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

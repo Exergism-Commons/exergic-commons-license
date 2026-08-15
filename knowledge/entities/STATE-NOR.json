@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-NOR",
+  "id": "STATE-NOR",
+  "type": "State",
+  "name": "Norway",
+  "iso3": "NOR",
+  "aliases": [
+    "NOR"
+  ],
+  "dossier": "../../dossiers/states/NOR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/129",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-HRV",
+  "id": "STATE-HRV",
+  "type": "State",
+  "name": "Croatia",
+  "iso3": "HRV",
+  "aliases": [
+    "HRV"
+  ],
+  "dossier": "../../dossiers/states/HRV.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/41",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

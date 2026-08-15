@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-OMN",
+  "id": "STATE-OMN",
+  "type": "State",
+  "name": "Oman",
+  "iso3": "OMN",
+  "aliases": [
+    "OMN"
+  ],
+  "dossier": "../../dossiers/states/OMN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/130",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

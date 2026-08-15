@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-GRD",
+  "id": "STATE-GRD",
+  "type": "State",
+  "name": "Grenada",
+  "iso3": "GRD",
+  "aliases": [
+    "GRD"
+  ],
+  "dossier": "../../dossiers/states/GRD.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/67",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

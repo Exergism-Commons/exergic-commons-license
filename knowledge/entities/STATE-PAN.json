@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PAN",
+  "id": "STATE-PAN",
+  "type": "State",
+  "name": "Panama",
+  "iso3": "PAN",
+  "aliases": [
+    "PAN"
+  ],
+  "dossier": "../../dossiers/states/PAN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/134",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

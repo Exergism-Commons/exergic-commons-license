@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-VCT",
+  "id": "STATE-VCT",
+  "type": "State",
+  "name": "Saint Vincent and the Grenadines",
+  "iso3": "VCT",
+  "aliases": [
+    "VCT"
+  ],
+  "dossier": "../../dossiers/states/VCT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/148",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

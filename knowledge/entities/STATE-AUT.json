@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-AUT",
+  "id": "STATE-AUT",
+  "type": "State",
+  "name": "Austria",
+  "iso3": "AUT",
+  "aliases": [
+    "AUT"
+  ],
+  "dossier": "../../dossiers/states/AUT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/10",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

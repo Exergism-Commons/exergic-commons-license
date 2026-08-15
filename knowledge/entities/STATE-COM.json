@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-COM",
+  "id": "STATE-COM",
+  "type": "State",
+  "name": "Comoros",
+  "iso3": "COM",
+  "aliases": [
+    "COM"
+  ],
+  "dossier": "../../dossiers/states/COM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/38",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-VUT",
+  "id": "STATE-VUT",
+  "type": "State",
+  "name": "Vanuatu",
+  "iso3": "VUT",
+  "aliases": [
+    "VUT"
+  ],
+  "dossier": "../../dossiers/states/VUT.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/190",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

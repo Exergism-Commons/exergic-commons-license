@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BDI",
+  "id": "STATE-BDI",
+  "type": "State",
+  "name": "Burundi",
+  "iso3": "BDI",
+  "aliases": [
+    "BDI"
+  ],
+  "dossier": "../../dossiers/states/BDI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/28",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

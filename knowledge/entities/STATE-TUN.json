@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-TUN",
+  "id": "STATE-TUN",
+  "type": "State",
+  "name": "Tunisia",
+  "iso3": "TUN",
+  "aliases": [
+    "TUN"
+  ],
+  "dossier": "../../dossiers/states/TUN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/179",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MDA",
+  "id": "STATE-MDA",
+  "type": "State",
+  "name": "Moldova",
+  "iso3": "MDA",
+  "aliases": [
+    "MDA"
+  ],
+  "dossier": "../../dossiers/states/MDA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/112",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-11-12",
+  "reviewClass": "manual"
+}

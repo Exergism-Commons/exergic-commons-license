@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-COG",
+  "id": "STATE-COG",
+  "type": "State",
+  "name": "Republic of the Congo",
+  "iso3": "COG",
+  "aliases": [
+    "COG"
+  ],
+  "dossier": "../../dossiers/states/COG.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/142",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

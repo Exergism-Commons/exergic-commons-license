@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PRY",
+  "id": "STATE-PRY",
+  "type": "State",
+  "name": "Paraguay",
+  "iso3": "PRY",
+  "aliases": [
+    "PRY"
+  ],
+  "dossier": "../../dossiers/states/PRY.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/136",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

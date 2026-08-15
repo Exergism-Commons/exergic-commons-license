@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MMR",
+  "id": "STATE-MMR",
+  "type": "State",
+  "name": "Myanmar",
+  "iso3": "MMR",
+  "aliases": [
+    "MMR"
+  ],
+  "dossier": "../../dossiers/states/MMR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/118",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

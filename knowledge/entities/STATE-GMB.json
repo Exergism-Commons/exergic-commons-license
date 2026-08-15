@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-GMB",
+  "id": "STATE-GMB",
+  "type": "State",
+  "name": "Gambia",
+  "iso3": "GMB",
+  "aliases": [
+    "GMB"
+  ],
+  "dossier": "../../dossiers/states/GMB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/62",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-DEU",
+  "id": "STATE-DEU",
+  "type": "State",
+  "name": "Germany",
+  "iso3": "DEU",
+  "aliases": [
+    "DEU"
+  ],
+  "dossier": "../../dossiers/states/DEU.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/64",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

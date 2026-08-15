@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CAN",
+  "id": "STATE-CAN",
+  "type": "State",
+  "name": "Canada",
+  "iso3": "CAN",
+  "aliases": [
+    "CAN"
+  ],
+  "dossier": "../../dossiers/states/CAN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/32",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

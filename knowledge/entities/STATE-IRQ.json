@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-IRQ",
+  "id": "STATE-IRQ",
+  "type": "State",
+  "name": "Iraq",
+  "iso3": "IRQ",
+  "aliases": [
+    "IRQ"
+  ],
+  "dossier": "../../dossiers/states/IRQ.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/80",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-11-12",
+  "reviewClass": "manual"
+}

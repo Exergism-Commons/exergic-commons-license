@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-VNM",
+  "id": "STATE-VNM",
+  "type": "State",
+  "name": "Viet Nam",
+  "iso3": "VNM",
+  "aliases": [
+    "VNM"
+  ],
+  "dossier": "../../dossiers/states/VNM.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/192",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

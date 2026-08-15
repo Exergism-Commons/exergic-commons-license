@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-GNB",
+  "id": "STATE-GNB",
+  "type": "State",
+  "name": "Guinea-Bissau",
+  "iso3": "GNB",
+  "aliases": [
+    "GNB"
+  ],
+  "dossier": "../../dossiers/states/GNB.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/70",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

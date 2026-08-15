@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SVK",
+  "id": "STATE-SVK",
+  "type": "State",
+  "name": "Slovakia",
+  "iso3": "SVK",
+  "aliases": [
+    "SVK"
+  ],
+  "dossier": "../../dossiers/states/SVK.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/158",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

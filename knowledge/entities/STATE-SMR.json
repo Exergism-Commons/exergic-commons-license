@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SMR",
+  "id": "STATE-SMR",
+  "type": "State",
+  "name": "San Marino",
+  "iso3": "SMR",
+  "aliases": [
+    "SMR"
+  ],
+  "dossier": "../../dossiers/states/SMR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/150",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

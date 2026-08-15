@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BIH",
+  "id": "STATE-BIH",
+  "type": "State",
+  "name": "Bosnia and Herzegovina",
+  "iso3": "BIH",
+  "aliases": [
+    "BIH"
+  ],
+  "dossier": "../../dossiers/states/BIH.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/22",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

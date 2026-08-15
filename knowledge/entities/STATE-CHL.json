@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-CHL",
+  "id": "STATE-CHL",
+  "type": "State",
+  "name": "Chile",
+  "iso3": "CHL",
+  "aliases": [
+    "CHL"
+  ],
+  "dossier": "../../dossiers/states/CHL.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/35",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

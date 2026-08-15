@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-ECU",
+  "id": "STATE-ECU",
+  "type": "State",
+  "name": "Ecuador",
+  "iso3": "ECU",
+  "aliases": [
+    "ECU"
+  ],
+  "dossier": "../../dossiers/states/ECU.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/50",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

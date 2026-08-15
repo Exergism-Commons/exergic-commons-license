@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MWI",
+  "id": "STATE-MWI",
+  "type": "State",
+  "name": "Malawi",
+  "iso3": "MWI",
+  "aliases": [
+    "MWI"
+  ],
+  "dossier": "../../dossiers/states/MWI.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/102",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

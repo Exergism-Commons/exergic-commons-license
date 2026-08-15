@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SWE",
+  "id": "STATE-SWE",
+  "type": "State",
+  "name": "Sweden",
+  "iso3": "SWE",
+  "aliases": [
+    "SWE"
+  ],
+  "dossier": "../../dossiers/states/SWE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/169",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

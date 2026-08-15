@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KNA",
+  "id": "STATE-KNA",
+  "type": "State",
+  "name": "Saint Kitts and Nevis",
+  "iso3": "KNA",
+  "aliases": [
+    "KNA"
+  ],
+  "dossier": "../../dossiers/states/KNA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/146",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

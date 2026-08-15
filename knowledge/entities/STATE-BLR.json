@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-BLR",
+  "id": "STATE-BLR",
+  "type": "State",
+  "name": "Belarus",
+  "iso3": "BLR",
+  "aliases": [
+    "BLR"
+  ],
+  "dossier": "../../dossiers/states/BLR.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/16",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

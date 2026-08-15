@@ -4,12 +4,19 @@
   "id": "STATE-NLD",
   "type": "State",
   "name": "Netherlands",
-  "aliases": ["NLD", "The Netherlands"],
+  "iso3": "NLD",
+  "aliases": [
+    "NLD",
+    "The Netherlands"
+  ],
   "dossier": "../../dossiers/states/NLD.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/122",
   "lastSubstantiveReview": "2026-08-14",
   "reviewDue": "2026-09-14",
   "reviewClass": "active",
   "reviewReason": "Narrow algorithmic finding is remediation-sensitive and the formal pilot is uncertainty-sensitive.",
-  "trackedObjects": ["ecl:PROJECT-NLD-PROBATION-RISK-TOOLS"],
+  "trackedObjects": [
+    "ecl:PROJECT-NLD-PROBATION-RISK-TOOLS"
+  ],
   "monitorIds": []
 }

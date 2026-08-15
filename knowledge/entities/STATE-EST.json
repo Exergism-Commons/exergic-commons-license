@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-EST",
+  "id": "STATE-EST",
+  "type": "State",
+  "name": "Estonia",
+  "iso3": "EST",
+  "aliases": [
+    "EST"
+  ],
+  "dossier": "../../dossiers/states/EST.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/55",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}

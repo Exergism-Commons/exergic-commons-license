@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-MDV",
+  "id": "STATE-MDV",
+  "type": "State",
+  "name": "Maldives",
+  "iso3": "MDV",
+  "aliases": [
+    "MDV"
+  ],
+  "dossier": "../../dossiers/states/MDV.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/104",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LBN",
+  "id": "STATE-LBN",
+  "type": "State",
+  "name": "Lebanon",
+  "iso3": "LBN",
+  "aliases": [
+    "LBN"
+  ],
+  "dossier": "../../dossiers/states/LBN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/94",
+  "lastSubstantiveReview": "2026-08-12",
+  "reviewDue": "2026-11-10",
+  "reviewClass": "manual"
+}

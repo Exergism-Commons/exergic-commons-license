@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-PER",
+  "id": "STATE-PER",
+  "type": "State",
+  "name": "Peru",
+  "iso3": "PER",
+  "aliases": [
+    "PER"
+  ],
+  "dossier": "../../dossiers/states/PER.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/137",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

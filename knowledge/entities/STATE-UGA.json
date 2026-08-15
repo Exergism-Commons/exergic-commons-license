@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-UGA",
+  "id": "STATE-UGA",
+  "type": "State",
+  "name": "Uganda",
+  "iso3": "UGA",
+  "aliases": [
+    "UGA"
+  ],
+  "dossier": "../../dossiers/states/UGA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/183",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

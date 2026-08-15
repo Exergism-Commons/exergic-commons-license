@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-KEN",
+  "id": "STATE-KEN",
+  "type": "State",
+  "name": "Kenya",
+  "iso3": "KEN",
+  "aliases": [
+    "KEN"
+  ],
+  "dossier": "../../dossiers/states/KEN.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/88",
+  "lastSubstantiveReview": "2026-08-12",
+  "reviewDue": "2026-11-10",
+  "reviewClass": "manual"
+}

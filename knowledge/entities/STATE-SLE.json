@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-SLE",
+  "id": "STATE-SLE",
+  "type": "State",
+  "name": "Sierra Leone",
+  "iso3": "SLE",
+  "aliases": [
+    "SLE"
+  ],
+  "dossier": "../../dossiers/states/SLE.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/156",
+  "lastSubstantiveReview": "2026-08-11",
+  "reviewDue": "2026-11-09",
+  "reviewClass": "manual"
+}

@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:STATE-LCA",
+  "id": "STATE-LCA",
+  "type": "State",
+  "name": "Saint Lucia",
+  "iso3": "LCA",
+  "aliases": [
+    "LCA"
+  ],
+  "dossier": "../../dossiers/states/LCA.md",
+  "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/147",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual"
+}
