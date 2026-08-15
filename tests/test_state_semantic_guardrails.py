@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from rdflib import Graph, Namespace, RDF, URIRef
+from rdflib import Graph, Namespace, RDF
 from rdflib.namespace import OWL
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,7 +51,8 @@ class StateSemanticGuardrailTests(unittest.TestCase):
             "currentgovernance", "governancestatus", "governanceoutcome",
             "restrictionstatus", "restrictedstatus", "tier", "provisionaloutcome", "outcome",
         )
-        outcomes = set(self.abox.subjects(RDF.type, ECL.GovernanceOutcome))
+        outcomes = {ECL.OutcomeR, ECL.OutcomeS, ECL.OutcomeU, ECL.OutcomeN}
+        outcomes.update(self.tbox.subjects(RDF.type, ECL.GovernanceOutcome))
         for state in self.abox.subjects(RDF.type, ECL.State):
             for predicate, value in self.abox.predicate_objects(state):
                 normalized = str(predicate).lower().replace("-", "").replace("_", "")
