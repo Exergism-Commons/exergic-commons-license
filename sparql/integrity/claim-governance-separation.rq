@@ -6,10 +6,11 @@ WHERE {
   OPTIONAL { ?claim ecl:object ?object . }
 
   # Normalize the semantic predicate IRI/path instead of only the final local
-  # name. For HTTP(S), strip scheme+authority first so a hostname cannot create
-  # a false governance match. Keep tier token-aware so "frontier" stays valid.
+  # name. For HTTP(S), strip scheme+authority only up to /, ? or # so semantic
+  # query/fragment content remains visible while hostname text stays excluded.
+  # Keep tier token-aware so "frontier" stays valid.
   BIND(LCASE(STR(?predicate)) AS ?predicateText)
-  BIND(REPLACE(?predicateText, "^[a-z][a-z0-9+.-]*://[^/]*", "") AS ?semanticPart)
+  BIND(REPLACE(?predicateText, "^[a-z][a-z0-9+.-]*://[^/?#]*", "") AS ?semanticPart)
   BIND(REPLACE(?semanticPart, "[^a-z0-9]+", "") AS ?normalizedSemantic)
 
   FILTER (
