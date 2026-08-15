@@ -101,8 +101,11 @@ def ordered(r:dict[str,Any])->dict[str,Any]:
 
 def record_text(r:dict[str,Any])->str: return json.dumps(ordered(r),indent=2,ensure_ascii=False)+"\n"
 
+def synthetic_v1_due_from_review(last_reviewed:str)->str:
+    return (date(last_reviewed,"lastSubstantiveReview")+dt.timedelta(days=90)).isoformat()
+
 def synthetic_v1_due(d:Dossier)->str:
-    return (date(d.last_reviewed,"last")+dt.timedelta(days=90)).isoformat()
+    return synthetic_v1_due_from_review(d.last_reviewed)
 
 def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None, cleanup_v1:bool=False)->dict[str,Any]:
     want=projection(d)
@@ -116,10 +119,16 @@ def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None, cleanup_v1:bool=
             if k=="name": legacy_name=str(old[k]); continue
             raise ValueError(f"{d.iso3}: legacy {k} conflicts with dossier-derived value")
     out=dict(old)
-    # v1 invented a +90-day date for every newly generated manual State. Remove
-    # only that exact synthetic pattern while upgrading the v1 manifest. Future
-    # v2 runs preserve any manually curated reviewDue, including on manual class.
-    if cleanup_v1 and out.get("reviewClass")=="manual" and not out.get("reviewReason") and out.get("reviewDue")==synthetic_v1_due(d):
+    # v1 invented a +90-day date for every newly generated manual State. Match
+    # that date against the stored v1 review date before replacing generated
+    # fields from the current dossier; the dossier review date may have changed.
+    stored_review=out.get("lastSubstantiveReview")
+    synthetic_due=(
+        synthetic_v1_due_from_review(str(stored_review))
+        if stored_review is not None
+        else None
+    )
+    if cleanup_v1 and out.get("reviewClass")=="manual" and not out.get("reviewReason") and out.get("reviewDue")==synthetic_due:
         out.pop("reviewDue",None)
     out.update(want); out.setdefault("aliases",[d.iso3]); out.setdefault("reviewClass","manual")
     if legacy_name and legacy_name!=d.entity and legacy_name not in out["aliases"]: out["aliases"].append(legacy_name)
