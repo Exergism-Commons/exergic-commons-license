@@ -35,6 +35,21 @@ REVIEWED_MECHANISM_FILENAMES = {
     "bundle_schema": "bundle.schema.json",
 }
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+CANONICAL_EMPTY_BUNDLES: dict[str, dict[str, Any]] = {
+    "ECL-0.3-DRAFT@RP-EMPTY-1": {
+        "operative": False,
+        "license": {
+            "ref": "ECL-0.3-DRAFT",
+            "path": "versions/licenses/ECL-0.3-DRAFT.md",
+            "sha256": "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d",
+        },
+        "schedule": {
+            "ref": "ECL-RP-EMPTY-1",
+            "path": "schedules/ECL-RP-EMPTY-1.md",
+            "sha256": "e12a6ffc03aa0be24a9f61d0d325bc8c06bb9c870416a72fcac0bfd968025aa2",
+        },
+    }
+}
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -66,6 +81,38 @@ def major_from_constraint(value: str) -> int | None:
 
 def valid_review_id(value: str) -> bool:
     return REVIEW_ID_RE.fullmatch(value) is not None
+
+
+def validate_bundle_identity(bundle: dict[str, Any]) -> None:
+    """Enforce semantic identity for canonical empty-Schedule fallback Bundles.
+
+    Empty fallback identifiers are intentionally opt-in rather than generative:
+    a new ``@RP-EMPTY-N`` identifier is invalid until its exact License and
+    Schedule components are registered here and in the Bundle schema. This
+    prevents a manifest from borrowing a canonical-looking fallback identifier
+    while substituting unrelated artifacts or hashes.
+    """
+
+    bundle_ref = bundle.get("bundle")
+    if not isinstance(bundle_ref, str):
+        raise ValueError("bundle manifest is missing string bundle identity")
+    if "@RP-EMPTY-" not in bundle_ref:
+        return
+
+    expected = CANONICAL_EMPTY_BUNDLES.get(bundle_ref)
+    if expected is None:
+        raise ValueError(f"unsupported canonical empty fallback bundle: {bundle_ref}")
+
+    if bundle.get("operative") is not expected["operative"]:
+        raise ValueError(f"canonical empty fallback {bundle_ref} has invalid operative state")
+
+    for component_name in ("license", "schedule"):
+        actual_component = bundle.get(component_name)
+        expected_component = expected[component_name]
+        if actual_component != expected_component:
+            raise ValueError(
+                f"canonical empty fallback {bundle_ref} has mismatched {component_name} identity"
+            )
 
 
 def validate_file_reference(
@@ -232,6 +279,7 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
 
 
 def validate_bundle_components(root: Path, bundle: dict[str, Any]) -> None:
+    validate_bundle_identity(bundle)
     license_component = bundle.get("license")
     schedule_component = bundle.get("schedule")
     if not isinstance(license_component, dict) or not isinstance(schedule_component, dict):
