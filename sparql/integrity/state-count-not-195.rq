@@ -1,0 +1,10 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?count WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?state) AS ?count) WHERE {
+      ?state a ecl:State .
+    }
+  }
+  FILTER (?count != 195)
+}
