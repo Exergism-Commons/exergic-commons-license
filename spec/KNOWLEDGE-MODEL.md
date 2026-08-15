@@ -55,6 +55,8 @@ The State dossier's governance identifier remains `ECL-STATE-USA`. That dossier 
 
 ABox records SHOULD remain small and reviewable in ordinary Git diffs. A State Actor may contain semantic identity, provenance, review-clock metadata and explicitly curated relations; it MUST NOT contain `R/S/U/N`, tier, restriction status or an equivalent direct governance classification.
 
+Review clocks preserve uncertainty. `hot`, `active` and `stable` identify scheduled review classes and therefore require an explicit `reviewDue`. `manual` means no automatic cadence is asserted; `reviewDue` may be absent until a reviewer curates one. Tooling MUST NOT synthesize a due date merely to satisfy a schema.
+
 ## 4. Claims as first-class individuals
 
 Material facts are represented as explicit `Claim` individuals rather than inferred from prose alone.
@@ -84,6 +86,7 @@ Examples:
 - every State has exactly one ISO3, dossier mapping and public-review IRI;
 - State stable ID / IRI / ISO3 / dossier paths agree;
 - State ISO3 and dossier mappings are one-to-one;
+- scheduled review classes require an explicit due date while `manual` may remain unscheduled;
 - no State carries a direct governance/tier/restriction-status predicate or direct GovernanceOutcome relation;
 - every active claim has an exact subject/predicate and evidence basis;
 - evidence grades are from the allowed `E0-E3` set;
@@ -138,4 +141,4 @@ The Git-native ABox now contains **195 State Actors**, one for every canonical `
 
 This completes the State **identity/provenance** migration only. It does not imply that all 195 dossiers have complete formal Exergism assessments, fully normalized Claim/EvidenceItem graphs or accepted machine-readable GovernanceDecision records. Those are separate reviewed migrations and must not be fabricated merely to fill the graph.
 
-Generator-owned State fields are reconstructed from dossier frontmatter; curated aliases, review clocks, tracked objects, monitors and semantic relations are preserved. The generator validates `provisional_outcome` but never materializes it into the Actor.
+Generator-owned State fields are reconstructed from dossier frontmatter; curated aliases, review clocks, tracked objects, monitors and semantic relations are preserved. New States default to `reviewClass: manual` without inventing a `reviewDue`; a due date appears only when the repository contains a curated cadence. The generator validates `provisional_outcome` but never materializes it into the Actor.
