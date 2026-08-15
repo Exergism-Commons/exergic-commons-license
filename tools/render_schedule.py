@@ -8,6 +8,7 @@ historical reviews are evidence sources, not Schedule inputs.
 from __future__ import annotations
 
 import argparse
+import hashlib
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -16,6 +17,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 REG = ROOT / "registry"
 TARGET_LICENSE = "ECL-0.3-DRAFT"
+COMPATIBILITY_REVIEW = REG / "schedule-license-compatibility.yml"
 
 READY_PREFIX = "ready"
 REFERENCE_STATUSES = {
@@ -32,6 +34,10 @@ def load_yaml(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{path}: expected mapping at document root")
     return value
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def extract_records(data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -100,16 +106,84 @@ def schedule_clause_source_paths() -> list[Path]:
     return paths
 
 
+def validate_compatibility_review(sources: list[Path], target_license: str) -> bool:
+    """Require a complete compatibility review to bind every exact source file.
+
+    A mutable metadata flip on the freeze files is not sufficient. A completed
+    revalidation must name the target License and bind the complete renderer
+    input set by repository-relative path and SHA-256.
+    """
+
+    if not COMPATIBILITY_REVIEW.is_file():
+        raise ValueError(f"missing compatibility review gate: {COMPATIBILITY_REVIEW}")
+    review = load_yaml(COMPATIBILITY_REVIEW)
+    if review.get("schema_version") != 1:
+        raise ValueError("unsupported Schedule compatibility review schema_version")
+    if review.get("target_license") != target_license:
+        raise ValueError(
+            "Schedule compatibility review target does not match renderer target License"
+        )
+
+    status = review.get("status")
+    if status == "pending":
+        if review.get("sources") not in (None, []):
+            raise ValueError("pending Schedule compatibility review must not claim source bindings")
+        if review.get("review_id") not in (None, ""):
+            raise ValueError("pending Schedule compatibility review must not claim a review_id")
+        return False
+    if status != "complete":
+        raise ValueError("Schedule compatibility review status must be pending or complete")
+
+    review_id = review.get("review_id")
+    if not isinstance(review_id, str) or not review_id.strip():
+        raise ValueError("complete Schedule compatibility review requires review_id")
+
+    bindings = review.get("sources")
+    if not isinstance(bindings, list):
+        raise ValueError("complete Schedule compatibility review requires source bindings")
+
+    actual: dict[str, str] = {}
+    for binding in bindings:
+        if not isinstance(binding, dict):
+            raise ValueError("Schedule compatibility source binding must be a mapping")
+        path = binding.get("path")
+        digest = binding.get("sha256")
+        if not isinstance(path, str) or not path:
+            raise ValueError("Schedule compatibility source binding is missing path")
+        if not isinstance(digest, str) or len(digest) != 64:
+            raise ValueError("Schedule compatibility source binding has invalid sha256")
+        if path in actual:
+            raise ValueError(f"duplicate Schedule compatibility source binding: {path}")
+        actual[path] = digest
+
+    expected = {
+        str(path.relative_to(ROOT)): sha256(path)
+        for path in sources
+    }
+    if actual != expected:
+        missing = sorted(expected.keys() - actual.keys())
+        extra = sorted(actual.keys() - expected.keys())
+        stale = sorted(
+            path for path in expected.keys() & actual.keys() if expected[path] != actual[path]
+        )
+        details = []
+        if missing:
+            details.append(f"missing={','.join(missing)}")
+        if extra:
+            details.append(f"extra={','.join(extra)}")
+        if stale:
+            details.append(f"stale={','.join(stale)}")
+        raise ValueError(
+            "Schedule compatibility review does not bind the exact renderer source set"
+            + (f" ({'; '.join(details)})" if details else "")
+        )
+    return True
+
+
 def compatibility_status(
     target_license: str = TARGET_LICENSE,
-) -> tuple[set[str], list[Path]]:
-    """Validate declared License compatibility for all rendered clause sources.
-
-    Compatibility is evidence, not a label inferred from the working LICENSE.
-    Every frozen clause source must declare its compatibility. A target License
-    may be advertised only when every consumed source was explicitly validated
-    for that exact target.
-    """
+) -> tuple[set[str], list[Path], bool]:
+    """Validate source declarations and explicit revalidation for a target License."""
 
     declarations: set[str] = set()
     incompatible: list[Path] = []
@@ -127,7 +201,12 @@ def compatibility_status(
         if declared != target_license:
             incompatible.append(path)
 
-    return declarations, incompatible
+    review_complete = validate_compatibility_review(sources, target_license)
+    if review_complete and incompatible:
+        raise ValueError(
+            "complete Schedule compatibility review conflicts with source compatible_license declarations"
+        )
+    return declarations, incompatible, review_complete
 
 
 def collect_state_s_records(outcomes: dict[str, str]) -> list[dict[str, Any]]:
@@ -219,7 +298,9 @@ def validate_unique(records: Iterable[dict[str, Any]], key: str, label: str) -> 
 
 
 def render() -> tuple[str, dict[str, int]]:
-    declared_licenses, incompatible_sources = compatibility_status()
+    declared_licenses, incompatible_sources, compatibility_review_complete = (
+        compatibility_status()
+    )
     outcomes = state_outcomes()
     r_states = collect_state_r_records(outcomes)
     s_records = collect_state_s_records(outcomes)
@@ -233,7 +314,8 @@ def render() -> tuple[str, dict[str, int]]:
     if len(r_states) != sum(1 for v in outcomes.values() if v == "R"):
         raise ValueError("not every active R State has a frozen Schedule identity")
 
-    if incompatible_sources:
+    compatibility_ready = not incompatible_sources and compatibility_review_complete
+    if not compatibility_ready:
         declared_text = ", ".join(sorted(declared_licenses))
         compatibility_lines = [
             f"> Target working License: **{TARGET_LICENSE}**.",
@@ -242,11 +324,15 @@ def render() -> tuple[str, dict[str, int]]:
             ">",
             f"> Frozen clause inputs currently declare compatibility with: **{declared_text}**.",
             ">",
-            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License.",
+            "> Explicit hash-bound compatibility revalidation: **PENDING**.",
+            ">",
+            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and the compatibility record binds the complete source set by SHA-256.",
         ]
     else:
         compatibility_lines = [
             f"> Intended compatibility: **{TARGET_LICENSE} only**.",
+            ">",
+            "> Exact frozen clause source set: **compatibility revalidation complete and SHA-256-bound**.",
         ]
 
     lines: list[str] = [
@@ -378,6 +464,7 @@ def render() -> tuple[str, dict[str, int]]:
         "organizations": len(organizations),
         "projects": len(projects),
         "compatibility_mismatches": len(incompatible_sources),
+        "compatibility_review_complete": int(compatibility_review_complete),
     }
     return "\n".join(lines), counts
 
@@ -389,10 +476,14 @@ def main() -> None:
     args = parser.parse_args()
 
     text, counts = render()
+    compatibility_ready = (
+        counts["compatibility_mismatches"] == 0
+        and counts["compatibility_review_complete"] == 1
+    )
     compatibility = (
         "ready"
-        if counts["compatibility_mismatches"] == 0
-        else f"pending ({counts['compatibility_mismatches']} source files require revalidation)"
+        if compatibility_ready
+        else f"pending ({counts['compatibility_mismatches']} source files require target revalidation; explicit review complete={bool(counts['compatibility_review_complete'])})"
     )
     print(
         "validated schedule inputs: "
