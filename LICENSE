@@ -41,7 +41,7 @@ This License is intended to operate through rights that a Licensor actually owns
 
 A project does not become a Restricted Project solely because an unrelated participant has an incidental or unknown connection to a Restricted Party.
 
-"Restricted Parties Schedule" or "Schedule" means the exact immutable versioned document incorporated by the applicable Software release that lists Restricted Parties, Restricted Projects, and any expressly defined class-based designations or exclusions. The Schedule must be objectively identifiable by an immutable version, content hash, or exact ECL Bundle manifest. A mutable branch, `latest` page, registry view, or channel pointer is not by itself an incorporated Schedule. A later Schedule does not retroactively alter rights for an earlier Software release unless that earlier release itself expressly and validly provided otherwise.
+"Restricted Parties Schedule" or "Schedule" means the exact immutable versioned document incorporated by the applicable Software release that lists Restricted Parties, Restricted Projects, and any expressly defined class-based designations or exclusions. The Schedule must be objectively identifiable by an immutable version, content hash, or exact ECL Bundle manifest. A mutable branch, `latest` page, registry view, or channel pointer is not by itself an incorporated Schedule. A later Schedule never retroactively alters the Licensed Rights or restrictions attached to an earlier Software release; adopting a different Schedule requires a new exact ECL Bundle for a new Software release.
 
 "ECL Bundle" or "Bundle" means the exact combination of the ECL License version and exact Restricted Parties Schedule incorporated by a Software release, identified by an immutable manifest or equivalent release metadata that pins the relevant artifacts and their cryptographic hashes.
 
@@ -77,11 +77,13 @@ If You distribute the Software or a substantial portion of it, modified or unmod
 (e) identify material modifications made by You; and
 (f) not represent the Software as OSI-approved open source unless a future version has separately received such approval.
 
-If the release materials supplied by the Licensor fail to identify an exact incorporated Schedule objectively, the Schedule is deemed empty for that Software release. That fallback does not remove the independent Section 5 conditions, but no party or project is treated as expressly Schedule-designated for that release on the basis of a later or mutable registry state.
+For an original application of ECL by a Licensor to material over which that Licensor controls the relevant Licensed Rights, if that Licensor's own initial release materials fail to identify an exact incorporated Schedule objectively, the Schedule for **that Licensor's grant in that material and that release only** is deemed empty. That limited fallback does not remove the independent Section 5 conditions.
+
+The empty-Schedule fallback cannot erase, replace, weaken, or re-resolve an exact upstream Bundle already governing ECL-covered material received from another Licensor. A downstream distributor or modifier must preserve each applicable upstream Bundle under paragraphs (c) and (d). Failure to do so is a breach of this Section; it does not make an upstream Schedule empty, does not substitute a later or mutable Schedule, and does not expand any downstream recipient's rights in the upstream material.
 
 You may license Your own original additions under additional terms, provided those terms do not purport to remove or weaken restrictions that continue to apply to ECL-covered material or grant rights in another Licensor's material that You do not possess.
 
-Each downstream recipient who receives ECL-covered material may independently exercise Licensed Rights granted directly by each relevant Licensor under the ECL terms applicable to that recipient's exact copy or release, provided the recipient independently complies with those terms.
+Each downstream recipient who receives ECL-covered material may independently exercise Licensed Rights granted directly by each relevant Licensor under the ECL terms applicable to that recipient's exact copy or release, provided the recipient independently complies with those terms. A downstream distributor's omission or corruption of required Bundle metadata does not grant the recipient broader rights than the relevant upstream Licensor granted.
 
 5. PROHIBITED USE CONTEXTS — CONDITIONS ON LICENSED RIGHTS
 
