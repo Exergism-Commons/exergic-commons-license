@@ -50,6 +50,15 @@ last_reviewed: {last}
             with self.assertRaisesRegex(ValueError, "invalid provisional_outcome"):
                 MODULE.load_dossiers(Path(tmp), require_195=False)
 
+    def test_new_manual_record_does_not_invent_review_due(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "AAA.md"
+            path.write_text(self.dossier_text(), encoding="utf-8")
+            dossier = MODULE.load_dossiers(Path(tmp), require_195=False)[0]
+            record = MODULE.merge(dossier, None, None)
+            self.assertEqual(record["reviewClass"], "manual")
+            self.assertNotIn("reviewDue", record)
+
     def test_curated_fields_survive_regeneration(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -72,6 +81,38 @@ last_reviewed: {last}
             self.assertEqual(merged["participatesIn"], ["ecl:PROJECT-EXAMPLE"])
             self.assertEqual(merged["monitorIds"], ["MONITOR-EXAMPLE"])
             self.assertEqual(merged["reviewClass"], "hot")
+            self.assertEqual(merged["reviewDue"], "2026-08-20")
+
+    def test_manual_curated_due_survives_normal_v2_regeneration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "AAA.md"
+            path.write_text(self.dossier_text(), encoding="utf-8")
+            dossier = MODULE.load_dossiers(root, require_195=False)[0]
+            existing = {
+                **MODULE.projection(dossier),
+                "aliases": ["AAA"],
+                "reviewDue": "2026-12-31",
+                "reviewClass": "manual",
+            }
+            merged = MODULE.merge(dossier, existing, None, cleanup_v1=False)
+            self.assertEqual(merged["reviewDue"], "2026-12-31")
+
+    def test_v1_synthetic_manual_due_is_removed_on_manifest_upgrade(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "AAA.md"
+            path.write_text(self.dossier_text(), encoding="utf-8")
+            dossier = MODULE.load_dossiers(root, require_195=False)[0]
+            existing = {
+                **MODULE.projection(dossier),
+                "aliases": ["AAA"],
+                "reviewDue": MODULE.synthetic_v1_due(dossier),
+                "reviewClass": "manual",
+            }
+            merged = MODULE.merge(dossier, existing, MODULE.phash(existing), cleanup_v1=True)
+            self.assertNotIn("reviewDue", merged)
+            self.assertEqual(merged["reviewClass"], "manual")
 
     def test_legacy_canonical_name_conflict_becomes_alias(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -99,7 +140,6 @@ last_reviewed: {last}
             existing = {
                 **MODULE.projection(dossier),
                 "aliases": ["AAA"],
-                "reviewDue": "2026-08-20",
                 "reviewClass": "manual",
             }
             recorded_hash = MODULE.phash(existing)
@@ -140,10 +180,14 @@ class StateABoxRepositoryTests(unittest.TestCase):
             self.assertEqual(record["iri"], f"ecl:STATE-{iso}")
             self.assertEqual(record["dossier"], f"../../dossiers/states/{iso}.md")
             MODULE.guard(record, str(path))
+            if record.get("reviewClass") == "manual" and "reviewReason" not in record:
+                self.assertNotIn("reviewDue", record, path)
 
     def test_manifest_has_all_195_generator_hashes(self):
         manifest = json.loads((ROOT / "knowledge" / "generated" / "state-abox-manifest.json").read_text(encoding="utf-8"))
         hashes = manifest["generatedProjectionSha256"]
+        self.assertEqual(manifest["version"], MODULE.VERSION)
+        self.assertEqual(manifest["generator"], MODULE.GENERATOR)
         self.assertEqual(len(hashes), 195)
         self.assertEqual(set(hashes), {path.stem.removeprefix("STATE-") for path in (ROOT / "knowledge" / "entities").glob("STATE-*.json")})
 
