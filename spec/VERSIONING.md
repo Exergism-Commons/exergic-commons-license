@@ -20,7 +20,7 @@ The governing invariant is:
 
 > **Knowledge may change; decisions are versioned; released Schedules and license texts are immutable; a software release resolves an exact ECL Bundle.**
 
-A later fact, assessment, decision, Schedule or license version MUST NOT silently rewrite the terms attached to an already released copy of software.
+A later fact, assessment, decision, Schedule, license version, review specification, versioning specification or tooling schema MUST NOT silently rewrite the terms or historical validation state attached to an already released Bundle.
 
 ## 2. Four meanings of "current"
 
@@ -89,7 +89,7 @@ A Schedule release MUST identify the `KnowledgeSnapshot` from which it was prepa
 
 A later Schedule never edits an older Schedule in place.
 
-## 7. ECLBundle
+## 7. ECLBundle and frozen legal-review inputs
 
 An `ECLBundle` is the exact pair that a software release actually incorporates:
 
@@ -105,9 +105,28 @@ ECL-1.0.0@RP-2026.10.02.1
 
 Every Bundle manifest MUST contain immutable identifiers and SHA-256 hashes for its License and Schedule components.
 
-An `operative: true` Bundle MUST additionally content-address the immutable completed legal-review record required by [`LEGAL-ADVERSARIAL-REVIEW.md`](LEGAL-ADVERSARIAL-REVIEW.md). That review record binds the exact candidate License plus the exact reviewed incorporation/versioning model and Bundle schema. A non-operative draft/candidate MAY omit the legal-review component, but it remains explicitly non-operative.
+An `operative: true` Bundle MUST additionally content-address the immutable completed legal-review record required by [`LEGAL-ADVERSARIAL-REVIEW.md`](LEGAL-ADVERSARIAL-REVIEW.md).
 
-This Bundle identity is the unit that downstream tooling, SBOMs, archives and compliance records should resolve.
+The legal-review record binds the exact candidate License SHA-256 and frozen copies of the non-License review inputs used for that review. Before a qualified review is finalized, those inputs MUST be snapshotted under a deterministic review-specific namespace:
+
+```text
+reviews/legal/inputs/<review_id>/
+  LEGAL-ADVERSARIAL-REVIEW.md
+  VERSIONING.md
+  bundle.schema.json
+
+reviews/legal/records/<review_id>.json
+```
+
+The record hashes those frozen snapshots. Release tooling validates those snapshots rather than the repository's future mutable canonical files.
+
+This distinction is mandatory. After an operative Bundle is released, a later legitimate change to `spec/VERSIONING.md`, `spec/LEGAL-ADVERSARIAL-REVIEW.md`, or `schemas/bundle.schema.json` MUST NOT invalidate the historical Bundle. By contrast, changing or corrupting a frozen input under `reviews/legal/inputs/<review_id>/` MUST cause validation of the affected Bundle to fail.
+
+The canonical files remain the source from which a **new** review snapshot is prepared. They are not retroactive dependencies of an **old** review record.
+
+A non-operative draft/candidate MAY omit the legal-review component, but it remains explicitly non-operative.
+
+This Bundle identity and its frozen review provenance are the units that downstream tooling, SBOMs, archives and compliance records should resolve.
 
 ## 8. Publisher policy versus resolved legal state
 
@@ -257,9 +276,10 @@ exact ECLBundle manifest
     -> exact LicenseRelease
     -> exact ScheduleRelease
     -> immutable legal-review record when operative
+    -> frozen legal-review input snapshots referenced by that record
 ```
 
-No mutable channel, registry, dossier, ticket or current Web view may override the exact immutable artifacts recorded in an already resolved bundle.
+No mutable channel, registry, dossier, ticket, current Web view, later canonical review specification or later canonical Bundle schema may override the exact immutable artifacts recorded for an already resolved Bundle.
 
 ## 15. Release gate
 
@@ -271,14 +291,16 @@ A bundle may be marked `operative: true` only when all required release gates ar
 - Schedule provenance resolves to reviewed governance decisions;
 - required CI/integrity checks pass;
 - the legal adversarial review required by [`LEGAL-ADVERSARIAL-REVIEW.md`](LEGAL-ADVERSARIAL-REVIEW.md) is complete for the exact release-candidate text and Schedule-incorporation mechanism;
-- the Bundle content-addresses that completed immutable legal-review record;
-- the legal-review record binds the exact License hash, exact reviewed `VERSIONING.md` incorporation model and exact reviewed Bundle schema;
+- the Bundle content-addresses that completed immutable legal-review record at `reviews/legal/records/<review_id>.json`;
+- the legal-review record binds the exact License hash and the exact frozen review inputs under `reviews/legal/inputs/<review_id>/`;
 - no unresolved legal-review `BLOCKER` remains, and every `MAJOR` finding is resolved, narrowed or explicitly accepted as a documented jurisdictional limitation/risk under that review process;
 - every required minimum jurisdiction track and every mandatory legal attack surface has a recorded disposition;
 - any separate internal release review required by project policy is complete; and
 - the bundle manifest is itself immutable/versioned.
 
-Release tooling MUST reject `operative: true` when the legal-review record is absent, its content hash fails, it targets a different License or reviewed incorporation artifact, or its machine-verifiable gate state is incomplete.
+Release tooling MUST reject `operative: true` when the legal-review record is absent, its content hash fails, it targets a different License, a frozen reviewed input is absent/tampered, or its machine-verifiable gate state is incomplete.
+
+Release tooling MUST NOT compare a historical review record against the contents of later mutable canonical review/versioning/schema files. Historical validation is against the frozen per-review snapshots.
 
 A maintainer self-review, AI review, automated check or general community approval does not by itself satisfy the independent qualified legal-review minimum defined by `LEGAL-ADVERSARIAL-REVIEW.md`.
 
