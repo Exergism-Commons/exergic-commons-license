@@ -40,6 +40,16 @@ Scope follows Public Ministry/FECI/prosecutorial, detention and implicated judic
 
 Release/fair review of prisoners-of-conscience cases, end to retaliatory prosecution and effective protection of Indigenous/anti-corruption civic participation.
 
-## 7. Procedural history
+## 7. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The Pacheco/Chaclán detention evidence, wider criminalization concern, Constitutional Court counter-institution, attribution boundary and removal trigger are reflected in §§2–6 above.
+- The historical tranche names the relevant 2025/26 evidence and May/July 2026 developments but supplies no exact source URL or document locator for this case. Repository search in this pass found no independent precise locator beyond the tranche/dossier text. No locator is invented or inferred here.
+- Issue #68 — **already reviewed / no separate issue evidence to absorb**. Its synchronized public-review body points back to this dossier and the thread contained no evidence comments at the time of review.
+
+Exact source-locator recovery therefore remains an evidence-curation gap. This record does not change the current outcome/scope or create structured Claims, EvidenceItems, grades, `asOf` dates, actor relationships or governance decisions.
+
+## 8. Procedural history
 
 Issue #68 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
