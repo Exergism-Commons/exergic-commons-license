@@ -3,7 +3,7 @@
   "channel": "draft",
   "operative": false,
   "license": {
-    "ref": "ECL-0.2-DRAFT",
+    "ref": "ECL-0.3-DRAFT",
     "path": "LICENSE",
     "mutable_working_copy": true
   },
