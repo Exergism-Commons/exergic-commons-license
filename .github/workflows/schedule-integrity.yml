@@ -5,6 +5,7 @@ on:
     paths:
       - "registry/**"
       - "tools/render_schedule.py"
+      - "tools/test_schedule_compatibility_gate.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
@@ -12,6 +13,7 @@ on:
     paths:
       - "registry/**"
       - "tools/render_schedule.py"
+      - "tools/test_schedule_compatibility_gate.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
@@ -33,6 +35,9 @@ jobs:
       - name: Install renderer dependency
         run: python -m pip install --disable-pip-version-check PyYAML
 
+      - name: Test exact License compatibility gate
+        run: python tools/test_schedule_compatibility_gate.py
+
       - name: Validate frozen Schedule inputs
         run: python tools/render_schedule.py --validate-only
 
@@ -49,6 +54,7 @@ jobs:
       - name: Guard target-License compatibility label
         run: |
           grep -q "Target working License: \*\*ECL-0.3-DRAFT\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
+          grep -q "Exact target License artifact: \*\*versions/licenses/ECL-0.3-DRAFT.md\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
           grep -q "Compatibility status: \*\*NOT YET VALIDATED for ECL-0.3-DRAFT\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
           if grep -q "Intended compatibility: \*\*ECL-0.3-DRAFT only\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md; then
             echo "renderer falsely advertised ECL-0.3-DRAFT compatibility before source revalidation" >&2
