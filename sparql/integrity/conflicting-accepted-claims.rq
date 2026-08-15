@@ -1,0 +1,32 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?left ?right ?subject ?predicate
+WHERE {
+  ?left a ecl:Claim ;
+        ecl:subject ?subject ;
+        ecl:predicate ?predicate ;
+        ecl:status "accepted" .
+  ?right a ecl:Claim ;
+         ecl:subject ?subject ;
+         ecl:predicate ?predicate ;
+         ecl:status "accepted" .
+  FILTER (STR(?left) < STR(?right))
+
+  OPTIONAL { ?left ecl:object ?leftObject . }
+  OPTIONAL { ?left ecl:literalValue ?leftLiteral . }
+  OPTIONAL { ?right ecl:object ?rightObject . }
+  OPTIONAL { ?right ecl:literalValue ?rightLiteral . }
+  BIND(COALESCE(CONCAT("iri:", STR(?leftObject)), CONCAT("literal:", STR(?leftLiteral))) AS ?leftValue)
+  BIND(COALESCE(CONCAT("iri:", STR(?rightObject)), CONCAT("literal:", STR(?rightLiteral))) AS ?rightValue)
+  FILTER (?leftValue != ?rightValue)
+
+  OPTIONAL { ?left ecl:validFrom ?leftFrom . }
+  OPTIONAL { ?left ecl:validTo ?leftTo . }
+  OPTIONAL { ?right ecl:validFrom ?rightFrom . }
+  OPTIONAL { ?right ecl:validTo ?rightTo . }
+  FILTER (!(BOUND(?leftTo) && BOUND(?rightFrom) && ?leftTo < ?rightFrom))
+  FILTER (!(BOUND(?rightTo) && BOUND(?leftFrom) && ?rightTo < ?leftFrom))
+
+  FILTER NOT EXISTS { ?left ecl:supersedes ?right . }
+  FILTER NOT EXISTS { ?right ecl:supersedes ?left . }
+}
