@@ -232,7 +232,7 @@ class StateProjectTrackClaimCompletenessTests(unittest.TestCase):
         }
         second = {
             "@id": "urn:ecl:SUPPORT-DOC-SPLIT-TEST",
-            "@graph": [
+            "urn:ecl:reviews": [
                 {
                     "@id": str(claim),
                     "urn:ecl:status": [{"@value": "accepted"}],
