@@ -4,6 +4,7 @@ SELECT ?state ?predicate ?value WHERE {
   ?state a ecl:State ; ?predicate ?value .
   FILTER (
     ?predicate = ecl:outcome ||
+    ?predicate = ecl:status ||
     REGEX(
       STR(?predicate),
       "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$",
