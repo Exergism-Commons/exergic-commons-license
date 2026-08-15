@@ -5,11 +5,15 @@ on:
     paths:
       - "registry/**"
       - "tools/render_schedule.py"
+      - "LICENSE"
+      - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
   pull_request:
     paths:
       - "registry/**"
       - "tools/render_schedule.py"
+      - "LICENSE"
+      - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
   workflow_dispatch:
 
