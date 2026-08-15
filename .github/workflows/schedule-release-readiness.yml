@@ -5,6 +5,7 @@ on:
     paths:
       - "registry/**"
       - "tools/render_schedule.py"
+      - "tools/test_schedule_compatibility_gate.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -12,6 +13,7 @@ on:
     paths:
       - "registry/**"
       - "tools/render_schedule.py"
+      - "tools/test_schedule_compatibility_gate.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -28,6 +30,8 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python -m pip install --disable-pip-version-check PyYAML
+      - name: Test exact License compatibility gate
+        run: python tools/test_schedule_compatibility_gate.py
       - name: Validate State coverage
         run: |
           python - <<'PY'
@@ -63,9 +67,10 @@ jobs:
       - name: Verify target-License compatibility is not overstated
         run: |
           grep -q "Target working License: \*\*ECL-0.3-DRAFT\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
+          grep -q "Exact target License artifact: \*\*versions/licenses/ECL-0.3-DRAFT.md\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
           grep -q "Compatibility status: \*\*NOT YET VALIDATED for ECL-0.3-DRAFT\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md
           if grep -q "Intended compatibility: \*\*ECL-0.3-DRAFT only\*\*" build/ECL-RP-0.5-GENERATED-DRAFT.md; then
-            echo "Schedule candidate claims 0.3 compatibility without 0.3-compatible freeze inputs" >&2
+            echo "Schedule candidate claims 0.3 compatibility without exact License/source revalidation" >&2
             exit 1
           fi
       - uses: actions/upload-artifact@v4
