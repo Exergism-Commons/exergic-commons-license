@@ -52,10 +52,10 @@ Reform of abusive terrorism/expression offences; release/remedy; independent rev
 Reviewed for ECL 1.0 normalization on 2026-08-15:
 
 - `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. Its substantive current evidence, counter-evidence, narrowing rationale and removal triggers are reflected in §§2–7 above; they are not duplicated as a second current finding.
-- https://github.com/Papishushi/exergic-commons-license/issues/3#issuecomment-5248193077 — **historical-only / locator incomplete**. The earlier 2026-08-11 evidence-review comment records a scoped concern involving arbitrary detention, unfair security prosecutions, travel bans and restrictions on dissent, and names `Amnesty Algeria 2025` plus a `UN HRC review` as its evidence baseline. The comment does not preserve precise locators for those two underlying source references, so they are retained as review provenance rather than silently added to the current source list or used to broaden the current scope.
+- https://github.com/Papishushi/exergic-commons-license/issues/3#issuecomment-5248193077 — **historical-only / locator incomplete**. The earlier 2026-08-11 evidence-review comment records a scoped concern involving arbitrary detention, unfair security prosecutions, travel bans and restrictions on dissent, and names `Amnesty Algeria 2025` plus a `UN HRC review` as its evidence baseline. The comment's legacy full-record pointer no longer resolves under that historical filename; the surviving first-pass repository record is `../../reviews/2026/initial-adjudication.md` row #3. Neither the comment nor that first-pass row preserves precise locators for those named source families, so they remain review provenance rather than silently entering the current source list or broadening the current scope.
 
 This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
 
 ## 9. Procedural history
 
-Issue #3 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
+Issue #3 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-02.md`
