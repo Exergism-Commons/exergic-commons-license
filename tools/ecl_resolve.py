@@ -83,36 +83,56 @@ def valid_review_id(value: str) -> bool:
     return REVIEW_ID_RE.fullmatch(value) is not None
 
 
+def _uses_reserved_fallback_component(
+    actual: Any, expected: dict[str, Any]
+) -> bool:
+    if not isinstance(actual, dict):
+        return False
+    return any(actual.get(key) == expected[key] for key in ("ref", "path", "sha256"))
+
+
 def validate_bundle_identity(bundle: dict[str, Any]) -> None:
     """Enforce semantic identity for canonical empty-Schedule fallback Bundles.
 
-    Empty fallback identifiers are intentionally opt-in rather than generative:
-    a new ``@RP-EMPTY-N`` identifier is invalid until its exact License and
-    Schedule components are registered here and in the Bundle schema. This
-    prevents a manifest from borrowing a canonical-looking fallback identifier
-    while substituting unrelated artifacts or hashes.
+    Empty fallback identities are intentionally opt-in rather than generative.
+    Their identifiers and their reserved License/Schedule components are a single
+    indivisible identity: neither side may be borrowed by an ordinary Bundle.
+    A new fallback is invalid until its exact state is registered here and in the
+    Bundle schema.
     """
 
     bundle_ref = bundle.get("bundle")
     if not isinstance(bundle_ref, str):
         raise ValueError("bundle manifest is missing string bundle identity")
-    if "@RP-EMPTY-" not in bundle_ref:
-        return
 
     expected = CANONICAL_EMPTY_BUNDLES.get(bundle_ref)
-    if expected is None:
+    if expected is not None:
+        if bundle.get("operative") is not expected["operative"]:
+            raise ValueError(
+                f"canonical empty fallback {bundle_ref} has invalid operative state"
+            )
+        for component_name in ("license", "schedule"):
+            actual_component = bundle.get(component_name)
+            expected_component = expected[component_name]
+            if actual_component != expected_component:
+                raise ValueError(
+                    f"canonical empty fallback {bundle_ref} has mismatched "
+                    f"{component_name} identity"
+                )
+        return
+
+    if "@RP-EMPTY-" in bundle_ref:
         raise ValueError(f"unsupported canonical empty fallback bundle: {bundle_ref}")
 
-    if bundle.get("operative") is not expected["operative"]:
-        raise ValueError(f"canonical empty fallback {bundle_ref} has invalid operative state")
-
-    for component_name in ("license", "schedule"):
-        actual_component = bundle.get(component_name)
-        expected_component = expected[component_name]
-        if actual_component != expected_component:
-            raise ValueError(
-                f"canonical empty fallback {bundle_ref} has mismatched {component_name} identity"
-            )
+    for registered_ref, registered in CANONICAL_EMPTY_BUNDLES.items():
+        for component_name in ("license", "schedule"):
+            if _uses_reserved_fallback_component(
+                bundle.get(component_name), registered[component_name]
+            ):
+                raise ValueError(
+                    f"bundle {bundle_ref} uses reserved canonical empty fallback "
+                    f"{component_name} identity from {registered_ref}"
+                )
 
 
 def validate_file_reference(
