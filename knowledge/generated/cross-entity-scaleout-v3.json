@@ -10,14 +10,14 @@
   "followsManifest": "knowledge/generated/cross-entity-scaleout-v1.json",
   "numberingNote": "Global tranche 2 is #217/#219. This tranche is globally numbered 3, while its cross-entity semantic lineage directly follows cross-entity-scaleout-v1 because tranche 2 is a separate scoped-system projectization lineage developed in parallel from the same post-#216 base.",
   "sourceReview": "reviews/2026/consistency/cross-entity-reconciliation.md",
-  "identityRule": "Create exact legal-entity identities only when the canonical dossier explicitly enumerates them. A network label may track them for review routing, but identity creation does not assert legal control, membership, culpability, or governance status.",
+  "identityRule": "Create exact legal-entity identities only when the canonical network dossier explicitly enumerates them. Each exact entity receives its own identity-only dossier with no provisional_outcome; the network dossier remains provenance and review-routing evidence, so network governance cannot be inherited by the exact entity.",
   "identities": [
-    {"id":"ORG-INTELLEXA-SA","type":"Organization","name":"Intellexa S.A.","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
-    {"id":"ORG-INTELLEXA-LIMITED","type":"Organization","name":"Intellexa Limited","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
-    {"id":"ORG-CYTROX-AD","type":"Organization","name":"Cytrox AD","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
-    {"id":"ORG-CYTROX-HOLDINGS-ZRT","type":"Organization","name":"Cytrox Holdings ZRT","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
-    {"id":"ORG-THALESTRIS-LIMITED","type":"Organization","name":"Thalestris Limited","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
-    {"id":"ORG-ALIADA-GROUP-INC","type":"Organization","name":"Aliada Group Inc.","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."}
+    {"id":"ORG-INTELLEXA-SA","type":"Organization","name":"Intellexa S.A.","dossier":"dossiers/organizations/INTELLEXA-SA.md","sourceDossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical network dossier; its own dossier is identity-only and carries no inherited governance."},
+    {"id":"ORG-INTELLEXA-LIMITED","type":"Organization","name":"Intellexa Limited","dossier":"dossiers/organizations/INTELLEXA-LIMITED.md","sourceDossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical network dossier; its own dossier is identity-only and carries no inherited governance."},
+    {"id":"ORG-CYTROX-AD","type":"Organization","name":"Cytrox AD","dossier":"dossiers/organizations/CYTROX-AD.md","sourceDossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical network dossier; its own dossier is identity-only and carries no inherited governance."},
+    {"id":"ORG-CYTROX-HOLDINGS-ZRT","type":"Organization","name":"Cytrox Holdings ZRT","dossier":"dossiers/organizations/CYTROX-HOLDINGS-ZRT.md","sourceDossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical network dossier; its own dossier is identity-only and carries no inherited governance."},
+    {"id":"ORG-THALESTRIS-LIMITED","type":"Organization","name":"Thalestris Limited","dossier":"dossiers/organizations/THALESTRIS-LIMITED.md","sourceDossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical network dossier; its own dossier is identity-only and carries no inherited governance."},
+    {"id":"ORG-ALIADA-GROUP-INC","type":"Organization","name":"Aliada Group Inc.","dossier":"dossiers/organizations/ALIADA-GROUP-INC.md","sourceDossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical network dossier; its own dossier is identity-only and carries no inherited governance."}
   ],
   "claims": [
     {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-INTELLEXA-SA","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-INTELLEXA-SA","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
@@ -42,6 +42,6 @@
     "Do not create spyware Project or Deployment identities without canonical reviewed project records.",
     "Do not infer controls, controlledBy, operates, participatesIn, ownership, membership, culpability, or governance outcomes from tracking dependencies.",
     "Do not import sanctions, UN, ICC, Commerce, or Treasury designations as ECL governance.",
-    "Do not modify Schedule, released license text, legal-review artifacts, dossiers, or registry views."
+    "Do not modify Schedule, released license text, legal-review artifacts, or registry views. Identity-only dossiers added here must not contain governance outcomes."
   ]
 }
