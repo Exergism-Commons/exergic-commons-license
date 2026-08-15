@@ -17,6 +17,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 REG = ROOT / "registry"
 TARGET_LICENSE = "ECL-0.3-DRAFT"
+TARGET_LICENSE_ARTIFACT = ROOT / "versions" / "licenses" / "ECL-0.3-DRAFT.md"
+WORKING_LICENSE = ROOT / "LICENSE"
 COMPATIBILITY_REVIEW = REG / "schedule-license-compatibility.yml"
 
 READY_PREFIX = "ready"
@@ -106,23 +108,58 @@ def schedule_clause_source_paths() -> list[Path]:
     return paths
 
 
-def validate_compatibility_review(sources: list[Path], target_license: str) -> bool:
-    """Require a complete compatibility review to bind every exact source file.
+def validate_target_license_artifact(review: dict[str, Any]) -> None:
+    """Bind compatibility evidence to exact frozen and working License bytes."""
 
-    A mutable metadata flip on the freeze files is not sufficient. A completed
-    revalidation must name the target License and bind the complete renderer
-    input set by repository-relative path and SHA-256.
+    binding = review.get("target_license_artifact")
+    if not isinstance(binding, dict):
+        raise ValueError("Schedule compatibility review requires target_license_artifact")
+
+    path_text = binding.get("path")
+    digest = binding.get("sha256")
+    expected_path = str(TARGET_LICENSE_ARTIFACT.relative_to(ROOT))
+    if path_text != expected_path:
+        raise ValueError(
+            "Schedule compatibility review target License path does not match renderer target artifact"
+        )
+    if not isinstance(digest, str) or len(digest) != 64:
+        raise ValueError("Schedule compatibility review target License has invalid sha256")
+    if not TARGET_LICENSE_ARTIFACT.is_file():
+        raise ValueError(f"missing target License artifact: {TARGET_LICENSE_ARTIFACT}")
+    if not WORKING_LICENSE.is_file():
+        raise ValueError(f"missing working License artifact: {WORKING_LICENSE}")
+
+    frozen_digest = sha256(TARGET_LICENSE_ARTIFACT)
+    if digest != frozen_digest:
+        raise ValueError(
+            "Schedule compatibility review target License SHA-256 is stale"
+        )
+    working_digest = sha256(WORKING_LICENSE)
+    if working_digest != frozen_digest:
+        raise ValueError(
+            "working LICENSE differs from the exact target License artifact bound by the Schedule compatibility review"
+        )
+
+
+def validate_compatibility_review(sources: list[Path], target_license: str) -> bool:
+    """Require a complete compatibility review to bind exact License and sources.
+
+    A mutable metadata flip on the freeze files is not sufficient. The review
+    always binds the exact target License artifact; a completed revalidation
+    must additionally bind the complete renderer input set by repository-
+    relative path and SHA-256.
     """
 
     if not COMPATIBILITY_REVIEW.is_file():
         raise ValueError(f"missing compatibility review gate: {COMPATIBILITY_REVIEW}")
     review = load_yaml(COMPATIBILITY_REVIEW)
-    if review.get("schema_version") != 1:
+    if review.get("schema_version") != 2:
         raise ValueError("unsupported Schedule compatibility review schema_version")
     if review.get("target_license") != target_license:
         raise ValueError(
             "Schedule compatibility review target does not match renderer target License"
         )
+    validate_target_license_artifact(review)
 
     status = review.get("status")
     if status == "pending":
@@ -156,10 +193,7 @@ def validate_compatibility_review(sources: list[Path], target_license: str) -> b
             raise ValueError(f"duplicate Schedule compatibility source binding: {path}")
         actual[path] = digest
 
-    expected = {
-        str(path.relative_to(ROOT)): sha256(path)
-        for path in sources
-    }
+    expected = {str(path.relative_to(ROOT)): sha256(path) for path in sources}
     if actual != expected:
         missing = sorted(expected.keys() - actual.keys())
         extra = sorted(actual.keys() - expected.keys())
@@ -320,19 +354,23 @@ def render() -> tuple[str, dict[str, int]]:
         compatibility_lines = [
             f"> Target working License: **{TARGET_LICENSE}**.",
             ">",
+            f"> Exact target License artifact: **{TARGET_LICENSE_ARTIFACT.relative_to(ROOT)}** (`{sha256(TARGET_LICENSE_ARTIFACT)}`).",
+            ">",
             f"> Compatibility status: **NOT YET VALIDATED for {TARGET_LICENSE}**.",
             ">",
             f"> Frozen clause inputs currently declare compatibility with: **{declared_text}**.",
             ">",
-            "> Explicit hash-bound compatibility revalidation: **PENDING**.",
+            "> Explicit License-and-source hash-bound compatibility revalidation: **PENDING**.",
             ">",
-            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and the compatibility record binds the complete source set by SHA-256.",
+            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and the compatibility record binds both the exact target License artifact and the complete source set by SHA-256.",
         ]
     else:
         compatibility_lines = [
             f"> Intended compatibility: **{TARGET_LICENSE} only**.",
             ">",
-            "> Exact frozen clause source set: **compatibility revalidation complete and SHA-256-bound**.",
+            f"> Exact target License artifact: **{TARGET_LICENSE_ARTIFACT.relative_to(ROOT)}** (`{sha256(TARGET_LICENSE_ARTIFACT)}`).",
+            ">",
+            "> Exact target License artifact and frozen clause source set: **compatibility revalidation complete and SHA-256-bound**.",
         ]
 
     lines: list[str] = [
