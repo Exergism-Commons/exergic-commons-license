@@ -60,12 +60,24 @@ ecl:StateShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path ecl:reviewDue ;
-        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date
+        sh:maxCount 1 ; sh:datatype xsd:date
     ] ;
     sh:property [
         sh:path ecl:reviewClass ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:in ( "hot" "active" "stable" "manual" )
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Non-manual State review classes require an explicit reviewDue date." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this WHERE {
+              $this ecl:reviewClass ?class .
+              FILTER (?class != "manual")
+              FILTER NOT EXISTS { $this ecl:reviewDue ?due }
+            }
+        """
     ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
