@@ -25,7 +25,24 @@ A legal-review record MUST bind itself to immutable inputs, at minimum:
 
 Review of a moving branch is insufficient for the stable-release gate.
 
-Any material change to the grant, restrictions, definitions, Schedule incorporation, notice, termination, remedies, governing-law model, contributor-rights model or statutory-rights savings language invalidates the affected portion of prior review and requires recorded delta review.
+Before a qualified review record is finalized, the exact non-License mechanism inputs used by the review MUST be copied into a deterministic frozen namespace for that review:
+
+```text
+reviews/legal/inputs/<review_id>/
+  LEGAL-ADVERSARIAL-REVIEW.md
+  VERSIONING.md
+  bundle.schema.json
+
+reviews/legal/records/<review_id>.json
+```
+
+The review record MUST hash and reference those frozen copies. It MUST NOT rely on the future contents of the mutable canonical files at `spec/LEGAL-ADVERSARIAL-REVIEW.md`, `spec/VERSIONING.md`, or `schemas/bundle.schema.json` when validating an already completed historical review.
+
+The canonical files are the source from which a **new** review snapshot is prepared. Once a review is frozen, later legitimate edits to those canonical files MUST NOT invalidate the historical review. By contrast, absence, mutation, path substitution, or hash failure of a frozen input under `reviews/legal/inputs/<review_id>/` MUST make the affected review record fail machine validation.
+
+The exact candidate License remains independently bound by its content hash in both the Bundle and legal-review record; it need not be duplicated in the frozen-input directory.
+
+Any material change to the grant, restrictions, definitions, Schedule incorporation, notice, termination, remedies, governing-law model, contributor-rights model or statutory-rights savings language invalidates the affected portion of prior review and requires recorded delta review. A new review/delta-review snapshot MUST be frozen for the exact mechanism inputs actually reviewed.
 
 ## 3. Review principle
 
@@ -52,9 +69,11 @@ The goal is not universal enforceability. The goal is to expose exactly where EC
 
 Every surface `LAR-01` through `LAR-16` MUST receive a recorded disposition for the exact release candidate.
 
+The attack surfaces are bound to **operative subjects/headings, not hard-coded section numbers**. License section numbers may change as a candidate evolves. The review record MUST map each LAR surface to the exact provision heading(s) or location(s) in the content-addressed candidate actually reviewed. Renumbering or inserting sections must never allow a mandatory attack surface to be accidentally pointed at the wrong provision.
+
 ### LAR-01 — Copyright hook and scope of grant
 
-For every operative verb in Sections 3, 5 and 6 of `LICENSE`, identify whether the conduct:
+For every operative verb in the candidate's grant, prohibited-use, restricted-party/project, distribution and service-provision provisions, identify whether the conduct:
 
 1. normally implicates a Licensor-controlled exclusive software/copyright right;
 2. does so only when particular technical facts such as reproduction are present;
@@ -90,13 +109,13 @@ Distinguish:
 
 Test program loading/execution copies, backup copies, observation/study/testing, interoperability/decompilation, fair use/fair dealing, maintenance/repair/essential-step copies, exhaustion/first-sale effects and relevant non-waivable consumer/mandatory-law protections.
 
-The review MUST decide whether ECL 1.0 requires an explicit savings clause stating that the License does not restrict conduct for which applicable law does not require Licensor permission and cannot override rights that applicable law makes non-waivable.
+The review MUST decide whether the candidate's statutory-rights/savings language correctly states that the License does not restrict conduct for which applicable law does not require Licensor permission and cannot override rights that applicable law makes non-waivable.
 
 ### LAR-05 — Exhaustion and downstream copies
 
 Determine what control, if any, remains after exhaustion/first sale of a particular lawfully transferred copy and separately identify later reproduction, adaptation, redistribution or deployment that still requires permission.
 
-Cover Sections 4, 6 and 10 explicitly.
+Explicitly cover the candidate's distribution/Bundle-preservation provisions, Restricted Party/Project and service-provision provisions, statutory-rights/exhaustion provisions, and termination/downstream-survival provisions.
 
 ### LAR-06 — SaaS, remote execution and service-provider reach
 
@@ -122,7 +141,7 @@ This legal review does not re-decide factual designation merits, but it MUST tes
 
 ### LAR-08 — Schedule incorporation and non-retroactivity
 
-Attack Sections 8, 9 and 16 and the exact-bundle model in `VERSIONING.md`.
+Attack the candidate's operative Schedule definition, governance/designation incorporation rule, non-retroactivity rule, distribution/Bundle-preservation requirements, exact-Bundle-control provision, and the exact-bundle model in `VERSIONING.md`.
 
 Test:
 
@@ -130,11 +149,13 @@ Test:
 - disappeared URLs/repository moves;
 - immutable hashes/content-addressed artifacts;
 - mirrors, vendoring, archives, binaries and containers;
+- downstream omission/corruption of upstream Bundle metadata;
+- any empty/missing-Schedule fallback;
 - later facts/governance changes;
 - correction without rewriting historical grants; and
 - any intended/disclaimed rescission theory.
 
-No mutable governance state may silently become the operative Schedule of an older release.
+No mutable governance state may silently become the operative Schedule of an older release, and no downstream omission may silently erase an upstream Bundle.
 
 ### LAR-09 — Termination, cure, authority and reinstatement
 
@@ -162,7 +183,7 @@ The stable project MUST document its contributor/inbound-rights model; a copyrig
 
 ### LAR-11 — Patent rights
 
-ECL 0.2 contains no express patent license.
+Review the candidate's patent treatment, whether that is an express no-patent grant or a proposed patent license.
 
 The review MUST recommend one of:
 
@@ -180,7 +201,7 @@ A restriction and the remedy available to enforce it are separate questions.
 
 ### LAR-13 — Choice of law, forum and cross-border enforcement
 
-Review the current absence of an express governing-law/forum clause against at least:
+Review the candidate's governing-law/forum model, including an intentional omission, against at least:
 
 - neutral no-choice model;
 - Licensor/home-jurisdiction choice;
@@ -191,13 +212,13 @@ Record conflicts/recognition consequences for a worldwide multi-Licensor public 
 
 ### LAR-14 — Warranty, liability and non-excludable rights
 
-Review Sections 12 and 13 for businesses and consumers, including mandatory warranties/remedies, gross negligence/intentional misconduct and any liability that cannot lawfully be excluded.
+Review the candidate's operative **disclaimer-of-warranty and limitation-of-liability provisions** for businesses and consumers, including mandatory warranties/remedies, gross negligence/intentional misconduct and any liability that cannot lawfully be excluded.
 
 `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW` is a limiter, not a substitute for review.
 
 ### LAR-15 — Severability and judicial modification
 
-Review Section 14 in every required jurisdiction and determine whether the forum recognizes the proposed narrowing/reformation approach and whether any provisions are interdependent/non-severable.
+Review the candidate's operative **severability provision** in every required jurisdiction and determine whether the forum recognizes the proposed narrowing/reformation approach and whether any provisions are interdependent/non-severable.
 
 ### LAR-16 — Independent regulation
 
@@ -272,7 +293,21 @@ Where reviewers disagree, preserve dissent. A contested material issue MUST NOT 
 
 ## 8. Machine-verifiable immutable legal-review record
 
-A stable operative Bundle MUST contain a content-addressed reference to an immutable legal-review record.
+A stable operative Bundle MUST contain a content-addressed reference to an immutable legal-review record at:
+
+```text
+reviews/legal/records/<review_id>.json
+```
+
+The record MUST bind to the exact frozen mechanism inputs at:
+
+```text
+reviews/legal/inputs/<review_id>/LEGAL-ADVERSARIAL-REVIEW.md
+reviews/legal/inputs/<review_id>/VERSIONING.md
+reviews/legal/inputs/<review_id>/bundle.schema.json
+```
+
+and to the exact candidate License SHA-256 carried independently by the Bundle.
 
 Tooling is responsible only for machine-verifiable integrity/state. It MUST NOT pretend to determine whether a lawyer is competent, whether an authority is correctly interpreted or whether the substantive legal analysis is true.
 
@@ -280,6 +315,7 @@ The record consumed by release tooling MUST, at minimum, attest:
 
 - `status: complete`;
 - the exact candidate License SHA-256 it reviewed;
+- the exact SHA-256 of each frozen review/mechanism input;
 - all five required jurisdiction tracks are `complete`;
 - all `LAR-01` through `LAR-16` surfaces are dispositioned;
 - qualified independent review count is at least 2;
@@ -288,7 +324,9 @@ The record consumed by release tooling MUST, at minimum, attest:
 - unresolved/undispositioned material-finding count is 0; and
 - required delta review is complete for the shipped candidate.
 
-The Bundle manifest MUST content-address that record. Release tooling MUST refuse `operative: true` when the record is absent, its hash fails, its reviewed License hash differs from the Bundle License hash, or its machine-verifiable gate state is incomplete.
+The Bundle manifest MUST content-address that record. Release tooling MUST refuse `operative: true` when the record is absent, its hash fails, its reviewed License hash differs from the Bundle License hash, a required frozen input is absent or its hash fails, the record/input paths do not match the record's `review_id`, or its machine-verifiable gate state is incomplete.
+
+Release tooling MUST validate historical review inputs against their frozen per-review snapshots. It MUST NOT require those snapshots to match later mutable canonical files. A later project-specification change therefore does not silently invalidate an already reviewed historical Bundle; tampering with the frozen reviewed input does.
 
 Non-operative draft/candidate artifacts may exist without a completed legal-review record, but tooling MUST NOT surface them as stable/operative merely because a user allows draft resolution.
 
@@ -297,17 +335,19 @@ Non-operative draft/candidate artifacts may exist without a completed legal-revi
 The ECL 1.0 legal-review gate is complete only when all of the following are true:
 
 - exact release-candidate `LICENSE` is frozen/content-addressed;
-- all LAR-01 through LAR-16 have recorded dispositions;
+- exact non-License review/mechanism inputs have been copied into the deterministic frozen `reviews/legal/inputs/<review_id>/` namespace and content-addressed by the legal-review record;
+- all LAR-01 through LAR-16 have recorded dispositions mapped to the exact candidate provisions reviewed;
 - **all five required jurisdiction tracks are complete**;
 - reviewer-independence/competence minimum is satisfied;
 - every material finding is recorded and dispositioned;
 - no `BLOCKER` remains unresolved;
 - every `MAJOR` is resolved, narrowed or explicitly accepted as a documented jurisdictional limitation/risk with reasoned decision;
 - every material amendment triggered by review has received required delta review;
-- the reviewed Schedule-incorporation mechanism is the one actually shipped;
+- the frozen reviewed Schedule-incorporation mechanism is the one actually shipped for that candidate;
 - remaining limitations and dissent are preserved;
-- an immutable machine-verifiable review record reflects those results; and
-- the exact operative Bundle content-addresses that review record and passes release-tool validation.
+- an immutable machine-verifiable review record reflects those results;
+- the exact operative Bundle content-addresses that review record; and
+- release-tool validation passes using the frozen review inputs rather than later mutable canonical project files.
 
 Completion means **reviewed against a defined threat model**, not `guaranteed enforceable everywhere`.
 
@@ -353,7 +393,7 @@ No express patent grant exists today.
 
 ### H-07 — Termination/reinstatement and multi-Licensor authority need review
 
-Section 10 does not expressly define post-termination reinstatement and may be ambiguous about whether notice from one Licensor can affect grants made by other rightsholders.
+The 0.2 termination provision does not expressly define post-termination reinstatement and may be ambiguous about whether notice from one Licensor can affect grants made by other rightsholders.
 
 **Initial candidate severity:** `BLOCKER` or `MAJOR` depending the final contributor/enforcement model.
 
@@ -365,7 +405,7 @@ Omission is not treated here as invalidity; reviewers must compare alternatives 
 
 ### H-09 — Exact Schedule identity may be lost on redistribution
 
-ECL 0.2 §4 requires preservation/reference to the exact ECL version but does not expressly require the exact incorporated Schedule/Bundle identity to travel with redistributed copies, even though §§2, 8 and 16 make that Schedule operative.
+ECL 0.2 redistribution terms require preservation/reference to the exact ECL version but do not expressly require the exact incorporated Schedule/Bundle identity to travel with redistributed copies, even though the 0.2 definitions, governance terms and entire-license clause make that Schedule operative.
 
 **Initial candidate severity:** `BLOCKER`.
 

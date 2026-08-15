@@ -10,7 +10,7 @@
     "operative": {"type": "boolean"},
     "license": {"$ref": "#/$defs/immutableComponent"},
     "schedule": {"$ref": "#/$defs/immutableComponent"},
-    "legal_review": {"$ref": "#/$defs/immutableComponent"},
+    "legal_review": {"$ref": "#/$defs/legalReviewComponent"},
     "knowledge_snapshot": {"type": ["string", "null"]},
     "released_at": {"type": "string", "format": "date-time"}
   },
@@ -30,6 +30,16 @@
       "properties": {
         "ref": {"type": "string", "minLength": 1},
         "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "legalReviewComponent": {
+      "type": "object",
+      "required": ["ref", "path", "sha256"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$"},
+        "path": {"type": "string", "pattern": "^reviews/legal/records/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?\\.json$"},
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       },
       "additionalProperties": false
