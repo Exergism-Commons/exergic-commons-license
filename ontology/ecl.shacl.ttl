@@ -48,7 +48,7 @@ ecl:StateShape a sh:NodeShape ;
     sh:property [
         sh:path ecl:dossier ;
         sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
-        sh:pattern "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$"
+        sh:pattern "^\.\./\.\./dossiers/states/[A-Z]{3}\.md$"
     ] ;
     sh:property [
         sh:path ecl:publicReviewIssue ;
@@ -102,17 +102,18 @@ ecl:StateShape a sh:NodeShape ;
             SELECT $this ?p WHERE {
               $this ?p ?value .
               BIND(LCASE(STR(?p)) AS ?predicateText)
-              BIND(REPLACE(?predicateText, "[^a-z0-9]+", "") AS ?normalizedPredicate)
+              BIND(REPLACE(?predicateText, "^[a-z][a-z0-9+.-]*://[^/]*", "") AS ?semanticPart)
+              BIND(REPLACE(?semanticPart, "[^a-z0-9]+", "") AS ?normalizedSemantic)
               FILTER (
                 ?p = ecl:outcome ||
                 ?p = ecl:status ||
-                CONTAINS(?normalizedPredicate, "currentgovernance") ||
-                CONTAINS(?normalizedPredicate, "governancestatus") ||
-                CONTAINS(?normalizedPredicate, "governanceoutcome") ||
-                CONTAINS(?normalizedPredicate, "restrictionstatus") ||
-                CONTAINS(?normalizedPredicate, "restrictedstatus") ||
-                CONTAINS(?normalizedPredicate, "provisionaloutcome") ||
-                REGEX(?predicateText, "(^|[:/#?&._-])tier([:/#?&._=-]|$)")
+                CONTAINS(?normalizedSemantic, "currentgovernance") ||
+                CONTAINS(?normalizedSemantic, "governancestatus") ||
+                CONTAINS(?normalizedSemantic, "governanceoutcome") ||
+                CONTAINS(?normalizedSemantic, "restrictionstatus") ||
+                CONTAINS(?normalizedSemantic, "restrictedstatus") ||
+                CONTAINS(?normalizedSemantic, "provisionaloutcome") ||
+                REGEX(?semanticPart, "(^|[^a-z0-9])tier([a-z0-9]*)([^a-z0-9]|$)")
               )
             }
         """
@@ -284,16 +285,17 @@ ecl:ClaimShape a sh:NodeShape ;
               $this ecl:predicate ?predicate .
               OPTIONAL { $this ecl:object ?object }
               BIND(LCASE(STR(?predicate)) AS ?predicateText)
-              BIND(REPLACE(?predicateText, "[^a-z0-9]+", "") AS ?normalizedPredicate)
+              BIND(REPLACE(?predicateText, "^[a-z][a-z0-9+.-]*://[^/]*", "") AS ?semanticPart)
+              BIND(REPLACE(?semanticPart, "[^a-z0-9]+", "") AS ?normalizedSemantic)
               FILTER (
                 ?predicate = ecl:outcome ||
-                CONTAINS(?normalizedPredicate, "currentgovernance") ||
-                CONTAINS(?normalizedPredicate, "governancestatus") ||
-                CONTAINS(?normalizedPredicate, "governanceoutcome") ||
-                CONTAINS(?normalizedPredicate, "restrictionstatus") ||
-                CONTAINS(?normalizedPredicate, "restrictedstatus") ||
-                CONTAINS(?normalizedPredicate, "provisionaloutcome") ||
-                REGEX(?predicateText, "(^|[:/#?&._-])tier([:/#?&._=-]|$)") ||
+                CONTAINS(?normalizedSemantic, "currentgovernance") ||
+                CONTAINS(?normalizedSemantic, "governancestatus") ||
+                CONTAINS(?normalizedSemantic, "governanceoutcome") ||
+                CONTAINS(?normalizedSemantic, "restrictionstatus") ||
+                CONTAINS(?normalizedSemantic, "restrictedstatus") ||
+                CONTAINS(?normalizedSemantic, "provisionaloutcome") ||
+                REGEX(?semanticPart, "(^|[^a-z0-9])tier([a-z0-9]*)([^a-z0-9]|$)") ||
                 (BOUND(?object) && EXISTS { ?object a ecl:GovernanceOutcome })
               )
             }
