@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-EPIC-FURY-MINAB",
+  "id": "PROJECT-EPIC-FURY-MINAB",
+  "type": "Project",
+  "name": "Operation Epic Fury — Minab school targeting chain",
+  "aliases": [
+    "Epic Fury Minab targeting chain"
+  ],
+  "dossier": "../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewDue": "2026-11-11",
+  "reviewClass": "manual",
+  "reviewReason": "Project identity is synchronized from its canonical project dossier; governance remains in that dossier and review procedure."
+}
