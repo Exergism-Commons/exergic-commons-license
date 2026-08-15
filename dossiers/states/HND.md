@@ -40,6 +40,16 @@ Legacy accountability, defender protection and any newly created localized excep
 
 Re-escalate to `S` if new emergency/security projects reproduce arbitrary detention, torture or repression. Move to `N` if non-recurrence and credible legacy accountability/remediation are demonstrated.
 
-## 7. Procedural history
+## 7. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The former nationwide state-of-exception abuses, January 2026 termination, post-emergency review scope, reversibility reasoning and re-escalation/removal triggers are reflected in §§1–6 above.
+- The historical tranche references CONADEH complaints, Amnesty/rights reporting and later government security-policy statements without exact source URLs or document identifiers. Repository search in this pass found no independent precise locator beyond the tranche/dossier text. Those references are not promoted into fabricated citations.
+- Issue #74 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+Exact source-locator recovery remains an evidence-curation gap. Historical emergency abuse remains provenance and does not by itself revive the terminated nationwide project or change the current `U` outcome.
+
+## 8. Procedural history
 
 Issue #74 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
