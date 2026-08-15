@@ -37,7 +37,7 @@ RFC3339_RE = re.compile(
     r"^(?P<date>\d{4}-\d{2}-\d{2})T"
     r"(?P<hour>[01]\d|2[0-3]):"
     r"(?P<minute>[0-5]\d):"
-    r"(?P<second>[0-5]\d|60)"
+    r"(?P<second>[0-5]\d)"
     r"(?:\.\d+)?"
     r"(?P<zone>Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
 )
@@ -206,7 +206,9 @@ def validate_reviewed_at(value: Any) -> None:
     ``datetime`` objects, so those semantic scalar types are accepted directly.
     String values are validated lexically and semantically rather than merely
     checked for non-emptiness. RFC 3339 clock and offset fields are range-bound
-    before any YAML timestamp constructor can normalize malformed input.
+    before any YAML timestamp constructor can normalize malformed input. Leap
+    seconds are intentionally rejected rather than relying on a mutable table of
+    historical UTC insertion instants.
     """
 
     if isinstance(value, datetime):
@@ -244,18 +246,32 @@ def validate_reviewed_at(value: Any) -> None:
 
 
 def reviewed_at_lexical_value(path: Path) -> str:
-    """Read the original reviewed_at scalar before PyYAML timestamp normalization."""
+    """Validate root evidence structure and return the original reviewed_at scalar."""
 
     text = path.read_text(encoding="utf-8")
     document = yaml.compose(text)
     if not isinstance(document, MappingNode):
         raise ValueError(f"{path}: expected mapping at document root")
+
+    seen: set[str] = set()
+    reviewed_at_node: ScalarNode | None = None
     for key_node, value_node in document.value:
-        if isinstance(key_node, ScalarNode) and key_node.value == "reviewed_at":
+        if not isinstance(key_node, ScalarNode):
+            raise ValueError("Schedule compatibility evidence keys must be scalar")
+        key = key_node.value
+        if key == "<<":
+            raise ValueError("Schedule compatibility evidence must not use YAML merge keys")
+        if key in seen:
+            raise ValueError(f"duplicate Schedule compatibility evidence key: {key}")
+        seen.add(key)
+        if key == "reviewed_at":
             if not isinstance(value_node, ScalarNode):
                 raise ValueError("Schedule compatibility evidence requires scalar reviewed_at")
-            return value_node.value
-    raise ValueError("Schedule compatibility evidence requires reviewed_at")
+            reviewed_at_node = value_node
+
+    if reviewed_at_node is None:
+        raise ValueError("Schedule compatibility evidence requires reviewed_at")
+    return reviewed_at_node.value
 
 
 def load_content_addressed_compatibility_evidence(
@@ -284,8 +300,8 @@ def load_content_addressed_compatibility_evidence(
     if sha256(evidence_path) != evidence_id:
         raise ValueError("Schedule compatibility evidence content hash does not match review id")
 
-    # Validate the original YAML scalar before safe_load can normalize malformed
-    # timezone fields such as +01:60 into a different, apparently valid offset.
+    # Inspect the original YAML mapping before safe_load can collapse duplicate
+    # keys or normalize malformed timestamp offsets into different values.
     validate_reviewed_at(reviewed_at_lexical_value(evidence_path))
     evidence = load_yaml(evidence_path)
     if evidence.get("schema_version") != 1:
