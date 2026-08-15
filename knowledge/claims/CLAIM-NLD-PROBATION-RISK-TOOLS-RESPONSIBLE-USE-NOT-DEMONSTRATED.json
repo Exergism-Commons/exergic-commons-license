@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-NLD-PROBATION-RISK-TOOLS-RESPONSIBLE-USE-NOT-DEMONSTRATED",
+  "id": "CLAIM-NLD-PROBATION-RISK-TOOLS-RESPONSIBLE-USE-NOT-DEMONSTRATED",
+  "type": "Claim",
+  "subject": "ecl:PROJECT-NLD-PROBATION-RISK-TOOLS",
+  "predicate": "ecl:status",
+  "literalValue": "responsible-use-not-demonstrated",
+  "status": "accepted",
+  "claimConfidence": "established",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-NLD-INSPECTIE-JENV-RISK-ALGORITHMS-2026-02-12"],
+  "provenance": ["../../dossiers/states/NLD.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "The proposition is limited to STATIC-99R, STABLE-2007 and ACUTE-2007 as curated in the NLD dossier. It does not treat suspended OXREC as currently deployed."
+}

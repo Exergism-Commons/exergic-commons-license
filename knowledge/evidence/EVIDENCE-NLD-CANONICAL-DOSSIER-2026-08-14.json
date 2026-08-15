@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-NLD-CANONICAL-DOSSIER-2026-08-14",
+  "id": "EVIDENCE-NLD-CANONICAL-DOSSIER-2026-08-14",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Netherlands canonical State dossier",
+  "sourceLocator": "../../dossiers/states/NLD.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/states/NLD.md", "../entities/STATE-NLD.json"],
+  "notes": "Repository-curated provenance for the pilot tracking edge. Evidence grade intentionally absent."
+}

@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD",
+  "id": "EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD",
+  "type": "EvidenceItem",
+  "publisher": "International Criminal Court",
+  "title": "Situation in Libya: ICC arrest warrant against Osama Elmasry Njeem",
+  "sourceLocator": "https://www.icc-cpi.int/news/situation-libya-icc-arrest-warrant-against-osama-elmasry-njeem-alleged-crimes-against-humanity",
+  "sourceType": "judicial-record",
+  "language": "en",
+  "evidenceGrade": "E3",
+  "provenance": ["../../dossiers/projects/MITIGA-DETENTION-APPARATUS.md", "../../dossiers/states/LBY.md"],
+  "notes": "E3 applies only to what the primary ICC warrant record directly establishes about the warrant and alleged SDF/RADA-linked conduct. It is not a final merits judgment and does not establish unitary Libyan State attribution."
+}

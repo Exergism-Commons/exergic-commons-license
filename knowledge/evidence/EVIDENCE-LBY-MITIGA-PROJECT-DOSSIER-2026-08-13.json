@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-LBY-MITIGA-PROJECT-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-LBY-MITIGA-PROJECT-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Mitiga Prison / SDF-RADA detention apparatus canonical project dossier",
+  "sourceLocator": "../../dossiers/projects/MITIGA-DETENTION-APPARATUS.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/projects/MITIGA-DETENTION-APPARATUS.md", "../../dossiers/states/LBY.md"],
+  "notes": "Repository-curated provenance for the pilot tracking edge. Evidence grade intentionally absent."
+}

@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-USA-TRACKS-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "id": "CLAIM-USA-TRACKS-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "type": "Claim",
+  "subject": "ecl:STATE-USA",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "status": "accepted",
+  "asOf": "2026-08-14",
+  "evidenceFor": ["ecl:EVIDENCE-USA-CANONICAL-DOSSIER-2026-08-14"],
+  "provenance": ["../../dossiers/states/USA.md", "../entities/STATE-USA.json"],
+  "notes": "Curated review-dependency claim only. It does not assert a GovernanceOutcome, culpability, or inherited restriction."
+}

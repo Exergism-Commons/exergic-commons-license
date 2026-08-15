@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-LBY-OPERATES-MITIGA-DETENTION",
+  "id": "CLAIM-LBY-OPERATES-MITIGA-DETENTION",
+  "type": "Claim",
+  "subject": "ecl:STATE-LBY",
+  "predicate": "ecl:operates",
+  "object": "ecl:PROJECT-MITIGA-DETENTION",
+  "status": "disputed",
+  "claimConfidence": "disputed",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD"],
+  "evidenceAgainst": ["ecl:EVIDENCE-LBY-STATE-DOSSIER-2026-08-11"],
+  "provenance": ["../../dossiers/states/LBY.md", "../../dossiers/projects/MITIGA-DETENTION-APPARATUS.md", "../../reviews/2026/adversarial/scoped/tranche-06.md"],
+  "notes": "The ICC material supports an SDF/RADA-linked Mitiga detention apparatus, while the State review preserves fragmented/de-facto authority and rejects unitary whole-State attribution. The broader State-operates-project proposition therefore remains disputed."
+}
