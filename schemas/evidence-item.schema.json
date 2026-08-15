@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/ecl/schemas/evidence-item.schema.json",
+  "title": "ECL graph-native EvidenceItem ABox record",
+  "type": "object",
+  "required": ["@context", "iri", "id", "type", "sourceLocator", "provenance"],
+  "properties": {
+    "@context": {"type": "string", "minLength": 1},
+    "iri": {"type": "string", "pattern": "^ecl:EVIDENCE-[A-Z0-9-]+$"},
+    "id": {"type": "string", "pattern": "^EVIDENCE-[A-Z0-9-]+$"},
+    "type": {"const": "EvidenceItem"},
+    "publisher": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "sourceLocator": {"type": "string", "minLength": 1},
+    "sourceType": {"type": "string", "minLength": 1},
+    "language": {"type": "string", "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"},
+    "publicationDate": {"type": "string", "format": "date"},
+    "retrievedAt": {"type": "string", "format": "date-time"},
+    "contentHash": {"type": "string", "pattern": "^(sha256:)?[0-9a-fA-F]{64}$"},
+    "evidenceGrade": {"enum": ["E0", "E1", "E2", "E3"]},
+    "supersedes": {"type": "string", "pattern": "^ecl:EVIDENCE-[A-Z0-9-]+$"},
+    "provenance": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}
