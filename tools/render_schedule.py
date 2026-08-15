@@ -15,6 +15,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 REG = ROOT / "registry"
+TARGET_LICENSE = "ECL-0.3-DRAFT"
 
 READY_PREFIX = "ready"
 REFERENCE_STATUSES = {
@@ -85,6 +86,50 @@ def first_identity(record: dict[str, Any]) -> str | None:
     return None
 
 
+def schedule_clause_source_paths() -> list[Path]:
+    """Return every frozen source whose clauses may be emitted by this renderer."""
+
+    fixed = [
+        REG / "schedule-state-r-freeze.yml",
+        REG / "schedule-organization-freezes.yml",
+        REG / "schedule-armed-organization-freezes.yml",
+        REG / "schedule-project-freezes.yml",
+    ]
+    paths = [path for path in fixed if path.exists()]
+    paths.extend(sorted((REG / "schedule-state-s-freezes").glob("*.yml")))
+    return paths
+
+
+def compatibility_status(
+    target_license: str = TARGET_LICENSE,
+) -> tuple[set[str], list[Path]]:
+    """Validate declared License compatibility for all rendered clause sources.
+
+    Compatibility is evidence, not a label inferred from the working LICENSE.
+    Every frozen clause source must declare its compatibility. A target License
+    may be advertised only when every consumed source was explicitly validated
+    for that exact target.
+    """
+
+    declarations: set[str] = set()
+    incompatible: list[Path] = []
+    sources = schedule_clause_source_paths()
+    if not sources:
+        raise ValueError("no frozen Schedule clause sources found")
+
+    for path in sources:
+        data = load_yaml(path)
+        declared = data.get("compatible_license")
+        if not isinstance(declared, str) or not declared.strip():
+            raise ValueError(f"{path}: missing compatible_license declaration")
+        declared = declared.strip()
+        declarations.add(declared)
+        if declared != target_license:
+            incompatible.append(path)
+
+    return declarations, incompatible
+
+
 def collect_state_s_records(outcomes: dict[str, str]) -> list[dict[str, Any]]:
     blocked = status_blocked_states()
     records: list[dict[str, Any]] = []
@@ -127,7 +172,10 @@ def collect_state_r_records(outcomes: dict[str, str]) -> list[dict[str, Any]]:
 
 def collect_organizations() -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
-    for filename in ("schedule-organization-freezes.yml", "schedule-armed-organization-freezes.yml"):
+    for filename in (
+        "schedule-organization-freezes.yml",
+        "schedule-armed-organization-freezes.yml",
+    ):
         path = REG / filename
         if not path.exists():
             continue
@@ -136,8 +184,12 @@ def collect_organizations() -> list[dict[str, Any]]:
             status = str(record.get("schedule_status", ""))
             if not status.startswith(READY_PREFIX) or status in REFERENCE_STATUSES:
                 continue
-            if not record.get("schedule_identity") and not record.get("schedule_entities"):
-                raise ValueError(f"{path}: ready organization {record.get('id')} has no identity")
+            if not record.get("schedule_identity") and not record.get(
+                "schedule_entities"
+            ):
+                raise ValueError(
+                    f"{path}: ready organization {record.get('id')} has no identity"
+                )
             records.append(record)
     return records
 
@@ -167,6 +219,7 @@ def validate_unique(records: Iterable[dict[str, Any]], key: str, label: str) -> 
 
 
 def render() -> tuple[str, dict[str, int]]:
+    declared_licenses, incompatible_sources = compatibility_status()
     outcomes = state_outcomes()
     r_states = collect_state_r_records(outcomes)
     s_records = collect_state_s_records(outcomes)
@@ -180,12 +233,28 @@ def render() -> tuple[str, dict[str, int]]:
     if len(r_states) != sum(1 for v in outcomes.values() if v == "R"):
         raise ValueError("not every active R State has a frozen Schedule identity")
 
+    if incompatible_sources:
+        declared_text = ", ".join(sorted(declared_licenses))
+        compatibility_lines = [
+            f"> Target working License: **{TARGET_LICENSE}**.",
+            ">",
+            f"> Compatibility status: **NOT YET VALIDATED for {TARGET_LICENSE}**.",
+            ">",
+            f"> Frozen clause inputs currently declare compatibility with: **{declared_text}**.",
+            ">",
+            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License.",
+        ]
+    else:
+        compatibility_lines = [
+            f"> Intended compatibility: **{TARGET_LICENSE} only**.",
+        ]
+
     lines: list[str] = [
         "# ECL Restricted Parties / Projects Schedule — 0.5 GENERATED DRAFT",
         "",
         "> **NON-OPERATIVE GENERATED CANDIDATE. DO NOT ADOPT OR INCORPORATE INTO A RELEASE.**",
         ">",
-        "> Intended compatibility: **ECL 0.3-DRAFT only**.",
+        *compatibility_lines,
         "",
         "This file is deterministically rendered from frozen registry records. It omits U/N outcomes, unresolved factual/status records, unfrozen residual dossier scope and cross-entity references whose canonical project/organization is rendered separately.",
         "",
@@ -202,19 +271,31 @@ def render() -> tuple[str, dict[str, int]]:
     ]
 
     for record in r_states:
-        lines.append(f"- **{record['iso3']} — {record['entity']}:** {record['candidate_class']}")
+        lines.append(
+            f"- **{record['iso3']} — {record['entity']}:** {record['candidate_class']}"
+        )
 
     lines += ["", "## Scoped State entries — S", ""]
-    for record in sorted(s_records, key=lambda r: (str(r.get("state")), str(first_identity(r)))):
+    for record in sorted(
+        s_records, key=lambda r: (str(r.get("state")), str(first_identity(r)))
+    ):
         state = record.get("state")
         entity = record.get("entity") or state
         lines += [f"### {state} — {entity}", ""]
         if record.get("schedule_identity"):
             lines += [f"**Frozen identity/project:** {record['schedule_identity']}", ""]
         if record.get("candidate_parties"):
-            lines += ["**Candidate parties:**", *render_bullets(record["candidate_parties"]), ""]
+            lines += [
+                "**Candidate parties:**",
+                *render_bullets(record["candidate_parties"]),
+                "",
+            ]
         if record.get("candidate_projects"):
-            lines += ["**Frozen projects/capacities:**", *render_bullets(record["candidate_projects"]), ""]
+            lines += [
+                "**Frozen projects/capacities:**",
+                *render_bullets(record["candidate_projects"]),
+                "",
+            ]
         for key, title in (
             ("project_boundary", "Boundary"),
             ("capacity_limit", "Capacity limit"),
@@ -223,7 +304,11 @@ def render() -> tuple[str, dict[str, int]]:
             if record.get(key):
                 lines += [f"**{title}:** {record[key]}", ""]
         if record.get("exclusions"):
-            lines += ["**Exclusions:**", *render_bullets(record["exclusions"]), ""]
+            lines += [
+                "**Exclusions:**",
+                *render_bullets(record["exclusions"]),
+                "",
+            ]
         lines += [f"_Freeze source: `{record['_source']}`._", ""]
 
     lines += ["## Non-State organization entries", ""]
@@ -232,14 +317,29 @@ def render() -> tuple[str, dict[str, int]]:
         if record.get("schedule_identity"):
             lines += [f"**Frozen identity:** {record['schedule_identity']}", ""]
         if record.get("schedule_entities"):
-            lines += ["**Frozen exact entities:**", *render_bullets(record["schedule_entities"]), ""]
+            lines += [
+                "**Frozen exact entities:**",
+                *render_bullets(record["schedule_entities"]),
+                "",
+            ]
         if record.get("frozen_aliases"):
-            lines += ["**Frozen aliases:**", *render_bullets(record["frozen_aliases"]), ""]
-        for key, title in (("scope_rule", "Scope rule"), ("capacity_limit", "Capacity limit")):
+            lines += [
+                "**Frozen aliases:**",
+                *render_bullets(record["frozen_aliases"]),
+                "",
+            ]
+        for key, title in (
+            ("scope_rule", "Scope rule"),
+            ("capacity_limit", "Capacity limit"),
+        ):
             if record.get(key):
                 lines += [f"**{title}:** {record[key]}", ""]
         if record.get("exclusions"):
-            lines += ["**Exclusions:**", *render_bullets(record["exclusions"]), ""]
+            lines += [
+                "**Exclusions:**",
+                *render_bullets(record["exclusions"]),
+                "",
+            ]
 
     lines += ["## Direct Restricted Projects", ""]
     for record in projects:
@@ -249,11 +349,19 @@ def render() -> tuple[str, dict[str, int]]:
             f"**Frozen project:** {record['schedule_identity']}",
             "",
         ]
-        for key, title in (("project_boundary", "Boundary"), ("operator_boundary", "Operator boundary"), ("prohibited_capacity", "Restricted capacity")):
+        for key, title in (
+            ("project_boundary", "Boundary"),
+            ("operator_boundary", "Operator boundary"),
+            ("prohibited_capacity", "Restricted capacity"),
+        ):
             if record.get(key):
                 lines += [f"**{title}:** {record[key]}", ""]
         if record.get("exclusions"):
-            lines += ["**Exclusions:**", *render_bullets(record["exclusions"]), ""]
+            lines += [
+                "**Exclusions:**",
+                *render_bullets(record["exclusions"]),
+                "",
+            ]
         if record.get("continuation_rule"):
             lines += [f"**Continuation rule:** {record['continuation_rule']}", ""]
 
@@ -269,6 +377,7 @@ def render() -> tuple[str, dict[str, int]]:
         "s_state_entries": len(s_records),
         "organizations": len(organizations),
         "projects": len(projects),
+        "compatibility_mismatches": len(incompatible_sources),
     }
     return "\n".join(lines), counts
 
@@ -280,12 +389,18 @@ def main() -> None:
     args = parser.parse_args()
 
     text, counts = render()
+    compatibility = (
+        "ready"
+        if counts["compatibility_mismatches"] == 0
+        else f"pending ({counts['compatibility_mismatches']} source files require revalidation)"
+    )
     print(
         "validated schedule inputs: "
         f"R states={counts['r_states']}, "
         f"S state entries={counts['s_state_entries']}, "
         f"organizations={counts['organizations']}, "
-        f"projects={counts['projects']}"
+        f"projects={counts['projects']}, "
+        f"target compatibility={compatibility}"
     )
     if args.validate_only:
         return
