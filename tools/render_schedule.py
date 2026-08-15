@@ -43,8 +43,9 @@ RFC3339_RE = re.compile(
 )
 STANDARD_MAPPING_TAG = "tag:yaml.org,2002:map"
 STANDARD_SEQUENCE_TAG = "tag:yaml.org,2002:seq"
+STANDARD_STRING_TAG = "tag:yaml.org,2002:str"
 ALLOWED_SCALAR_TAGS = {
-    "tag:yaml.org,2002:str",
+    STANDARD_STRING_TAG,
     "tag:yaml.org,2002:int",
     "tag:yaml.org,2002:bool",
     "tag:yaml.org,2002:null",
@@ -270,12 +271,12 @@ def validate_evidence_yaml_node(node: Node, seen_nodes: set[int] | None = None) 
         seen_keys: set[str] = set()
         for key_node, value_node in node.value:
             if not isinstance(key_node, ScalarNode):
-                raise ValueError("Schedule compatibility evidence keys must be scalar")
+                raise ValueError("Schedule compatibility evidence keys must be scalar strings")
             key = key_node.value
             if key == "<<" or key_node.tag == "tag:yaml.org,2002:merge":
                 raise ValueError("Schedule compatibility evidence must not use YAML merge keys")
-            if key_node.tag not in ALLOWED_SCALAR_TAGS:
-                raise ValueError("Schedule compatibility evidence key uses an unsupported YAML tag")
+            if key_node.tag != STANDARD_STRING_TAG:
+                raise ValueError("Schedule compatibility evidence keys must use the YAML string tag")
             if key in seen_keys:
                 raise ValueError(f"duplicate Schedule compatibility evidence key: {key}")
             seen_keys.add(key)
