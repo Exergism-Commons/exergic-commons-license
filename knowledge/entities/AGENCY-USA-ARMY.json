@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:AGENCY-USA-ARMY",
+  "id": "AGENCY-USA-ARMY",
+  "type": "Agency",
+  "name": "U.S. Army",
+  "aliases": ["United States Army", "Army"],
+  "dossier": "../../dossiers/agencies/USA-ARMY.md",
+  "provenance": ["../../dossiers/agencies/USA-ARMY.md", "../../dossiers/projects/MAVEN-SMART-SYSTEM.md", "https://www.army.mil/organization/"],
+  "lastSubstantiveReview": "2026-08-15",
+  "reviewClass": "manual",
+  "reviewReason": "Tranche 5 institutional identity/hierarchy; functional attribution remains Claim/Evidence data.",
+  "partOf": ["ecl:AGENCY-USA-DOD"]
+}

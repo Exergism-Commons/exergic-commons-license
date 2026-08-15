@@ -35,6 +35,7 @@
     "predicate": {"@id": "ecl:predicate", "@type": "@id"},
     "object": {"@id": "ecl:object", "@type": "@id"},
     "literalValue": "ecl:literalValue",
+    "partOf": {"@id": "ecl:partOf", "@type": "@id", "@container": "@set"},
     "controls": {"@id": "ecl:controls", "@type": "@id"},
     "participatesIn": {"@id": "ecl:participatesIn", "@type": "@id"},
     "operates": {"@id": "ecl:operates", "@type": "@id"},

@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-MINAB-CANONICAL-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-MINAB-CANONICAL-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Operation Epic Fury — Minab targeting chain canonical project dossier",
+  "sourceLocator": "../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md", "../../dossiers/states/USA.md"],
+  "notes": "Repository-curated provenance for the dossier's explicit U.S./CENTCOM operational-chain attribution. Evidence grade and source date intentionally absent."
+}

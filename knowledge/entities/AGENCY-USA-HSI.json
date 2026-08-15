@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:AGENCY-USA-HSI",
+  "id": "AGENCY-USA-HSI",
+  "type": "Agency",
+  "name": "Homeland Security Investigations",
+  "aliases": ["HSI"],
+  "dossier": "../../dossiers/agencies/USA-HSI.md",
+  "provenance": ["../../dossiers/agencies/USA-HSI.md", "../../dossiers/projects/ICE-ICM-INVESTIGATIVE-ANALYTICS.md", "https://www.ice.gov/about-ice"],
+  "lastSubstantiveReview": "2026-08-15",
+  "reviewClass": "manual",
+  "reviewReason": "Tranche 5 institutional identity/hierarchy; functional attribution remains Claim/Evidence data.",
+  "partOf": ["ecl:AGENCY-USA-ICE"]
+}

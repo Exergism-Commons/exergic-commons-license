@@ -46,6 +46,7 @@
       "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
       "uniqueItems": true
     },
+    "partOf": {"$ref": "#/$defs/iriList"},
     "controls": {"$ref": "#/$defs/iriList"},
     "participatesIn": {"$ref": "#/$defs/iriList"},
     "operates": {"$ref": "#/$defs/iriList"},
@@ -89,6 +90,14 @@
             {"required": ["provisional_outcome"]},
             {"required": ["status"]}
           ]
+        }
+      }
+    },
+    {
+      "if": {"required": ["partOf"]},
+      "then": {
+        "properties": {
+          "type": {"enum": ["State", "Organization", "Person", "Agency", "Institution"]}
         }
       }
     }

@@ -57,6 +57,8 @@ ABox records SHOULD remain small and reviewable in ordinary Git diffs. A State A
 
 `trackedObjects` on a State is a legacy compatibility/review projection serialized as direct `ecl:tracks` edges. Once the same edge is represented by a first-class Claim, the Claim is the auditable proposition carrying status, evidence and provenance; `trackedObjects` is not an independent governance or evidentiary store. Repository integrity tooling MUST require every non-empty State `trackedObjects` edge to have exactly one active (`candidate`, `accepted` or `disputed`) `ecl:tracks` Claim with the same subject/object and resolving supporting evidence. The inverse is deliberately not required: a reviewed `ecl:tracks` Claim may exist without being copied back into the legacy projection. No tracking edge or Claim implies operation, control, culpability or inherited governance.
 
+`partOf` is direct institutional identity/context metadata for Actors. It records only the explicitly curated immediate parent edge (for example, HSI → ICE or CENTCOM → DoD). `partOf` is deliberately non-transitive in the TBox and tooling MUST NOT synthesize ancestor edges. It also MUST NOT propagate `controls`, `participatesIn`, `operates`, `tracks`, culpability, restriction status or GovernanceOutcome. Attribution-sensitive functional relations remain first-class Claims with their own evidence even when the relevant actors are connected by `partOf`.
+
 Review clocks preserve uncertainty. `hot`, `active` and `stable` identify scheduled review classes and therefore require an explicit `reviewDue`. `manual` means no automatic cadence is asserted; `reviewDue` may be absent until a reviewer curates one. Tooling MUST NOT synthesize a due date merely to satisfy a schema.
 
 ## 4. Claims as first-class individuals
@@ -121,7 +123,7 @@ Three forms of inference must remain distinct:
 2. **validation** — SHACL constraints over repository records;
 3. **governance inference** — explicit review procedure implemented/documented outside the ontology.
 
-Only the third can lead toward an ECL governance decision, and even then only through the defined review process. A relation such as `controls`, `tracks`, `participatesIn`, `operates` or `deploys` is evidence/review structure, never inherited restriction.
+Only the third can lead toward an ECL governance decision, and even then only through the defined review process. A relation such as `partOf`, `controls`, `tracks`, `participatesIn`, `operates` or `deploys` is evidence/review/identity structure, never inherited restriction. In particular, institutional ancestry does not inherit a subordinate actor's functional Claim, and a parent actor does not acquire participation, operation or control merely because a child actor has such a Claim.
 
 ## 8. Reproducibility
 
@@ -140,6 +142,8 @@ For State identities, `knowledge/generated/state-abox-manifest.json` additionall
 ## 9. Current implementation boundary
 
 The Git-native ABox now contains **195 State Actors**, one for every canonical `dossiers/states/ISO3.md` dossier. The migration is generated and checked by `tools/migrate_state_abox.py` and CI requires 195 unique State IRIs, stable IDs, ISO3 values and dossier mappings.
+
+The bounded Agency hierarchy scale-out adds only explicitly curated institutional identities needed by canonical project attribution. Agency `partOf` edges are identity/context metadata; functional attribution remains Claim/Evidence data and is not inherited across hierarchy edges.
 
 This completes the State **identity/provenance** migration only. It does not imply that all 195 dossiers have complete formal Exergism assessments, fully normalized Claim/EvidenceItem graphs or accepted machine-readable GovernanceDecision records. Those are separate reviewed migrations and must not be fabricated merely to fill the graph.
 

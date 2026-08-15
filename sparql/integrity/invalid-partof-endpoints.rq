@@ -1,0 +1,20 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?child ?parent ?reason WHERE {
+  ?child ecl:partOf ?parent .
+  {
+    FILTER NOT EXISTS {
+      ?child ecl:stableId ?childId ; a ?childType .
+      VALUES ?childType { ecl:State ecl:Organization ecl:Person ecl:Agency ecl:Institution }
+    }
+    BIND("invalid-or-unresolved-child-actor" AS ?reason)
+  }
+  UNION
+  {
+    FILTER NOT EXISTS {
+      ?parent ecl:stableId ?parentId ; a ?parentType .
+      VALUES ?parentType { ecl:State ecl:Organization ecl:Person ecl:Agency ecl:Institution }
+    }
+    BIND("invalid-or-unresolved-parent-actor" AS ?reason)
+  }
+}

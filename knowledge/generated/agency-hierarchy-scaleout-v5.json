@@ -1,0 +1,36 @@
+{
+  "version": 5,
+  "globalTranche": 5,
+  "kind": "agency-hierarchy-scaleout",
+  "issue": 224,
+  "baseMainCommit": "d56aa690b19115cd275043c2f49ea8cbcc8f5cc2",
+  "agencies": [
+    "AGENCY-USA-DHS",
+    "AGENCY-USA-ICE",
+    "AGENCY-USA-HSI",
+    "AGENCY-USA-DOD",
+    "AGENCY-USA-ARMY",
+    "AGENCY-USA-CENTCOM"
+  ],
+  "partOfEdges": [
+    {"child": "AGENCY-USA-HSI", "parent": "AGENCY-USA-ICE"},
+    {"child": "AGENCY-USA-ICE", "parent": "AGENCY-USA-DHS"},
+    {"child": "AGENCY-USA-DHS", "parent": "STATE-USA"},
+    {"child": "AGENCY-USA-ARMY", "parent": "AGENCY-USA-DOD"},
+    {"child": "AGENCY-USA-CENTCOM", "parent": "AGENCY-USA-DOD"},
+    {"child": "AGENCY-USA-DOD", "parent": "STATE-USA"}
+  ],
+  "functionalClaims": [
+    "CLAIM-HSI-PARTICIPATES-IN-ICE-ICM-IA",
+    "CLAIM-USA-ARMY-PARTICIPATES-IN-MAVEN-SMART-SYSTEM",
+    "CLAIM-USA-CENTCOM-OPERATES-EPIC-FURY-MINAB-TARGETING"
+  ],
+  "semantics": {
+    "partOf": "direct institutional identity/context only",
+    "transitive": false,
+    "propagatesFunctionalAttribution": false,
+    "propagatesGovernance": false,
+    "claimsExecutePredicates": false
+  },
+  "notes": "Historical tranche-5 audit snapshot. It is not a complete U.S. institutional graph and does not create licensing restrictions."
+}

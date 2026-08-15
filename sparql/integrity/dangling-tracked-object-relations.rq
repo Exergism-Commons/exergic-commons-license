@@ -3,6 +3,7 @@ PREFIX ecl: <urn:ecl:>
 SELECT ?subject ?predicate ?object WHERE {
   VALUES ?predicate {
     ecl:tracks
+    ecl:partOf
     ecl:controls
     ecl:controlledBy
     ecl:participatesIn
