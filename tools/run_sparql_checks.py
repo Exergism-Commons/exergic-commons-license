@@ -9,6 +9,17 @@ from pathlib import Path
 from rdflib import Graph
 
 
+def graph_format(path: Path) -> str | None:
+    return {
+        ".ttl": "turtle",
+        ".nt": "nt",
+        ".nq": "nquads",
+        ".trig": "trig",
+        ".jsonld": "json-ld",
+        ".json": "json-ld",
+    }.get(path.suffix.lower())
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("graph", type=Path)
@@ -16,7 +27,8 @@ def main() -> int:
     args = parser.parse_args()
 
     graph = Graph()
-    graph.parse(args.graph, format="turtle")
+    fmt = graph_format(args.graph)
+    graph.parse(args.graph, format=fmt)
 
     failed = False
     queries = sorted(args.query_dir.glob("*.rq"))
