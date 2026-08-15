@@ -11,7 +11,6 @@
     "name",
     "dossier",
     "lastSubstantiveReview",
-    "reviewDue",
     "reviewClass"
   ],
   "properties": {
@@ -58,6 +57,13 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {"reviewClass": {"enum": ["hot", "active", "stable"]}},
+        "required": ["reviewClass"]
+      },
+      "then": {"required": ["reviewDue"]}
+    },
     {
       "if": {"properties": {"type": {"const": "State"}}, "required": ["type"]},
       "then": {
