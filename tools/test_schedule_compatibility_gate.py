@@ -8,6 +8,7 @@ import hashlib
 import importlib.util
 import tempfile
 import unittest
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -26,9 +27,9 @@ def load_module(name: str, relative: str):
 
 class ScheduleCompatibilityGateTests(unittest.TestCase):
     def setUp(self):
-        self.renderer = load_module("render_schedule_pass15", "tools/render_schedule.py")
+        self.renderer = load_module("render_schedule_pass16", "tools/render_schedule.py")
         self.checker = load_module(
-            "check_schedule_compatibility_pass15",
+            "check_schedule_compatibility_pass16",
             "tools/check_schedule_compatibility_output.py",
         )
         self.sources = self.renderer.schedule_clause_source_paths()
@@ -51,7 +52,7 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
         self.created.append(path)
         return path
 
-    def create_evidence(self, target_binding=None):
+    def create_evidence(self, target_binding=None, reviewed_at="2026-08-15T00:00:00Z"):
         evidence = {
             "schema_version": 1,
             "target_license": self.renderer.TARGET_LICENSE,
@@ -59,7 +60,7 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
                 target_binding or self.review["target_license_artifact"]
             ),
             "reviewer": "compatibility-regression-test",
-            "reviewed_at": "2026-08-15T00:00:00Z",
+            "reviewed_at": reviewed_at,
             "conclusion": "compatible",
             "sources": [
                 {
@@ -86,6 +87,17 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             "path": f"reviews/schedule-compatibility/{evidence_id}.yml",
         }
         return review
+
+    def validate_pointer(self, review):
+        review_path = self.with_review(review)
+        old = self.renderer.COMPATIBILITY_REVIEW
+        try:
+            self.renderer.COMPATIBILITY_REVIEW = review_path
+            return self.renderer.validate_compatibility_review(
+                self.sources, self.renderer.TARGET_LICENSE
+            )
+        finally:
+            self.renderer.COMPATIBILITY_REVIEW = old
 
     def test_current_pending_gate_binds_exact_target_license(self):
         self.assertFalse(
@@ -133,18 +145,7 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
 
     def test_complete_pointer_requires_content_addressed_evidence(self):
         evidence_id, _ = self.create_evidence()
-        review = self.complete_pointer(evidence_id)
-        review_path = self.with_review(review)
-        old = self.renderer.COMPATIBILITY_REVIEW
-        try:
-            self.renderer.COMPATIBILITY_REVIEW = review_path
-            self.assertTrue(
-                self.renderer.validate_compatibility_review(
-                    self.sources, self.renderer.TARGET_LICENSE
-                )
-            )
-        finally:
-            self.renderer.COMPATIBILITY_REVIEW = old
+        self.assertTrue(self.validate_pointer(self.complete_pointer(evidence_id)))
 
     def test_tampered_evidence_cannot_reuse_review_id(self):
         evidence_id, evidence_path = self.create_evidence()
@@ -197,6 +198,41 @@ class ScheduleCompatibilityGateTests(unittest.TestCase):
             self.renderer.COMPATIBILITY_REVIEW = old_review
             self.renderer.TARGET_LICENSE_ARTIFACT = old_target
             self.renderer.WORKING_LICENSE = old_working
+
+    def test_reviewed_at_accepts_iso_date_rfc3339_and_yaml_scalar_types(self):
+        accepted = [
+            "2026-08-15",
+            "2026-08-15T00:00:00Z",
+            "2026-08-15T00:00:00.123456+02:00",
+            date(2026, 8, 15),
+            datetime(2026, 8, 15, 0, 0, tzinfo=timezone.utc),
+        ]
+        for value in accepted:
+            with self.subTest(value=value):
+                self.renderer.validate_reviewed_at(value)
+
+    def test_reviewed_at_rejects_malformed_or_timezone_less_values(self):
+        rejected = [
+            "not-a-date",
+            "2026-02-30",
+            "2026-08-15T00:00:00",
+            "2026-08-15 00:00:00Z",
+            datetime(2026, 8, 15, 0, 0),
+            20260815,
+        ]
+        for value in rejected:
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    self.renderer.validate_reviewed_at(value)
+
+    def test_complete_evidence_accepts_unquoted_yaml_date_scalar(self):
+        evidence_id, _ = self.create_evidence(reviewed_at=date(2026, 8, 15))
+        self.assertTrue(self.validate_pointer(self.complete_pointer(evidence_id)))
+
+    def test_complete_evidence_rejects_malformed_review_timestamp(self):
+        evidence_id, _ = self.create_evidence(reviewed_at="not-a-date")
+        with self.assertRaisesRegex(ValueError, "valid ISO date or RFC 3339 timestamp"):
+            self.validate_pointer(self.complete_pointer(evidence_id))
 
     def test_rendered_state_checker_accepts_pending_and_complete(self):
         pending_text, _ = self.renderer.render()
