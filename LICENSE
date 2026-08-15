@@ -64,7 +64,7 @@ You may exercise Licensed Rights for personal, academic, scientific, educational
 
 Sections 4, 5, and 6 are conditions on the Licensed Rights granted by this Section. If an activity does not exercise a Licensed Right and does not otherwise require a Licensor's authorization under applicable law, this License does not transform that activity into copyright infringement merely because the activity falls within a factual description used by this License.
 
-This License does not assume that an independent contract has been formed for conduct outside the Licensed Rights. Any contractual obligation or remedy beyond the scope of the Licensed Rights must arise, if at all, under applicable law from independently sufficient formation, assent, authority, and enforceability.
+This License does not assume that an independent contract has been formed for conduct outside the Licensed Rights. Section 6 describes a separate Hosted-Service Covenant for the narrow service-provider gap identified there, but that covenant exists only where applicable law finds independently sufficient formation, assent, authority, consideration or other required legal basis, and enforceability. No contractual obligation or remedy beyond the Licensed Rights arises merely because this License labels conduct restricted.
 
 4. DISTRIBUTION AND BUNDLE-PRESERVATION CONDITIONS
 
@@ -72,18 +72,20 @@ If You distribute the Software or a substantial portion of it, modified or unmod
 
 (a) preserve copyright, attribution, and license notices;
 (b) provide a copy of this License or an unambiguous immutable reference to the exact ECL License version governing the distributed Software;
-(c) preserve and provide the exact Schedule governing the distributed Software, either by including that Schedule or by including an immutable ECL Bundle manifest or equivalent release metadata that identifies the exact Schedule and its cryptographic hash;
-(d) preserve enough immutable Bundle information for a downstream recipient to determine objectively which License and Schedule govern the distributed copy without consulting a mutable `latest`, branch, registry view, or channel;
+(c) provide the exact Schedule governing the distributed Software in a form that accompanies the distributed copy and allows the recipient to read the operative Restricted Party, Restricted Project, class-designation, and exclusion entries without consulting mutable project state;
+(d) preserve and provide immutable Bundle metadata identifying the exact License and exact Schedule, including their immutable versions or identifiers and cryptographic hashes, so the recipient can verify which artifacts govern the distributed copy without consulting a mutable `latest`, branch, registry view, or channel;
 (e) identify material modifications made by You; and
 (f) not represent the Software as OSI-approved open source unless a future version has separately received such approval.
 
+A Bundle manifest, hash, repository-relative path, or other identifier may verify the Schedule supplied under paragraph (c), but does not by itself substitute for providing the operative Schedule. A distributor may instead provide a demonstrably retrievable immutable content-addressed copy only where the reference itself remains sufficient for the recipient to retrieve and read the exact Schedule independently of any mutable branch, channel, registry view, repository-relative path, or later project state.
+
 For an original application of ECL by a Licensor to material over which that Licensor controls the relevant Licensed Rights, if that Licensor's own initial release materials fail to identify an exact incorporated Schedule objectively, the Schedule for **that Licensor's grant in that material and that release only** is deemed empty. That limited fallback does not remove the independent Section 5 conditions.
 
-The empty-Schedule fallback cannot erase, replace, weaken, or re-resolve an exact upstream Bundle already governing ECL-covered material received from another Licensor. A downstream distributor or modifier must preserve each applicable upstream Bundle under paragraphs (c) and (d). Failure to do so is a breach of this Section; it does not make an upstream Schedule empty, does not substitute a later or mutable Schedule, and does not expand any downstream recipient's rights in the upstream material.
+The empty-Schedule fallback cannot erase, replace, weaken, or re-resolve an exact upstream Bundle already governing ECL-covered material received from another Licensor. A downstream distributor or modifier must preserve each applicable upstream Schedule and Bundle under paragraphs (c) and (d). Failure to do so is a breach of this Section; it does not make an upstream Schedule empty, does not substitute a later or mutable Schedule, and does not expand any downstream recipient's rights in the upstream material.
 
 You may license Your own original additions under additional terms, provided those terms do not purport to remove or weaken restrictions that continue to apply to ECL-covered material or grant rights in another Licensor's material that You do not possess.
 
-Each downstream recipient who receives ECL-covered material may independently exercise Licensed Rights granted directly by each relevant Licensor under the ECL terms applicable to that recipient's exact copy or release, provided the recipient independently complies with those terms. A downstream distributor's omission or corruption of required Bundle metadata does not grant the recipient broader rights than the relevant upstream Licensor granted.
+Each downstream recipient who receives ECL-covered material may independently exercise Licensed Rights granted directly by each relevant Licensor under the ECL terms applicable to that recipient's exact copy or release, provided the recipient independently complies with those terms. A downstream distributor's omission or corruption of required Schedule or Bundle information does not grant the recipient broader rights than the relevant upstream Licensor granted.
 
 5. PROHIBITED USE CONTEXTS — CONDITIONS ON LICENSED RIGHTS
 
@@ -120,9 +122,15 @@ No Licensed Rights are granted under this License to a Restricted Party for the 
 
 You may not knowingly exercise Licensed Rights as part of a Restricted Project.
 
-You may not knowingly exercise Licensed Rights to reproduce, modify, adapt, distribute, deploy, operate, or otherwise use the Software in order to provide a Restricted Party or Restricted Project with the Software, a derivative work, hosted functionality, integration, model, dataset transformation, technical service, or other material Software-enabled capability where You know or reasonably should know that Your exercise of Licensed Rights would materially circumvent this Section.
+You may not knowingly exercise any Licensed Right to reproduce, adapt, modify, configure where configuration constitutes adaptation, distribute, install, deploy where deployment requires reproduction, update, scale where scaling requires reproduction, transmit where transmission implicates a Licensed Right, or otherwise provision or maintain the Software for the purpose of providing a Restricted Party or Restricted Project with the Software, a derivative work, hosted functionality, integration, model, dataset transformation, technical service, or other material Software-enabled capability where You know or reasonably should know that the exercise of that Licensed Right materially enables or supports the Restricted Party or Restricted Project.
 
-For avoidance of doubt, where You operate the Software to provide remote or hosted functionality, this Section conditions Your own exercise of Licensed Rights as the provider. A remote user who merely receives functionality or output and does not itself exercise a Licensed Right is not deemed a copyright licensee solely because it used the remote service. Any separate obligation of that remote user must have an independent legal basis.
+For avoidance of doubt, where You operate the Software to provide remote or hosted functionality, this Section first conditions the provider's **actual exercise of Licensed Rights** in establishing, provisioning, modifying, updating, scaling, or maintaining the service. A remote user who merely receives functionality or output and does not itself exercise a Licensed Right is not deemed a copyright licensee solely because it used the remote service.
+
+A provider may have lawfully established a long-lived or multi-tenant deployment before it knows that a later customer is a Restricted Party or that a later use is part of a Restricted Project. If, after that knowledge arises, continued service from the already established deployment can occur without any further exercise of a Licensed Right, this License does **not** deem the later service request itself an exercise of copyright or another Licensed Right merely to manufacture an infringement theory.
+
+To address that service-provider gap without inventing a copyright-exclusive right, the following **Hosted-Service Covenant** applies only where an independently enforceable contract incorporating this License is formed under applicable law. Where You, with legally sufficient notice of these terms, assent to such a contract or applicable law otherwise treats Your knowing acceptance or exercise of ECL-granted rights as sufficient assent, You covenant that after You know or reasonably should know that a customer, beneficiary, project, or materially supported activity is a Restricted Party or Restricted Project under the exact Bundle governing Your Software copy or release, You will not knowingly continue to provide that party or project with material Software-enabled hosted functionality or capability except to the extent permitted as an Independent Remediation Activity.
+
+The Hosted-Service Covenant is deliberately contractual. Its breach does not by itself constitute copyright infringement where the complained-of conduct does not exercise a Licensed Right. Contractual obligations and remedies exist only to the extent the relevant jurisdiction recognizes the required formation, assent, authority, consideration or other legal basis, enforceability, and remedy. If no such contract exists, ECL reaches the provider only when and to the extent the provider actually exercises a Licensed Right or another authorization controlled by the relevant Licensor.
 
 A person who is a Covered Associate only because of a professional or project-specific relationship is not permanently restricted from unrelated personal or professional activity after that relationship ceases, unless that person is separately designated as a Restricted Party in the applicable Schedule.
 
@@ -160,15 +168,19 @@ Moving a mutable channel such as `stable`, `stable-1`, `candidate`, or `draft` d
 
 Rights granted by a particular Licensor under this License terminate only with respect to the Licensed Rights that particular Licensor granted, and only as provided by this Section. Notice may be given by that Licensor or by a person or entity the Licensor has authorized to administer or enforce the relevant grant. One Licensor does not, merely by being a Licensor, have authority to terminate rights granted by another Licensor.
 
-For a knowing violation of Sections 5 or 6, the affected Licensor's grant terminates with respect to the affected Software if You fail to cease and cure the violation within thirty (30) days after receiving reasonably specific notice identifying the material breach and the authority of the notifying party. For deliberate circumvention under Section 5.7, termination may take effect upon such reasonably specific notice without a cure period.
+A notice intended to trigger termination under this Section must identify with reasonable specificity: (a) the affected Licensor or Licensors whose grant is asserted to be terminable; (b) the ECL-covered material, contribution, or other objectively identifiable portion of Software to which that grant relates; (c) the affected Software release and exact ECL Bundle, where objectively identifiable from the relevant release materials; (d) the Licensed Rights or grant whose termination is asserted; (e) the material breach and the facts reasonably sufficient to understand it; (f) the authority of the notifying party to act for each affected Licensor; and (g) any applicable cure deadline. A notice does not terminate rights beyond the affected grant, material, release, Bundle, and Licensor scope that it objectively identifies.
 
-For any other material breach of a condition of the Licensed Rights, the affected Licensor's grant terminates if You fail to cure the breach within thirty (30) days after receiving reasonably specific notice identifying the material breach and the authority of the notifying party.
+For a knowing violation of Sections 5 or 6, the affected Licensor's identified grant terminates with respect to the identified affected Software if You fail to cease and cure the violation within thirty (30) days after receiving a notice satisfying the preceding paragraph. For deliberate circumvention under Section 5.7, termination of the identified affected grant may take effect upon such notice without a cure period.
 
-Termination is limited to rights actually granted by the affected Licensor and does not itself transfer, extinguish, or terminate rights owned or independently granted by another rightsholder.
+For any other material breach of a condition of the Licensed Rights, the affected Licensor's identified grant terminates if You fail to cure the breach within thirty (30) days after receiving a notice satisfying the notice requirements above.
+
+Termination is limited to rights actually granted by the affected Licensor and objectively identified by the terminating notice. It does not itself transfer, extinguish, or terminate rights owned or independently granted by another rightsholder, another Bundle, another Software release, or material outside the identified affected grant.
 
 A downstream recipient who obtained an ECL-covered copy before Your termination and who holds an independent direct grant from the relevant Licensor remains governed by that recipient's own compliance and is not automatically terminated solely because Your grant terminated.
 
 After termination, rights from the affected Licensor are reinstated only if that Licensor or an authorized enforcement agent expressly reinstates them, unless applicable law requires a different result. A reinstatement may be unconditional or subject to lawful written conditions. Cure before the applicable termination deadline prevents termination under the relevant notice.
+
+A breach of the Hosted-Service Covenant described in Section 6 is governed by independently applicable contract law and remedies where that covenant forms part of an enforceable contract. It does not automatically terminate a copyright or other Licensed Right grant under this Section unless the independently applicable contract and law validly provide for that result, or the provider separately commits a breach involving an exercise of Licensed Rights that satisfies the termination rules above.
 
 11. STATUTORY RIGHTS, EXCEPTIONS, EXHAUSTION, AND MANDATORY LAW
 
@@ -178,7 +190,7 @@ An act performed solely under such an independent statutory permission is not an
 
 Nothing in this License is intended to recreate a copyright distribution right that applicable law has exhausted with respect to a particular copy. Exhaustion of a distribution right does not by itself grant permission to reproduce, adapt, modify, or otherwise exercise a distinct Licensed Right that remains controlled by a Licensor.
 
-Nothing in this Section determines whether a waivable statutory default may be altered by a separately valid contract. ECL does not rely on an assumed contract outside the Licensed Rights as stated in Section 3.
+Nothing in this Section determines whether a waivable statutory default may be altered by a separately valid contract. ECL does not rely on an assumed contract outside the Licensed Rights except for the Hosted-Service Covenant described in Section 6, and that covenant applies only where an independently enforceable contract incorporating it is formed under applicable law.
 
 12. NO PATENT LICENSE
 
