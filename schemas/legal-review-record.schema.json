@@ -9,6 +9,8 @@
     "status",
     "license_sha256",
     "review_spec",
+    "incorporation_spec",
+    "bundle_schema",
     "jurisdictions",
     "attack_surfaces",
     "qualified_independent_reviews",
@@ -24,7 +26,15 @@
     "review_id": {"type": "string", "minLength": 1},
     "status": {"const": "complete"},
     "license_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "review_spec": {"$ref": "#/$defs/immutableComponent"},
+    "review_spec": {
+      "$ref": "#/$defs/reviewSpecComponent"
+    },
+    "incorporation_spec": {
+      "$ref": "#/$defs/incorporationSpecComponent"
+    },
+    "bundle_schema": {
+      "$ref": "#/$defs/bundleSchemaComponent"
+    },
     "jurisdictions": {
       "type": "object",
       "required": ["eu_software", "spain", "united_states", "united_kingdom", "cross_border"],
@@ -87,6 +97,24 @@
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       },
       "additionalProperties": false
+    },
+    "reviewSpecComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/immutableComponent"},
+        {"properties": {"path": {"const": "spec/LEGAL-ADVERSARIAL-REVIEW.md"}}}
+      ]
+    },
+    "incorporationSpecComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/immutableComponent"},
+        {"properties": {"path": {"const": "spec/VERSIONING.md"}}}
+      ]
+    },
+    "bundleSchemaComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/immutableComponent"},
+        {"properties": {"path": {"const": "schemas/bundle.schema.json"}}}
+      ]
     }
   },
   "additionalProperties": false
