@@ -20,8 +20,13 @@
     "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
     "type": {"enum": ["State", "Organization", "Person", "Agency", "Project", "Deployment", "Institution"]},
     "name": {"type": "string", "minLength": 1},
-    "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "iso3": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
     "dossier": {"type": "string", "minLength": 1},
+    "publicReviewIssue": {
+      "type": "string",
+      "pattern": "^https://github\\.com/Papishushi/exergic-commons-license/issues/[1-9][0-9]*$"
+    },
     "lastSubstantiveReview": {"type": "string", "format": "date"},
     "reviewDue": {"type": "string", "format": "date"},
     "reviewClass": {"enum": ["hot", "active", "stable", "manual"]},
@@ -35,7 +40,46 @@
       "type": "array",
       "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
       "uniqueItems": true
+    },
+    "controls": {"$ref": "#/$defs/iriList"},
+    "participatesIn": {"$ref": "#/$defs/iriList"},
+    "operates": {"$ref": "#/$defs/iriList"},
+    "deploys": {"$ref": "#/$defs/iriList"},
+    "materiallyBenefits": {"$ref": "#/$defs/iriList"},
+    "targetsOrAffects": {"$ref": "#/$defs/iriList"},
+    "remediates": {"$ref": "#/$defs/iriList"},
+    "reviews": {"$ref": "#/$defs/iriList"}
+  },
+  "$defs": {
+    "iriList": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+      "uniqueItems": true
     }
   },
+  "allOf": [
+    {
+      "if": {"properties": {"type": {"const": "State"}}, "required": ["type"]},
+      "then": {
+        "required": ["iso3", "publicReviewIssue", "aliases"],
+        "properties": {
+          "id": {"pattern": "^STATE-[A-Z]{3}$"},
+          "iri": {"pattern": "^ecl:STATE-[A-Z]{3}$"},
+          "dossier": {"pattern": "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$"}
+        },
+        "not": {
+          "anyOf": [
+            {"required": ["currentGovernance"]},
+            {"required": ["governanceStatus"]},
+            {"required": ["restrictionStatus"]},
+            {"required": ["tier"]},
+            {"required": ["outcome"]},
+            {"required": ["provisional_outcome"]},
+            {"required": ["status"]}
+          ]
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }
