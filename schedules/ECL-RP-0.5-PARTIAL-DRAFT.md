@@ -2,11 +2,11 @@
 
 > **NON-OPERATIVE RENDERING CANDIDATE. DO NOT ADOPT OR INCORPORATE INTO A RELEASE.**
 >
-> Intended compatibility: **ECL 0.2-DRAFT only**.
+> Intended compatibility: **ECL 0.3-DRAFT only**.
 >
 > Render date: **2026-08-13**.
 
-This file is the first post-ECL-0.2 Schedule rendering test generated from frozen governance records. It intentionally omits every State `S` entry, every `U`/`N` outcome, every unresolved factual/status record, every person-level candidate and every residual dossier scope that has not been frozen into contract-readable identity.
+This file is the first ECL-0.3 Schedule rendering test generated from frozen governance records. It intentionally omits every State `S` entry, every `U`/`N` outcome, every unresolved factual/status record, every person-level candidate and every residual dossier scope that has not been frozen into contract-readable identity.
 
 It therefore **must not** be treated as a complete Restricted Parties Schedule.
 
@@ -193,7 +193,7 @@ Before a complete `0.5-DRAFT` can be proposed:
 2. render the frozen State `S` entries into this Schedule as self-contained clauses;
 3. deduplicate overlapping State ↔ organization ↔ project entries;
 4. conduct controlled-class and knowability review on every rendered clause;
-5. perform internal legal consistency review against ECL 0.2-DRAFT; and
+5. perform internal legal consistency review against ECL 0.3-DRAFT; and
 6. freeze the exact completed Schedule text as a separately versioned artifact.
 
 Until those steps are complete, **this partial draft has no licensing effect and should not be incorporated into any release**.
