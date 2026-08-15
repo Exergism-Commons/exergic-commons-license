@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "generator": "tools/migrate_state_abox.py:v1",
+  "version": 2,
+  "generator": "tools/migrate_state_abox.py:v2",
   "note": "Derived conflict-detection hashes only; not ABox data and not a governance source.",
   "generatedProjectionSha256": {
     "AFG": "4591fb92d866db5bc4f7e727304be9ef5f6684f2e16d593364b5d2e34cc93477",
