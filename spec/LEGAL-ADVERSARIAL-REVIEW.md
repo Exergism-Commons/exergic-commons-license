@@ -69,9 +69,11 @@ The goal is not universal enforceability. The goal is to expose exactly where EC
 
 Every surface `LAR-01` through `LAR-16` MUST receive a recorded disposition for the exact release candidate.
 
+The attack surfaces are bound to **operative subjects/headings, not hard-coded section numbers**. License section numbers may change as a candidate evolves. The review record MUST map each LAR surface to the exact provision heading(s) or location(s) in the content-addressed candidate actually reviewed. Renumbering or inserting sections must never allow a mandatory attack surface to be accidentally pointed at the wrong provision.
+
 ### LAR-01 — Copyright hook and scope of grant
 
-For every operative verb in Sections 3, 5 and 6 of `LICENSE`, identify whether the conduct:
+For every operative verb in the candidate's grant, prohibited-use, restricted-party/project, distribution and service-provision provisions, identify whether the conduct:
 
 1. normally implicates a Licensor-controlled exclusive software/copyright right;
 2. does so only when particular technical facts such as reproduction are present;
@@ -107,13 +109,13 @@ Distinguish:
 
 Test program loading/execution copies, backup copies, observation/study/testing, interoperability/decompilation, fair use/fair dealing, maintenance/repair/essential-step copies, exhaustion/first-sale effects and relevant non-waivable consumer/mandatory-law protections.
 
-The review MUST decide whether ECL 1.0 requires an explicit savings clause stating that the License does not restrict conduct for which applicable law does not require Licensor permission and cannot override rights that applicable law makes non-waivable.
+The review MUST decide whether the candidate's statutory-rights/savings language correctly states that the License does not restrict conduct for which applicable law does not require Licensor permission and cannot override rights that applicable law makes non-waivable.
 
 ### LAR-05 — Exhaustion and downstream copies
 
 Determine what control, if any, remains after exhaustion/first sale of a particular lawfully transferred copy and separately identify later reproduction, adaptation, redistribution or deployment that still requires permission.
 
-Cover Sections 4, 6 and 10 explicitly.
+Explicitly cover the candidate's distribution/Bundle-preservation provisions, Restricted Party/Project and service-provision provisions, statutory-rights/exhaustion provisions, and termination/downstream-survival provisions.
 
 ### LAR-06 — SaaS, remote execution and service-provider reach
 
@@ -139,7 +141,7 @@ This legal review does not re-decide factual designation merits, but it MUST tes
 
 ### LAR-08 — Schedule incorporation and non-retroactivity
 
-Attack Sections 8, 9 and 16 and the exact-bundle model in `VERSIONING.md`.
+Attack the candidate's operative Schedule definition, governance/designation incorporation rule, non-retroactivity rule, distribution/Bundle-preservation requirements, exact-Bundle-control provision, and the exact-bundle model in `VERSIONING.md`.
 
 Test:
 
@@ -147,11 +149,13 @@ Test:
 - disappeared URLs/repository moves;
 - immutable hashes/content-addressed artifacts;
 - mirrors, vendoring, archives, binaries and containers;
+- downstream omission/corruption of upstream Bundle metadata;
+- any empty/missing-Schedule fallback;
 - later facts/governance changes;
 - correction without rewriting historical grants; and
 - any intended/disclaimed rescission theory.
 
-No mutable governance state may silently become the operative Schedule of an older release.
+No mutable governance state may silently become the operative Schedule of an older release, and no downstream omission may silently erase an upstream Bundle.
 
 ### LAR-09 — Termination, cure, authority and reinstatement
 
@@ -179,7 +183,7 @@ The stable project MUST document its contributor/inbound-rights model; a copyrig
 
 ### LAR-11 — Patent rights
 
-ECL 0.2 contains no express patent license.
+Review the candidate's patent treatment, whether that is an express no-patent grant or a proposed patent license.
 
 The review MUST recommend one of:
 
@@ -197,7 +201,7 @@ A restriction and the remedy available to enforce it are separate questions.
 
 ### LAR-13 — Choice of law, forum and cross-border enforcement
 
-Review the current absence of an express governing-law/forum clause against at least:
+Review the candidate's governing-law/forum model, including an intentional omission, against at least:
 
 - neutral no-choice model;
 - Licensor/home-jurisdiction choice;
@@ -208,13 +212,13 @@ Record conflicts/recognition consequences for a worldwide multi-Licensor public 
 
 ### LAR-14 — Warranty, liability and non-excludable rights
 
-Review Sections 12 and 13 for businesses and consumers, including mandatory warranties/remedies, gross negligence/intentional misconduct and any liability that cannot lawfully be excluded.
+Review the candidate's operative **disclaimer-of-warranty and limitation-of-liability provisions** for businesses and consumers, including mandatory warranties/remedies, gross negligence/intentional misconduct and any liability that cannot lawfully be excluded.
 
 `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW` is a limiter, not a substitute for review.
 
 ### LAR-15 — Severability and judicial modification
 
-Review Section 14 in every required jurisdiction and determine whether the forum recognizes the proposed narrowing/reformation approach and whether any provisions are interdependent/non-severable.
+Review the candidate's operative **severability provision** in every required jurisdiction and determine whether the forum recognizes the proposed narrowing/reformation approach and whether any provisions are interdependent/non-severable.
 
 ### LAR-16 — Independent regulation
 
@@ -332,7 +336,7 @@ The ECL 1.0 legal-review gate is complete only when all of the following are tru
 
 - exact release-candidate `LICENSE` is frozen/content-addressed;
 - exact non-License review/mechanism inputs have been copied into the deterministic frozen `reviews/legal/inputs/<review_id>/` namespace and content-addressed by the legal-review record;
-- all LAR-01 through LAR-16 have recorded dispositions;
+- all LAR-01 through LAR-16 have recorded dispositions mapped to the exact candidate provisions reviewed;
 - **all five required jurisdiction tracks are complete**;
 - reviewer-independence/competence minimum is satisfied;
 - every material finding is recorded and dispositioned;
@@ -389,7 +393,7 @@ No express patent grant exists today.
 
 ### H-07 — Termination/reinstatement and multi-Licensor authority need review
 
-Section 10 does not expressly define post-termination reinstatement and may be ambiguous about whether notice from one Licensor can affect grants made by other rightsholders.
+The 0.2 termination provision does not expressly define post-termination reinstatement and may be ambiguous about whether notice from one Licensor can affect grants made by other rightsholders.
 
 **Initial candidate severity:** `BLOCKER` or `MAJOR` depending the final contributor/enforcement model.
 
@@ -401,7 +405,7 @@ Omission is not treated here as invalidity; reviewers must compare alternatives 
 
 ### H-09 — Exact Schedule identity may be lost on redistribution
 
-ECL 0.2 §4 requires preservation/reference to the exact ECL version but does not expressly require the exact incorporated Schedule/Bundle identity to travel with redistributed copies, even though §§2, 8 and 16 make that Schedule operative.
+ECL 0.2 redistribution terms require preservation/reference to the exact ECL version but do not expressly require the exact incorporated Schedule/Bundle identity to travel with redistributed copies, even though the 0.2 definitions, governance terms and entire-license clause make that Schedule operative.
 
 **Initial candidate severity:** `BLOCKER`.
 
