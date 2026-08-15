@@ -1,0 +1,12 @@
+schema_version: 1
+target_license: "ECL-0.3-DRAFT"
+status: pending
+review_id: null
+sources: []
+note: >-
+  The frozen Schedule clause sources were prepared against ECL-0.2-DRAFT.
+  Do not mark this record complete or populate ECL-0.3-DRAFT source bindings
+  until an explicit compatibility revalidation has reviewed the exact source
+  files against the current ECL-0.3-DRAFT semantics. A complete record must
+  bind every renderer-consumed frozen clause source by repository-relative path
+  and SHA-256; the renderer rejects incomplete, stale or partial bindings.
