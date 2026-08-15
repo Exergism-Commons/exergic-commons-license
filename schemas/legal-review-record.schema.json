@@ -23,7 +23,7 @@
   ],
   "properties": {
     "schema_version": {"const": 1},
-    "review_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+    "review_id": {"type": "string", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$"},
     "status": {"const": "complete"},
     "license_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "review_spec": {"$ref": "#/$defs/reviewSpecSnapshot"},
@@ -95,19 +95,19 @@
     "reviewSpecSnapshot": {
       "allOf": [
         {"$ref": "#/$defs/immutableSnapshot"},
-        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9._-]+/LEGAL-ADVERSARIAL-REVIEW\\.md$"}}}
+        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?/LEGAL-ADVERSARIAL-REVIEW\\.md$"}}}
       ]
     },
     "incorporationSpecSnapshot": {
       "allOf": [
         {"$ref": "#/$defs/immutableSnapshot"},
-        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9._-]+/VERSIONING\\.md$"}}}
+        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?/VERSIONING\\.md$"}}}
       ]
     },
     "bundleSchemaSnapshot": {
       "allOf": [
         {"$ref": "#/$defs/immutableSnapshot"},
-        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9._-]+/bundle\\.schema\\.json$"}}}
+        {"properties": {"path": {"pattern": "^reviews/legal/inputs/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?/bundle\\.schema\\.json$"}}}
       ]
     }
   },
