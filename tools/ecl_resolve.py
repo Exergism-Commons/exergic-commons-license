@@ -239,8 +239,10 @@ def render_lock(bundle: dict[str, Any]) -> str:
     now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     license_part = bundle["license"]
     schedule_part = bundle["schedule"]
+    operative = bool(bundle.get("operative"))
     lines = [
         f'bundle = "{bundle["bundle"]}"',
+        f"operative = {'true' if operative else 'false'}",
         f'license = "{license_part["ref"]}"',
         f'license_sha256 = "{license_part["sha256"]}"',
         f'schedule = "{schedule_part["ref"]}"',
