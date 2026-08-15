@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-INTELLEXA-CANONICAL-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-INTELLEXA-CANONICAL-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Intellexa / Predator commercial spyware network canonical dossier",
+  "sourceLocator": "../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md",
+  "sourceType": "canonical-dossier",
+  "provenance": [
+    "../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "notes": "Repository-curated provenance for exact legal-entity tracking dependencies. Evidence grade and source dates are intentionally absent."
+}

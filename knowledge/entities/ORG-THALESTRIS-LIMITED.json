@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-THALESTRIS-LIMITED",
+  "id": "ORG-THALESTRIS-LIMITED",
+  "type": "Organization",
+  "name": "Thalestris Limited",
+  "dossier": "../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Exact legal-entity identity explicitly enumerated by the canonical Intellexa/Predator network dossier; this identity does not assert network control, aggregation, or governance status."
+}

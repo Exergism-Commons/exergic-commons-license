@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "issue": 220,
+  "followsManifest": "knowledge/generated/cross-entity-scaleout-v1.json",
+  "sourceReview": "reviews/2026/consistency/cross-entity-reconciliation.md",
+  "identityRule": "Create exact legal-entity identities only when the canonical dossier explicitly enumerates them. A network label may track them for review routing, but identity creation does not assert legal control, membership, culpability, or governance status.",
+  "identities": [
+    {"id":"ORG-INTELLEXA-SA","type":"Organization","name":"Intellexa S.A.","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
+    {"id":"ORG-INTELLEXA-LIMITED","type":"Organization","name":"Intellexa Limited","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
+    {"id":"ORG-CYTROX-AD","type":"Organization","name":"Cytrox AD","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
+    {"id":"ORG-CYTROX-HOLDINGS-ZRT","type":"Organization","name":"Cytrox Holdings ZRT","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
+    {"id":"ORG-THALESTRIS-LIMITED","type":"Organization","name":"Thalestris Limited","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."},
+    {"id":"ORG-ALIADA-GROUP-INC","type":"Organization","name":"Aliada Group Inc.","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","reason":"Exact legal entity explicitly enumerated in the canonical Intellexa/Predator network dossier."}
+  ],
+  "claims": [
+    {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-INTELLEXA-SA","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-INTELLEXA-SA","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
+    {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-INTELLEXA-LIMITED","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-INTELLEXA-LIMITED","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
+    {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-CYTROX-AD","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-CYTROX-AD","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
+    {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-CYTROX-HOLDINGS-ZRT","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-CYTROX-HOLDINGS-ZRT","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
+    {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-THALESTRIS-LIMITED","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-THALESTRIS-LIMITED","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
+    {"id":"CLAIM-INTELLEXA-NETWORK-TRACKS-ALIADA-GROUP-INC","subject":"ORG-INTELLEXA-PREDATOR-NETWORK","predicate":"ecl:tracks","object":"ORG-ALIADA-GROUP-INC","reason":"The canonical Intellexa/Predator dossier explicitly enumerates this exact legal entity; tracks records review dependency only."},
+    {"id":"CLAIM-HAMAS-TRACKS-IZZ-AL-DIN-AL-QASSAM","subject":"ORG-HAMAS","predicate":"ecl:tracks","object":"ORG-IZZ-AL-DIN-AL-QASSAM","reason":"The Hamas dossier explicitly distinguishes Izz al-Din al-Qassam Brigades as its military wing with a separate canonical dossier; tracks preserves that review dependency without asserting whole-organization control."}
+  ],
+  "evidence": [
+    {"id":"EVIDENCE-INTELLEXA-CANONICAL-DOSSIER-2026-08-13","kind":"curation-anchor","graded":false},
+    {"id":"EVIDENCE-HAMAS-QASSAM-CANONICAL-DOSSIERS-2026-08-13","kind":"curation-anchor","graded":false},
+    {"id":"EVIDENCE-INTELLEXA-TREASURY-JY2155","kind":"primary-source-anchor","graded":false,"sourceLocator":"https://home.treasury.gov/news/press-releases/jy2155","dossiers":["dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md"]},
+    {"id":"EVIDENCE-INTELLEXA-TREASURY-JY2581","kind":"primary-source-anchor","graded":false,"sourceLocator":"https://home.treasury.gov/news/press-releases/jy2581","dossiers":["dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md"]},
+    {"id":"EVIDENCE-NSO-CANDIRU-COMMERCE-SPYWARE-ENTITY-LIST","kind":"primary-source-anchor","graded":false,"sourceLocator":"https://www.bis.gov/press-release/commerce-adds-nso-group-other-foreign-companies-entity-list-malicious-cyber-activities","dossiers":["dossiers/organizations/NSO-GROUP.md","dossiers/organizations/CANDIRU.md"]},
+    {"id":"EVIDENCE-HAMAS-QASSAM-UN-COI-A-HRC-56-26","kind":"primary-source-anchor","graded":false,"sourceLocator":"https://www.un.org/unispal/document/coi-report-a-hrc-56-26-27may24/","dossiers":["dossiers/organizations/HAMAS.md","dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md"]},
+    {"id":"EVIDENCE-AL-QAIDA-UN-QDE004","kind":"primary-source-anchor","graded":false,"sourceLocator":"https://main.un.org/securitycouncil/en/sanctions/1267/aq_sanctions_list/summaries/entity/al-qaida","dossiers":["dossiers/organizations/AL-QAIDA.md"]},
+    {"id":"EVIDENCE-ISIL-UN-QDE115","kind":"primary-source-anchor","graded":false,"sourceLocator":"https://main.un.org/securitycouncil/en/sanctions/1267/aq_sanctions_list/summaries/entity/al-qaida-in-iraq","dossiers":["dossiers/organizations/ISIL-DAESH.md"]}
+  ],
+  "explicitNonGoals": [
+    "Do not create spyware Project or Deployment identities without canonical reviewed project records.",
+    "Do not infer controls, controlledBy, operates, participatesIn, ownership, membership, culpability, or governance outcomes from tracking dependencies.",
+    "Do not import sanctions, UN, ICC, Commerce, or Treasury designations as ECL governance.",
+    "Do not modify Schedule, released license text, legal-review artifacts, dossiers, or registry views."
+  ]
+}
