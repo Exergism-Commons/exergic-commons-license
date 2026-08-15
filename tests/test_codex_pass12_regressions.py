@@ -90,7 +90,8 @@ class DraftVersionAlignmentTests(unittest.TestCase):
         self.assertEqual(channel["license"]["path"], "LICENSE")
 
         working_license = (ROOT / "LICENSE").read_text(encoding="utf-8")
-        self.assertIn("0.3-DRAFT", working_license[:300])
+        self.assertIn("Version 0.3", working_license[:300])
+        self.assertIn("DRAFT", working_license[:300])
 
         rendered, _ = RENDERER.render()
         self.assertIn("Intended compatibility: **ECL 0.3-DRAFT only**.", rendered)
