@@ -28,10 +28,10 @@ REQUIRED_JURISDICTIONS = {
 }
 REQUIRED_ATTACK_SURFACES = {f"LAR-{number:02d}" for number in range(1, 17)}
 COMPLETE_DISPOSITIONS = {"resolved", "accepted-risk", "not-applicable"}
-REVIEWED_MECHANISM_ARTIFACTS = {
-    "review_spec": "spec/LEGAL-ADVERSARIAL-REVIEW.md",
-    "incorporation_spec": "spec/VERSIONING.md",
-    "bundle_schema": "schemas/bundle.schema.json",
+REVIEWED_MECHANISM_FILENAMES = {
+    "review_spec": "LEGAL-ADVERSARIAL-REVIEW.md",
+    "incorporation_spec": "VERSIONING.md",
+    "bundle_schema": "bundle.schema.json",
 }
 
 
@@ -62,6 +62,10 @@ def major_from_constraint(value: str) -> int | None:
     return None
 
 
+def valid_review_id(value: str) -> bool:
+    return bool(value) and all(char.isalnum() or char in "._-" for char in value)
+
+
 def validate_file_reference(
     root: Path, component: dict[str, Any], *, label: str
 ) -> Path:
@@ -83,17 +87,23 @@ def validate_component(root: Path, component: dict[str, Any]) -> None:
     validate_file_reference(root, component, label="bundle component")
 
 
-def validate_reviewed_mechanism_artifact(
-    root: Path, record: dict[str, Any], key: str, expected_path: str
+def validate_frozen_review_input(
+    root: Path,
+    record: dict[str, Any],
+    *,
+    review_id: str,
+    key: str,
+    filename: str,
 ) -> None:
     component = record.get(key)
     if not isinstance(component, dict):
         raise ValueError(f"legal review record is missing immutable {key}")
+    expected_path = f"reviews/legal/inputs/{review_id}/{filename}"
     if component.get("path") != expected_path:
         raise ValueError(
-            f"legal review {key} must bind exact repository artifact {expected_path}"
+            f"legal review {key} must bind frozen review input {expected_path}"
         )
-    validate_file_reference(root, component, label=f"legal review {key}")
+    validate_file_reference(root, component, label=f"frozen legal review {key}")
 
 
 def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
@@ -102,6 +112,10 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     This deliberately does not attempt to decide whether a reviewer is legally
     qualified or whether the recorded legal conclusions are correct. Those are
     human review obligations defined by spec/LEGAL-ADVERSARIAL-REVIEW.md.
+
+    Review-spec/versioning/schema inputs are validated against frozen per-review
+    snapshots, never against later mutable canonical files. This preserves the
+    validity of historical Bundles when the project evolves after release.
     """
 
     if not bundle.get("operative"):
@@ -119,10 +133,15 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
         raise ValueError("operative bundle requires completed legal review record")
 
     review_id = record.get("review_id")
-    if not isinstance(review_id, str) or not review_id:
-        raise ValueError("legal review record is missing review_id")
+    if not isinstance(review_id, str) or not valid_review_id(review_id):
+        raise ValueError("legal review record has invalid review_id")
     if component.get("ref") != review_id:
         raise ValueError("bundle legal_review ref does not match legal review record review_id")
+    expected_record_path = f"reviews/legal/records/{review_id}.json"
+    if component.get("path") != expected_record_path:
+        raise ValueError(
+            f"bundle legal_review path must match immutable record path {expected_record_path}"
+        )
 
     license_component = bundle.get("license")
     if not isinstance(license_component, dict):
@@ -131,8 +150,10 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     if record.get("license_sha256") != expected_license_sha:
         raise ValueError("legal review record does not bind exact bundle license SHA-256")
 
-    for key, expected_path in REVIEWED_MECHANISM_ARTIFACTS.items():
-        validate_reviewed_mechanism_artifact(root, record, key, expected_path)
+    for key, filename in REVIEWED_MECHANISM_FILENAMES.items():
+        validate_frozen_review_input(
+            root, record, review_id=review_id, key=key, filename=filename
+        )
 
     jurisdictions = record.get("jurisdictions")
     if not isinstance(jurisdictions, dict):
