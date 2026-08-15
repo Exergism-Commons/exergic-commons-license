@@ -2,6 +2,11 @@ PREFIX ecl: <urn:ecl:>
 
 SELECT ?left ?right ?subject ?predicate
 WHERE {
+  # Accepted-value conflicts are meaningful only for predicates whose values are
+  # explicitly curated as mutually exclusive/single-valued. Relationship
+  # predicates such as tracks/controls/deploys are intentionally multi-valued.
+  VALUES ?predicate { ecl:status }
+
   ?left a ecl:Claim ;
         ecl:subject ?subject ;
         ecl:predicate ?predicate ;
@@ -16,9 +21,9 @@ WHERE {
   OPTIONAL { ?left ecl:literalValue ?leftLiteral . }
   OPTIONAL { ?right ecl:object ?rightObject . }
   OPTIONAL { ?right ecl:literalValue ?rightLiteral . }
-  BIND(COALESCE(CONCAT("iri:", STR(?leftObject)), CONCAT("literal:", STR(?leftLiteral))) AS ?leftValue)
-  BIND(COALESCE(CONCAT("iri:", STR(?rightObject)), CONCAT("literal:", STR(?rightLiteral))) AS ?rightValue)
-  FILTER (?leftValue != ?rightValue)
+  BIND(COALESCE(?leftObject, ?leftLiteral) AS ?leftValue)
+  BIND(COALESCE(?rightObject, ?rightLiteral) AS ?rightValue)
+  FILTER (!sameTerm(?leftValue, ?rightValue))
 
   OPTIONAL { ?left ecl:validFrom ?leftFrom . }
   OPTIONAL { ?left ecl:validTo ?leftTo . }
