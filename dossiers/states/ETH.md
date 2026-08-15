@@ -46,6 +46,15 @@ Rights-compliant eviction redesign, compensation/consultation, end to incommunic
 - https://www.amnesty.org/en/latest/news/2026/05/ethiopian-authorities-have-intensified-their-crackdown-on-press-freedom/
 - https://www.amnesty.org/en/documents/afr25/1019/2026/en/
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **already represented**. The forced-eviction/media evidence, suspension and Million Beyene release as remediation, attribution boundary and removal triggers are reflected in §§2–7 above.
+- Issue #57 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+No current evidence, scope or governance status is changed by this absorption record.
+
+## 9. Procedural history
 
 Issue #57 · `../../reviews/2026/adversarial/scoped/tranche-03.md`
