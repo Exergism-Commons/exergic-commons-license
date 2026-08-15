@@ -17,6 +17,7 @@
   "reviewReason": "Scoped live detention/targeting/security findings and counter-institution-sensitive attribution require current-status review.",
   "trackedObjects": [
     "ecl:PROJECT-ICE-ICM-IA",
+    "ecl:PROJECT-MAVEN-SMART-SYSTEM",
     "ecl:PROJECT-EPIC-FURY-MINAB"
   ],
   "monitorIds": []
