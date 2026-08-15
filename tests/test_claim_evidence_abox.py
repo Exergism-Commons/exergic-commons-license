@@ -5,7 +5,8 @@ import unittest
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
-from rdflib import Graph, Namespace, RDF, URIRef
+from pyshacl import validate as shacl_validate
+from rdflib import Graph, Literal, Namespace, RDF, URIRef
 
 ROOT = Path(__file__).resolve().parents[1]
 ECL = Namespace("urn:ecl:")
@@ -54,6 +55,12 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
         cls.graph = Graph()
         for path in BUILD.iter_abox_files(ROOT / "knowledge"):
             cls.graph.parse(path, format="json-ld")
+        cls.shapes = Graph().parse(ROOT / "ontology" / "ecl.shacl.ttl", format="turtle")
+        cls.ontology = Graph().parse(ROOT / "ontology" / "ecl.owl.ttl", format="turtle")
+
+    @staticmethod
+    def integrity_query(name: str) -> str:
+        return (ROOT / "sparql" / "integrity" / name).read_text(encoding="utf-8")
 
     def test_all_claim_and_evidence_sources_validate_against_json_schema(self):
         self.assertGreaterEqual(len(self.claim_files), 5)
@@ -108,14 +115,120 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
                     self.assertTrue(any(self.graph.objects(evidence, ECL.stableId)), (claim, evidence))
 
     def test_claims_do_not_assert_governance_outcome_predicates(self):
-        forbidden_suffixes = (
-            "currentgovernance", "governancestatus", "governanceoutcome",
-            "restrictionstatus", "restrictedstatus", "tier", "provisionaloutcome", "outcome",
+        forbidden_contains = (
+            "currentgovernance",
+            "governancestatus",
+            "governanceoutcome",
+            "restrictionstatus",
+            "restrictedstatus",
+            "provisionaloutcome",
         )
         for claim in self.graph.subjects(RDF.type, ECL.Claim):
             for predicate in self.graph.objects(claim, ECL.predicate):
-                normalized = str(predicate).lower().replace("-", "").replace("_", "")
-                self.assertFalse(normalized.endswith(forbidden_suffixes), (claim, predicate))
+                local_name = str(predicate).rsplit(":", 1)[-1].rsplit("/", 1)[-1].rsplit("#", 1)[-1]
+                normalized = local_name.lower().replace("-", "").replace("_", "")
+                forbidden = (
+                    predicate == ECL.outcome
+                    or any(token in normalized for token in forbidden_contains)
+                    or normalized.startswith("tier")
+                )
+                self.assertFalse(forbidden, (claim, predicate))
+
+    def test_conflict_guard_allows_multi_valued_relationships(self):
+        graph = Graph()
+        subject = ECL["STATE-TEST"]
+        for suffix, target in (("A", ECL["PROJECT-A"]), ("B", ECL["PROJECT-B"])):
+            claim = ECL[f"CLAIM-TEST-TRACKS-{suffix}"]
+            graph.add((claim, RDF.type, ECL.Claim))
+            graph.add((claim, ECL.subject, subject))
+            graph.add((claim, ECL.predicate, ECL.tracks))
+            graph.add((claim, ECL.status, Literal("accepted")))
+            graph.add((claim, ECL.object, target))
+        rows = list(graph.query(self.integrity_query("conflicting-accepted-claims.rq")))
+        self.assertEqual(rows, [])
+
+    def test_conflict_guard_preserves_literal_datatypes(self):
+        graph = Graph()
+        subject = ECL["PROJECT-TEST"]
+        values = (Literal(1), Literal("1"))
+        for index, value in enumerate(values):
+            claim = ECL[f"CLAIM-TEST-STATUS-{index}"]
+            graph.add((claim, RDF.type, ECL.Claim))
+            graph.add((claim, ECL.subject, subject))
+            graph.add((claim, ECL.predicate, ECL.status))
+            graph.add((claim, ECL.status, Literal("accepted")))
+            graph.add((claim, ECL.literalValue, value))
+        rows = list(graph.query(self.integrity_query("conflicting-accepted-claims.rq")))
+        self.assertEqual(len(rows), 1)
+
+    def test_governance_guard_normalizes_separators_and_suffixes(self):
+        graph = Graph()
+        for index, predicate in enumerate(
+            (ECL["governance__status"], ECL["governance-status-code"])
+        ):
+            claim = ECL[f"CLAIM-BAD-GOVERNANCE-{index}"]
+            graph.add((claim, RDF.type, ECL.Claim))
+            graph.add((claim, ECL.predicate, predicate))
+        rows = list(graph.query(self.integrity_query("claim-governance-separation.rq")))
+        self.assertEqual(len(rows), 2)
+
+        data = Graph()
+        claim = ECL["CLAIM-BAD-GOVERNANCE-SHACL"]
+        data.add((claim, RDF.type, ECL.Claim))
+        data.add((claim, ECL.stableId, Literal("CLAIM-BAD-GOVERNANCE-SHACL")))
+        data.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))
+        data.add((claim, ECL.predicate, ECL["governance__status"]))
+        data.add((claim, ECL.literalValue, Literal("x")))
+        data.add((claim, ECL.status, Literal("rejected")))
+        data.add((claim, ECL.provenance, Literal("adversarial test")))
+        conforms, _, report = shacl_validate(
+            data,
+            shacl_graph=self.shapes,
+            ont_graph=self.ontology,
+            inference="none",
+        )
+        self.assertFalse(conforms, report)
+
+    def test_supersedes_must_resolve_to_same_record_kind(self):
+        graph = Graph()
+        claim = ECL["CLAIM-TEST-SUPERSESSION"]
+        evidence_target = ECL["EVIDENCE-REAL-TARGET"]
+        graph.add((claim, RDF.type, ECL.Claim))
+        graph.add((claim, ECL.stableId, Literal("CLAIM-TEST-SUPERSESSION")))
+        graph.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))
+        graph.add((claim, ECL.predicate, ECL.status))
+        graph.add((claim, ECL.literalValue, Literal("x")))
+        graph.add((claim, ECL.status, Literal("rejected")))
+        graph.add((claim, ECL.provenance, Literal("adversarial test")))
+        graph.add((claim, ECL.supersedes, evidence_target))
+
+        graph.add((evidence_target, RDF.type, ECL.EvidenceItem))
+        graph.add((evidence_target, ECL.stableId, Literal("EVIDENCE-REAL-TARGET")))
+        graph.add((evidence_target, ECL.sourceLocator, Literal("https://example.invalid/evidence")))
+        graph.add((evidence_target, ECL.provenance, Literal("adversarial test")))
+
+        evidence = ECL["EVIDENCE-TEST-SUPERSESSION"]
+        graph.add((evidence, RDF.type, ECL.EvidenceItem))
+        graph.add((evidence, ECL.stableId, Literal("EVIDENCE-TEST-SUPERSESSION")))
+        graph.add((evidence, ECL.sourceLocator, Literal("https://example.invalid/evidence-2")))
+        graph.add((evidence, ECL.provenance, Literal("adversarial test")))
+        graph.add((evidence, ECL.supersedes, ECL["EVIDENCE-MISSING"]))
+
+        rows = list(graph.query(self.integrity_query("dangling-supersedes.rq")))
+        self.assertEqual(len(rows), 2)
+
+        conforms, _, report = shacl_validate(
+            graph,
+            shacl_graph=self.shapes,
+            ont_graph=self.ontology,
+            inference="none",
+        )
+        self.assertFalse(conforms, report)
+
+    def test_repository_has_no_dangling_supersedes(self):
+        self.assertEqual(
+            list(self.graph.query(self.integrity_query("dangling-supersedes.rq"))), []
+        )
 
     def test_schema_rejects_accepted_claim_without_support(self):
         sample = json.loads(self.claim_files[0].read_text(encoding="utf-8"))
