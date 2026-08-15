@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from rdflib import Graph, Namespace, RDF
+from rdflib import Graph, Namespace, RDF, URIRef
 from rdflib.namespace import OWL
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,8 +20,10 @@ class StateSemanticGuardrailTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.abox = Graph()
-        cls.state_files = sorted((ROOT / "knowledge" / "entities").glob("STATE-*.json"))
-        for path in cls.state_files:
+        entity_root = ROOT / "knowledge" / "entities"
+        cls.state_files = sorted(entity_root.glob("STATE-*.json"))
+        cls.entity_files = sorted(entity_root.glob("*.json"))
+        for path in cls.entity_files:
             cls.abox.parse(path, format="json-ld")
         cls.tbox = Graph().parse(ROOT / "ontology" / "ecl.owl.ttl", format="turtle")
 
@@ -73,6 +75,20 @@ class StateSemanticGuardrailTests(unittest.TestCase):
             for _, predicate, target in self.tbox.triples((relation, None, None)):
                 self.assertNotEqual(predicate, OWL.propertyChainAxiom)
                 self.assertNotEqual(target, ECL.outcome)
+
+    def test_internal_relationship_targets_resolve_to_abox_identity(self):
+        relation_names = (
+            "tracks", "controls", "controlledBy", "participatesIn", "operates",
+            "deploys", "materiallyBenefits", "targetsOrAffects", "remediates", "reviews",
+        )
+        for name in relation_names:
+            predicate = ECL[name]
+            for subject, obj in self.abox.subject_objects(predicate):
+                if isinstance(obj, URIRef) and str(obj).startswith("urn:ecl:"):
+                    self.assertTrue(
+                        any(self.abox.objects(obj, ECL.stableId)),
+                        (subject, predicate, obj),
+                    )
 
     def test_deterministic_canonical_rdf_build(self):
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
