@@ -1,0 +1,6 @@
+PREFIX ecl: <urn:ecl:>
+
+SELECT ?state ?predicate ?outcome WHERE {
+  ?state a ecl:State ; ?predicate ?outcome .
+  ?outcome a ecl:GovernanceOutcome .
+}
