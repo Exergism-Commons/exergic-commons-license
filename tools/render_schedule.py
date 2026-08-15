@@ -20,6 +20,7 @@ TARGET_LICENSE = "ECL-0.3-DRAFT"
 TARGET_LICENSE_ARTIFACT = ROOT / "versions" / "licenses" / "ECL-0.3-DRAFT.md"
 WORKING_LICENSE = ROOT / "LICENSE"
 COMPATIBILITY_REVIEW = REG / "schedule-license-compatibility.yml"
+COMPATIBILITY_EVIDENCE_DIR = ROOT / "reviews" / "schedule-compatibility"
 
 READY_PREFIX = "ready"
 REFERENCE_STATUSES = {
@@ -131,9 +132,7 @@ def validate_target_license_artifact(review: dict[str, Any]) -> None:
 
     frozen_digest = sha256(TARGET_LICENSE_ARTIFACT)
     if digest != frozen_digest:
-        raise ValueError(
-            "Schedule compatibility review target License SHA-256 is stale"
-        )
+        raise ValueError("Schedule compatibility review target License SHA-256 is stale")
     working_digest = sha256(WORKING_LICENSE)
     if working_digest != frozen_digest:
         raise ValueError(
@@ -141,59 +140,34 @@ def validate_target_license_artifact(review: dict[str, Any]) -> None:
         )
 
 
-def validate_compatibility_review(sources: list[Path], target_license: str) -> bool:
-    """Require a complete compatibility review to bind exact License and sources.
+def expected_source_bindings(sources: list[Path]) -> dict[str, str]:
+    return {str(path.relative_to(ROOT)): sha256(path) for path in sources}
 
-    A mutable metadata flip on the freeze files is not sufficient. The review
-    always binds the exact target License artifact; a completed revalidation
-    must additionally bind the complete renderer input set by repository-
-    relative path and SHA-256.
-    """
 
-    if not COMPATIBILITY_REVIEW.is_file():
-        raise ValueError(f"missing compatibility review gate: {COMPATIBILITY_REVIEW}")
-    review = load_yaml(COMPATIBILITY_REVIEW)
-    if review.get("schema_version") != 2:
-        raise ValueError("unsupported Schedule compatibility review schema_version")
-    if review.get("target_license") != target_license:
-        raise ValueError(
-            "Schedule compatibility review target does not match renderer target License"
-        )
-    validate_target_license_artifact(review)
-
-    status = review.get("status")
-    if status == "pending":
-        if review.get("sources") not in (None, []):
-            raise ValueError("pending Schedule compatibility review must not claim source bindings")
-        if review.get("review_id") not in (None, ""):
-            raise ValueError("pending Schedule compatibility review must not claim a review_id")
-        return False
-    if status != "complete":
-        raise ValueError("Schedule compatibility review status must be pending or complete")
-
-    review_id = review.get("review_id")
-    if not isinstance(review_id, str) or not review_id.strip():
-        raise ValueError("complete Schedule compatibility review requires review_id")
-
-    bindings = review.get("sources")
+def parse_source_bindings(bindings: Any, label: str) -> dict[str, str]:
     if not isinstance(bindings, list):
-        raise ValueError("complete Schedule compatibility review requires source bindings")
-
+        raise ValueError(f"{label} requires source bindings")
     actual: dict[str, str] = {}
     for binding in bindings:
         if not isinstance(binding, dict):
-            raise ValueError("Schedule compatibility source binding must be a mapping")
+            raise ValueError(f"{label} source binding must be a mapping")
         path = binding.get("path")
         digest = binding.get("sha256")
         if not isinstance(path, str) or not path:
-            raise ValueError("Schedule compatibility source binding is missing path")
+            raise ValueError(f"{label} source binding is missing path")
         if not isinstance(digest, str) or len(digest) != 64:
-            raise ValueError("Schedule compatibility source binding has invalid sha256")
+            raise ValueError(f"{label} source binding has invalid sha256")
         if path in actual:
-            raise ValueError(f"duplicate Schedule compatibility source binding: {path}")
+            raise ValueError(f"duplicate {label} source binding: {path}")
         actual[path] = digest
+    return actual
 
-    expected = {str(path.relative_to(ROOT)): sha256(path) for path in sources}
+
+def assert_exact_source_bindings(
+    bindings: Any, sources: list[Path], label: str
+) -> None:
+    actual = parse_source_bindings(bindings, label)
+    expected = expected_source_bindings(sources)
     if actual != expected:
         missing = sorted(expected.keys() - actual.keys())
         extra = sorted(actual.keys() - expected.keys())
@@ -208,9 +182,93 @@ def validate_compatibility_review(sources: list[Path], target_license: str) -> b
         if stale:
             details.append(f"stale={','.join(stale)}")
         raise ValueError(
-            "Schedule compatibility review does not bind the exact renderer source set"
+            f"{label} does not bind the exact renderer source set"
             + (f" ({'; '.join(details)})" if details else "")
         )
+
+
+def load_content_addressed_compatibility_evidence(
+    pointer: dict[str, Any], sources: list[Path], target_license: str
+) -> dict[str, Any]:
+    """Resolve immutable compatibility evidence from a SHA-256-addressed file."""
+
+    reference = pointer.get("review_evidence")
+    if not isinstance(reference, dict):
+        raise ValueError("complete Schedule compatibility review requires review_evidence")
+    evidence_id = reference.get("id")
+    evidence_path_text = reference.get("path")
+    if (
+        not isinstance(evidence_id, str)
+        or len(evidence_id) != 64
+        or any(c not in "0123456789abcdef" for c in evidence_id)
+    ):
+        raise ValueError("Schedule compatibility review evidence id must be lowercase SHA-256")
+
+    expected_path_text = f"reviews/schedule-compatibility/{evidence_id}.yml"
+    if evidence_path_text != expected_path_text:
+        raise ValueError("Schedule compatibility evidence path must match its content hash id")
+    evidence_path = ROOT / expected_path_text
+    if not evidence_path.is_file():
+        raise ValueError(f"missing Schedule compatibility evidence: {evidence_path}")
+    if sha256(evidence_path) != evidence_id:
+        raise ValueError("Schedule compatibility evidence content hash does not match review id")
+
+    evidence = load_yaml(evidence_path)
+    if evidence.get("schema_version") != 1:
+        raise ValueError("unsupported Schedule compatibility evidence schema_version")
+    if evidence.get("target_license") != target_license:
+        raise ValueError("Schedule compatibility evidence targets a different License")
+    if evidence.get("target_license_artifact") != pointer.get("target_license_artifact"):
+        raise ValueError("Schedule compatibility evidence target License binding does not match pointer")
+    validate_target_license_artifact(evidence)
+
+    reviewer = evidence.get("reviewer")
+    reviewed_at = evidence.get("reviewed_at")
+    if not isinstance(reviewer, str) or not reviewer.strip():
+        raise ValueError("Schedule compatibility evidence requires reviewer")
+    if not isinstance(reviewed_at, str) or not reviewed_at.strip():
+        raise ValueError("Schedule compatibility evidence requires reviewed_at")
+    if evidence.get("conclusion") != "compatible":
+        raise ValueError("Schedule compatibility evidence conclusion must be compatible")
+
+    assert_exact_source_bindings(
+        evidence.get("sources"), sources, "Schedule compatibility evidence"
+    )
+    return evidence
+
+
+def validate_compatibility_review(sources: list[Path], target_license: str) -> bool:
+    """Require immutable evidence before compatibility may be marked complete.
+
+    The mutable registry is only a pointer. A complete state is accepted only
+    when it resolves to a content-addressed evidence record whose own bytes bind
+    the exact target License artifact and complete renderer source set.
+    """
+
+    if not COMPATIBILITY_REVIEW.is_file():
+        raise ValueError(f"missing compatibility review gate: {COMPATIBILITY_REVIEW}")
+    review = load_yaml(COMPATIBILITY_REVIEW)
+    if review.get("schema_version") != 3:
+        raise ValueError("unsupported Schedule compatibility review schema_version")
+    if review.get("target_license") != target_license:
+        raise ValueError(
+            "Schedule compatibility review target does not match renderer target License"
+        )
+    validate_target_license_artifact(review)
+
+    status = review.get("status")
+    if status == "pending":
+        if review.get("review_evidence") not in (None, {}):
+            raise ValueError("pending Schedule compatibility review must not claim review evidence")
+        if review.get("review_id") is not None or review.get("sources") is not None:
+            raise ValueError("pending Schedule compatibility review must not use legacy mutable claims")
+        return False
+    if status != "complete":
+        raise ValueError("Schedule compatibility review status must be pending or complete")
+
+    if review.get("review_id") is not None or review.get("sources") is not None:
+        raise ValueError("complete Schedule compatibility review must use immutable review_evidence only")
+    load_content_addressed_compatibility_evidence(review, sources, target_license)
     return True
 
 
@@ -360,9 +418,9 @@ def render() -> tuple[str, dict[str, int]]:
             ">",
             f"> Frozen clause inputs currently declare compatibility with: **{declared_text}**.",
             ">",
-            "> Explicit License-and-source hash-bound compatibility revalidation: **PENDING**.",
+            "> Explicit content-addressed License-and-source compatibility revalidation: **PENDING**.",
             ">",
-            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and the compatibility record binds both the exact target License artifact and the complete source set by SHA-256.",
+            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and a content-addressed evidence record binds both the exact target License artifact and complete source set by SHA-256.",
         ]
     else:
         compatibility_lines = [
@@ -370,7 +428,7 @@ def render() -> tuple[str, dict[str, int]]:
             ">",
             f"> Exact target License artifact: **{TARGET_LICENSE_ARTIFACT.relative_to(ROOT)}** (`{sha256(TARGET_LICENSE_ARTIFACT)}`).",
             ">",
-            "> Exact target License artifact and frozen clause source set: **compatibility revalidation complete and SHA-256-bound**.",
+            "> Exact target License artifact and frozen clause source set: **compatibility revalidation complete and SHA-256-bound by immutable evidence**.",
         ]
 
     lines: list[str] = [
