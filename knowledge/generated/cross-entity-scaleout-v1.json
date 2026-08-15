@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "issue": 214,
+  "sourceReview": "reviews/2026/consistency/cross-entity-reconciliation.md",
+  "identityRule": "Remove the leading ECL- from the canonical dossier id; preserve entity type/name/dossier/review date only. Governance outcome/scope never enters the identity node.",
+  "identities": [
+    {"id":"ORG-PALANTIR-TECHNOLOGIES","type":"Organization","dossier":"dossiers/organizations/PALANTIR-TECHNOLOGIES.md","dossierId":"ECL-ORG-PALANTIR-TECHNOLOGIES"},
+    {"id":"ORG-NSO-GROUP","type":"Organization","dossier":"dossiers/organizations/NSO-GROUP.md","dossierId":"ECL-ORG-NSO-GROUP"},
+    {"id":"ORG-CANDIRU","type":"Organization","dossier":"dossiers/organizations/CANDIRU.md","dossierId":"ECL-ORG-CANDIRU"},
+    {"id":"ORG-INTELLEXA-PREDATOR-NETWORK","type":"Organization","dossier":"dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md","dossierId":"ECL-ORG-INTELLEXA-PREDATOR-NETWORK"},
+    {"id":"ORG-AL-QAIDA","type":"Organization","dossier":"dossiers/organizations/AL-QAIDA.md","dossierId":"ECL-ORG-AL-QAIDA"},
+    {"id":"ORG-ISIL-DAESH","type":"Organization","dossier":"dossiers/organizations/ISIL-DAESH.md","dossierId":"ECL-ORG-ISIL-DAESH"},
+    {"id":"ORG-HAMAS","type":"Organization","dossier":"dossiers/organizations/HAMAS.md","dossierId":"ECL-ORG-HAMAS"},
+    {"id":"ORG-IZZ-AL-DIN-AL-QASSAM","type":"Organization","dossier":"dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md","dossierId":"ECL-ORG-IZZ-AL-DIN-AL-QASSAM"},
+    {"id":"ORG-RSF","type":"Organization","dossier":"dossiers/organizations/RAPID-SUPPORT-FORCES.md","dossierId":"ECL-ORG-RSF"},
+    {"id":"ORG-SAF","type":"Organization","dossier":"dossiers/organizations/SUDANESE-ARMED-FORCES.md","dossierId":"ECL-ORG-SAF"},
+    {"id":"ORG-SDF-RADA","type":"Organization","dossier":"dossiers/organizations/SDF-RADA.md","dossierId":"ECL-ORG-SDF-RADA"},
+    {"id":"PERSON-OSAMA-ELMASRY-NJEEM","type":"Person","dossier":"dossiers/persons/OSAMA-ELMASRY-NJEEM.md","dossierId":"ECL-PERSON-OSAMA-ELMASRY-NJEEM"}
+  ],
+  "claims": [
+    {"id":"CLAIM-PALANTIR-PARTICIPATES-IN-ICE-ICM-IA","subject":"ORG-PALANTIR-TECHNOLOGIES","predicate":"ecl:participatesIn","object":"PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS","reason":"Both canonical organization and project dossiers explicitly identify Palantir as the current software supplier/technical participant."},
+    {"id":"CLAIM-PALANTIR-PARTICIPATES-IN-MAVEN-SMART-SYSTEM","subject":"ORG-PALANTIR-TECHNOLOGIES","predicate":"ecl:participatesIn","object":"PROJECT-MAVEN-SMART-SYSTEM","reason":"The canonical Maven dossier explicitly identifies Palantir USG as software contractor/licensor in current DoD awards."},
+    {"id":"CLAIM-SDF-RADA-OPERATES-MITIGA-DETENTION","subject":"ORG-SDF-RADA","predicate":"ecl:operates","object":"PROJECT-MITIGA-DETENTION","reason":"The canonical Mitiga dossier explicitly defines the apparatus as operated through SDF/RADA structures; the ICC evidence is already a first-class EvidenceItem."},
+    {"id":"CLAIM-LBY-TRACKS-SDF-RADA","subject":"STATE-LBY","predicate":"ecl:tracks","object":"ORG-SDF-RADA","reason":"Review-dependency only; the cross-entity record and canonical dossiers require SDF/RADA to remain separately attributable from the whole Libyan State."},
+    {"id":"CLAIM-SDN-TRACKS-RSF","subject":"STATE-SDN","predicate":"ecl:tracks","object":"ORG-RSF","reason":"The Sudan dossier explicitly requires RSF to be separately attributed rather than silently assigned to SAF/state structures."},
+    {"id":"CLAIM-SDN-TRACKS-SAF","subject":"STATE-SDN","predicate":"ecl:tracks","object":"ORG-SAF","reason":"The Sudan dossier explicitly scopes State-aligned findings to SAF and specifically attributable structures."}
+  ],
+  "evidence": [
+    {"id":"EVIDENCE-PALANTIR-CANONICAL-DOSSIER-2026-08-13","graded":false},
+    {"id":"EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13","graded":false},
+    {"id":"EVIDENCE-MAVEN-CANONICAL-DOSSIER-2026-08-13","graded":false},
+    {"id":"EVIDENCE-SDF-RADA-CANONICAL-DOSSIER-2026-08-13","graded":false},
+    {"id":"EVIDENCE-SDN-CANONICAL-DOSSIER-2026-08-11","graded":false}
+  ]
+}

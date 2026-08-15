@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-SDN-TRACKS-RSF",
+  "id": "CLAIM-SDN-TRACKS-RSF",
+  "type": "Claim",
+  "subject": "ecl:STATE-SDN",
+  "predicate": "ecl:tracks",
+  "object": "ecl:ORG-RSF",
+  "status": "accepted",
+  "asOf": "2026-08-11",
+  "evidenceFor": ["ecl:EVIDENCE-SDN-CANONICAL-DOSSIER-2026-08-11"],
+  "provenance": ["../../dossiers/states/SDN.md", "../../dossiers/organizations/RAPID-SUPPORT-FORCES.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Curated review-dependency edge preserving the Sudan dossier's explicit SAF/RSF attribution split. It does not attribute RSF conduct to the State actor."
+}

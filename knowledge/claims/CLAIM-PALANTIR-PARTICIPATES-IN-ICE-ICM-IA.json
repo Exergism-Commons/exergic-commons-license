@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-PALANTIR-PARTICIPATES-IN-ICE-ICM-IA",
+  "id": "CLAIM-PALANTIR-PARTICIPATES-IN-ICE-ICM-IA",
+  "type": "Claim",
+  "subject": "ecl:ORG-PALANTIR-TECHNOLOGIES",
+  "predicate": "ecl:participatesIn",
+  "object": "ecl:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-PALANTIR-CANONICAL-DOSSIER-2026-08-13", "ecl:EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13"],
+  "provenance": ["../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md", "../../dossiers/projects/ICE-ICM-INVESTIGATIVE-ANALYTICS.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Accepted technical/project participation only. It does not imply that every ICE use is prohibited or that Palantir inherits any governance outcome."
+}

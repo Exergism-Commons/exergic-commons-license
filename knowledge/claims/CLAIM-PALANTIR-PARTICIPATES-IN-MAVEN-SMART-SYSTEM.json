@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-PALANTIR-PARTICIPATES-IN-MAVEN-SMART-SYSTEM",
+  "id": "CLAIM-PALANTIR-PARTICIPATES-IN-MAVEN-SMART-SYSTEM",
+  "type": "Claim",
+  "subject": "ecl:ORG-PALANTIR-TECHNOLOGIES",
+  "predicate": "ecl:participatesIn",
+  "object": "ecl:PROJECT-MAVEN-SMART-SYSTEM",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-PALANTIR-CANONICAL-DOSSIER-2026-08-13", "ecl:EVIDENCE-MAVEN-CANONICAL-DOSSIER-2026-08-13"],
+  "provenance": ["../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md", "../../dossiers/projects/MAVEN-SMART-SYSTEM.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Accepted technical/project participation only. It does not establish a prohibited Maven deployment or propagate any project/organization governance outcome."
+}

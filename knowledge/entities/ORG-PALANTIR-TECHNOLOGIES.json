@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-PALANTIR-TECHNOLOGIES",
+  "id": "ORG-PALANTIR-TECHNOLOGIES",
+  "type": "Organization",
+  "name": "Palantir Technologies Inc.",
+  "dossier": "../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical non-State identity from the 2026 cross-entity reconciliation cohort; governance remains in the dossier and review procedure."
+}

@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-SDF-RADA",
+  "id": "ORG-SDF-RADA",
+  "type": "Organization",
+  "name": "Special Deterrence Forces / RADA",
+  "dossier": "../../dossiers/organizations/SDF-RADA.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical non-State identity from the 2026 cross-entity reconciliation cohort; governance remains in the dossier and review procedure."
+}

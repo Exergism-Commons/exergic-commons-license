@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "ICE ICM / Investigative Analytics canonical project dossier",
+  "sourceLocator": "../../dossiers/projects/ICE-ICM-INVESTIGATIVE-ANALYTICS.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/projects/ICE-ICM-INVESTIGATIVE-ANALYTICS.md", "../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md"],
+  "notes": "Repository-curated provenance for the explicit Palantir project-participation proposition. Evidence grade intentionally absent."
+}

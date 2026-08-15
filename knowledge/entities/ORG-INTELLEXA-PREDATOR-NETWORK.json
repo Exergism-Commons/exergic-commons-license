@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-INTELLEXA-PREDATOR-NETWORK",
+  "id": "ORG-INTELLEXA-PREDATOR-NETWORK",
+  "type": "Organization",
+  "name": "Intellexa / Predator commercial spyware network",
+  "dossier": "../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical tracked network label from its dossier; this identity does not imply legal-entity control, aggregation, or inherited governance status among network participants."
+}
