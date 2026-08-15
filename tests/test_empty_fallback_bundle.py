@@ -153,7 +153,7 @@ class EmptyScheduleFallbackBundleTests(unittest.TestCase):
     def test_runtime_rejects_reserved_fallback_components_under_ordinary_id(self):
         candidate = self._manifest()
         candidate["bundle"] = self.ORDINARY_BUNDLE_REF
-        with self.assertRaisesRegex(ValueError, "reserved canonical empty fallback"):
+        with self.assertRaisesRegex(ValueError, "reserved canonical empty fallback identity"):
             MODULE.validate_bundle_components(ROOT, candidate)
 
         schedule_only = self._manifest()
@@ -163,7 +163,9 @@ class EmptyScheduleFallbackBundleTests(unittest.TestCase):
             "path": "LICENSE",
             "sha256": "0" * 64,
         }
-        with self.assertRaisesRegex(ValueError, "reserved canonical empty fallback schedule"):
+        with self.assertRaisesRegex(
+            ValueError, "reserved canonical empty fallback identity in schedule slot"
+        ):
             MODULE.validate_bundle_components(ROOT, schedule_only)
 
         license_only = self._manifest()
@@ -173,7 +175,9 @@ class EmptyScheduleFallbackBundleTests(unittest.TestCase):
             "path": "schedules/ECL-RP-2026.08.15.md",
             "sha256": "0" * 64,
         }
-        with self.assertRaisesRegex(ValueError, "reserved canonical empty fallback license"):
+        with self.assertRaisesRegex(
+            ValueError, "reserved canonical empty fallback identity in license slot"
+        ):
             MODULE.validate_bundle_components(ROOT, license_only)
 
     def test_resolver_pins_exact_fallback_components(self):
