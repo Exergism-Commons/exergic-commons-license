@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-LBY-TRACKS-SDF-RADA",
+  "id": "CLAIM-LBY-TRACKS-SDF-RADA",
+  "type": "Claim",
+  "subject": "ecl:STATE-LBY",
+  "predicate": "ecl:tracks",
+  "object": "ecl:ORG-SDF-RADA",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-SDF-RADA-CANONICAL-DOSSIER-2026-08-13"],
+  "provenance": ["../../dossiers/states/LBY.md", "../../dossiers/organizations/SDF-RADA.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Curated review-dependency edge only. Tracking SDF/RADA does not imply unitary Libyan State control, responsibility, or inherited restriction."
+}

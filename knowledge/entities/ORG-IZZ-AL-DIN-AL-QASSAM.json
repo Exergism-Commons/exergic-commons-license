@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-IZZ-AL-DIN-AL-QASSAM",
+  "id": "ORG-IZZ-AL-DIN-AL-QASSAM",
+  "type": "Organization",
+  "name": "Izz al-Din al-Qassam Brigades",
+  "dossier": "../../dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical non-State identity from the 2026 cross-entity reconciliation cohort; governance remains in the dossier and review procedure."
+}

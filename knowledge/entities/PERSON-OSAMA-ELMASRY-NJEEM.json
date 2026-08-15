@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PERSON-OSAMA-ELMASRY-NJEEM",
+  "id": "PERSON-OSAMA-ELMASRY-NJEEM",
+  "type": "Person",
+  "name": "Osama Elmasry Njeem",
+  "dossier": "../../dossiers/persons/OSAMA-ELMASRY-NJEEM.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical person identity only; allegations, due-process posture and governance remain in the dossier/review procedure and this identity does not establish guilt."
+}

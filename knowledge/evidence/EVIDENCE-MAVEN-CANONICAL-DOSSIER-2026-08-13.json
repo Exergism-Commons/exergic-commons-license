@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-MAVEN-CANONICAL-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-MAVEN-CANONICAL-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Maven Smart System canonical project dossier",
+  "sourceLocator": "../../dossiers/projects/MAVEN-SMART-SYSTEM.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/projects/MAVEN-SMART-SYSTEM.md", "../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md"],
+  "notes": "Repository-curated provenance for the explicit Palantir project-participation proposition. Evidence grade intentionally absent."
+}

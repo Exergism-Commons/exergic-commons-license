@@ -1,0 +1,11 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-ISIL-DAESH",
+  "id": "ORG-ISIL-DAESH",
+  "type": "Organization",
+  "name": "Islamic State in Iraq and the Levant (ISIL / Da'esh)",
+  "dossier": "../../dossiers/organizations/ISIL-DAESH.md",
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Canonical non-State identity from the 2026 cross-entity reconciliation cohort; governance remains in the dossier and review procedure."
+}

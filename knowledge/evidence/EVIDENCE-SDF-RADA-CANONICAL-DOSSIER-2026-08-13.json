@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-SDF-RADA-CANONICAL-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-SDF-RADA-CANONICAL-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Special Deterrence Forces / RADA canonical organization dossier",
+  "sourceLocator": "../../dossiers/organizations/SDF-RADA.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/organizations/SDF-RADA.md", "../../dossiers/projects/MITIGA-DETENTION-APPARATUS.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Repository-curated provenance for SDF/RADA review-dependency and Mitiga-operation propositions. Evidence grade intentionally absent; warrant evidence remains separately represented."
+}

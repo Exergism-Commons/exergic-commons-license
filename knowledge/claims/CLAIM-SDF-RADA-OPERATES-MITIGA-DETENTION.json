@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-SDF-RADA-OPERATES-MITIGA-DETENTION",
+  "id": "CLAIM-SDF-RADA-OPERATES-MITIGA-DETENTION",
+  "type": "Claim",
+  "subject": "ecl:ORG-SDF-RADA",
+  "predicate": "ecl:operates",
+  "object": "ecl:PROJECT-MITIGA-DETENTION",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-SDF-RADA-CANONICAL-DOSSIER-2026-08-13", "ecl:EVIDENCE-LBY-MITIGA-PROJECT-DOSSIER-2026-08-13", "ecl:EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD"],
+  "provenance": ["../../dossiers/organizations/SDF-RADA.md", "../../dossiers/projects/MITIGA-DETENTION-APPARATUS.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "The accepted proposition is organizational operation of the defined Mitiga detention/security apparatus. It does not adjudicate individual criminal guilt or propagate the project's governance outcome to the organization."
+}

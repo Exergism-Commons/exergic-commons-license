@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-PALANTIR-CANONICAL-DOSSIER-2026-08-13",
+  "id": "EVIDENCE-PALANTIR-CANONICAL-DOSSIER-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Palantir Technologies canonical organization dossier",
+  "sourceLocator": "../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Repository-curated provenance for explicit project participation. Evidence grade and external-source dates intentionally absent."
+}

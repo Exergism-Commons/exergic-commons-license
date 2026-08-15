@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-SDN-CANONICAL-DOSSIER-2026-08-11",
+  "id": "EVIDENCE-SDN-CANONICAL-DOSSIER-2026-08-11",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Sudan canonical State dossier",
+  "sourceLocator": "../../dossiers/states/SDN.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/states/SDN.md", "../../dossiers/organizations/RAPID-SUPPORT-FORCES.md", "../../dossiers/organizations/SUDANESE-ARMED-FORCES.md"],
+  "notes": "Repository-curated provenance for explicit SAF/RSF separation and review-dependency edges. Evidence grade intentionally absent."
+}

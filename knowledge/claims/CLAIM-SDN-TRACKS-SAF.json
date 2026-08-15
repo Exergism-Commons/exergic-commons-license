@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-SDN-TRACKS-SAF",
+  "id": "CLAIM-SDN-TRACKS-SAF",
+  "type": "Claim",
+  "subject": "ecl:STATE-SDN",
+  "predicate": "ecl:tracks",
+  "object": "ecl:ORG-SAF",
+  "status": "accepted",
+  "asOf": "2026-08-11",
+  "evidenceFor": ["ecl:EVIDENCE-SDN-CANONICAL-DOSSIER-2026-08-11"],
+  "provenance": ["../../dossiers/states/SDN.md", "../../dossiers/organizations/SUDANESE-ARMED-FORCES.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Curated review-dependency edge for the specifically attributable SAF/state-aligned scope. Tracking creates review relevance only and does not copy the State dossier governance outcome onto SAF."
+}
