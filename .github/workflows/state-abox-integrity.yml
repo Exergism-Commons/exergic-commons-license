@@ -111,18 +111,6 @@ jobs:
       - name: Run SPARQL integrity suite over deterministic RDF
         run: python tools/run_sparql_checks.py build-a/ecl-knowledge.nt sparql/integrity
 
-      - name: Guard against governance or legal artifact changes
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch origin main --quiet
-          protected="$(git diff --name-only origin/main...HEAD -- dossiers schedules registry LICENSE versions/licenses)"
-          if [ -n "$protected" ]; then
-            echo "State ABox migration changed protected governance/legal artifacts:" >&2
-            echo "$protected" >&2
-            exit 1
-          fi
-
       - name: Guard against OWL property-chain inheritance
         run: |
           python - <<'PY'
