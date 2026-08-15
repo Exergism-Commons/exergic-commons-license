@@ -185,7 +185,7 @@ def render() -> tuple[str, dict[str, int]]:
         "",
         "> **NON-OPERATIVE GENERATED CANDIDATE. DO NOT ADOPT OR INCORPORATE INTO A RELEASE.**",
         ">",
-        "> Intended compatibility: **ECL 0.2-DRAFT only**.",
+        "> Intended compatibility: **ECL 0.3-DRAFT only**.",
         "",
         "This file is deterministically rendered from frozen registry records. It omits U/N outcomes, unresolved factual/status records, unfrozen residual dossier scope and cross-entity references whose canonical project/organization is rendered separately.",
         "",
