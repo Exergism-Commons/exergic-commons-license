@@ -23,8 +23,8 @@ reviewer: "<identity of compatibility reviewer>"
 reviewed_at: "2026-08-15T00:00:00Z"
 conclusion: compatible
 sources:
-  - path: "<exact renderer-consumed source path>"
-    sha256: "<exact source SHA-256>"
+  - path: "<exact renderer-consumed input path>"
+    sha256: "<exact input SHA-256>"
 ```
 
 `reviewed_at` must be either a valid ISO calendar date (`YYYY-MM-DD`) or a
@@ -47,24 +47,35 @@ construction. This prevents raw keys such as `1`/`true`, `01`/`1`, or `null`/`~`
 from collapsing to equal Python keys under SafeLoader's construction rules.
 Explicitly quoted numeric-looking keys remain ordinary string keys. YAML merge
 keys (`<<`) are forbidden recursively, not only at the document root. YAML
-aliases are also forbidden so one node cannot be injected into multiple semantic
-positions, and only standard mapping/sequence/scalar tags used by this evidence
-schema are accepted. This prevents nested target-License or source bindings from
-relying on last-value-wins, key-coercion, merge, alias, or custom-tag construction
-semantics that differ from the bytes reviewed by the lexical pre-pass. These
-parsing rules are part of the compatibility gate itself and are regression-tested
-through the same content-addressed evidence path used by a future `complete`
-state.
+aliases are forbidden across the complete node graph, including aliases reused
+in **mapping-key position** as well as in values or sequence items. Mapping keys
+and values therefore participate in the same node-identity traversal. Only
+standard mapping/sequence/scalar tags used by this evidence schema are accepted.
+This prevents nested target-License or source bindings from relying on
+last-value-wins, key-coercion, merge, alias, or custom-tag construction semantics
+that differ from the bytes reviewed by the lexical pre-pass. These parsing rules
+are part of the compatibility gate itself and are regression-tested through the
+same validation path used by a future `complete` state.
 
-The `sources` set must exactly equal every frozen clause source consumed by
-`tools/render_schedule.py`: no missing, extra, duplicate or stale bindings are
-accepted. The evidence target-License binding must also exactly match the
-current mutable pointer and the frozen License bytes, while root `LICENSE` must
-remain byte-identical to that frozen artifact.
+The `sources` set is the complete byte-exact renderer compatibility input set,
+not only the files that contain Schedule clauses. It must include every frozen
+clause source consumed by `tools/render_schedule.py`, plus the control inputs
+that determine which clauses are selected: `registry/states.yml`, every matching
+`registry/state-outcome-overrides*.yml`, and
+`registry/schedule-status-overrides.yml` when present. The set also binds the
+exact bytes of `tools/render_schedule.py` itself, so changing the selection or
+rendering algorithm cannot silently reuse compatibility evidence issued for an
+earlier implementation. No missing, extra, duplicate, or stale binding is
+accepted.
 
-Changing the License or any consumed source therefore requires a new review and
-a new evidence file with a new content hash. Reusing an old evidence ID after
-refreshing mutable claims is rejected.
+The evidence target-License binding must also exactly match the current mutable
+pointer and the frozen License bytes, while root `LICENSE` must remain
+byte-identical to that frozen artifact.
+
+Changing the License, any consumed clause/control input, the renderer
+implementation, or the membership of the dynamic override set therefore
+requires a new review and a new evidence file with a new content hash. Reusing
+an old evidence ID after refreshing mutable claims is rejected.
 
 These records prove repository-level compatibility-review identity and input
 binding only. They do not by themselves constitute qualified independent legal
