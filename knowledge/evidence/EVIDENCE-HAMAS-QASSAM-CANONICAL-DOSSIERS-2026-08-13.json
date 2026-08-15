@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-HAMAS-QASSAM-CANONICAL-DOSSIERS-2026-08-13",
+  "id": "EVIDENCE-HAMAS-QASSAM-CANONICAL-DOSSIERS-2026-08-13",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Hamas / Izz al-Din al-Qassam Brigades canonical identity boundary",
+  "sourceLocator": "../../dossiers/organizations/HAMAS.md",
+  "sourceType": "canonical-dossier",
+  "provenance": [
+    "../../dossiers/organizations/HAMAS.md",
+    "../../dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "notes": "Repository-curated provenance for the explicit separate military-wing review dependency. Tracking does not assert whole-organization control, culpability, or inherited governance."
+}

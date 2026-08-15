@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-HAMAS-QASSAM-UN-COI-A-HRC-56-26",
+  "id": "EVIDENCE-HAMAS-QASSAM-UN-COI-A-HRC-56-26",
+  "type": "EvidenceItem",
+  "publisher": "United Nations Independent International Commission of Inquiry",
+  "title": "UN Commission of Inquiry report A/HRC/56/26",
+  "sourceLocator": "https://www.un.org/unispal/document/coi-report-a-hrc-56-26-27may24/",
+  "sourceType": "authoritative-international-record",
+  "provenance": [
+    "../../dossiers/organizations/HAMAS.md",
+    "../../dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "notes": "Reusable primary-source anchor. It does not by itself convert allegations/findings into an ECL governance outcome or collective guilt."
+}

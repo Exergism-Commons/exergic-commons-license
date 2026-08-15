@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-INTELLEXA-TREASURY-JY2581",
+  "id": "EVIDENCE-INTELLEXA-TREASURY-JY2581",
+  "type": "EvidenceItem",
+  "publisher": "U.S. Department of the Treasury",
+  "title": "Treasury record identifying Aliada Group and the decentralized Intellexa network",
+  "sourceLocator": "https://home.treasury.gov/news/press-releases/jy2581",
+  "sourceType": "official-government-record",
+  "provenance": [
+    "../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "notes": "Primary-source anchor copied from the canonical dossier. No E0-E3 grade or publication/retrieval date is inferred here."
+}

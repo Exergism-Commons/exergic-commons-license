@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-INTELLEXA-NETWORK-TRACKS-THALESTRIS-LIMITED",
+  "id": "CLAIM-INTELLEXA-NETWORK-TRACKS-THALESTRIS-LIMITED",
+  "type": "Claim",
+  "subject": "ecl:ORG-INTELLEXA-PREDATOR-NETWORK",
+  "predicate": "ecl:tracks",
+  "object": "ecl:ORG-THALESTRIS-LIMITED",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-INTELLEXA-CANONICAL-DOSSIER-2026-08-13"],
+  "provenance": ["../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Curated review-dependency edge from the canonical network label to an exact legal-entity identity. It does not assert ownership, control, membership, culpability, or inherited governance status."
+}

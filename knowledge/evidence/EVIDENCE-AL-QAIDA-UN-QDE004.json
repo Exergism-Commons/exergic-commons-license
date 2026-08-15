@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-AL-QAIDA-UN-QDE004",
+  "id": "EVIDENCE-AL-QAIDA-UN-QDE004",
+  "type": "EvidenceItem",
+  "publisher": "United Nations Security Council",
+  "title": "Al-Qaida sanctions-list narrative summary, permanent reference QDe.004",
+  "sourceLocator": "https://main.un.org/securitycouncil/en/sanctions/1267/aq_sanctions_list/summaries/entity/al-qaida",
+  "sourceType": "authoritative-international-record",
+  "provenance": [
+    "../../dossiers/organizations/AL-QAIDA.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "notes": "Reusable identity/conduct evidence anchor. UN listing is evidence, not automatic ECL law."
+}

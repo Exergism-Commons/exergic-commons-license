@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-HAMAS-TRACKS-IZZ-AL-DIN-AL-QASSAM",
+  "id": "CLAIM-HAMAS-TRACKS-IZZ-AL-DIN-AL-QASSAM",
+  "type": "Claim",
+  "subject": "ecl:ORG-HAMAS",
+  "predicate": "ecl:tracks",
+  "object": "ecl:ORG-IZZ-AL-DIN-AL-QASSAM",
+  "status": "accepted",
+  "asOf": "2026-08-13",
+  "evidenceFor": ["ecl:EVIDENCE-HAMAS-QASSAM-CANONICAL-DOSSIERS-2026-08-13"],
+  "provenance": ["../../dossiers/organizations/HAMAS.md", "../../dossiers/organizations/IZZ-AL-DIN-AL-QASSAM-BRIGADES.md", "../../reviews/2026/consistency/cross-entity-reconciliation.md"],
+  "notes": "Curated review-dependency edge preserving separate treatment of Hamas and its military-wing dossier. It does not assert that every Hamas function controls or participates in al-Qassam conduct, and it propagates no governance status."
+}

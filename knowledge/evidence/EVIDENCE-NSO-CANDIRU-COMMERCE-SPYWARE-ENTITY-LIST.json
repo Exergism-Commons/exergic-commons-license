@@ -1,0 +1,16 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-NSO-CANDIRU-COMMERCE-SPYWARE-ENTITY-LIST",
+  "id": "EVIDENCE-NSO-CANDIRU-COMMERCE-SPYWARE-ENTITY-LIST",
+  "type": "EvidenceItem",
+  "publisher": "U.S. Department of Commerce",
+  "title": "Commerce record concerning NSO Group and Candiru spyware activity",
+  "sourceLocator": "https://www.bis.gov/press-release/commerce-adds-nso-group-other-foreign-companies-entity-list-malicious-cyber-activities",
+  "sourceType": "official-government-record",
+  "provenance": [
+    "../../dossiers/organizations/NSO-GROUP.md",
+    "../../dossiers/organizations/CANDIRU.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "notes": "Reusable primary-source anchor for future narrowly curated claims. The listing itself is not encoded as ECL governance."
+}

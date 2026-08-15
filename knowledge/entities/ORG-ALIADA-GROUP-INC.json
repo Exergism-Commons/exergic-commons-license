@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-ALIADA-GROUP-INC",
+  "id": "ORG-ALIADA-GROUP-INC",
+  "type": "Organization",
+  "name": "Aliada Group Inc.",
+  "dossier": "../../dossiers/organizations/ALIADA-GROUP-INC.md",
+  "provenance": [
+    "../../dossiers/organizations/INTELLEXA-PREDATOR-NETWORK.md",
+    "../../reviews/2026/consistency/cross-entity-reconciliation.md"
+  ],
+  "lastSubstantiveReview": "2026-08-13",
+  "reviewClass": "manual",
+  "reviewReason": "Exact legal-entity identity explicitly enumerated by the canonical Intellexa/Predator network dossier; its own dossier is identity-only and carries no inherited network governance."
+}
