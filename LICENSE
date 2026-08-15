@@ -1,27 +1,31 @@
 EXERGIC COMMONS LICENSE
-Version 0.2 — DRAFT
+Version 0.3 — DRAFT
 
 Copyright (c) 2026 Daniel Molinero Lucas and contributors, where applicable.
 
-THIS IS AN EXPERIMENTAL SOURCE-AVAILABLE LICENSE DRAFT. IT IS NOT AN OSI-APPROVED OPEN SOURCE LICENSE. IT HAS NOT YET RECEIVED FORMAL LEGAL REVIEW AND SHOULD NOT BE RELIED UPON FOR HIGH-CONSEQUENCE DEPLOYMENTS WITHOUT QUALIFIED LEGAL ADVICE.
+THIS IS AN EXPERIMENTAL SOURCE-AVAILABLE LICENSE DRAFT. IT IS NOT AN OSI-APPROVED OPEN SOURCE LICENSE. IT HAS NOT YET COMPLETED THE ECL PRE-1.0 QUALIFIED LEGAL-REVIEW GATE AND SHOULD NOT BE RELIED UPON FOR HIGH-CONSEQUENCE DEPLOYMENTS WITHOUT QUALIFIED LEGAL ADVICE.
 
 1. PURPOSE
 
-The Exergic Commons License ("ECL") grants broad rights to use, study, copy, modify, distribute, and build upon software while withholding those permissions from uses, projects, and actors that materially contribute to coercive capture, systemic domination, deceptive manipulation, repressive surveillance, unlawful political repression, or comparable reductions of meaningful human agency.
+The Exergic Commons License ("ECL") grants broad permission to exercise copyright and other software rights controlled by a Licensor while withholding that permission where the exercise of those rights materially enables specified forms of coercive capture, systemic domination, deceptive manipulation, repressive surveillance, unlawful political repression, or comparable reductions of meaningful human agency.
 
-The ethical principles motivating this License are described in `spec/PRINCIPLES.md`. Those principles aid interpretation but do not independently create restrictions beyond the operative terms of this License, the applicable Restricted Parties Schedule, and applicable law.
+The ethical principles motivating this License are described in `spec/PRINCIPLES.md`. Those principles aid interpretation but do not independently create restrictions beyond the operative terms of this License, the exact Restricted Parties Schedule incorporated by the applicable Software release, and applicable law.
+
+This License is intended to operate through rights that a Licensor actually owns or is authorized to license. It does not create a copyright prohibition over an act merely by calling that act a Prohibited Use.
 
 2. DEFINITIONS
 
-"Software" means the source code, object code, documentation, and other material to which a copyright holder has applied this License.
+"Software" means the source code, object code, documentation, and other copyrightable material to which a copyright holder or other authorized rightsholder has applied this License.
 
-"Licensor" means the copyright holder or other person or entity authorized to grant rights under this License.
+"Licensor" means a copyright holder or other person or entity authorized to grant one or more Licensed Rights in the Software. Each Licensor acts only with respect to rights that Licensor owns or is authorized to license.
 
-"You" means the individual or legal entity exercising rights under this License.
+"You" means the individual or legal entity exercising Licensed Rights under this License.
+
+"Licensed Rights" means only those copyright, software-exploitation, and equivalent rights in the Software that a particular Licensor owns or is authorized to license and for which applicable law requires that Licensor's permission. Depending on the applicable law and facts, Licensed Rights may include reproduction; translation, adaptation, arrangement, modification, or creation of derivative works; distribution; and loading, displaying, running, transmission, or storage to the extent those acts require an authorization controlled by the Licensor. Licensed Rights do not include patent or trademark rights and do not include an act to the extent applicable law permits that act without the Licensor's authorization notwithstanding this License.
 
 "Control" means the direct or indirect power to direct the management or policies of an entity, whether through ownership of voting interests, contract, appointment rights, or comparable means.
 
-"Restricted Party" means a person, legal entity, governmental body, agency, military body, or other organization expressly designated in the Restricted Parties Schedule incorporated by the applicable Software release.
+"Restricted Party" means a person, legal entity, governmental body, agency, military body, or other organization expressly designated in the exact Restricted Parties Schedule incorporated by the applicable Software release.
 
 "Covered Associate" means, solely in relation to a particular use or project, a person or entity that You know or reasonably should know is materially acting for, under the direction or Control of, on behalf of, or for the material benefit of a Restricted Party. Covered Associate includes a contractor, consultant, controlled affiliate, material project collaborator, intermediary, or service provider when the relevant activity materially supports a Restricted Party. Mere historical contact, incidental interaction, ordinary consumer use, or remote social association does not by itself create Covered Associate status.
 
@@ -29,7 +33,7 @@ The ethical principles motivating this License are described in `spec/PRINCIPLES
 
 "Restricted Project" means a project, program, deployment, contract, research effort, service, product, or coordinated activity that either:
 
-(a) is expressly designated as a Restricted Project in the Restricted Parties Schedule incorporated by the applicable Software release;
+(a) is expressly designated as a Restricted Project in the exact Restricted Parties Schedule incorporated by the applicable Software release;
 (b) has Material Participation by a Restricted Party;
 (c) has Material Participation by a Covered Associate in connection with the Restricted Party;
 (d) is performed at the direction of, on behalf of, or primarily for the material benefit of a Restricted Party; or
@@ -37,44 +41,51 @@ The ethical principles motivating this License are described in `spec/PRINCIPLES
 
 A project does not become a Restricted Project solely because an unrelated participant has an incidental or unknown connection to a Restricted Party.
 
-"Restricted Parties Schedule" or "Schedule" means the versioned document identified by the Software release that lists Restricted Parties, Restricted Projects, and any expressly defined class-based designations or exclusions. A later Schedule does not retroactively alter rights granted for an earlier Software release unless that earlier release expressly incorporated the later Schedule.
+"Restricted Parties Schedule" or "Schedule" means the exact immutable versioned document incorporated by the applicable Software release that lists Restricted Parties, Restricted Projects, and any expressly defined class-based designations or exclusions. The Schedule must be objectively identifiable by an immutable version, content hash, or exact ECL Bundle manifest. A mutable branch, `latest` page, registry view, or channel pointer is not by itself an incorporated Schedule. A later Schedule does not retroactively alter rights for an earlier Software release unless that earlier release itself expressly and validly provided otherwise.
 
-"Prohibited Use" means a use described in Section 5.
+"ECL Bundle" or "Bundle" means the exact combination of the ECL License version and exact Restricted Parties Schedule incorporated by a Software release, identified by an immutable manifest or equivalent release metadata that pins the relevant artifacts and their cryptographic hashes.
+
+"Prohibited Use" means a use context described in Section 5 in which Licensed Rights may not be exercised as provided by that Section.
 
 "Independent Remediation Activity" means an activity whose principal and actual purpose is to investigate, document, challenge, audit, review, prosecute, defend against, remedy, disclose, or prevent a Prohibited Use or the conduct forming the basis of a Restricted Party or Restricted Project designation, provided that the relevant person or function:
 
 (a) is operationally independent from the persons or functions directing or materially participating in the underlying prohibited conduct;
 (b) does not itself materially participate in that conduct except in an investigative, judicial, defence, audit, oversight, disclosure, or remedial capacity;
-(c) does not use the Software to continue, conceal, optimize, or materially support the underlying Prohibited Use or Restricted Project; and
-(d) limits the use of the Software to what is reasonably necessary for the remedial purpose.
+(c) does not exercise Licensed Rights to continue, conceal, optimize, or materially support the underlying Prohibited Use or Restricted Project; and
+(d) limits exercise of Licensed Rights to what is reasonably necessary for the remedial purpose.
 
-3. GRANT OF RIGHTS
+3. GRANT OF LICENSED RIGHTS
 
-Subject to the conditions and restrictions of this License, each Licensor grants You a worldwide, royalty-free, non-exclusive license to:
+Subject to the conditions and restrictions of this License, each Licensor grants You a worldwide, royalty-free, non-exclusive license to exercise all Licensed Rights that the particular Licensor owns or is authorized to license in the Software.
 
-(a) use and execute the Software;
-(b) study and inspect the Software;
-(c) reproduce the Software;
-(d) modify, adapt, translate, and create derivative works of the Software;
-(e) distribute copies or modified versions of the Software; and
-(f) combine the Software with other software and provide services using the Software.
+Accordingly, to the extent a relevant act requires a Licensed Right, this grant permits You to reproduce, load, run, inspect, study, modify, adapt, translate, combine, create derivative works from, distribute, deploy, and provide services using the Software, subject to this License.
 
-You may exercise these rights for personal, academic, scientific, educational, governmental, non-profit, or commercial purposes except where the activity is a Prohibited Use or forms part of a Restricted Project.
+You may exercise Licensed Rights for personal, academic, scientific, educational, governmental, non-profit, or commercial purposes except where that exercise is prohibited by Sections 5 or 6 or forms part of a Restricted Project.
 
-4. DISTRIBUTION CONDITIONS
+Sections 4, 5, and 6 are conditions on the Licensed Rights granted by this Section. If an activity does not exercise a Licensed Right and does not otherwise require a Licensor's authorization under applicable law, this License does not transform that activity into copyright infringement merely because the activity falls within a factual description used by this License.
 
-If You distribute the Software or a substantial portion of it, modified or unmodified, You must:
+This License does not assume that an independent contract has been formed for conduct outside the Licensed Rights. Any contractual obligation or remedy beyond the scope of the Licensed Rights must arise, if at all, under applicable law from independently sufficient formation, assent, authority, and enforceability.
+
+4. DISTRIBUTION AND BUNDLE-PRESERVATION CONDITIONS
+
+If You distribute the Software or a substantial portion of it, modified or unmodified, in exercise of Licensed Rights, You must:
 
 (a) preserve copyright, attribution, and license notices;
-(b) provide a copy of this License or an unambiguous reference to the exact ECL version governing the distributed Software;
-(c) identify material modifications made by You; and
-(d) not represent the Software as OSI-approved open source unless a future version has separately received such approval.
+(b) provide a copy of this License or an unambiguous immutable reference to the exact ECL License version governing the distributed Software;
+(c) preserve and provide the exact Schedule governing the distributed Software, either by including that Schedule or by including an immutable ECL Bundle manifest or equivalent release metadata that identifies the exact Schedule and its cryptographic hash;
+(d) preserve enough immutable Bundle information for a downstream recipient to determine objectively which License and Schedule govern the distributed copy without consulting a mutable `latest`, branch, registry view, or channel;
+(e) identify material modifications made by You; and
+(f) not represent the Software as OSI-approved open source unless a future version has separately received such approval.
 
-You may license Your own original additions under additional terms, provided those terms do not purport to remove or weaken restrictions that continue to apply to ECL-covered material.
+If the release materials supplied by the Licensor fail to identify an exact incorporated Schedule objectively, the Schedule is deemed empty for that Software release. That fallback does not remove the independent Section 5 conditions, but no party or project is treated as expressly Schedule-designated for that release on the basis of a later or mutable registry state.
 
-5. PROHIBITED USES
+You may license Your own original additions under additional terms, provided those terms do not purport to remove or weaken restrictions that continue to apply to ECL-covered material or grant rights in another Licensor's material that You do not possess.
 
-You may not knowingly use, modify, deploy, distribute, provide, train, integrate, or otherwise exploit the Software where the Software materially enables or supports any of the following:
+Each downstream recipient who receives ECL-covered material may independently exercise Licensed Rights granted directly by each relevant Licensor under the ECL terms applicable to that recipient's exact copy or release, provided the recipient independently complies with those terms.
+
+5. PROHIBITED USE CONTEXTS — CONDITIONS ON LICENSED RIGHTS
+
+As a condition of the grant in Section 3, You may not knowingly exercise any Licensed Right in or to the Software where that exercise materially enables or supports any of the following. References in this Section to using, deploying, training, integrating, hosting, or otherwise employing the Software describe the factual context of the conditioned exercise of Licensed Rights; they do not assert a freestanding copyright right over conduct that applicable law does not reserve to a Licensor.
 
 5.1 Repressive surveillance.
 Systematic surveillance, tracking, identification, or profiling of persons or populations for the purpose of political repression, persecution, unlawful intimidation, arbitrary detention, or suppression of lawful dissent.
@@ -94,24 +105,26 @@ Systems primarily designed to create or maintain coercive technological dependen
 5.6 Systematic coercive domination and unlawful political repression.
 Systems, deployments, operational processes, or material Software-enabled capabilities whose primary purpose, or whose known and reasonably foreseeable material function in the relevant deployment, is to enable or maintain systematic persecution, unlawful political repression, torture or comparably severe cruel, inhuman, or degrading treatment, enforced disappearance, arbitrary detention, collective punishment, forced labour, forced displacement or expulsion without meaningful individualized protection, severe discriminatory domination, or a comparable coercive denial of fundamental rights or of the practical ability to dissent, contest, or exit.
 
-Ordinary lawful criminal justice, immigration administration, military service, employment, public-health action, emergency response, content moderation, public administration, or other compulsory activity is not prohibited merely because it is coercive, restrictive, controversial, or governmental. Capital punishment, detention, deportation, conscription, protest regulation, and similar exercises of State power are not standalone ECL categories; the relevant Software-enabled use must independently satisfy the elements of this or another subsection.
+Ordinary lawful criminal justice, immigration administration, military service, employment, public-health action, emergency response, content moderation, public administration, or other compulsory activity is not prohibited merely because it is coercive, restrictive, controversial, or governmental. Capital punishment, detention, deportation, conscription, protest regulation, and similar exercises of State power are not standalone ECL categories; the relevant Software-enabled context must independently satisfy the elements of this or another subsection.
 
 5.7 Circumvention.
-Any arrangement whose principal purpose is to enable conduct that another provision of this License expressly prohibits.
+Exercise of Licensed Rights through an arrangement whose principal purpose is to enable conduct that another provision of this License expressly prohibits.
 
-A use is not prohibited merely because it is controversial, politically disputed, military-adjacent, commercial, governmental, security-related, or capable of dual use. The relevant use must satisfy the substantive criteria above or fall within a Restricted Project.
+A context is not prohibited merely because it is controversial, politically disputed, military-adjacent, commercial, governmental, security-related, or capable of dual use. The relevant exercise of Licensed Rights must satisfy the substantive criteria above or fall within a Restricted Project.
 
-6. RESTRICTED PARTIES AND RESTRICTED PROJECTS
+6. RESTRICTED PARTIES, PROJECTS, AND SERVICE PROVISION
 
-No rights are granted under this License to a Restricted Party for the applicable Software release except to the limited extent expressly permitted by the Independent Remediation Activity provision below.
+No Licensed Rights are granted under this License to a Restricted Party for the applicable Software release except to the limited extent expressly permitted by the Independent Remediation Activity provision below. This withholding applies only to rights a Licensor is legally entitled to withhold and does not purport to negate statutory rights, exhausted rights, or other permissions that applicable law makes available independently of this License.
 
-You may not knowingly exercise rights under this License as part of a Restricted Project.
+You may not knowingly exercise Licensed Rights as part of a Restricted Project.
 
-You may not provide the Software, a derivative work, hosted functionality, integration, model, dataset transformation, technical service, or other material Software-enabled capability to a Restricted Party or for a Restricted Project where You know or reasonably should know that the provision would materially circumvent this Section.
+You may not knowingly exercise Licensed Rights to reproduce, modify, adapt, distribute, deploy, operate, or otherwise use the Software in order to provide a Restricted Party or Restricted Project with the Software, a derivative work, hosted functionality, integration, model, dataset transformation, technical service, or other material Software-enabled capability where You know or reasonably should know that Your exercise of Licensed Rights would materially circumvent this Section.
+
+For avoidance of doubt, where You operate the Software to provide remote or hosted functionality, this Section conditions Your own exercise of Licensed Rights as the provider. A remote user who merely receives functionality or output and does not itself exercise a Licensed Right is not deemed a copyright licensee solely because it used the remote service. Any separate obligation of that remote user must have an independent legal basis.
 
 A person who is a Covered Associate only because of a professional or project-specific relationship is not permanently restricted from unrelated personal or professional activity after that relationship ceases, unless that person is separately designated as a Restricted Party in the applicable Schedule.
 
-Notwithstanding the preceding restrictions, a person or function otherwise within the scope of a Restricted Party may exercise rights under this License solely to conduct an Independent Remediation Activity. This exception may apply, where its definition is actually satisfied, to an independent court or tribunal, ombuds or National Preventive Mechanism function, inspector, auditor, prosecutor investigating official abuse, independent legal defence function, public-interest accountability body, or comparable remedial function.
+Notwithstanding the preceding restrictions, a person or function otherwise within the scope of a Restricted Party may exercise Licensed Rights solely to conduct an Independent Remediation Activity. This exception may apply, where its definition is actually satisfied, to an independent court or tribunal, ombuds or National Preventive Mechanism function, inspector, auditor, prosecutor investigating official abuse, independent legal defence function, public-interest accountability body, or comparable remedial function.
 
 A person relying on this exception must have reasonably documented grounds for concluding that the Independent Remediation Activity definition is satisfied. The exception does not authorize ordinary operational, intelligence, military, policing, detention, immigration, procurement, surveillance, targeting, administrative, or commercial activity merely because it is described as compliance, oversight, safety, accountability, or remediation.
 
@@ -133,48 +146,78 @@ For license-compliance purposes, however, an express designation or exclusion in
 
 The governance procedure and supporting evidence do not themselves modify the operative license attached to a Software release. A designation becomes binding for a particular Software release only through the exact Schedule expressly incorporated by that release.
 
-9. NON-RETROACTIVITY
+9. NON-RETROACTIVITY AND IMMUTABLE RELEASE STATE
 
-Once a Licensor releases a particular version of the Software under a specific ECL version and Restricted Parties Schedule, later amendments to ECL or the Schedule do not retroactively alter the rights granted for that released version.
+Once a Licensor releases a particular version of the Software under a specific ECL Bundle, later amendments to ECL, the Schedule, governance records, evidence, registry views, channels, or classifications do not retroactively alter the Licensed Rights or restrictions attached to that released Bundle.
 
-A new Software release may adopt a later ECL version or Schedule.
+A new Software release may adopt a later ECL License version or Schedule by creating or resolving a new exact Bundle.
 
-10. TERMINATION
+Moving a mutable channel such as `stable`, `stable-1`, `candidate`, or `draft` does not change the Bundle already attached to an earlier Software release.
 
-Your rights under this License terminate automatically with respect to the affected Software if You knowingly violate Sections 5 or 6 and fail to cease the violation within thirty (30) days after receiving reasonably specific notice from a Licensor, except that no cure period is required for deliberate circumvention under Section 5.7.
+10. TERMINATION, AUTHORITY, AND REINSTATEMENT
 
-For other material breaches, Your rights terminate if You fail to cure the breach within thirty (30) days after receiving reasonably specific notice.
+Rights granted by a particular Licensor under this License terminate only with respect to the Licensed Rights that particular Licensor granted, and only as provided by this Section. Notice may be given by that Licensor or by a person or entity the Licensor has authorized to administer or enforce the relevant grant. One Licensor does not, merely by being a Licensor, have authority to terminate rights granted by another Licensor.
 
-Termination does not automatically terminate licenses previously granted by You to downstream recipients who remain independently compliant with the ECL terms applicable to their copy.
+For a knowing violation of Sections 5 or 6, the affected Licensor's grant terminates with respect to the affected Software if You fail to cease and cure the violation within thirty (30) days after receiving reasonably specific notice identifying the material breach and the authority of the notifying party. For deliberate circumvention under Section 5.7, termination may take effect upon such reasonably specific notice without a cure period.
 
-11. NO TRADEMARK LICENSE
+For any other material breach of a condition of the Licensed Rights, the affected Licensor's grant terminates if You fail to cure the breach within thirty (30) days after receiving reasonably specific notice identifying the material breach and the authority of the notifying party.
+
+Termination is limited to rights actually granted by the affected Licensor and does not itself transfer, extinguish, or terminate rights owned or independently granted by another rightsholder.
+
+A downstream recipient who obtained an ECL-covered copy before Your termination and who holds an independent direct grant from the relevant Licensor remains governed by that recipient's own compliance and is not automatically terminated solely because Your grant terminated.
+
+After termination, rights from the affected Licensor are reinstated only if that Licensor or an authorized enforcement agent expressly reinstates them, unless applicable law requires a different result. A reinstatement may be unconditional or subject to lawful written conditions. Cure before the applicable termination deadline prevents termination under the relevant notice.
+
+11. STATUTORY RIGHTS, EXCEPTIONS, EXHAUSTION, AND MANDATORY LAW
+
+Nothing in this License restricts an act to the extent applicable law permits that act without authorization from the relevant Licensor notwithstanding the terms of this License, or makes the relevant statutory right, exception, limitation, or privilege non-waivable.
+
+An act performed solely under such an independent statutory permission is not an exercise of Licensed Rights granted by this License merely because the Software is involved.
+
+Nothing in this License is intended to recreate a copyright distribution right that applicable law has exhausted with respect to a particular copy. Exhaustion of a distribution right does not by itself grant permission to reproduce, adapt, modify, or otherwise exercise a distinct Licensed Right that remains controlled by a Licensor.
+
+Nothing in this Section determines whether a waivable statutory default may be altered by a separately valid contract. ECL does not rely on an assumed contract outside the Licensed Rights as stated in Section 3.
+
+12. NO PATENT LICENSE
+
+No patent license is granted by this License. A Licensor's grant of copyright or software-exploitation rights must not be interpreted by itself as an express or implied patent license. A future ECL version may adopt a separate patent grant only through express operative text and the applicable legal-review process.
+
+13. NO TRADEMARK LICENSE
 
 This License does not grant rights to use the names, trademarks, service marks, or logos of any Licensor except as reasonably necessary to describe the origin of the Software or reproduce required notices.
 
-12. DISCLAIMER OF WARRANTY
+14. DISCLAIMER OF WARRANTY
 
 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. YOU BEAR THE RISK OF USING THE SOFTWARE.
 
-13. LIMITATION OF LIABILITY
+15. LIMITATION OF LIABILITY
 
 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, NO LICENSOR OR CONTRIBUTOR SHALL BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, OR SIMILAR DAMAGES ARISING FROM THE SOFTWARE OR THIS LICENSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-Nothing in this License excludes liability that cannot lawfully be excluded.
+Nothing in this License excludes or limits liability to the extent applicable law does not permit that exclusion or limitation.
 
-14. SEVERABILITY
+16. SEVERABILITY
 
-If a provision of this License is held unenforceable in a jurisdiction, it shall be interpreted or limited to the minimum extent necessary to make it enforceable where legally possible, and the remaining provisions shall continue in effect.
+If a provision of this License is held invalid or unenforceable in a jurisdiction, it shall be interpreted, narrowed, or limited only to the minimum extent legally permitted and necessary to preserve its intended lawful effect where the applicable law allows such treatment. If such treatment is not legally permitted, the affected provision or portion is severed to the extent necessary, and the remaining provisions continue in effect unless applicable law requires otherwise.
 
-15. NO IMPLIED WAIVER
+17. NO IMPLIED WAIVER
 
 Failure to enforce a provision does not waive the right to enforce it later.
 
-16. ENTIRE LICENSE; VERSION CONTROL
+18. ENTIRE LICENSE; EXACT BUNDLE CONTROL
 
-This text, together with the exact Restricted Parties Schedule expressly incorporated by the applicable Software release, constitutes the ECL conditions for that release. `spec/PRINCIPLES.md`, `spec/GOVERNANCE.md`, `spec/DESIGNATION-STANDARD.md`, and other governance records may guide interpretation and administration but do not independently expand a license restriction unless expressly incorporated into the applicable release.
+This text, together with the exact Restricted Parties Schedule expressly incorporated by the applicable Software release, constitutes the ECL conditions for that release. The exact ECL Bundle controls over any mutable channel, registry page, current dossier, later Schedule, or later ECL version.
 
-17. NOTICE ON OPEN-SOURCE STATUS
+`spec/PRINCIPLES.md`, `spec/GOVERNANCE.md`, `spec/DESIGNATION-STANDARD.md`, dossiers, evidence records, and other governance materials may guide interpretation and administration but do not independently expand a license restriction unless the exact Software release expressly incorporates them into the operative legal artifact.
 
-Because ECL restricts certain actors, projects, and fields of use, ECL 0.2 is a source-available license and is not intended to satisfy the Open Source Definition.
+If an asserted Schedule designation cannot be traced to the exact Schedule objectively incorporated by the applicable Software release, that asserted designation does not govern that release merely because it appears in a later or current registry view.
 
-END OF EXERGIC COMMONS LICENSE 0.2 — DRAFT
+19. INDEPENDENT REGULATION
+
+This License does not authorize conduct prohibited by sanctions, export controls, procurement law, criminal law, privacy law, human-rights law, or any other independently applicable legal regime. Conversely, absence of a person, project, or activity from an ECL Schedule does not represent that the conduct is lawful under any independent legal regime.
+
+20. NOTICE ON OPEN-SOURCE STATUS
+
+Because ECL restricts certain actors, projects, and fields of use, ECL 0.3 is a source-available license and is not intended to satisfy the Open Source Definition.
+
+END OF EXERGIC COMMONS LICENSE 0.3 — DRAFT
