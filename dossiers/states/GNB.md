@@ -40,6 +40,16 @@ The finding follows the current military/de facto governing apparatus and projec
 
 Immediate review on unconditional release of political detainees and mandatory review after the scheduled 6 December 2026 elections/civilian transfer or any earlier restoration of constitutional government.
 
-## 7. Procedural history
+## 7. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The November 2025 military takeover, political detention, March 2026 African Union intervention, transition commitments, 6 December 2026 election trigger and narrow de-facto-apparatus attribution are reflected in §§1–6 above.
+- The historical tranche does not provide exact URLs/document identifiers for the AU Peace and Security Council record or the transition/detainee-status sources. Repository search in this pass found no independent precise locator beyond the tranche/dossier text. No source precision is fabricated.
+- Issue #70 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+Exact source-locator recovery remains an evidence-curation gap. This absorption record does not alter `R`, expand attribution beyond the current military/de facto governing apparatus or create structured Claim/Evidence semantics.
+
+## 8. Procedural history
 
 Issue #70 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
