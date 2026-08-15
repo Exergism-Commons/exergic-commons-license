@@ -45,6 +45,15 @@ Release or fair independent review of remaining political prisoners, medical/rem
 - https://www.hrw.org/news/2026/06/10/bhutan-2-political-prisoners-freed-but-28-remain
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=BTN+1%2F2024
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. The remaining-prisoner evidence, concrete 2026 releases, distinction between legacy convictions and the present constitutional order, attribution boundary and removal trigger are reflected in §§2–7 above.
+- Issue #20 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #20 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
