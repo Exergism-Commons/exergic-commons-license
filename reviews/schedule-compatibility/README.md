@@ -41,15 +41,19 @@ leap-second insertion instants. Malformed dates, padded strings, arbitrary text,
 out-of-range clock/offset fields, and timezone-less timestamps are rejected.
 
 The complete evidence YAML tree is parsed structurally before `safe_load`.
-Every mapping at every depth must use unique scalar keys; YAML merge keys (`<<`)
-are forbidden recursively, not only at the document root. YAML aliases are also
-forbidden so one node cannot be injected into multiple semantic positions, and
-only standard mapping/sequence/scalar tags used by this evidence schema are
-accepted. This prevents nested target-License or source bindings from relying on
-last-value-wins, merge, alias, or custom-tag construction semantics that differ
-from the bytes reviewed by the lexical pre-pass. These parsing rules are part of
-the compatibility gate itself and are regression-tested through the same
-content-addressed evidence path used by a future `complete` state.
+Every mapping at every depth must use unique **YAML string-tagged keys**; numeric,
+boolean, null, timestamp, merge, or other non-string key tags are rejected before
+construction. This prevents raw keys such as `1`/`true`, `01`/`1`, or `null`/`~`
+from collapsing to equal Python keys under SafeLoader's construction rules. YAML
+merge keys (`<<`) are forbidden recursively, not only at the document root.
+YAML aliases are also forbidden so one node cannot be injected into multiple
+semantic positions, and only standard mapping/sequence/scalar tags used by this
+evidence schema are accepted. This prevents nested target-License or source
+bindings from relying on last-value-wins, key-coercion, merge, alias, or custom-tag
+construction semantics that differ from the bytes reviewed by the lexical
+pre-pass. These parsing rules are part of the compatibility gate itself and are
+regression-tested through the same content-addressed evidence path used by a
+future `complete` state.
 
 The `sources` set must exactly equal every frozen clause source consumed by
 `tools/render_schedule.py`: no missing, extra, duplicate or stale bindings are
