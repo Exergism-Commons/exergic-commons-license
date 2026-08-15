@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:CLAIM-SRB-TRACKS-STATE-LINKED-DIGITAL-SURVEILLANCE",
+  "id": "CLAIM-SRB-TRACKS-STATE-LINKED-DIGITAL-SURVEILLANCE",
+  "type": "Claim",
+  "subject": "ecl:STATE-SRB",
+  "predicate": "ecl:tracks",
+  "object": "ecl:PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
+  "status": "accepted",
+  "asOf": "2026-08-11",
+  "evidenceFor": ["ecl:EVIDENCE-SRB-DIGITAL-SURVEILLANCE-PROJECT-DOSSIER-2026-08-11"],
+  "provenance": ["../../dossiers/states/SRB.md", "../../dossiers/projects/SRB-STATE-LINKED-DIGITAL-SURVEILLANCE.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "Curated review-dependency edge only. It does not assert supplier culpability, exact vendor participation, unitary State control or inherited restriction."
+}

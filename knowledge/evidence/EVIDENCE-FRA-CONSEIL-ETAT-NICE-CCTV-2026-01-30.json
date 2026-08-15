@@ -1,0 +1,14 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-FRA-CONSEIL-ETAT-NICE-CCTV-2026-01-30",
+  "id": "EVIDENCE-FRA-CONSEIL-ETAT-NICE-CCTV-2026-01-30",
+  "type": "EvidenceItem",
+  "publisher": "Conseil d'Etat",
+  "title": "Nice: algorithmic processing of public-street CCTV not authorized under current law",
+  "sourceLocator": "https://www.conseil-etat.fr/actualites/nice-le-traitement-algorithmique-des-images-de-videosurveillance-de-la-voie-publique-n-est-en-l-etat-actuel-de-la-loi-pas-autorise",
+  "sourceType": "judicial-decision",
+  "language": "fr",
+  "evidenceGrade": "E3",
+  "provenance": ["../../dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md", "../../dossiers/states/FRA.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "E3 is proposition-specific: this directly relevant judicial material supports only the narrow proposition that the reviewed Nice algorithmic public-street CCTV processing was not authorized under the law then in force. It does not determine the status of other French VSA deployments or create an ECL governance outcome."
+}

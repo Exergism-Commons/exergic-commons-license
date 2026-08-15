@@ -1,0 +1,12 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11",
+  "id": "EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11",
+  "type": "EvidenceItem",
+  "publisher": "Exergic Commons License project",
+  "title": "Nice algorithmic public-street CCTV remediation project dossier",
+  "sourceLocator": "../../dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md",
+  "sourceType": "canonical-dossier",
+  "provenance": ["../../dossiers/projects/FRA-NICE-ALGORITHMIC-CCTV.md", "../../dossiers/states/FRA.md", "../../reviews/2026/adversarial/scoped/tranche-01.md"],
+  "notes": "Repository-curated provenance for the France-to-project remediation tracking edge. Evidence grade and publication/retrieval dates intentionally absent."
+}
