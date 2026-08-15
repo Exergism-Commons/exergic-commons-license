@@ -28,6 +28,11 @@ REQUIRED_JURISDICTIONS = {
 }
 REQUIRED_ATTACK_SURFACES = {f"LAR-{number:02d}" for number in range(1, 17)}
 COMPLETE_DISPOSITIONS = {"resolved", "accepted-risk", "not-applicable"}
+REVIEWED_MECHANISM_ARTIFACTS = {
+    "review_spec": "spec/LEGAL-ADVERSARIAL-REVIEW.md",
+    "incorporation_spec": "spec/VERSIONING.md",
+    "bundle_schema": "schemas/bundle.schema.json",
+}
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -78,6 +83,19 @@ def validate_component(root: Path, component: dict[str, Any]) -> None:
     validate_file_reference(root, component, label="bundle component")
 
 
+def validate_reviewed_mechanism_artifact(
+    root: Path, record: dict[str, Any], key: str, expected_path: str
+) -> None:
+    component = record.get(key)
+    if not isinstance(component, dict):
+        raise ValueError(f"legal review record is missing immutable {key}")
+    if component.get("path") != expected_path:
+        raise ValueError(
+            f"legal review {key} must bind exact repository artifact {expected_path}"
+        )
+    validate_file_reference(root, component, label=f"legal review {key}")
+
+
 def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     """Validate the machine-verifiable release-gate attestation.
 
@@ -100,6 +118,12 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     if record.get("status") != "complete":
         raise ValueError("operative bundle requires completed legal review record")
 
+    review_id = record.get("review_id")
+    if not isinstance(review_id, str) or not review_id:
+        raise ValueError("legal review record is missing review_id")
+    if component.get("ref") != review_id:
+        raise ValueError("bundle legal_review ref does not match legal review record review_id")
+
     license_component = bundle.get("license")
     if not isinstance(license_component, dict):
         raise ValueError("bundle license component is invalid")
@@ -107,10 +131,8 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     if record.get("license_sha256") != expected_license_sha:
         raise ValueError("legal review record does not bind exact bundle license SHA-256")
 
-    review_spec = record.get("review_spec")
-    if not isinstance(review_spec, dict):
-        raise ValueError("legal review record is missing immutable review_spec")
-    validate_file_reference(root, review_spec, label="legal review specification")
+    for key, expected_path in REVIEWED_MECHANISM_ARTIFACTS.items():
+        validate_reviewed_mechanism_artifact(root, record, key, expected_path)
 
     jurisdictions = record.get("jurisdictions")
     if not isinstance(jurisdictions, dict):
