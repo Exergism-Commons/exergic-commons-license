@@ -40,6 +40,16 @@ Scope follows currently operative border/asylum systems materially denying indiv
 
 Rights-compliant asylum access, repeal/non-use of unlawful pushback powers, effective judicial remedies and completion of reforms eliminating ECL-relevant coercive characteristics.
 
-## 7. Procedural history
+## 7. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The 2026 governmental change, removal of Pride/assembly from active scope, continuing migration-crisis/pushback concern, narrow attribution and removal triggers are reflected in §§1–6 above.
+- The tranche records June 2026 Pride authorization/protection, continuing migration emergency authority and July 2026 Serbia border cooperation without exact source URLs/document identifiers. Repository search in this pass found no independent precise locator. No political or legal status is inferred beyond the historical record.
+- Issue #75 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+Exact source-locator recovery remains an evidence-curation gap. This record does not restore superseded Pride/civic-space scope, alter the current `S`, or create Claim/Evidence/actor/governance semantics.
+
+## 8. Procedural history
 
 Issue #75 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
