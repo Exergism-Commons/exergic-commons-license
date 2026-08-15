@@ -23,9 +23,16 @@ class ECLResolveTests(unittest.TestCase):
 
     def _write_completed_legal_review(self, root: Path, license_path: Path):
         (root / "spec").mkdir(parents=True, exist_ok=True)
+        (root / "schemas").mkdir(parents=True, exist_ok=True)
         (root / "reviews" / "legal").mkdir(parents=True, exist_ok=True)
+
         review_spec_path = root / "spec" / "LEGAL-ADVERSARIAL-REVIEW.md"
+        incorporation_spec_path = root / "spec" / "VERSIONING.md"
+        bundle_schema_path = root / "schemas" / "bundle.schema.json"
         review_spec_path.write_text("legal review specification", encoding="utf-8")
+        incorporation_spec_path.write_text("exact incorporation model", encoding="utf-8")
+        bundle_schema_path.write_text("{}", encoding="utf-8")
+
         review_id = "ECL-1.0.0-legal-review-1"
         review_path = root / "reviews" / "legal" / f"{review_id}.json"
         record = {
@@ -36,6 +43,14 @@ class ECLResolveTests(unittest.TestCase):
             "review_spec": {
                 "path": "spec/LEGAL-ADVERSARIAL-REVIEW.md",
                 "sha256": MODULE.sha256(review_spec_path),
+            },
+            "incorporation_spec": {
+                "path": "spec/VERSIONING.md",
+                "sha256": MODULE.sha256(incorporation_spec_path),
+            },
+            "bundle_schema": {
+                "path": "schemas/bundle.schema.json",
+                "sha256": MODULE.sha256(bundle_schema_path),
             },
             "jurisdictions": {
                 "eu_software": "complete",
@@ -153,6 +168,20 @@ class ECLResolveTests(unittest.TestCase):
             self.assertFalse(resolved["operative"])
             self.assertNotIn("legal_review", resolved)
 
+    def test_legal_review_reference_must_match_record_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bundle, license_path = self._bundle(root, operative=True)
+            _, _, legal_review = self._write_completed_legal_review(root, license_path)
+            legal_review["ref"] = "different-review"
+            bundle["legal_review"] = legal_review
+            self._write_bundle(root, bundle)
+
+            with self.assertRaisesRegex(ValueError, "ref does not match"):
+                MODULE.resolve_pinned(
+                    {"mode": "pinned", "bundle": bundle["bundle"]}, root, False
+                )
+
     def test_legal_review_must_bind_exact_bundle_license_hash(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -168,6 +197,48 @@ class ECLResolveTests(unittest.TestCase):
 
             with self.assertRaisesRegex(
                 ValueError, "does not bind exact bundle license SHA-256"
+            ):
+                MODULE.resolve_pinned(
+                    {"mode": "pinned", "bundle": bundle["bundle"]}, root, False
+                )
+
+    def test_reviewed_incorporation_spec_change_requires_new_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bundle, license_path = self._bundle(root, operative=True)
+            _, _, legal_review = self._write_completed_legal_review(root, license_path)
+            bundle["legal_review"] = legal_review
+            self._write_bundle(root, bundle)
+
+            (root / "spec" / "VERSIONING.md").write_text(
+                "changed incorporation model", encoding="utf-8"
+            )
+
+            with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+                MODULE.resolve_pinned(
+                    {"mode": "pinned", "bundle": bundle["bundle"]}, root, False
+                )
+
+    def test_review_cannot_point_incorporation_spec_at_different_artifact(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bundle, license_path = self._bundle(root, operative=True)
+            review_path, record, legal_review = self._write_completed_legal_review(
+                root, license_path
+            )
+            alternate_path = root / "spec" / "ALTERNATE.md"
+            alternate_path.write_text("alternate", encoding="utf-8")
+            record["incorporation_spec"] = {
+                "path": "spec/ALTERNATE.md",
+                "sha256": MODULE.sha256(alternate_path),
+            }
+            review_path.write_text(json.dumps(record), encoding="utf-8")
+            legal_review["sha256"] = MODULE.sha256(review_path)
+            bundle["legal_review"] = legal_review
+            self._write_bundle(root, bundle)
+
+            with self.assertRaisesRegex(
+                ValueError, "must bind exact repository artifact spec/VERSIONING.md"
             ):
                 MODULE.resolve_pinned(
                     {"mode": "pinned", "bundle": bundle["bundle"]}, root, False
