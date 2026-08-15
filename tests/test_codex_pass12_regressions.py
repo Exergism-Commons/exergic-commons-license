@@ -79,7 +79,7 @@ class CrossSlotFallbackIdentityTests(unittest.TestCase):
 
 
 class DraftVersionAlignmentTests(unittest.TestCase):
-    def test_draft_channel_renderer_and_stored_schedule_agree_on_03(self):
+    def test_draft_channel_targets_03_without_claiming_unreviewed_schedule_compatibility(self):
         channel = json.loads(
             (ROOT / "channels" / "draft.json").read_text(encoding="utf-8")
         )
@@ -95,16 +95,22 @@ class DraftVersionAlignmentTests(unittest.TestCase):
         renderer_source = (ROOT / "tools" / "render_schedule.py").read_text(
             encoding="utf-8"
         )
-        self.assertIn(
-            'Intended compatibility: **ECL 0.3-DRAFT only**.', renderer_source
-        )
-        self.assertNotIn("ECL 0.2-DRAFT only", renderer_source)
+        self.assertIn('TARGET_LICENSE = "ECL-0.3-DRAFT"', renderer_source)
+        self.assertIn("compatible_license", renderer_source)
+        self.assertIn("NOT YET VALIDATED", renderer_source)
 
         stored_schedule = (
             ROOT / "schedules" / "ECL-RP-0.5-PARTIAL-DRAFT.md"
         ).read_text(encoding="utf-8")
-        self.assertIn("Intended compatibility: **ECL 0.3-DRAFT only**.", stored_schedule)
-        self.assertNotIn("ECL 0.2-DRAFT", stored_schedule)
+        self.assertIn("Target working License: **ECL-0.3-DRAFT**.", stored_schedule)
+        self.assertIn(
+            "Compatibility status: **NOT YET VALIDATED for ECL-0.3-DRAFT**.",
+            stored_schedule,
+        )
+        self.assertIn("ECL-0.2-DRAFT", stored_schedule)
+        self.assertNotIn(
+            "Intended compatibility: **ECL 0.3-DRAFT only**.", stored_schedule
+        )
 
 
 if __name__ == "__main__":
