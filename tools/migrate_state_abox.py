@@ -90,8 +90,10 @@ def load_manifest(p:Path)->tuple[dict[str,str],bool]:
     if x.get("version")==LEGACY_VERSION and x.get("generator")==LEGACY_GENERATOR: return dict(hashes),True
     raise ValueError(f"{p}: unsupported manifest")
 
-def manifest_text(h:dict[str,str])->str:
-    return json.dumps({"version":VERSION,"generator":GENERATOR,"note":"Derived conflict-detection hashes only; not ABox data and not a governance source.","generatedProjectionSha256":dict(sorted(h.items()))},indent=2,ensure_ascii=False)+"\n"
+def manifest_text(h:dict[str,str], legacy:bool=False)->str:
+    version=LEGACY_VERSION if legacy else VERSION
+    generator=LEGACY_GENERATOR if legacy else GENERATOR
+    return json.dumps({"version":version,"generator":generator,"note":"Derived conflict-detection hashes only; not ABox data and not a governance source.","generatedProjectionSha256":dict(sorted(h.items()))},indent=2,ensure_ascii=False)+"\n"
 
 def ordered(r:dict[str,Any])->dict[str,Any]:
     order=("@context","iri","id","type","name","iso3","aliases","dossier","publicReviewIssue","lastSubstantiveReview","reviewDue","reviewClass","reviewReason","trackedObjects","monitorIds","controls","participatesIn","operates","deploys","materiallyBenefits","targetsOrAffects","remediates","reviews")
@@ -99,8 +101,11 @@ def ordered(r:dict[str,Any])->dict[str,Any]:
 
 def record_text(r:dict[str,Any])->str: return json.dumps(ordered(r),indent=2,ensure_ascii=False)+"\n"
 
+def synthetic_v1_due_from_review(last_reviewed:str)->str:
+    return (date(last_reviewed,"lastSubstantiveReview")+dt.timedelta(days=90)).isoformat()
+
 def synthetic_v1_due(d:Dossier)->str:
-    return (date(d.last_reviewed,"last")+dt.timedelta(days=90)).isoformat()
+    return synthetic_v1_due_from_review(d.last_reviewed)
 
 def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None, cleanup_v1:bool=False)->dict[str,Any]:
     want=projection(d)
@@ -114,10 +119,16 @@ def merge(d:Dossier, old:dict[str,Any]|None, old_hash:str|None, cleanup_v1:bool=
             if k=="name": legacy_name=str(old[k]); continue
             raise ValueError(f"{d.iso3}: legacy {k} conflicts with dossier-derived value")
     out=dict(old)
-    # v1 invented a +90-day date for every newly generated manual State. Remove
-    # only that exact synthetic pattern while upgrading the v1 manifest. Future
-    # v2 runs preserve any manually curated reviewDue, including on manual class.
-    if cleanup_v1 and out.get("reviewClass")=="manual" and not out.get("reviewReason") and out.get("reviewDue")==synthetic_v1_due(d):
+    # v1 invented a +90-day date for every newly generated manual State. Match
+    # that date against the stored v1 review date before replacing generated
+    # fields from the current dossier; the dossier review date may have changed.
+    stored_review=out.get("lastSubstantiveReview")
+    synthetic_due=(
+        synthetic_v1_due_from_review(str(stored_review))
+        if stored_review is not None
+        else None
+    )
+    if cleanup_v1 and out.get("reviewClass")=="manual" and not out.get("reviewReason") and out.get("reviewDue")==synthetic_due:
         out.pop("reviewDue",None)
     out.update(want); out.setdefault("aliases",[d.iso3]); out.setdefault("reviewClass","manual")
     if legacy_name and legacy_name!=d.entity and legacy_name not in out["aliases"]: out["aliases"].append(legacy_name)
@@ -136,8 +147,8 @@ def scan(root:Path)->tuple[int,int,int,int]:
         if x.get("type")=="State": guard(x,str(p)); rs.append(x)
     return len(rs),len({x.get("iso3") for x in rs}),len({x.get("id") for x in rs}),len({x.get("dossier") for x in rs})
 
-def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,check:bool=False,dry_run:bool=False)->tuple[Summary,int]:
-    ds=load_dossiers(dossier_root); selected=ds
+def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,check:bool=False,dry_run:bool=False,require_195:bool=True)->tuple[Summary,int]:
+    ds=load_dossiers(dossier_root,require_195=require_195); selected=ds
     if iso3:
         iso3=iso3.upper(); selected=[d for d in ds if d.iso3==iso3]
         if not ISO_RE.fullmatch(iso3) or not selected: raise ValueError(f"unknown ISO3 {iso3!r}")
@@ -150,7 +161,11 @@ def migrate(dossier_root:Path,entity_root:Path,manifest:Path,iso3:str|None=None,
         if cur==text: s.unchanged.append(d.iso3)
         elif p.exists(): s.updated.append(d.iso3); writes.append((p,text))
         else: s.created.append(d.iso3); writes.append((p,text))
-    mt=manifest_text(next_hashes); mc=manifest.read_text(encoding="utf-8") if manifest.exists() else None
+    # A v1 manifest certifies that v1's synthetic review dates may still exist.
+    # A partial --iso3 pass cannot prove the rest of the corpus is clean, so it
+    # must remain v1. Only a full-corpus pass is allowed to promote to v2.
+    keep_legacy_manifest=cleanup_v1 and iso3 is not None
+    mt=manifest_text(next_hashes,legacy=keep_legacy_manifest); mc=manifest.read_text(encoding="utf-8") if manifest.exists() else None
     if not s.conflicts and mt!=mc: writes.append((manifest,mt))
     if not (check or dry_run) and not s.conflicts:
         for p,text in writes: p.parent.mkdir(parents=True,exist_ok=True); p.write_text(text,encoding="utf-8")
