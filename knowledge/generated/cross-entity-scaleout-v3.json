@@ -1,7 +1,14 @@
 {
-  "version": 2,
+  "version": 3,
+  "globalTranche": 3,
   "issue": 220,
+  "globalTranche2": {
+    "issue": 217,
+    "pullRequest": 219,
+    "manifest": "knowledge/generated/scoped-system-project-scaleout-v2.json"
+  },
   "followsManifest": "knowledge/generated/cross-entity-scaleout-v1.json",
+  "numberingNote": "Global tranche 2 is #217/#219. This tranche is globally numbered 3, while its cross-entity semantic lineage directly follows cross-entity-scaleout-v1 because tranche 2 is a separate scoped-system projectization lineage developed in parallel from the same post-#216 base.",
   "sourceReview": "reviews/2026/consistency/cross-entity-reconciliation.md",
   "identityRule": "Create exact legal-entity identities only when the canonical dossier explicitly enumerates them. A network label may track them for review routing, but identity creation does not assert legal control, membership, culpability, or governance status.",
   "identities": [

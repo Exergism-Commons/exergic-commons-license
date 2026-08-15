@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "knowledge" / "generated" / "cross-entity-scaleout-v2.json"
+MANIFEST = ROOT / "knowledge" / "generated" / "cross-entity-scaleout-v3.json"
 V1_MANIFEST = ROOT / "knowledge" / "generated" / "cross-entity-scaleout-v1.json"
 
 FORBIDDEN_IDENTITY_KEYS = {
@@ -30,7 +30,7 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-class CrossEntityClaimEvidenceScaleoutV2Tests(unittest.TestCase):
+class CrossEntityClaimEvidenceScaleoutV3Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = load_json(MANIFEST)
@@ -46,13 +46,21 @@ class CrossEntityClaimEvidenceScaleoutV2Tests(unittest.TestCase):
             for record in [load_json(path)]
         }
 
-    def test_manifest_is_bounded_and_follows_v1(self):
-        self.assertEqual(self.manifest["version"], 2)
+    def test_manifest_is_bounded_and_numbered_as_global_tranche_3(self):
+        self.assertEqual(self.manifest["version"], 3)
+        self.assertEqual(self.manifest["globalTranche"], 3)
         self.assertEqual(self.manifest["issue"], 220)
+        self.assertEqual(self.manifest["globalTranche2"]["issue"], 217)
+        self.assertEqual(self.manifest["globalTranche2"]["pullRequest"], 219)
+        self.assertEqual(
+            self.manifest["globalTranche2"]["manifest"],
+            "knowledge/generated/scoped-system-project-scaleout-v2.json",
+        )
         self.assertEqual(
             self.manifest["followsManifest"],
             "knowledge/generated/cross-entity-scaleout-v1.json",
         )
+        self.assertIn("Global tranche 2 is #217/#219", self.manifest["numberingNote"])
         self.assertEqual(len(self.manifest["identities"]), 6)
         self.assertEqual(len(self.manifest["claims"]), 7)
         self.assertEqual(len(self.manifest["evidence"]), 8)
