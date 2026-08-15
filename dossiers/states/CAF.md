@@ -45,6 +45,16 @@ Independent investigation/remedy for the February incident, command accountabili
 - https://minusca.unmissions.org/fr/node/134381
 - https://minusca.unmissions.org/fr/node/135293
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **historical-only / superseded as current scope**. The 2026-08-11 tranche supported a broader government/State-aligned security-operations scope using Amnesty reporting and credited the Special Criminal Court as counter-evidence. The later 2026-08-13 current-status revalidation narrowed the active basis to the Ouanda-Djalé incident and separately frozen current projects. The older tranche therefore remains provenance and is not merged into §§1–7 as if it were the current scope.
+- Historical tranche source locators retained for provenance: https://www.amnesty.org/en/location/africa/west-and-central-africa/central-african-republic/report-central-african-republic/ · https://www.amnesty.org/en/latest/news/2026/06/car-bozize/ · https://www.amnesty.org/en/latest/news/2026/02/car-special-criminal-court-2/
+- Issue #33 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not revive superseded scope or create/change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #33 · `../../reviews/2026/adversarial/scoped/tranche-03.md` · 2026-08-13 Schedule current-status revalidation
