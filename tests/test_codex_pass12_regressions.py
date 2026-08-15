@@ -18,7 +18,6 @@ def load_module(name: str, path: Path):
 
 
 RESOLVER = load_module("ecl_resolve_pass12", ROOT / "tools" / "ecl_resolve.py")
-RENDERER = load_module("render_schedule_pass12", ROOT / "tools" / "render_schedule.py")
 
 
 class CrossSlotFallbackIdentityTests(unittest.TestCase):
@@ -93,9 +92,13 @@ class DraftVersionAlignmentTests(unittest.TestCase):
         self.assertIn("Version 0.3", working_license[:300])
         self.assertIn("DRAFT", working_license[:300])
 
-        rendered, _ = RENDERER.render()
-        self.assertIn("Intended compatibility: **ECL 0.3-DRAFT only**.", rendered)
-        self.assertNotIn("ECL 0.2-DRAFT only", rendered)
+        renderer_source = (ROOT / "tools" / "render_schedule.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            'Intended compatibility: **ECL 0.3-DRAFT only**.', renderer_source
+        )
+        self.assertNotIn("ECL 0.2-DRAFT only", renderer_source)
 
         stored_schedule = (
             ROOT / "schedules" / "ECL-RP-0.5-PARTIAL-DRAFT.md"
