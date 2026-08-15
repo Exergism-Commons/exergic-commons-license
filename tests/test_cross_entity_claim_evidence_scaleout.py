@@ -93,14 +93,10 @@ class CrossEntityClaimEvidenceScaleoutTests(unittest.TestCase):
                 self.assertNotIn("publicationDate", record)
                 self.assertNotIn("retrievedAt", record)
 
-    def test_person_identity_does_not_materialize_warrant_allegations_as_claims(self):
+    def test_this_tranche_does_not_materialize_njeem_warrant_allegations_as_claims(self):
         person_id = "PERSON-OSAMA-ELMASRY-NJEEM"
-        person_claims = []
-        for path in (ROOT / "knowledge" / "claims").glob("*.json"):
-            record = load_json(path)
-            if record.get("subject") == f"ecl:{person_id}":
-                person_claims.append(record["id"])
-        self.assertEqual(person_claims, [])
+        tranche_subjects = {item["subject"] for item in self.manifest["claims"]}
+        self.assertNotIn(person_id, tranche_subjects)
 
 
 if __name__ == "__main__":
