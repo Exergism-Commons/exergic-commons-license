@@ -46,6 +46,15 @@ Implementation of WGAD opinions, disclosure/release/remedy for defenders, indepe
 - https://www.amnesty.org/en/documents/afr28/1119/2026/en/
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=GNQ+1%2F2026
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **already represented**. The defender/detention evidence, third-country transfer/refoulement concern, 476-prisoner pardon as material remediation, narrowed attribution and removal triggers are reflected in §§2–7 above.
+- Issue #53 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+No current evidence, scope or governance status is changed by this absorption record.
+
+## 9. Procedural history
 
 Issue #53 · `../../reviews/2026/adversarial/scoped/tranche-03.md`

@@ -44,6 +44,15 @@ Release/remedy or fair review of remaining cases, abuse investigation and demons
 
 - https://www.amnesty.org/en/latest/news/2026/03/cote-divoire-women-detained-without-cause/
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **already represented**. Its October 2025 crackdown evidence, non-uniform protest counter-evidence, narrow attribution rule and removal trigger are reflected in §§2–7 above.
+- Issue #40 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+No current evidence, scope or governance status is changed by this absorption record.
+
+## 9. Procedural history
 
 Issue #40 · `../../reviews/2026/adversarial/scoped/tranche-03.md`

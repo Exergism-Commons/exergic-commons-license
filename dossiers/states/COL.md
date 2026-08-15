@@ -59,6 +59,16 @@ Any future `S` finding must follow a fresh named case or finite intervention who
 - https://www.corteconstitucional.gov.co/relatoria/autos/2026/a337-26.htm
 - https://www.corteconstitucional.gov.co/relatoria/autos/2026/a767-26.htm
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **historical-only / superseded as governance outcome**. The 2026-08-11 tranche retained `S` around Military Criminal Justice obstruction and specifically credited OPCAT/CAT-related counter-evidence. The 2026-08-14 current-status revalidation subsequently downgraded the dossier to `U` after case-level review showed correction, constitutional supervision or unresolved current status rather than a sufficiently current frozen obstruction project.
+- Historical tranche locators retained for provenance, not promoted as proof of a current `S`: https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=rpmCdurWI0%2FPyrcGoDROcGfyH%2F83vr49s4LKP9FVfWvtCxXbjdszZHD9n728icRToGjZWEtlzG8gOBTx5QDbdw%3D%3D · https://uhri.ohchr.org/fr/pledges?pledgingEntityTypes=45b31963-82b9-4793-97fb-3f68c77a831e%2C8917d6f4-02c2-4eea-8529-10376b342d2d
+- Issue #37 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review preserves the earlier reasoning without reviving the superseded `S` outcome or inventing a still-active obstruction project.
+
+## 9. Procedural history
 
 Issue #37 · `../../reviews/2026/adversarial/scoped/tranche-03.md` · `../../reviews/2026/consistency/schedule-readiness.md`

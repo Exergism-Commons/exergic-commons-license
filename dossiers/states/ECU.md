@@ -44,7 +44,17 @@ Independent San Martín investigation, judicial review/remediation of intelligen
 
 - https://spcommreports.ohchr.org/TmSearch/Mandates?m=31&sort=country
 - https://spcommreports.ohchr.org/TmSearch/SummaryPrint?id=30708
+- https://spcommreports.ohchr.org/TmSearch/RelCom?code=ECU+8%2F2025
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-03.md` — **absorbed / otherwise already represented**. Its Exterminio Total/intelligence/emergency-power evidence, credited State replies, attribution limits and review triggers were already represented. This pass restores the exact `ECU+8/2025` UN communication locator that the tranche relied on but the dossier source list omitted.
+- Issue #50 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+No Claim status, Evidence grade, `asOf`, actor relationship or governance outcome is created or changed by this absorption.
+
+## 9. Procedural history
 
 Issue #50 · `../../reviews/2026/adversarial/scoped/tranche-03.md`
