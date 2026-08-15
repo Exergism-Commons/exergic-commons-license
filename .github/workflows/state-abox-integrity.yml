@@ -1,0 +1,135 @@
+name: State ABox integrity
+
+on:
+  push:
+    paths:
+      - "dossiers/states/**"
+      - "knowledge/**"
+      - "ontology/**"
+      - "schemas/entity.schema.json"
+      - "sparql/integrity/**"
+      - "requirements-ontology.txt"
+      - "tools/migrate_state_abox.py"
+      - "tools/build_knowledge_graph.py"
+      - "tools/run_sparql_checks.py"
+      - "tests/test_migrate_state_abox.py"
+      - "tests/test_state_semantic_guardrails.py"
+      - ".github/workflows/state-abox-integrity.yml"
+  pull_request:
+    paths:
+      - "dossiers/states/**"
+      - "knowledge/**"
+      - "ontology/**"
+      - "schemas/entity.schema.json"
+      - "sparql/integrity/**"
+      - "requirements-ontology.txt"
+      - "tools/migrate_state_abox.py"
+      - "tools/build_knowledge_graph.py"
+      - "tools/run_sparql_checks.py"
+      - "tests/test_migrate_state_abox.py"
+      - "tests/test_state_semantic_guardrails.py"
+      - ".github/workflows/state-abox-integrity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-ontology.txt
+
+      - name: Install RDF and SHACL tooling
+        run: python -m pip install -r requirements-ontology.txt
+
+      - name: Unit and repository migration tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Validate 195 dossier mappings and idempotence
+        run: |
+          python tools/migrate_state_abox.py --check --summary /tmp/state-abox-summary.json
+          python - <<'PY'
+          import json
+          summary = json.load(open('/tmp/state-abox-summary.json', encoding='utf-8'))
+          assert summary['dossiers_seen'] == 195, summary
+          assert summary['state_actor_count'] == 195, summary
+          assert summary['unique_iso3'] == 195, summary
+          assert summary['unique_ids'] == 195, summary
+          assert summary['unique_dossiers'] == 195, summary
+          assert summary['generated_manifest_entries'] == 195, summary
+          assert not summary['created'] and not summary['updated'] and not summary['conflicts'], summary
+          print('validated deterministic 195/195 State dossier -> ABox mappings')
+          PY
+
+      - name: Parse every State JSON-LD record as RDF
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from rdflib import Graph, Namespace, RDF
+          ecl = Namespace('urn:ecl:')
+          graph = Graph()
+          paths = sorted(Path('knowledge/entities').glob('STATE-*.json'))
+          assert len(paths) == 195, len(paths)
+          for path in paths:
+              Graph().parse(path, format='json-ld')
+              graph.parse(path, format='json-ld')
+          states = set(graph.subjects(RDF.type, ecl.State))
+          assert len(states) == 195, len(states)
+          print('parsed 195 State JSON-LD files into 195 RDF State actors')
+          PY
+
+      - name: Parse OWL TBox and SHACL shapes
+        run: |
+          python - <<'PY'
+          from rdflib import Graph
+          for path in ('ontology/ecl.owl.ttl', 'ontology/ecl.shacl.ttl'):
+              graph = Graph().parse(path, format='turtle')
+              print(f'parsed {path}: {len(graph)} triples')
+          PY
+
+      - name: Build RDF dataset twice
+        run: |
+          python tools/build_knowledge_graph.py --output-dir build-a
+          python tools/build_knowledge_graph.py --output-dir build-b
+
+      - name: Assert deterministic RDF output
+        run: |
+          cmp build-a/ecl-abox.nt build-b/ecl-abox.nt
+          cmp build-a/ecl-knowledge.nt build-b/ecl-knowledge.nt
+          cmp build-a/knowledge-build.json build-b/knowledge-build.json
+
+      - name: Validate full ABox with OWL-RL plus SHACL
+        run: pyshacl -s ontology/ecl.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build-a/ecl-abox.ttl
+
+      - name: Run SPARQL integrity suite over deterministic RDF
+        run: python tools/run_sparql_checks.py build-a/ecl-knowledge.nt sparql/integrity
+
+      - name: Guard against governance or legal artifact changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          protected="$(git diff --name-only origin/main...HEAD -- dossiers schedules registry LICENSE versions/licenses)"
+          if [ -n "$protected" ]; then
+            echo "State ABox migration changed protected governance/legal artifacts:" >&2
+            echo "$protected" >&2
+            exit 1
+          fi
+
+      - name: Guard against OWL property-chain inheritance
+        run: |
+          python - <<'PY'
+          from rdflib import Graph
+          from rdflib.namespace import OWL
+          graph = Graph().parse('ontology/ecl.owl.ttl', format='turtle')
+          chains = list(graph.triples((None, OWL.propertyChainAxiom, None)))
+          assert not chains, chains
+          print('no owl:propertyChainAxiom present')
+          PY
