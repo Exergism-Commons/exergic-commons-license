@@ -46,6 +46,15 @@ Independent investigation outcomes, prosecution/remedy where warranted, use-of-f
 - https://www.amnesty.org/en/location/africa/southern-africa/angola/report-angola/
 - https://www.hrw.org/world-report/2026/country-chapters/angola
 
-## 8. Procedural history
+## 8. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-02.md` — **already represented**. Its substantive current evidence, counter-evidence, attribution narrowing and remediation triggers are reflected in §§2–7 above.
+- Issue #5's earlier adjudication comment — **historical-only / locator incomplete**. It points to the former `STATE-ADJUDICATION-2026.md` row #5 as the reasoned evidence baseline but adds no independent source locator or substantive evidence beyond that historical adjudication surface. It is therefore retained as provenance rather than duplicated into the current source list.
+
+This absorption review does not create or change structured Claim status, Evidence grade, `asOf`, actor relationship, or governance outcome.
+
+## 9. Procedural history
 
 Issue #5 · `../../reviews/2026/adversarial/scoped/tranche-02.md`
