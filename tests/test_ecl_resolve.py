@@ -128,6 +128,7 @@ class ECLResolveTests(unittest.TestCase):
             )
             lock = MODULE.render_lock(resolved)
             self.assertIn(f'bundle = "{bundle["bundle"]}"', lock)
+            self.assertIn("operative = true", lock)
             self.assertIn('license = "ECL-1.0.0"', lock)
             self.assertIn('legal_review = "ECL-1.0.0-legal-review-1"', lock)
             self.assertIn(
@@ -167,6 +168,7 @@ class ECLResolveTests(unittest.TestCase):
             )
             self.assertFalse(resolved["operative"])
             self.assertNotIn("legal_review", resolved)
+            self.assertIn("operative = false", MODULE.render_lock(resolved))
 
     def test_legal_review_reference_must_match_record_identity(self):
         with tempfile.TemporaryDirectory() as tmp:
