@@ -6,12 +6,14 @@ on:
       - "registry/**"
       - "reviews/schedule-compatibility/**"
       - "tools/render_schedule.py"
+      - "tools/render_schedule_impl.py"
       - "tools/check_schedule_compatibility_output.py"
       - "tools/schedule-requirements.txt"
       - "tools/test_schedule_compatibility_gate.py"
       - "tools/test_schedule_yaml_key_security.py"
       - "tools/test_schedule_compatibility_pass21.py"
       - "tools/test_schedule_compatibility_pass22.py"
+      - "tests/test_codex_pass23_import_shadowing.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -20,12 +22,14 @@ on:
       - "registry/**"
       - "reviews/schedule-compatibility/**"
       - "tools/render_schedule.py"
+      - "tools/render_schedule_impl.py"
       - "tools/check_schedule_compatibility_output.py"
       - "tools/schedule-requirements.txt"
       - "tools/test_schedule_compatibility_gate.py"
       - "tools/test_schedule_yaml_key_security.py"
       - "tools/test_schedule_compatibility_pass21.py"
       - "tools/test_schedule_compatibility_pass22.py"
+      - "tests/test_codex_pass23_import_shadowing.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -48,6 +52,7 @@ jobs:
           python tools/test_schedule_yaml_key_security.py
           python tools/test_schedule_compatibility_pass21.py
           python tools/test_schedule_compatibility_pass22.py
+          python tests/test_codex_pass23_import_shadowing.py
       - name: Validate State coverage
         run: |
           python - <<'PY'
