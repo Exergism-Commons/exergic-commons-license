@@ -7,9 +7,11 @@ on:
       - "reviews/schedule-compatibility/**"
       - "tools/render_schedule.py"
       - "tools/check_schedule_compatibility_output.py"
+      - "tools/schedule-requirements.txt"
       - "tools/test_schedule_compatibility_gate.py"
       - "tools/test_schedule_yaml_key_security.py"
       - "tools/test_schedule_compatibility_pass21.py"
+      - "tools/test_schedule_compatibility_pass22.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
@@ -19,9 +21,11 @@ on:
       - "reviews/schedule-compatibility/**"
       - "tools/render_schedule.py"
       - "tools/check_schedule_compatibility_output.py"
+      - "tools/schedule-requirements.txt"
       - "tools/test_schedule_compatibility_gate.py"
       - "tools/test_schedule_yaml_key_security.py"
       - "tools/test_schedule_compatibility_pass21.py"
+      - "tools/test_schedule_compatibility_pass22.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
@@ -41,13 +45,14 @@ jobs:
           python-version: "3.12"
 
       - name: Install renderer dependency
-        run: python -m pip install --disable-pip-version-check PyYAML
+        run: python -m pip install --disable-pip-version-check -r tools/schedule-requirements.txt
 
       - name: Test compatibility gate regressions
         run: |
           python tools/test_schedule_compatibility_gate.py
           python tools/test_schedule_yaml_key_security.py
           python tools/test_schedule_compatibility_pass21.py
+          python tools/test_schedule_compatibility_pass22.py
 
       - name: Validate frozen Schedule inputs
         run: python tools/render_schedule.py --validate-only
