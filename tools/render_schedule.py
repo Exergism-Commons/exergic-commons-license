@@ -12,9 +12,7 @@ from __future__ import annotations
 
 import sys
 
-_WRAPPER_PATH = __file__.replace("\\", "/")
-_WRAPPER_DIR = _WRAPPER_PATH.rsplit("/", 1)[0]
-_IMPL_PATH = f"{_WRAPPER_DIR}/render_schedule_impl.py"
+_WRAPPER_INPUT_PATH = __file__.replace("\\", "/")
 _ORIGINAL_NAME = globals().get("__name__", "render_schedule")
 _ORIGINAL_SPEC = globals().get("__spec__")
 _ORIGINAL_SYS_PATH = list(sys.path)
@@ -96,6 +94,27 @@ for _entry in sys.path:
     ):
         _sanitised_path.append(_entry)
 sys.path[:] = _sanitised_path
+
+# Only after import search is restricted to interpreter-owned roots may the
+# bootstrap import filesystem helpers.  The wrapper path itself is part of the
+# trust boundary: invoking the reviewed file through a symlink can otherwise
+# redirect sibling selection to an attacker-controlled render_schedule_impl.py.
+import os as _os
+
+if _os.path.islink(_WRAPPER_INPUT_PATH):
+    _fail_bootstrap("Schedule renderer refuses symlink invocation of its bootstrap")
+try:
+    _wrapper_stat = _os.stat(_WRAPPER_INPUT_PATH)
+except OSError as _exc:
+    _fail_bootstrap(f"Schedule renderer cannot stat its bootstrap: {_exc}")
+if getattr(_wrapper_stat, "st_nlink", 1) != 1:
+    _fail_bootstrap("Schedule renderer refuses hardlink aliases of its bootstrap")
+
+_WRAPPER_PATH = _os.path.realpath(_WRAPPER_INPUT_PATH).replace("\\", "/")
+if _WRAPPER_PATH != _os.path.abspath(_WRAPPER_INPUT_PATH).replace("\\", "/"):
+    _fail_bootstrap("Schedule renderer bootstrap path is not canonical")
+_WRAPPER_DIR = _WRAPPER_PATH.rsplit("/", 1)[0]
+_IMPL_PATH = f"{_WRAPPER_DIR}/render_schedule_impl.py"
 
 # ``-S`` deliberately omits site-packages.  Add exactly the interpreter's own
 # site-packages directory so the separately pinned PyYAML dependency remains
