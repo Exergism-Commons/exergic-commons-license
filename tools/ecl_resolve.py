@@ -94,10 +94,13 @@ def valid_review_id(value: str) -> bool:
 def _uses_reserved_fallback_identity(actual: Any) -> bool:
     if not isinstance(actual, dict):
         return False
-    return any(
-        actual.get(key) in RESERVED_FALLBACK_IDENTITIES[key]
-        for key in ("ref", "path", "sha256")
-    )
+    for key in ("ref", "path", "sha256"):
+        value = actual.get(key)
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"bundle component {key} must be a non-empty string")
+        if value in RESERVED_FALLBACK_IDENTITIES[key]:
+            return True
+    return False
 
 
 def validate_bundle_identity(bundle: dict[str, Any]) -> None:
