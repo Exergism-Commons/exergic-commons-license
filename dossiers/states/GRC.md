@@ -55,6 +55,15 @@ Effective EMIDIPA capacity; completion of the Lolos criminal/disciplinary invest
 - `../../registry/schedule-state-s-freezes/batch-21b-grc-freeze.yml` freezes only the 26 January 2025 Lolos incident/accountability project.
 - Other protest-policing incidents, general less-lethal policy and systemic accountability concerns remain governance-only until separately frozen.
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-15:
+
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented with precise current locators**. Its protest-policing evidence, EMIDIPA/judicial counter-evidence, narrow attribution rule and removal triggers are reflected in §§2–7 above. The historical tranche itself does not provide a per-case URL list, but the canonical dossier now carries exact Amnesty locators for the source family on which the current synthesis relies.
+- Issue #66 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+
+This absorption review does not broaden the Schedule freeze, revive any broader police-sector restriction or create/change structured Claim status, Evidence grade, `asOf`, actor relationship or governance outcome.
+
+## 10. Procedural history
 
 Issue #66 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
