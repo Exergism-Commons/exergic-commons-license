@@ -53,6 +53,14 @@ Review immediately on substantial implementation of Ombudsman/Commission recomme
 - https://www.amnesty.org/en/location/africa/southern-africa/lesotho/report-lesotho/
 - https://www.lena.gov.ls/lcs-resists-ombudsman-recommendations/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The preserved Amnesty country-report locator and LENA Ombudsman-follow-up locator remain the historical provenance for the correctional-system theory recorded above.
+- The historical speech/public-order proposition remains part of the scoped adjudication record, but it does **not** widen the later Schedule renderability boundary without its own exact project freeze.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-03a.yml` is controlling for the promoted Lesotho project: the Lesotho Correctional Service only in the Maseru correctional abuse/conditions project and materially continuous unremediated detention/conditions/accountability practices involving severe ill-treatment or coercive deprivation. The Ombudsman, courts, remediation projects and ordinary public services remain excluded.
+
+## 10. Procedural history
 
 Issue #95 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`

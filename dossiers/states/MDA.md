@@ -68,6 +68,14 @@ Review on durable compliance with individualized pretrial-detention reasoning; e
 - `../../registry/schedule-state-s-freezes/batch-21a-mda-freeze.yml` freezes only the three-facility informal-prisoner-hierarchy control subset.
 - Šarban-group pretrial-detention scope, Levința-group ill-treatment/investigation failures and any other residual MDA scope remain governance-only until separately frozen.
 
-## 10. Procedural history
+## 10. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / superseded by later revalidation where narrower or more current. The June 2026 Council of Europe pretrial-detention locator preserves the core historical proposition; the dossier was subsequently re-reviewed through 2026-08-14 with additional CPT, European Court and execution-supervision evidence.
+- The historical tranche's removal of the broad media-regulatory component and its non-attribution rule for Transnistria remain controlling. Later evidence does not reactivate either excluded theory.
+- **Schedule boundary:** the later `batch-21a-mda-freeze.yml` three-facility informal-prisoner-hierarchy project is the controlling frozen subset. The broader historical pretrial-detention and ill-treatment/remedy theories remain governance-only unless separately frozen; historical normalization does not roll the dossier back to its 2026-08-11 boundary.
+
+## 11. Procedural history
 
 Issue #112 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`

@@ -54,6 +54,14 @@ Review on durable narrowing/non-use of vague speech offences against protected e
 - https://suhakam.org.my/2026/04/media-statement-no-19-2026_suhakam-calls-for-restraint-and-review-of-laws-following-arrest-of-social-media-user/
 - https://suhakam.org.my/2026/07/media-statement-no-38-2026_suhakam-calls-for-urgent-reforms-to-immigration-detention-centres/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The two April 2026 SUHAKAM speech-enforcement locators and the July 2026 immigration-detention locator are preserved directly above, so the historical propositions no longer depend on the tranche to recover their source provenance.
+- The tranche's removal of the earlier generic `LGBTI raid` component is retained as a narrowing decision; historical mention of that component does not reactivate it.
+- **Schedule boundary:** the later `../../registry/schedule-state-s-freezes/batch-04-detention-digital.yml` record controls current renderability. The **Immigration Department of Malaysia — Detention and Depot Management Division**, only in qualifying immigration-detention/depot-management operations and the capacity defined there, is already a `renderable-subset` with `schedule_status: ready-narrowed-subset`. **Speech/public-order enforcement remains residual unfrozen scope pending an exact police case/statutory-boundary freeze.** This historical normalization neither collapses those two states nor infers a generic Immigration Department, police, communications, Home Affairs or depot-wide Restricted party.
+
+## 10. Procedural history
 
 Issue #103 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`

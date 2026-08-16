@@ -54,6 +54,14 @@ Review on replacement of automatic detention with individualized necessity/revie
 - https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/malta/report-malta/
 - https://www.coe.int/en/web/execution/-/malta-meeting-with-the-state-advocate-and-the-permanent-representative-of-malta-to-the-council-of-europe
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** already represented substantively / open provenance-granularity gap. The historical Amnesty umbrella locator and Council of Europe remedial locator are preserved above and the tranche's detention, maritime-return, `El Hiblu` and judicial counter-evidence propositions are synthesized in this dossier.
+- The preserved repo record does not establish separate proposition-specific locators here for every CPT-condition, `El Hiblu` or maritime-return sub-proposition. This dossier therefore preserves the historical synthesis without inventing finer source-to-proposition mapping or reconstructing missing historical locators externally.
+- **Schedule boundary:** the later `../../registry/schedule-state-s-freezes/batch-01-identity.yml` record controls current renderability. Malta already has a `renderable-subset` for the **Detention Services Agency**, **Malta Police Force / Commissioner of Police in the capacity of Principal Immigration Officer**, and **Armed Forces of Malta / RCC and relevant maritime-SAR units**, each only in the capacity-limited qualifying projects defined by that freeze. `El Hiblu` or another prosecution project and any maritime incident not separately identified and substantiated remain residual unfrozen scope. The historical tranche neither widens that renderable subset nor makes Maltese migration, detention, policing or SAR functions Restricted generally.
+
+## 10. Procedural history
 
 Issue #106 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
