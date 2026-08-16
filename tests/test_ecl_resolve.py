@@ -332,6 +332,27 @@ class ECLResolveTests(unittest.TestCase):
                     {"mode": "pinned", "bundle": bundle["bundle"]}, root, False
                 )
 
+    def test_follow_channel_bundle_ref_must_match_manifest_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "channels").mkdir()
+            (root / "releases" / "bundles").mkdir(parents=True)
+            bundle, _ = self._bundle(root, operative=False)
+            channel_ref = bundle["bundle"]
+            bundle["bundle"] = "ECL-1.0.0@RP-2026.10.02.99"
+            manifest = root / "releases" / "bundles" / f"{channel_ref}.json"
+            manifest.write_text(json.dumps(bundle), encoding="utf-8")
+            (root / "channels" / "stable-1.json").write_text(
+                json.dumps({"operative": True, "bundle": channel_ref}), encoding="utf-8"
+            )
+
+            with self.assertRaisesRegex(ValueError, "bundle manifest identity mismatch"):
+                MODULE.resolve_follow(
+                    {"mode": "follow-stable", "license": "1.x", "channel": "stable-1"},
+                    root,
+                    True,
+                )
+
     def test_follow_stable_does_not_cross_required_major(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "bundle": "ECL-0.3-DRAFT@RP-EMPTY-1",
+  "operative": false,
+  "license": {
+    "ref": "ECL-0.3-DRAFT",
+    "path": "versions/licenses/ECL-0.3-DRAFT.md",
+    "sha256": "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d"
+  },
+  "schedule": {
+    "ref": "ECL-RP-EMPTY-1",
+    "path": "schedules/ECL-RP-EMPTY-1.md",
+    "sha256": "e12a6ffc03aa0be24a9f61d0d325bc8c06bb9c870416a72fcac0bfd968025aa2"
+  }
+}

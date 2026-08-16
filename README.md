@@ -1,13 +1,13 @@
 # Exergic Commons License (ECL)
 
-> **Status: ECL 0.2-DRAFT — experimental source-available license.**
+> **Status: ECL 0.3-DRAFT — experimental source-available license.**
 
 ECL is an experimental software-license project focused on human agency, contestability, reversibility and distributed capacity. It is **not OSI-approved Open Source** and is not intended to satisfy the Open Source Definition.
 
 ## Canonical sources
 
 - [`LICENSE`](LICENSE) — current working license text.
-- [`spec/`](spec/) — principles, governance, terminology, designation standard, evidence valuation, formal Exergism, knowledge-model, living-update and versioning specifications.
+- [`spec/`](spec/) — principles, governance, terminology, designation standard, evidence valuation, formal Exergism, knowledge-model, living-update, versioning and legal-adversarial-review specifications.
 - [`knowledge/`](knowledge/) — Git-native JSON-LD ABox records.
 - [`ontology/`](ontology/) — OWL TBox, JSON-LD context and SHACL shapes.
 - [`monitoring/`](monitoring/) — source-monitor contracts and change-detection policy.
@@ -19,7 +19,7 @@ ECL is an experimental software-license project focused on human agency, contest
 - [`versions/`](versions/) — immutable historical license snapshots.
 - [`channels/`](channels/) — mutable convenience pointers; never authoritative over an exact bundle.
 
-The immutable ECL 0.1 snapshot is [`versions/licenses/ECL-0.1.md`](versions/licenses/ECL-0.1.md). The root `LICENSE` is ECL 0.2-DRAFT.
+The immutable ECL 0.1 snapshot is [`versions/licenses/ECL-0.1.md`](versions/licenses/ECL-0.1.md). The root `LICENSE` is the ECL 0.3-DRAFT legal-hardening candidate; earlier drafts remain available through Git history.
 
 ## Formal Exergism layer
 
@@ -88,7 +88,7 @@ Publisher policy is separate from the exact resolved bundle. Planned modes are:
 - `follow-stable` — each **new software release** resolves the newest compatible stable bundle;
 - `latest-stable` — follows the newest stable line, with explicit confirmation required before crossing a legal MAJOR boundary.
 
-`tools/ecl_resolve.py` implements the resolution boundary and writes an exact `ecl.lock`. It refuses non-operative/draft channels by default. `channels/draft.json` exists only as a development pointer: ECL currently has **no fabricated stable 1.0 bundle**.
+`tools/ecl_resolve.py` implements the resolution boundary and writes an exact `ecl.lock`. It refuses non-operative/draft channels by default. An `operative: true` Bundle must also content-address a completed immutable legal-review record bound to the exact License and reviewed incorporation mechanism. `channels/draft.json` exists only as a development pointer: ECL currently has **no fabricated stable 1.0 bundle**.
 
 This preserves both continuous governance improvement and non-retroactivity: later knowledge or Schedules do not silently rewrite already published software releases.
 
@@ -157,7 +157,9 @@ source/change detection -> EvidenceItem/Claim -> KnowledgeSnapshot
         -> generated current registry view
         -> Schedule translation/freeze -> immutable ScheduleRelease
         -> exact LicenseRelease + ScheduleRelease = ECLBundle
-        -> software release records exact bundle/lock
+        -> qualified legal adversarial review of exact candidate artifacts
+        -> content-addressed legal-review record
+        -> operative software release records exact bundle/lock
 ```
 
 Formal Exergism may confirm, weaken, narrow or expose an inconsistency in a governance result. It cannot create a restriction absent operative ECL fit.
@@ -166,6 +168,6 @@ No signal, GitHub ticket, claim record, dossier, Exergism assessment, review, on
 
 ## Legal status
 
-ECL remains experimental and has not yet received specialist legal review sufficient for production use. Obtain qualified intellectual-property advice before relying on it for consequential deployments.
+ECL remains experimental. The project now defines a machine-enforced pre-1.0 adversarial legal-review gate in [`spec/LEGAL-ADVERSARIAL-REVIEW.md`](spec/LEGAL-ADVERSARIAL-REVIEW.md), but ECL 0.3-DRAFT has **not** completed that gate and no automated, maintainer, AI or community review counts as the required qualified independent legal review. Obtain qualified intellectual-property advice before relying on ECL for consequential deployments.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for challenges, contrary evidence and governance contributions.

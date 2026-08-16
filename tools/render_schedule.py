@@ -1,300 +1,258 @@
 #!/usr/bin/env python3
-"""Render a non-operative ECL Schedule candidate from frozen registries.
+"""Isolated bootstrap for the content-addressed Schedule renderer.
 
-The renderer deliberately consumes only freeze/override records. Dossiers and
-historical reviews are evidence sources, not Schedule inputs.
+The executable renderer is intentionally fail-closed.  It must be launched as
+``python -I -S tools/render_schedule.py`` so repository paths, ``PYTHONPATH``,
+user-site packages, ``sitecustomize`` and ``.pth`` processing cannot run before
+the reviewed renderer imports are resolved.  Internal regression tests may
+import this bootstrap only from an already isolated (``-I``) interpreter.
 """
 
 from __future__ import annotations
 
-import argparse
-from pathlib import Path
-from typing import Any, Iterable
+import sys
 
-import yaml
-
-ROOT = Path(__file__).resolve().parents[1]
-REG = ROOT / "registry"
-
-READY_PREFIX = "ready"
-REFERENCE_STATUSES = {
-    "ready-by-cross-entity-reference",
-    "ready-narrowed-subset-via-direct-project",
-    "ready-by-state-scope-reference",
-    "ready-by-project-reference",
-}
+_WRAPPER_INPUT_PATH = __file__.replace("\\", "/")
+_ORIGINAL_NAME = globals().get("__name__", "render_schedule")
+_ORIGINAL_SPEC = globals().get("__spec__")
+_ORIGINAL_SYS_PATH = list(sys.path)
 
 
-def load_yaml(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        value = yaml.safe_load(handle) or {}
-    if not isinstance(value, dict):
-        raise ValueError(f"{path}: expected mapping at document root")
-    return value
+def _fail_bootstrap(message: str) -> None:
+    raise RuntimeError(message)
 
 
-def extract_records(data: dict[str, Any]) -> list[dict[str, Any]]:
-    if isinstance(data.get("records"), list):
-        return [r for r in data["records"] if isinstance(r, dict)]
-    if "state" in data:
-        return [data]
-    return []
+def _normalise_absolute_path(entry: str) -> str | None:
+    """Lexically normalise an absolute import path without importing path code."""
 
+    if not isinstance(entry, str) or not entry:
+        return None
+    value = entry.replace("\\", "/")
+    drive = ""
+    if sys.platform == "win32":
+        if len(value) < 3 or value[1] != ":" or value[2] != "/":
+            return None
+        drive = value[:2].lower()
+        value = value[2:]
+    elif not value.startswith("/"):
+        return None
 
-def state_outcomes() -> dict[str, str]:
-    base = load_yaml(REG / "states.yml").get("outcomes", {})
-    result: dict[str, str] = {}
-    for outcome in ("R", "S", "U", "N"):
-        for iso3 in base.get(outcome, []) or []:
-            result[str(iso3)] = outcome
-
-    # Outcome overlays are intentionally cumulative. Apply every matching
-    # layer in lexical order so renderer semantics match the canonical
-    # governance precedence documented by README/progress validation.
-    for overlay_path in sorted(REG.glob("state-outcome-overrides*.yml")):
-        overlay = load_yaml(overlay_path)
-        for iso3, record in (overlay.get("overrides") or {}).items():
-            if not isinstance(record, dict) or "to" not in record:
-                raise ValueError(f"{overlay_path}: malformed override for {iso3}")
-            result[str(iso3)] = str(record["to"])
-    return result
-
-
-def status_blocked_states() -> set[str]:
-    path = REG / "schedule-status-overrides.yml"
-    if not path.exists():
-        return set()
-    data = load_yaml(path)
-    return {str(v) for v in (data.get("current_status_review") or [])}
-
-
-def render_bullets(values: Iterable[Any], indent: str = "") -> list[str]:
-    return [f"{indent}- {str(value)}" for value in values if str(value).strip()]
-
-
-def first_identity(record: dict[str, Any]) -> str | None:
-    value = record.get("schedule_identity")
-    if value:
-        return str(value)
-    parties = record.get("candidate_parties") or []
-    if parties:
-        return str(parties[0])
-    projects = record.get("candidate_projects") or []
-    if projects:
-        return str(projects[0])
-    return None
-
-
-def collect_state_s_records(outcomes: dict[str, str]) -> list[dict[str, Any]]:
-    blocked = status_blocked_states()
-    records: list[dict[str, Any]] = []
-    freeze_dir = REG / "schedule-state-s-freezes"
-    for path in sorted(freeze_dir.glob("*.yml")):
-        data = load_yaml(path)
-        for record in extract_records(data):
-            state = str(record.get("state", ""))
-            status = str(record.get("schedule_status", ""))
-            if not state or outcomes.get(state) != "S":
-                continue
-            if state in blocked:
-                continue
-            if not status.startswith(READY_PREFIX):
-                continue
-            if status in REFERENCE_STATUSES:
-                # Direct project / synchronized entity will be rendered from its
-                # canonical project or organization freeze instead.
-                continue
-            if not first_identity(record):
-                raise ValueError(f"{path}: ready record for {state} has no identity")
-            copied = dict(record)
-            copied["_source"] = str(path.relative_to(ROOT))
-            records.append(copied)
-    return records
-
-
-def collect_state_r_records(outcomes: dict[str, str]) -> list[dict[str, Any]]:
-    data = load_yaml(REG / "schedule-state-r-freeze.yml")
-    records = []
-    for record in data.get("entries", []) or []:
-        iso3 = str(record.get("iso3", ""))
-        if outcomes.get(iso3) != "R":
+    parts: list[str] = []
+    for part in value.split("/"):
+        if not part or part == ".":
             continue
-        if not record.get("candidate_class"):
-            raise ValueError(f"R freeze {iso3} has no candidate_class")
-        records.append(record)
-    return records
-
-
-def collect_organizations() -> list[dict[str, Any]]:
-    records: list[dict[str, Any]] = []
-    for filename in ("schedule-organization-freezes.yml", "schedule-armed-organization-freezes.yml"):
-        path = REG / filename
-        if not path.exists():
+        if part == "..":
+            if not parts:
+                return None
+            parts.pop()
             continue
-        data = load_yaml(path)
-        for record in data.get("organizations", []) or []:
-            status = str(record.get("schedule_status", ""))
-            if not status.startswith(READY_PREFIX) or status in REFERENCE_STATUSES:
-                continue
-            if not record.get("schedule_identity") and not record.get("schedule_entities"):
-                raise ValueError(f"{path}: ready organization {record.get('id')} has no identity")
-            records.append(record)
-    return records
+        parts.append(part.lower() if sys.platform == "win32" else part)
+    suffix = "/".join(parts)
+    return f"{drive}/{suffix}" if drive else f"/{suffix}"
 
 
-def collect_projects() -> list[dict[str, Any]]:
-    data = load_yaml(REG / "schedule-project-freezes.yml")
-    records = []
-    for record in data.get("projects", []) or []:
-        status = str(record.get("schedule_status", ""))
-        if not status.startswith(READY_PREFIX):
-            continue
-        if not record.get("schedule_identity"):
-            raise ValueError(f"ready project {record.get('id')} has no schedule_identity")
-        records.append(record)
-    return records
+def _is_within(path: str, prefix: str) -> bool:
+    return path == prefix or path.startswith(prefix.rstrip("/") + "/")
 
 
-def validate_unique(records: Iterable[dict[str, Any]], key: str, label: str) -> None:
-    seen: set[str] = set()
-    for record in records:
-        value = str(record.get(key, "")).strip()
-        if not value:
-            continue
-        if value in seen:
-            raise ValueError(f"duplicate {label}: {value}")
-        seen.add(value)
-
-
-def render() -> tuple[str, dict[str, int]]:
-    outcomes = state_outcomes()
-    r_states = collect_state_r_records(outcomes)
-    s_records = collect_state_s_records(outcomes)
-    organizations = collect_organizations()
-    projects = collect_projects()
-
-    validate_unique(r_states, "iso3", "R State ISO3")
-    validate_unique(organizations, "id", "organization ID")
-    validate_unique(projects, "id", "project ID")
-
-    if len(r_states) != sum(1 for v in outcomes.values() if v == "R"):
-        raise ValueError("not every active R State has a frozen Schedule identity")
-
-    lines: list[str] = [
-        "# ECL Restricted Parties / Projects Schedule — 0.5 GENERATED DRAFT",
-        "",
-        "> **NON-OPERATIVE GENERATED CANDIDATE. DO NOT ADOPT OR INCORPORATE INTO A RELEASE.**",
-        ">",
-        "> Intended compatibility: **ECL 0.2-DRAFT only**.",
-        "",
-        "This file is deterministically rendered from frozen registry records. It omits U/N outcomes, unresolved factual/status records, unfrozen residual dossier scope and cross-entity references whose canonical project/organization is rendered separately.",
-        "",
-        "## Global interpretation",
-        "",
-        "- State entries concern only the stated apparatus/project capacity, never population or nationality.",
-        "- Independent remediation, legal defence, audit and rights-protective review remain excluded unless expressly designated.",
-        "- Association, employment, residence or remote affiliation does not create status by itself.",
-        "- Material Participation controls project/associate linkage under the operative ECL text.",
-        "- No external sanctions/warrant list is dynamically incorporated.",
-        "",
-        "## State apparatus entries — R",
-        "",
-    ]
-
-    for record in r_states:
-        lines.append(f"- **{record['iso3']} — {record['entity']}:** {record['candidate_class']}")
-
-    lines += ["", "## Scoped State entries — S", ""]
-    for record in sorted(s_records, key=lambda r: (str(r.get("state")), str(first_identity(r)))):
-        state = record.get("state")
-        entity = record.get("entity") or state
-        lines += [f"### {state} — {entity}", ""]
-        if record.get("schedule_identity"):
-            lines += [f"**Frozen identity/project:** {record['schedule_identity']}", ""]
-        if record.get("candidate_parties"):
-            lines += ["**Candidate parties:**", *render_bullets(record["candidate_parties"]), ""]
-        if record.get("candidate_projects"):
-            lines += ["**Frozen projects/capacities:**", *render_bullets(record["candidate_projects"]), ""]
-        for key, title in (
-            ("project_boundary", "Boundary"),
-            ("capacity_limit", "Capacity limit"),
-            ("scope_rule", "Scope rule"),
-        ):
-            if record.get(key):
-                lines += [f"**{title}:** {record[key]}", ""]
-        if record.get("exclusions"):
-            lines += ["**Exclusions:**", *render_bullets(record["exclusions"]), ""]
-        lines += [f"_Freeze source: `{record['_source']}`._", ""]
-
-    lines += ["## Non-State organization entries", ""]
-    for record in organizations:
-        lines += [f"### {record['id']} — {record['outcome']}", ""]
-        if record.get("schedule_identity"):
-            lines += [f"**Frozen identity:** {record['schedule_identity']}", ""]
-        if record.get("schedule_entities"):
-            lines += ["**Frozen exact entities:**", *render_bullets(record["schedule_entities"]), ""]
-        if record.get("frozen_aliases"):
-            lines += ["**Frozen aliases:**", *render_bullets(record["frozen_aliases"]), ""]
-        for key, title in (("scope_rule", "Scope rule"), ("capacity_limit", "Capacity limit")):
-            if record.get(key):
-                lines += [f"**{title}:** {record[key]}", ""]
-        if record.get("exclusions"):
-            lines += ["**Exclusions:**", *render_bullets(record["exclusions"]), ""]
-
-    lines += ["## Direct Restricted Projects", ""]
-    for record in projects:
-        lines += [
-            f"### {record['id']} — {record['outcome']}",
-            "",
-            f"**Frozen project:** {record['schedule_identity']}",
-            "",
-        ]
-        for key, title in (("project_boundary", "Boundary"), ("operator_boundary", "Operator boundary"), ("prohibited_capacity", "Restricted capacity")):
-            if record.get(key):
-                lines += [f"**{title}:** {record[key]}", ""]
-        if record.get("exclusions"):
-            lines += ["**Exclusions:**", *render_bullets(record["exclusions"]), ""]
-        if record.get("continuation_rule"):
-            lines += [f"**Continuation rule:** {record['continuation_rule']}", ""]
-
-    lines += [
-        "## Non-operative status",
-        "",
-        "This generated draft is a release-readiness artifact only. It has no licensing effect unless a future exact Schedule is intentionally reviewed, versioned and expressly incorporated with an exact ECL version.",
-        "",
-    ]
-
-    counts = {
-        "r_states": len(r_states),
-        "s_state_entries": len(s_records),
-        "organizations": len(organizations),
-        "projects": len(projects),
-    }
-    return "\n".join(lines), counts
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=Path)
-    parser.add_argument("--validate-only", action="store_true")
-    args = parser.parse_args()
-
-    text, counts = render()
-    print(
-        "validated schedule inputs: "
-        f"R states={counts['r_states']}, "
-        f"S state entries={counts['s_state_entries']}, "
-        f"organizations={counts['organizations']}, "
-        f"projects={counts['projects']}"
+# No shadowable import is permitted before these gates.  Non-isolated script,
+# package/module (``python -m``), PYTHONPATH-driven, and ordinary host imports
+# fail before the renderer implementation can import argparse/hashlib/pathlib,
+# PyYAML, or any of their dependencies.
+if not sys.flags.isolated:
+    _fail_bootstrap(
+        "Schedule renderer requires isolated Python; run executable mode as "
+        "`python -I -S tools/render_schedule.py ...`"
     )
-    if args.validate_only:
-        return
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(text, encoding="utf-8")
+if _ORIGINAL_NAME == "__main__" and not sys.flags.no_site:
+    _fail_bootstrap(
+        "Schedule renderer executable mode requires site-disabled isolation; run "
+        "`python -I -S tools/render_schedule.py ...`"
+    )
+
+# Keep only interpreter-owned import roots.  Under -I this excludes cwd,
+# PYTHONPATH, the script directory, and user-site paths.  The lexical collapse
+# also rejects ``..`` aliases that would otherwise appear to live below an
+# interpreter prefix.  A repository cannot create a symlink inside an
+# interpreter-owned prefix without already controlling the trusted runtime.
+_trusted_prefixes: list[str] = []
+for _prefix in (
+    sys.prefix,
+    sys.base_prefix,
+    sys.exec_prefix,
+    sys.base_exec_prefix,
+):
+    _normalised = _normalise_absolute_path(_prefix)
+    if _normalised and _normalised not in _trusted_prefixes:
+        _trusted_prefixes.append(_normalised)
+
+_sanitised_path: list[str] = []
+for _entry in sys.path:
+    _normalised = _normalise_absolute_path(_entry)
+    if _normalised and any(
+        _is_within(_normalised, _prefix) for _prefix in _trusted_prefixes
+    ):
+        _sanitised_path.append(_entry)
+sys.path[:] = _sanitised_path
+
+# Only after import search is restricted to interpreter-owned roots may the
+# bootstrap import filesystem and hashing helpers.  The wrapper path itself is
+# part of the trust boundary: aliases or standalone copies must not be allowed
+# to redirect sibling implementation selection before reviewed renderer
+# validation begins.
+import hashlib as _hashlib
+import os as _os
+
+if _os.path.islink(_WRAPPER_INPUT_PATH):
+    _fail_bootstrap("Schedule renderer refuses symlink invocation of its bootstrap")
+try:
+    _wrapper_stat = _os.stat(_WRAPPER_INPUT_PATH)
+except OSError as _exc:
+    _fail_bootstrap(f"Schedule renderer cannot stat its bootstrap: {_exc}")
+if getattr(_wrapper_stat, "st_nlink", 1) != 1:
+    _fail_bootstrap("Schedule renderer refuses hardlink aliases of its bootstrap")
+
+_WRAPPER_PATH = _os.path.realpath(_WRAPPER_INPUT_PATH).replace("\\", "/")
+if _WRAPPER_PATH != _os.path.abspath(_WRAPPER_INPUT_PATH).replace("\\", "/"):
+    _fail_bootstrap("Schedule renderer bootstrap path is not canonical")
+
+
+def _looks_like_repository_root(path: str) -> bool:
+    """Recognise the ECL checkout without trusting cwd or mutable import paths."""
+
+    required_files = (
+        "LICENSE",
+        "registry/states.yml",
+        "versions/licenses/ECL-0.3-DRAFT.md",
+        ".github/workflows/schedule-integrity.yml",
+        ".github/workflows/schedule-release-readiness.yml",
+    )
+    return all(_os.path.isfile(_os.path.join(path, rel)) for rel in required_files)
+
+
+def _find_repository_root(wrapper_path: str) -> str:
+    """Find the containing ECL checkout, then bind the wrapper to its canonical slot."""
+
+    current = _os.path.dirname(wrapper_path)
+    while True:
+        if _looks_like_repository_root(current):
+            return _os.path.realpath(current).replace("\\", "/")
+        parent = _os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    _fail_bootstrap("Schedule renderer cannot locate its canonical ECL repository root")
+    raise AssertionError("unreachable")
+
+
+_REPOSITORY_ROOT = _find_repository_root(_WRAPPER_PATH)
+_EXPECTED_WRAPPER_PATH = _os.path.realpath(
+    _os.path.join(_REPOSITORY_ROOT, "tools", "render_schedule.py")
+).replace("\\", "/")
+if _WRAPPER_PATH != _EXPECTED_WRAPPER_PATH:
+    _fail_bootstrap(
+        "Schedule renderer refuses bootstrap copies or bind-mounted aliases outside "
+        "the canonical repository tools/render_schedule.py path"
+    )
+
+_WRAPPER_DIR = _os.path.join(_REPOSITORY_ROOT, "tools").replace("\\", "/")
+_IMPL_PATH = _os.path.join(_WRAPPER_DIR, "render_schedule_impl.py").replace("\\", "/")
+if _os.path.realpath(_IMPL_PATH).replace("\\", "/") != _IMPL_PATH:
+    _fail_bootstrap("Schedule renderer implementation path is not canonical")
+if not _os.path.isfile(_IMPL_PATH):
+    _fail_bootstrap("Schedule renderer canonical implementation is missing")
+
+# A repository-shaped directory is not, by itself, an authenticity signal.
+# The reviewed bootstrap carries the exact Git blob identity of the reviewed
+# implementation and executes the same bytes it authenticates.  A copied
+# wrapper surrounded by spoofed sentinels can therefore run only the reviewed
+# implementation bytes, never an attacker-selected sibling.  Git's blob frame
+# binds both the byte length and content; matching this fixed existing object
+# with different bytes requires a second preimage, not merely a generic SHA-1
+# collision.
+_EXPECTED_IMPL_GIT_BLOB_SHA1 = "d266a52f5c040c3b5e865b8b6592553ae20770d9"
+try:
+    with open(_IMPL_PATH, "rb") as _handle:
+        _impl_bytes = _handle.read()
+except OSError as _exc:
+    _fail_bootstrap(f"Schedule renderer cannot read its implementation: {_exc}")
+_impl_blob_frame = f"blob {len(_impl_bytes)}\0".encode("ascii") + _impl_bytes
+_actual_impl_git_blob_sha1 = _hashlib.sha1(_impl_blob_frame).hexdigest()
+if _actual_impl_git_blob_sha1 != _EXPECTED_IMPL_GIT_BLOB_SHA1:
+    _fail_bootstrap(
+        "Schedule renderer implementation bytes do not match the reviewed bootstrap trust anchor"
+    )
+try:
+    _source = _impl_bytes.decode("utf-8")
+except UnicodeDecodeError as _exc:
+    _fail_bootstrap(f"Schedule renderer implementation is not valid UTF-8: {_exc}")
+
+# ``-S`` deliberately omits site-packages.  Add exactly the interpreter's own
+# site-packages directory so the separately pinned PyYAML dependency remains
+# available without processing site.py, .pth files, user-site, or repository
+# paths.  The renderer later verifies PyYAML == 6.0.3 and hash-binds its pin.
+if _ORIGINAL_NAME == "__main__":
+    if sys.platform == "win32":
+        _site_packages = f"{sys.prefix.replace(chr(92), '/')}/Lib/site-packages"
     else:
-        print(text)
+        _site_packages = (
+            f"{sys.prefix.replace(chr(92), '/')}/lib/"
+            f"python{sys.version_info.major}.{sys.version_info.minor}/site-packages"
+        )
+    _site_normalised = _normalise_absolute_path(_site_packages)
+    if not _site_normalised or not any(
+        _is_within(_site_normalised, _prefix) for _prefix in _trusted_prefixes
+    ):
+        _fail_bootstrap("Schedule renderer derived an untrusted site-packages path")
+    sys.path.append(_site_packages)
+
+_globals = globals()
+_globals["__file__"] = _IMPL_PATH
+_globals["__name__"] = "_ecl_render_schedule_impl"
+_globals["__spec__"] = None
+try:
+    exec(compile(_source, _IMPL_PATH, "exec"), _globals)
+finally:
+    _globals["__name__"] = _ORIGINAL_NAME
+    _globals["__spec__"] = _ORIGINAL_SPEC
+
+_impl_control_paths = schedule_renderer_control_paths
+_impl_validate_environment = validate_renderer_environment
 
 
-if __name__ == "__main__":
+def _repository_local_module(label, module) -> None:
+    origin = getattr(module, "__file__", None)
+    if not isinstance(origin, str) or not origin:
+        raise ValueError(f"Schedule renderer cannot verify imported {label} origin")
+    origin_path = Path(origin).resolve()
+    try:
+        origin_path.relative_to(ROOT)
+    except ValueError:
+        return
+    raise ValueError(
+        f"Schedule renderer refuses repository-local shadowing of imported {label}: {origin_path}"
+    )
+
+
+def validate_renderer_environment() -> None:
+    """Fail closed if a supported isolated run still resolves local shadows."""
+
+    _repository_local_module("argparse", argparse)
+    _repository_local_module("hashlib", hashlib)
+    _repository_local_module("re", re)
+    _repository_local_module("yaml", yaml)
+    _impl_validate_environment()
+
+
+def schedule_renderer_control_paths() -> list[Path]:
+    """Bind both the bootstrap and implementation as material renderer code."""
+
+    paths = list(_impl_control_paths())
+    wrapper = Path(_WRAPPER_PATH).resolve()
+    if wrapper not in {path.resolve() for path in paths}:
+        paths.append(wrapper)
+    return paths
+
+
+if _ORIGINAL_NAME == "__main__":
     main()

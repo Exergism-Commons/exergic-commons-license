@@ -35,6 +35,29 @@ REVIEWED_MECHANISM_FILENAMES = {
     "bundle_schema": "bundle.schema.json",
 }
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+CANONICAL_EMPTY_BUNDLES: dict[str, dict[str, Any]] = {
+    "ECL-0.3-DRAFT@RP-EMPTY-1": {
+        "operative": False,
+        "license": {
+            "ref": "ECL-0.3-DRAFT",
+            "path": "versions/licenses/ECL-0.3-DRAFT.md",
+            "sha256": "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d",
+        },
+        "schedule": {
+            "ref": "ECL-RP-EMPTY-1",
+            "path": "schedules/ECL-RP-EMPTY-1.md",
+            "sha256": "e12a6ffc03aa0be24a9f61d0d325bc8c06bb9c870416a72fcac0bfd968025aa2",
+        },
+    }
+}
+RESERVED_FALLBACK_IDENTITIES: dict[str, set[str]] = {
+    key: {
+        registered[component_name][key]
+        for registered in CANONICAL_EMPTY_BUNDLES.values()
+        for component_name in ("license", "schedule")
+    }
+    for key in ("ref", "path", "sha256")
+}
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -66,6 +89,59 @@ def major_from_constraint(value: str) -> int | None:
 
 def valid_review_id(value: str) -> bool:
     return REVIEW_ID_RE.fullmatch(value) is not None
+
+
+def _uses_reserved_fallback_identity(actual: Any) -> bool:
+    if not isinstance(actual, dict):
+        return False
+    for key in ("ref", "path", "sha256"):
+        value = actual.get(key)
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"bundle component {key} must be a non-empty string")
+        if value in RESERVED_FALLBACK_IDENTITIES[key]:
+            return True
+    return False
+
+
+def validate_bundle_identity(bundle: dict[str, Any]) -> None:
+    """Enforce semantic identity for canonical empty-Schedule fallback Bundles.
+
+    Empty fallback identities are intentionally opt-in rather than generative.
+    Their identifiers and every reserved component identity are a single
+    indivisible namespace: no reserved ref, path, or hash may be borrowed in
+    either the License or Schedule slot of an ordinary Bundle. A new fallback is
+    invalid until its exact state is registered here and in the Bundle schema.
+    """
+
+    bundle_ref = bundle.get("bundle")
+    if not isinstance(bundle_ref, str):
+        raise ValueError("bundle manifest is missing string bundle identity")
+
+    expected = CANONICAL_EMPTY_BUNDLES.get(bundle_ref)
+    if expected is not None:
+        if bundle.get("operative") is not expected["operative"]:
+            raise ValueError(
+                f"canonical empty fallback {bundle_ref} has invalid operative state"
+            )
+        for component_name in ("license", "schedule"):
+            actual_component = bundle.get(component_name)
+            expected_component = expected[component_name]
+            if actual_component != expected_component:
+                raise ValueError(
+                    f"canonical empty fallback {bundle_ref} has mismatched "
+                    f"{component_name} identity"
+                )
+        return
+
+    if "@RP-EMPTY-" in bundle_ref:
+        raise ValueError(f"unsupported canonical empty fallback bundle: {bundle_ref}")
+
+    for component_name in ("license", "schedule"):
+        if _uses_reserved_fallback_identity(bundle.get(component_name)):
+            raise ValueError(
+                f"bundle {bundle_ref} uses reserved canonical empty fallback "
+                f"identity in {component_name} slot"
+            )
 
 
 def validate_file_reference(
@@ -232,6 +308,7 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
 
 
 def validate_bundle_components(root: Path, bundle: dict[str, Any]) -> None:
+    validate_bundle_identity(bundle)
     license_component = bundle.get("license")
     schedule_component = bundle.get("schedule")
     if not isinstance(license_component, dict) or not isinstance(schedule_component, dict):
@@ -251,7 +328,10 @@ def resolve_follow(policy: dict[str, Any], root: Path, allow_draft: bool) -> dic
     bundle_ref = channel.get("bundle")
     if not isinstance(bundle_ref, str) or not bundle_ref:
         raise ValueError(f"channel {channel_name!r} does not resolve an immutable bundle")
-    bundle = load_json(root / "releases" / "bundles" / f"{bundle_ref}.json")
+    path = root / "releases" / "bundles" / f"{bundle_ref}.json"
+    bundle = load_json(path)
+    if bundle.get("bundle") != bundle_ref:
+        raise ValueError(f"bundle manifest identity mismatch in {path}")
     if not bundle.get("operative") and not allow_draft:
         raise ValueError(f"bundle {bundle_ref!r} is non-operative/draft")
 

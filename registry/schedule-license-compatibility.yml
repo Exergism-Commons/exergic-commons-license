@@ -1,0 +1,16 @@
+schema_version: 3
+target_license: "ECL-0.3-DRAFT"
+target_license_artifact:
+  path: "versions/licenses/ECL-0.3-DRAFT.md"
+  sha256: "347a39d2e0b2a0df5bbe6c8b4bb0cc97b34f4866061d6be8522fe5f5578eb50d"
+status: pending
+review_evidence: null
+note: >-
+  The frozen Schedule clause sources were prepared against ECL-0.2-DRAFT.
+  Do not mark this record complete until an explicit compatibility revalidation
+  has reviewed the exact frozen target License and the exact renderer-consumed
+  source files. A completed pointer must reference a content-addressed evidence
+  record at reviews/schedule-compatibility/<sha256>.yml whose filename/id equals
+  the SHA-256 of the evidence bytes. That immutable evidence record, not this
+  mutable pointer, must bind the target License path/hash and every consumed
+  source path/hash and record the reviewer, review time and compatible conclusion.

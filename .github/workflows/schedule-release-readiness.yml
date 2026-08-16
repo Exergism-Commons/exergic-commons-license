@@ -2,9 +2,45 @@ name: Schedule release readiness
 
 on:
   push:
-    paths: ["registry/**", "tools/render_schedule.py", ".github/workflows/schedule-release-readiness.yml"]
+    paths:
+      - "registry/**"
+      - "reviews/schedule-compatibility/**"
+      - "tools/render_schedule.py"
+      - "tools/render_schedule_impl.py"
+      - "tools/check_schedule_compatibility_output.py"
+      - "tools/schedule-requirements.txt"
+      - "tools/test_schedule_compatibility_gate.py"
+      - "tools/test_schedule_yaml_key_security.py"
+      - "tools/test_schedule_compatibility_pass21.py"
+      - "tools/test_schedule_compatibility_pass22.py"
+      - "tools/test_schedule_compatibility_pass23.py"
+      - "tools/test_schedule_compatibility_pass24.py"
+      - "tools/test_schedule_compatibility_pass25.py"
+      - "tools/test_schedule_compatibility_pass26.py"
+      - "tools/test_schedule_compatibility_pass27.py"
+      - "LICENSE"
+      - "versions/licenses/**"
+      - ".github/workflows/schedule-release-readiness.yml"
   pull_request:
-    paths: ["registry/**", "tools/render_schedule.py", ".github/workflows/schedule-release-readiness.yml"]
+    paths:
+      - "registry/**"
+      - "reviews/schedule-compatibility/**"
+      - "tools/render_schedule.py"
+      - "tools/render_schedule_impl.py"
+      - "tools/check_schedule_compatibility_output.py"
+      - "tools/schedule-requirements.txt"
+      - "tools/test_schedule_compatibility_gate.py"
+      - "tools/test_schedule_yaml_key_security.py"
+      - "tools/test_schedule_compatibility_pass21.py"
+      - "tools/test_schedule_compatibility_pass22.py"
+      - "tools/test_schedule_compatibility_pass23.py"
+      - "tools/test_schedule_compatibility_pass24.py"
+      - "tools/test_schedule_compatibility_pass25.py"
+      - "tools/test_schedule_compatibility_pass26.py"
+      - "tools/test_schedule_compatibility_pass27.py"
+      - "LICENSE"
+      - "versions/licenses/**"
+      - ".github/workflows/schedule-release-readiness.yml"
   workflow_dispatch:
 
 permissions:
@@ -17,10 +53,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: python -m pip install --disable-pip-version-check PyYAML
+      - run: python -I -m pip install --disable-pip-version-check -r tools/schedule-requirements.txt
+      - name: Test compatibility gate regressions
+        run: |
+          python -I tools/test_schedule_compatibility_gate.py
+          python -I tools/test_schedule_yaml_key_security.py
+          python -I tools/test_schedule_compatibility_pass21.py
+          python -I tools/test_schedule_compatibility_pass22.py
+          python -I tools/test_schedule_compatibility_pass23.py
+          python -I tools/test_schedule_compatibility_pass24.py
+          python -I tools/test_schedule_compatibility_pass25.py
+          python -I tools/test_schedule_compatibility_pass26.py
+          python -I tools/test_schedule_compatibility_pass27.py
       - name: Validate State coverage
         run: |
-          python - <<'PY'
+          python -I - <<'PY'
           from pathlib import Path
           import yaml
           R=Path('registry')
@@ -47,9 +94,11 @@ jobs:
           print(f"coverage valid: R={len(active_r)} S={len(active_s)} renderable={len(ready)} factual_gate={len(active_s-ready)}")
           PY
       - name: Validate renderer
-        run: python tools/render_schedule.py --validate-only
+        run: python -I -S tools/render_schedule.py --validate-only
       - name: Render candidate
-        run: python tools/render_schedule.py --output build/ECL-RP-0.5-GENERATED-DRAFT.md
+        run: python -I -S tools/render_schedule.py --output build/ECL-RP-0.5-GENERATED-DRAFT.md
+      - name: Validate rendered compatibility state
+        run: python -I tools/check_schedule_compatibility_output.py build/ECL-RP-0.5-GENERATED-DRAFT.md
       - uses: actions/upload-artifact@v4
         with:
           name: ecl-rp-0.5-generated-draft
