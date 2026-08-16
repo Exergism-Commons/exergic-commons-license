@@ -26,7 +26,7 @@ def load_renderer():
 class ImportShadowingRegressions(unittest.TestCase):
     def run_renderer(self) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, str(RENDERER), "--validate-only"],
+            [sys.executable, "-I", "-S", str(RENDERER), "--validate-only"],
             cwd=ROOT,
             text=True,
             capture_output=True,
