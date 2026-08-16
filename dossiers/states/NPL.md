@@ -59,10 +59,11 @@ Current review is limited to **implementation of accountability for the Septembe
 
 Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
 
-- **Status:** historical-only / superseded as an active restriction. The NHRC and Amnesty locators are preserved above as provenance for the September 2025 protest-abuse and accountability record, but that historical severity does not preserve the former `S` after the tranche's continuity analysis.
-- The 2026 government change, NHRC investigation/recommendations and absence at cutoff of sufficiently established fresh recurrence are part of the evidence for **downgrade `S → U`**, not evidence to erase the earlier abuse record.
-- **Schedule boundary:** the former Nepal `S` theory is non-renderable after the downgrade. No present State, police/security class or development/FPIC project may be restored to Schedule-State `S` without new attributable project-level evidence satisfying the re-escalation trigger.
+- **Status:** absorbed as the historical origin of the `S → U` downgrade, then **revalidated by later review**. The NHRC and Amnesty locators are preserved above as provenance for the September 2025 protest-abuse and accountability record, while the tranche records the original continuity break that caused the downgrade.
+- The later `../../reviews/2026/adversarial/under-review/full-cohort.md` review explicitly revalidated Nepal as `U`, finding that government change plus NHRC accountability continued to break continuity of the 2025 repression project and that non-recurrence/accountability remained under review. It preserved the earlier immutable tranche history rather than replacing it.
+- The subsequent `../../reviews/2026/consistency/ecl-0.2-state-delta.md` consistency recheck again retained Nepal as `U`, specifically because current recurrence/persistence remained insufficient. These later reviews are the controlling current provenance for retaining `U`; the historical tranche is not represented as the terminal review event.
+- **Schedule boundary:** Nepal remains non-renderable as an `S` restriction. No present State, police/security class or development/FPIC project may be restored to Schedule-State `S` without new attributable project-level evidence satisfying the re-escalation trigger.
 
 ## 10. Procedural history
 
-Issue #121 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
+Issue #121 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
