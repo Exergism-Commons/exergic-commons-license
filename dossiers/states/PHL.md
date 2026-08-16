@@ -68,6 +68,15 @@ Expressly excluded are PNP, MPD, Malate Police Station 9 and SDEUs generally; la
 - https://www.hrw.org/news/2026/06/30/philippines-drug-war-abuses-persist-10-years-on
 - https://www.hrw.org/world-report/2026/country-chapters/philippines
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11). Later controlling review: `../../reviews/2026/consistency/schedule-readiness.md` (2026-08-14).
+
+- **Status:** historical-only / superseded where the tranche described a broader active `S` scope. The tranche's evidence of continuing anti-drug killings, arbitrary arrests and specific security-repression concerns remains governance provenance and is still represented by the HRW locators above, but it does not control the later Schedule identity.
+- The tranche also recorded the 2025 ICC transfer of former President Rodrigo Duterte and a May 2026 civilian Truth and Reconciliation Commission as counter-evidence. Exact locators for those discrete historical assertions are not preserved in the audited pass surfaces, so they are retained as historical context without manufacturing URLs or using them to define the current freeze.
+- **Later revalidation:** the 2026-08-14 Schedule-readiness review found an objectively knowable, finite January 2026 Malate Police Station 9 SDEU incident and narrowed renderability accordingly. That later review supersedes the tranche as the controlling Schedule-status determination without erasing the broader historical abuse record.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-22a-phl-freeze.yml` controls current renderability. Only the **28 January 2026 Barangay San Isidro unauthorized anti-drug / armed-robbery incident** and materially participating alleged abusive functions of the six identified SDEU personnel are frozen. The nationwide anti-drug campaign, PNP/MPD/station/SDEU classes generally, other killings/arrests/torture allegations and counterterrorism/red-tagging cases remain governance-only unless separately frozen.
+
+## 10. Procedural history
 
 Issue #138 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md` · `../../reviews/2026/consistency/schedule-readiness.md`
