@@ -96,9 +96,11 @@ for _entry in sys.path:
 sys.path[:] = _sanitised_path
 
 # Only after import search is restricted to interpreter-owned roots may the
-# bootstrap import filesystem helpers.  The wrapper path itself is part of the
-# trust boundary: aliases or standalone copies must not be allowed to redirect
-# sibling implementation selection before reviewed renderer validation begins.
+# bootstrap import filesystem and hashing helpers.  The wrapper path itself is
+# part of the trust boundary: aliases or standalone copies must not be allowed
+# to redirect sibling implementation selection before reviewed renderer
+# validation begins.
+import hashlib as _hashlib
 import os as _os
 
 if _os.path.islink(_WRAPPER_INPUT_PATH):
@@ -160,6 +162,31 @@ if _os.path.realpath(_IMPL_PATH).replace("\\", "/") != _IMPL_PATH:
 if not _os.path.isfile(_IMPL_PATH):
     _fail_bootstrap("Schedule renderer canonical implementation is missing")
 
+# A repository-shaped directory is not, by itself, an authenticity signal.
+# The reviewed bootstrap carries the exact Git blob identity of the reviewed
+# implementation and executes the same bytes it authenticates.  A copied
+# wrapper surrounded by spoofed sentinels can therefore run only the reviewed
+# implementation bytes, never an attacker-selected sibling.  Git's blob frame
+# binds both the byte length and content; matching this fixed existing object
+# with different bytes requires a second preimage, not merely a generic SHA-1
+# collision.
+_EXPECTED_IMPL_GIT_BLOB_SHA1 = "d266a52f5c040c3b5e865b8b6592553ae20770d9"
+try:
+    with open(_IMPL_PATH, "rb") as _handle:
+        _impl_bytes = _handle.read()
+except OSError as _exc:
+    _fail_bootstrap(f"Schedule renderer cannot read its implementation: {_exc}")
+_impl_blob_frame = f"blob {len(_impl_bytes)}\0".encode("ascii") + _impl_bytes
+_actual_impl_git_blob_sha1 = _hashlib.sha1(_impl_blob_frame).hexdigest()
+if _actual_impl_git_blob_sha1 != _EXPECTED_IMPL_GIT_BLOB_SHA1:
+    _fail_bootstrap(
+        "Schedule renderer implementation bytes do not match the reviewed bootstrap trust anchor"
+    )
+try:
+    _source = _impl_bytes.decode("utf-8")
+except UnicodeDecodeError as _exc:
+    _fail_bootstrap(f"Schedule renderer implementation is not valid UTF-8: {_exc}")
+
 # ``-S`` deliberately omits site-packages.  Add exactly the interpreter's own
 # site-packages directory so the separately pinned PyYAML dependency remains
 # available without processing site.py, .pth files, user-site, or repository
@@ -184,8 +211,6 @@ _globals["__file__"] = _IMPL_PATH
 _globals["__name__"] = "_ecl_render_schedule_impl"
 _globals["__spec__"] = None
 try:
-    with open(_IMPL_PATH, "r", encoding="utf-8") as _handle:
-        _source = _handle.read()
     exec(compile(_source, _IMPL_PATH, "exec"), _globals)
 finally:
     _globals["__name__"] = _ORIGINAL_NAME
