@@ -61,7 +61,19 @@ Excluded: the NCHR, parliament, ordinary courts providing independent remedy, un
 - https://nchr.org.jo/en/statements/statement-issued-by-the-national-centre-for-human-rights-on-the-occasion-of-the-arab-human-rights-day/
 - https://nchr.org.jo/en/statements/statement-on-world-press-freedom-day/
 
-## 9. Procedural history
+The NCHR World Press Freedom Day locator is also the exact project-context source preserved by `../../registry/schedule-state-s-batches/batch-06-detention-political.yml`; it is counter-institutional/context provenance and is not promoted into proof of the separate Sanduka, administrative-detention or media-blocking propositions.
+
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-16:
+
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **already represented substantively**. Its expression-punishment, administrative-detention, cybercrime/media-blocking, NCHR counter-evidence, attribution boundary and removal triggers are reflected in §§1–8.
+- `../../registry/schedule-state-s-batches/batch-06-detention-political.yml` — **already represented**. Its exact NCHR locator and capacity-limited Jordan translation are preserved without treating that source as conduct evidence for unrelated propositions.
+- Issue #86 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
+
+No historical locator gap is asserted here beyond what the canonical dossier itself already exposes; this normalization changes no current outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+
+## 10. Procedural history
 
 - Issue #86
 - `../../reviews/2026/initial-adjudication.md`
