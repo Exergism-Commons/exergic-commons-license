@@ -55,6 +55,14 @@ Closure or compliant reform of abusive facilities such as Tiger Base; traceable 
 - https://www.nigeriarights.gov.ng/nhrc-media/data-and-infographics/644-april-2026-human-rights-dashboard.html
 - https://www.nigeriarights.gov.ng/nhrc-media/news-and-events/654-international-day-in-support-of-victims-of-torture-nhrc-reaffirms-commitment-to-preventing-torture-protecting-dignity-and-securing-justice-for-victims.html
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The exact February 2026 Amnesty Tiger Base investigation, the broader Amnesty country record and NHRC counter-evidence locators are preserved above, so the scoped-tranche propositions no longer require the tranche for source recovery.
+- The tranche's broader references to protest force, military/security operations and other public-security abuse remain governance evidence only where separately attributable; they do not create a generic Nigeria Police Force, armed-forces or whole-State restriction.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-03a.yml` is the controlling later renderability surface. It promotes only the **Imo State Police Anti-Kidnapping Unit (Tiger Base) detention/custody project**, limited to Tiger Base in the documented project and materially continuous unremediated operations. NHRC/NPM, courts, independent remediation and other security units lacking separate evidence remain excluded; the broader historical security/protest scope does not widen this promoted project.
+
+## 10. Procedural history
 
 Issue #126 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
