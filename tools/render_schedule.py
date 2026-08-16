@@ -24,6 +24,8 @@ TARGET_LICENSE_ARTIFACT = ROOT / "versions" / "licenses" / "ECL-0.3-DRAFT.md"
 WORKING_LICENSE = ROOT / "LICENSE"
 COMPATIBILITY_REVIEW = REG / "schedule-license-compatibility.yml"
 COMPATIBILITY_EVIDENCE_DIR = ROOT / "reviews" / "schedule-compatibility"
+SCHEDULE_REQUIREMENTS = ROOT / "tools" / "schedule-requirements.txt"
+PINNED_PYYAML_VERSION = "6.0.3"
 
 READY_PREFIX = "ready"
 REFERENCE_STATUSES = {
@@ -32,14 +34,14 @@ REFERENCE_STATUSES = {
     "ready-by-state-scope-reference",
     "ready-by-project-reference",
 }
-DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 RFC3339_RE = re.compile(
-    r"^(?P<date>\d{4}-\d{2}-\d{2})T"
-    r"(?P<hour>[01]\d|2[0-3]):"
-    r"(?P<minute>[0-5]\d):"
-    r"(?P<second>[0-5]\d)"
-    r"(?:\.\d+)?"
-    r"(?P<zone>Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+    r"^(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})T"
+    r"(?P<hour>[01][0-9]|2[0-3]):"
+    r"(?P<minute>[0-5][0-9]):"
+    r"(?P<second>[0-5][0-9])"
+    r"(?:\.[0-9]+)?"
+    r"(?P<zone>Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
 )
 STANDARD_MAPPING_TAG = "tag:yaml.org,2002:map"
 STANDARD_SEQUENCE_TAG = "tag:yaml.org,2002:seq"
@@ -63,6 +65,23 @@ def load_yaml(path: Path) -> dict[str, Any]:
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def validate_renderer_environment() -> None:
+    """Require the parser release reviewed as part of Schedule compatibility."""
+
+    expected_requirements = f"PyYAML=={PINNED_PYYAML_VERSION}\n"
+    if not SCHEDULE_REQUIREMENTS.is_file():
+        raise ValueError(f"missing Schedule renderer dependency pin: {SCHEDULE_REQUIREMENTS}")
+    if SCHEDULE_REQUIREMENTS.read_text(encoding="utf-8") != expected_requirements:
+        raise ValueError(
+            "Schedule renderer dependency pin does not match the renderer's expected PyYAML version"
+        )
+    actual_version = getattr(yaml, "__version__", None)
+    if actual_version != PINNED_PYYAML_VERSION:
+        raise ValueError(
+            f"Schedule renderer requires PyYAML {PINNED_PYYAML_VERSION}; found {actual_version!r}"
+        )
 
 
 def extract_records(data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -132,7 +151,7 @@ def schedule_clause_source_paths() -> list[Path]:
 
 
 def schedule_renderer_control_paths() -> list[Path]:
-    """Return non-clause inputs that can change which frozen clauses are emitted."""
+    """Return non-clause inputs that can change reviewed renderer semantics."""
 
     paths = [REG / "states.yml"]
     paths.extend(sorted(REG.glob("state-outcome-overrides*.yml")))
@@ -140,9 +159,11 @@ def schedule_renderer_control_paths() -> list[Path]:
     if status_override.exists():
         paths.append(status_override)
 
-    # Compatibility evidence also binds the implementation whose selection
-    # semantics consume the data above. A renderer-code change therefore cannot
-    # silently reuse evidence reviewed against an earlier algorithm.
+    # The parser release is a semantic input: SafeLoader/compose determine the
+    # values and node graph consumed by the renderer. Bind its exact pin along
+    # with the renderer implementation so old evidence cannot survive either a
+    # dependency upgrade or an algorithm change.
+    paths.append(SCHEDULE_REQUIREMENTS)
     paths.append(Path(__file__).resolve())
     return paths
 
@@ -150,6 +171,7 @@ def schedule_renderer_control_paths() -> list[Path]:
 def schedule_compatibility_input_paths() -> list[Path]:
     """Return the complete byte-exact input set a compatibility review must bind."""
 
+    validate_renderer_environment()
     result: list[Path] = []
     seen: set[Path] = set()
     for path in schedule_clause_source_paths() + schedule_renderer_control_paths():
@@ -417,6 +439,7 @@ def validate_compatibility_review(sources: list[Path], target_license: str) -> b
     the exact target License artifact and complete renderer input set.
     """
 
+    validate_renderer_environment()
     if not COMPATIBILITY_REVIEW.is_file():
         raise ValueError(f"missing compatibility review gate: {COMPATIBILITY_REVIEW}")
     review = load_yaml(COMPATIBILITY_REVIEW)
@@ -594,7 +617,7 @@ def render() -> tuple[str, dict[str, int]]:
             ">",
             "> Explicit content-addressed License-and-renderer-input compatibility revalidation: **PENDING**.",
             ">",
-            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and a content-addressed evidence record binds the exact target License artifact plus the complete renderer clause/control/code input set by SHA-256.",
+            "> This candidate MUST NOT be labelled compatible with the target License until every consumed frozen clause source is explicitly revalidated for that exact License and a content-addressed evidence record binds the exact target License artifact plus the complete renderer clause/control/code/environment input set by SHA-256.",
         ]
     else:
         compatibility_lines = [
