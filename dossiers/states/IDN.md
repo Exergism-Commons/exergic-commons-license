@@ -44,15 +44,17 @@ Accountability/cessation of deception campaigns, protection of peaceful protest,
 
 - https://www.amnesty.org/en/documents/asa21/1300/2026/en/
 - https://www.amnesty.org/en/documents/asa21/0624/2026/en/
+- https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/indonesia/report-indonesia/
 
-These locators are retained for the named Khariq Anhar peaceful-expression/prosecution project represented in the Schedule freeze; they do not establish the dossier's other military/deception, counterterrorism or Papua/extractive propositions by themselves.
+The first two locators are retained for the named Khariq Anhar peaceful-expression/prosecution project represented in the Schedule freeze. The Amnesty Indonesia country report is retained as broader project-context provenance recovered from the Schedule batch. None of these locators is treated, by presence alone, as proof of the dossier's separate military-connected deception/intimidation, UN-communication, broader release/acquittal-cohort or Papua/extractive propositions.
 
 ## 8. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-15:
 
 - `../../reviews/2026/adversarial/scoped/tranche-04.md` — **absorbed / partial locator gap remains**. The protest-criminalization evidence, military-connected deception/intimidation concern, UN scrutiny, release/acquittal counter-evidence, implementation boundary for military powers and Papua/extractive attribution rule are reflected in §§1–7 above.
-- Exact Amnesty locators for the named Khariq Anhar protest/expression prosecution project were recovered from `../../registry/schedule-state-s-freezes/batch-10b-idn-freeze.yml` and normalized into §7. The tranche's separate military-connected deception/intimidation, UN Special Procedures, broader release/acquittal cohort and Papua/extractive propositions still lack exact historical locators in the reviewed provenance; those narrower gaps remain open rather than being reconstructed by inference.
+- Exact Amnesty locators for the named Khariq Anhar protest/expression prosecution project were recovered from `../../registry/schedule-state-s-freezes/batch-10b-idn-freeze.yml`. The Amnesty Indonesia country-report locator associated with the broader capacity-limited Indonesia project set was recovered from `../../registry/schedule-state-s-batches/batch-05-civic-security.yml`. They are normalized into §7 with proposition-specific limitations.
+- The tranche's separate military-connected deception/intimidation, UN Special Procedures, broader release/acquittal cohort and Papua/extractive propositions still lack exact historical locators in the reviewed provenance; those narrower gaps remain open rather than being reconstructed by inference.
 - Issue #78 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
 
 Only the remaining proposition-specific historical locators are evidence-curation gaps. This record does not convert draft legal authority into a restricted project, broaden Papua/extractive attribution or create/change structured Claims, EvidenceItems, grades, `asOf`, actor relationships or governance outcomes.
