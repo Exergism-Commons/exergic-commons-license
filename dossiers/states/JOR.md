@@ -43,6 +43,8 @@ Covered scope follows State Security Court/prosecutorial/security projects mater
 
 Excluded: the NCHR, parliament, ordinary courts providing independent remedy, unrelated administration and Jordanian people/nationality.
 
+The later Schedule-freeze promotion at `../../registry/schedule-state-s-freezes/promoted-ready-03a.yml` records a renderable **State Security Court / Media Commission / governor detention qualifying project class** with `ready-promoted-capacity-limited-parties` status. That promotion preserves the same case/order/detention-specific capacity limit and does not create a generic Jordan security, judicial or media-regulatory class.
+
 ## 6. Adversarial determination
 
 **UPHOLD / NARROW S.** The active detention/expression record supports restriction, but functioning counter-institutions and political/legal contestability require precise project-level attribution.
@@ -61,14 +63,15 @@ Excluded: the NCHR, parliament, ordinary courts providing independent remedy, un
 - https://nchr.org.jo/en/statements/statement-issued-by-the-national-centre-for-human-rights-on-the-occasion-of-the-arab-human-rights-day/
 - https://nchr.org.jo/en/statements/statement-on-world-press-freedom-day/
 
-The NCHR World Press Freedom Day locator is also the exact project-context source preserved by `../../registry/schedule-state-s-batches/batch-06-detention-political.yml`; it is counter-institutional/context provenance and is not promoted into proof of the separate Sanduka, administrative-detention or media-blocking propositions.
+The NCHR World Press Freedom Day locator is also the exact project-context source preserved by `../../registry/schedule-state-s-batches/batch-06-detention-political.yml`; it is counter-institutional/context provenance and is not promoted into proof of the separate Sanduka, administrative-detention or media-blocking propositions. The later `promoted-ready-03a.yml` record changes the Schedule translation status/boundary, not the evidentiary role of that NCHR source.
 
 ## 9. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-16:
 
 - `../../reviews/2026/adversarial/scoped/tranche-05.md` — **already represented substantively**. Its expression-punishment, administrative-detention, cybercrime/media-blocking, NCHR counter-evidence, attribution boundary and removal triggers are reflected in §§1–8.
-- `../../registry/schedule-state-s-batches/batch-06-detention-political.yml` — **already represented**. Its exact NCHR locator and capacity-limited Jordan translation are preserved without treating that source as conduct evidence for unrelated propositions.
+- `../../registry/schedule-state-s-batches/batch-06-detention-political.yml` — **already represented as the earlier translation stage**. Its exact NCHR locator and capacity-limited Jordan candidate class are preserved without treating that source as conduct evidence for unrelated propositions.
+- `../../registry/schedule-state-s-freezes/promoted-ready-03a.yml` — **absorbed as the later renderable-status surface**. It promotes the State Security Court / Media Commission / governor-detention qualifying project class to `ready-promoted-capacity-limited-parties` while retaining the case/order/detention-specific boundary and the exclusions for NCHR, parliament, remedial ordinary courts and unrelated administration.
 - Issue #86 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
 
 No historical locator gap is asserted here beyond what the canonical dossier itself already exposes; this normalization changes no current outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
