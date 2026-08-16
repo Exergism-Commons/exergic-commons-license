@@ -70,15 +70,15 @@ No Schedule freeze may be generated for the current religious-detention record u
 - https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/laos/
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=LAO+3%2F2025
 
-The HRW Sisay locator and `LAO 3/2025` are also the exact locators retained in `../../registry/schedule-state-s-batches/batch-06-detention-political.yml`. The later Open Doors locator supports the separately revalidated June 2026 religious-detention concern; it is not retroactively substituted for the tranche's earlier transfer or transnational-repression propositions.
+The HRW Sisay locator and `LAO 3/2025` are also the exact locators retained in `../../registry/schedule-state-s-batches/batch-06-detention-political.yml`. The Amnesty Laos country-report URL is the recoverable historical locator corresponding to the `Amnesty International Laos 2025/26` baseline cited by `../../reviews/2026/initial-adjudication.md`, including the earlier high-risk Myanmar-transfer proposition. It is retained as proposition-associated historical provenance, while no more granular event-specific transfer locator is preserved. The later Open Doors locator supports the separately revalidated June 2026 religious-detention concern and is not retroactively substituted for the transfer or transnational-repression propositions.
 
 ## 10. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-16:
 
-- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / partial locator gap remains**. Its Sisay disappearance/death concern, attribution caution, high-risk-transfer/religious-enforcement boundaries and reversibility logic are represented in §§1–9, subject to the later 2026-08-14 status/knowability revalidation.
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / historical provenance recovered with granularity limitation**. Its Sisay disappearance/death concern, attribution caution, high-risk-transfer/religious-enforcement boundaries and reversibility logic are represented in §§1–9, subject to the later 2026-08-14 status/knowability revalidation.
+- `../../reviews/2026/initial-adjudication.md` — **absorbed** for the `Amnesty International Laos 2025/26` evidence baseline. The corresponding Amnesty Laos country-report locator in §9 is the preserved historical source for the earlier Myanmar-transfer proposition; the repository does not preserve a more granular event-specific transfer locator.
 - `../../registry/schedule-state-s-batches/batch-06-detention-political.yml` — **already represented** for the exact HRW Sisay and `LAO 3/2025` locators. Those sources are kept within their proposition/context boundaries.
-- The tranche's separate assertion concerning transfer of Myanmar nationals to the Myanmar military did not retain an exact proposition-specific source locator in the reviewed tranche, issue #92, dossier, initial adjudication or Schedule translation surfaces. That locator remains an explicit historical evidence-curation gap rather than being reconstructed externally.
 - The tranche's transnational-repression reference remains attribution-contested; `LAO 3/2025` is retained as the recoverable UN communication locator without converting the allegation into proven State conduct.
 - Issue #92 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
 
