@@ -55,6 +55,14 @@ Current review is limited to **implementation of accountability for the Septembe
 - https://www.nhrcnepal.org/press_release/detail/883
 - https://www.amnesty.org/en/location/asia-and-the-pacific/south-asia/nepal/report-nepal/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** historical-only / superseded as an active restriction. The NHRC and Amnesty locators are preserved above as provenance for the September 2025 protest-abuse and accountability record, but that historical severity does not preserve the former `S` after the tranche's continuity analysis.
+- The 2026 government change, NHRC investigation/recommendations and absence at cutoff of sufficiently established fresh recurrence are part of the evidence for **downgrade `S → U`**, not evidence to erase the earlier abuse record.
+- **Schedule boundary:** the former Nepal `S` theory is non-renderable after the downgrade. No present State, police/security class or development/FPIC project may be restored to Schedule-State `S` without new attributable project-level evidence satisfying the re-escalation trigger.
+
+## 10. Procedural history
 
 Issue #121 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
