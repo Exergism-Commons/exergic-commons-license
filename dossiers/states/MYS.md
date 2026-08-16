@@ -60,7 +60,7 @@ Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff
 
 - **Status:** absorbed / already represented. The two April 2026 SUHAKAM speech-enforcement locators and the July 2026 immigration-detention locator are preserved directly above, so the historical propositions no longer depend on the tranche to recover their source provenance.
 - The tranche's removal of the earlier generic `LGBTI raid` component is retained as a narrowing decision; historical mention of that component does not reactivate it.
-- **Schedule boundary:** the current registry remains project-freeze dependent for the police/speech case and immigration-detention family. This dossier does not infer a generic police, communications, Home Affairs or depot-wide Restricted party from the historical evidence alone.
+- **Schedule boundary:** the later `../../registry/schedule-state-s-freezes/batch-04-detention-digital.yml` record controls current renderability. The **Immigration Department of Malaysia — Detention and Depot Management Division**, only in qualifying immigration-detention/depot-management operations and the capacity defined there, is already a `renderable-subset` with `schedule_status: ready-narrowed-subset`. **Speech/public-order enforcement remains residual unfrozen scope pending an exact police case/statutory-boundary freeze.** This historical normalization neither collapses those two states nor infers a generic Immigration Department, police, communications, Home Affairs or depot-wide Restricted party.
 
 ## 10. Procedural history
 
