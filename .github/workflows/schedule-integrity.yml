@@ -13,7 +13,7 @@ on:
       - "tools/test_schedule_yaml_key_security.py"
       - "tools/test_schedule_compatibility_pass21.py"
       - "tools/test_schedule_compatibility_pass22.py"
-      - "tests/test_codex_pass23_import_shadowing.py"
+      - "tools/test_schedule_compatibility_pass23.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
@@ -29,7 +29,7 @@ on:
       - "tools/test_schedule_yaml_key_security.py"
       - "tools/test_schedule_compatibility_pass21.py"
       - "tools/test_schedule_compatibility_pass22.py"
-      - "tests/test_codex_pass23_import_shadowing.py"
+      - "tools/test_schedule_compatibility_pass23.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-integrity.yml"
@@ -57,7 +57,7 @@ jobs:
           python tools/test_schedule_yaml_key_security.py
           python tools/test_schedule_compatibility_pass21.py
           python tools/test_schedule_compatibility_pass22.py
-          python tests/test_codex_pass23_import_shadowing.py
+          python tools/test_schedule_compatibility_pass23.py
 
       - name: Validate frozen Schedule inputs
         run: python tools/render_schedule.py --validate-only
