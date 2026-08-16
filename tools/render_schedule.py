@@ -97,8 +97,8 @@ sys.path[:] = _sanitised_path
 
 # Only after import search is restricted to interpreter-owned roots may the
 # bootstrap import filesystem helpers.  The wrapper path itself is part of the
-# trust boundary: invoking the reviewed file through a symlink can otherwise
-# redirect sibling selection to an attacker-controlled render_schedule_impl.py.
+# trust boundary: aliases or standalone copies must not be allowed to redirect
+# sibling implementation selection before reviewed renderer validation begins.
 import os as _os
 
 if _os.path.islink(_WRAPPER_INPUT_PATH):
@@ -113,8 +113,52 @@ if getattr(_wrapper_stat, "st_nlink", 1) != 1:
 _WRAPPER_PATH = _os.path.realpath(_WRAPPER_INPUT_PATH).replace("\\", "/")
 if _WRAPPER_PATH != _os.path.abspath(_WRAPPER_INPUT_PATH).replace("\\", "/"):
     _fail_bootstrap("Schedule renderer bootstrap path is not canonical")
-_WRAPPER_DIR = _WRAPPER_PATH.rsplit("/", 1)[0]
-_IMPL_PATH = f"{_WRAPPER_DIR}/render_schedule_impl.py"
+
+
+def _looks_like_repository_root(path: str) -> bool:
+    """Recognise the ECL checkout without trusting cwd or mutable import paths."""
+
+    required_files = (
+        "LICENSE",
+        "registry/states.yml",
+        "versions/licenses/ECL-0.3-DRAFT.md",
+        ".github/workflows/schedule-integrity.yml",
+        ".github/workflows/schedule-release-readiness.yml",
+    )
+    return all(_os.path.isfile(_os.path.join(path, rel)) for rel in required_files)
+
+
+def _find_repository_root(wrapper_path: str) -> str:
+    """Find the containing ECL checkout, then bind the wrapper to its canonical slot."""
+
+    current = _os.path.dirname(wrapper_path)
+    while True:
+        if _looks_like_repository_root(current):
+            return _os.path.realpath(current).replace("\\", "/")
+        parent = _os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    _fail_bootstrap("Schedule renderer cannot locate its canonical ECL repository root")
+    raise AssertionError("unreachable")
+
+
+_REPOSITORY_ROOT = _find_repository_root(_WRAPPER_PATH)
+_EXPECTED_WRAPPER_PATH = _os.path.realpath(
+    _os.path.join(_REPOSITORY_ROOT, "tools", "render_schedule.py")
+).replace("\\", "/")
+if _WRAPPER_PATH != _EXPECTED_WRAPPER_PATH:
+    _fail_bootstrap(
+        "Schedule renderer refuses bootstrap copies or bind-mounted aliases outside "
+        "the canonical repository tools/render_schedule.py path"
+    )
+
+_WRAPPER_DIR = _os.path.join(_REPOSITORY_ROOT, "tools").replace("\\", "/")
+_IMPL_PATH = _os.path.join(_WRAPPER_DIR, "render_schedule_impl.py").replace("\\", "/")
+if _os.path.realpath(_IMPL_PATH).replace("\\", "/") != _IMPL_PATH:
+    _fail_bootstrap("Schedule renderer implementation path is not canonical")
+if not _os.path.isfile(_IMPL_PATH):
+    _fail_bootstrap("Schedule renderer canonical implementation is missing")
 
 # ``-S`` deliberately omits site-packages.  Add exactly the interpreter's own
 # site-packages directory so the separately pinned PyYAML dependency remains
