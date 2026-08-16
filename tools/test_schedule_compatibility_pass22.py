@@ -42,7 +42,7 @@ class ScheduleCompatibilityPass22Tests(unittest.TestCase):
 
     def test_renderer_dependency_pin_is_exact_and_hash_bound(self):
         self.assertEqual(RENDERER.PINNED_PYYAML_VERSION, "6.0.3")
-        self.assertEqual(yaml.__version__, RENDERER.PINNED_PYYAML_VERSION)
+        self.assertEqual(RENDERER.yaml.__version__, RENDERER.PINNED_PYYAML_VERSION)
         self.assertEqual(
             RENDERER.SCHEDULE_REQUIREMENTS.read_text(encoding="utf-8"),
             "PyYAML==6.0.3\n",
@@ -57,13 +57,13 @@ class ScheduleCompatibilityPass22Tests(unittest.TestCase):
         )
 
     def test_renderer_rejects_unreviewed_pyyaml_version(self):
-        original = yaml.__version__
+        original = RENDERER.yaml.__version__
         try:
-            yaml.__version__ = "0.0.0-pass22-probe"
+            RENDERER.yaml.__version__ = "0.0.0-pass22-probe"
             with self.assertRaisesRegex(ValueError, "requires PyYAML 6.0.3"):
                 RENDERER.validate_renderer_environment()
         finally:
-            yaml.__version__ = original
+            RENDERER.yaml.__version__ = original
 
     def test_schedule_workflows_install_the_pinned_environment_and_run_pass22(self):
         for relative in (
@@ -74,7 +74,7 @@ class ScheduleCompatibilityPass22Tests(unittest.TestCase):
             self.assertIn('- "tools/schedule-requirements.txt"', text)
             self.assertIn('- "tools/test_schedule_compatibility_pass22.py"', text)
             self.assertIn("-r tools/schedule-requirements.txt", text)
-            self.assertIn("python tools/test_schedule_compatibility_pass22.py", text)
+            self.assertIn("python -I tools/test_schedule_compatibility_pass22.py", text)
             self.assertNotIn("pip install --disable-pip-version-check PyYAML", text)
 
 
