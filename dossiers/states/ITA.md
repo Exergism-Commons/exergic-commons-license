@@ -56,11 +56,31 @@ Excluded absent independent evidence: the Italian State as a whole, the judiciar
 
 ## 8. Sources
 
+General/current dossier sources:
+
 - https://www.gazzettaufficiale.it/atto/vediMenuHTML?atto.codiceRedazionale=26A02297&atto.dataPubblicazioneGazzetta=2026-05-11&tipoSerie=serie_generale&tipoVigenza=originario
 - https://www.amnesty.org/en/documents/eur30/1229/2026/en/
 - https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/italy/report-italy/
 
-## 9. Procedural history
+Exact frozen statutory-project provenance:
+
+- https://www.gazzettaufficiale.it/atto/serie_generale/caricaDettaglioAtto/originario?atto.codiceRedazionale=26G00078&atto.dataPubblicazioneGazzetta=2026-04-24&elenco30giorni=false
+- https://www.amnesty.it/dissenso-sotto-attacco-cambiare-la-legge-54-2026/
+
+The freeze-specific sources identify the Law No. 54/2026 Articles 7 and 9 protest-enforcement workflow. Their presence does not by itself extend the renderable subset to the dossier's separate detention or migration-externalization scope.
+
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-16:
+
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed**. Its public-order, detention and migration-externalization reasoning, judicial counter-evidence, attribution boundary and removal triggers are represented in §§1–8.
+- `../../registry/schedule-state-s-batches/batch-05-civic-security.yml` — **absorbed** as the earlier project translation; its Gazzetta identity locator is retained through the dossier's statutory sources.
+- `../../registry/schedule-state-s-freezes/batch-17a-ita-freeze.yml` — **absorbed**. The exact Gazzetta and Amnesty Italy locators are now retained in §8, while the freeze's narrower Articles 7/9 boundary remains distinct from residual governance-only detention/externalization scope.
+- Issue #83 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
+
+No source is promoted merely by inclusion into proof of an ECL-prohibited implementation. This normalization changes no current outcome, scope, freeze, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+
+## 10. Procedural history
 
 - Issue #83
 - `../../reviews/2026/initial-adjudication.md`

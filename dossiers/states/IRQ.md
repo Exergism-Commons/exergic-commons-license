@@ -60,12 +60,35 @@ Expressly excluded are Iraq, the Ministry of Justice, Supreme Judicial Council, 
 
 ## 8. Sources
 
+Current frozen-project sources:
+
 - https://www.sjc.iq/ncijcen.79111/
 - https://www.sjc.iq/view.79141/
 - https://www.hrw.org/news/2026/02/17/iraq-alleged-isis-detainees-transferred-from-syria-at-risk-of-abuse
 - https://www.aljazeera.com/news/2026/1/29/french-isil-suspects-transferred-from-syria-allege-torture-in-iraqi-prisons
 - https://www.hrw.org/news/2026/07/16/submission-to-the-universal-periodic-review-of-syrian-arab-republic
 
-## 9. Procedural history
+Historical enforced-disappearance provenance recovered from the earlier canonical dossier history:
+
+- https://tbinternet.ohchr.org/_layouts/TreatyBodyExternal/countries.aspx?CountryCode=IRQ&Lang=EN
+- https://docstore.ohchr.org/SelfServices/FilesHandler.ashx?enc=Y9p3xaBIUTMj6fwiwYuMMtHf68q%2BlEW3QdK3sXpy%2BQQ5%2B1MoWH3ea55rPWPpq%2BySCSSLWqPzhYD89P5r2aDbzg%3D%3D
+- https://www.menarights.org/en/articles/iraq-reviewed-un-committee-enforced-disappearances
+- https://www.menarights.org/en/documents/iraq-alternative-report
+
+The OHCHR docstore locator is the preserved direct source for `CED/C/IRQ/OAI/2`; the MENA Rights locators retain proposition-specific civil-society provenance from the same historical review period. These sources support the earlier enforced-disappearance/search/investigation review only. They are not substituted into the later Al-Karkh evidentiary record and do not reactivate the broader pre-revalidation Schedule scope.
+
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-16:
+
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **historical-only / superseded in current renderable scope; provenance recovered**. The tranche preserved a broader `S` theory around attributable enforced-disappearance, irregular-detention, reprisal and search/investigation-obstruction systems. The later 2026-08-14 status revalidation narrowed the renderable/current project to the Al-Karkh transferred-detainee cohort described in §§1–8; the older broader theory is not silently reactivated.
+- Historical Git version `1633753:dossiers/states/IRQ.md` — **absorbed**. It preserved the direct OHCHR `CED/C/IRQ/OAI/2` docstore locator plus two proposition-specific MENA Rights locators that were displaced when the dossier was rewritten around the later Al-Karkh revalidation. They are retained in §8 as historical provenance only.
+- `../../registry/schedule-state-s-batches/batch-05-civic-security.yml` — **absorbed as historical project-context provenance**. Its broad Iraq translation remains governance history and does not override the later freeze.
+- `../../registry/schedule-state-s-freezes/batch-22b-irq-freeze.yml` — **already represented** in §§1–8, including its five exact identity/evidence locators and residual-scope boundary.
+- Issue #80 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
+
+This normalization changes no current outcome, scope, freeze, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+
+## 10. Procedural history
 
 Issue #80 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-05.md` · `../../reviews/2026/consistency/schedule-readiness.md`

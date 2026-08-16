@@ -60,7 +60,20 @@ Excluded: KNCHR, courts, genuinely independent oversight and prosecutorial funct
 - https://www.knchr.org/Articles/ArtMID/2432/ArticleID/1258/Enforced-Disappearances-Torture-and-other-Human-Rights-Violations-following-the-25th-June-2026-Protests-Marking-the-2nd-Anniversary-of-the-2024-Gen-Z-Protests
 - https://www.knchr.org/
 
-## 9. Procedural history
+The first locator is the same exact KNCHR record preserved by both `../../registry/schedule-state-s-translations.yml` and `../../registry/schedule-state-s-freezes/batch-14a-ken-freeze.yml` for the six-person Parliament-arrest incident cohort. The broader homepage is retained only as institutional context.
+
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-16:
+
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / already represented**. Its seven-disappearance record, six-person secret-detention/torture cohort, KNCHR counter-institution, project-level attribution and removal triggers are reflected in §§1–8.
+- `../../registry/schedule-state-s-translations.yml` — **already represented**. Its NPS/DCI capacity-limited translation and exact KNCHR locator match the canonical scope without creating generic police/DCI restriction.
+- `../../registry/schedule-state-s-freezes/batch-14a-ken-freeze.yml` — **already represented**. The exact six-person cohort and KNCHR locator are preserved in §§3, 5 and 8; other protest operations remain outside that freeze absent separate evidence.
+- Issue #88 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
+
+No historical locator gap is asserted for the tranche's core June 2026 proposition because the exact KNCHR source is preserved. This normalization changes no current outcome, scope, freeze, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+
+## 10. Procedural history
 
 - Issue #88
 - `../../reviews/2026/initial-adjudication.md`
