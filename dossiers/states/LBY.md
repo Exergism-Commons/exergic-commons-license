@@ -55,6 +55,14 @@ Review on independently verifiable closure or compliant reform of abusive facili
 - https://www.ohchr.org/en/countries/libya
 - https://unsmil.unmissions.org/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The preserved OHCHR/UNSMIL locator remains the proposition-level historical provenance for the 2026 migration, detention and abuse theory summarized above.
+- The historical adjudication deliberately used fragmented attribution: references to GNU-, LAAF- and other de facto-authority structures are not a whole-State or whole-authority restriction and do not make unrelated institutions or private armed groups Restricted by association.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-11d-lby-link.yml` is controlling where the State dossier reaches a renderable restriction through the repository's exact cross-entity links. The broader historical security/detention/migration theory does not widen those linked entity/project boundaries.
+
+## 10. Procedural history
 
 Issue #97 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
