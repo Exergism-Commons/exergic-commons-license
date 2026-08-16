@@ -52,7 +52,17 @@ Credible accountability for protest killings/abuse; sustained rights-compliant c
 - https://www.amnesty.org/en/location/americas/south-america/peru/
 - https://www.amnestyusa.org/press-releases/peru-another-step-towards-entrenching-impunity/
 - https://www.hrw.org/world-report/2026/country-chapters/peru
+- https://www.elperuano.pe/noticia/300766-ley-32735-redefine-las-reglas-del-delito-de-funcion-en-el-ambito-militar-y-policial
+- https://www.amnesty.org/en/latest/news/2026/07/peru-un-paso-mas-hacia-la-consolidacion-de-la-impunidad/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The Amnesty/HRW current record and the Law 32735 accountability proposition are represented above. The later freeze preserves an official El Peruano locator for the statute plus the exact Amnesty July 2026 locator, and those locators are now surfaced here so the canonical dossier no longer depends on the freeze file merely to identify the legal measure.
+- The official statute locator establishes the identity and content of Law 32735; it is not, by itself, evidence that every military/police proceeding is abusive. The ECL concern remains limited to qualifying jurisdiction-transfer implementations that materially obstruct independent accountability.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-18b-per-freeze.yml` controls current renderability. It freezes only the **Law No. 32735 military-police jurisdiction transfer project** where a proceeding concerning alleged serious abuse against civilians is transferred, halted or displaced from ordinary jurisdiction. Public-order and civic-control scope remains governance-only until separately frozen.
+
+## 10. Procedural history
 
 Issue #137 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
