@@ -54,6 +54,14 @@ Review on credible prosecution/remedy for unlawful killings and disappearances, 
 - https://www.amnesty.org/en/latest/news/2026/07/mozambique-authorities-must-immediately-open-investigation-into-summary-execution-of-narciso-castigo-sambo/
 - https://www.amnesty.org/en/location/africa/southern-africa/mozambique/report-mozambique/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The exact July 2026 Amnesty Sambo locator and the broader Amnesty country-report locator are preserved above, so the historical current-persistence theory no longer depends on the tranche for source recovery.
+- The Sambo summary-execution proposition and the broader post-election repression theory remain historical/current dossier evidence; neither is automatically the same project as a later Schedule freeze.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-11c-moz-freeze.yml` controls the separately frozen Estácio Valoi / SERNIC equipment-retention project in Pemba. That exact freeze is distinct from the Sambo execution and does not expand into a generic SERNIC, police, public-order or security class. Conversely, the broader historical Sambo/post-election theory does not widen the Valoi freeze.
+
+## 10. Procedural history
 
 Issue #117 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
