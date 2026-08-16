@@ -92,8 +92,15 @@ class DraftVersionAlignmentTests(unittest.TestCase):
         self.assertIn("Version 0.3", working_license[:300])
         self.assertIn("DRAFT", working_license[:300])
 
-        renderer_source = (ROOT / "tools" / "render_schedule.py").read_text(
-            encoding="utf-8"
+        # Since CODEX-0.3-041 the renderer is intentionally split into a safe
+        # bootstrap plus the byte-preserved implementation. Pass 12's semantic
+        # alignment invariant applies to the effective renderer source set, not
+        # to the bootstrap file in isolation.
+        renderer_source = "\n".join(
+            (
+                (ROOT / "tools" / "render_schedule.py").read_text(encoding="utf-8"),
+                (ROOT / "tools" / "render_schedule_impl.py").read_text(encoding="utf-8"),
+            )
         )
         self.assertIn('TARGET_LICENSE = "ECL-0.3-DRAFT"', renderer_source)
         self.assertIn("compatible_license", renderer_source)
