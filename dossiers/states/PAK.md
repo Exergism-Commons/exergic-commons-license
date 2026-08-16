@@ -30,7 +30,9 @@ operative: false
 
 ## 3. Evidence supporting the determination
 
-The current record continues to document enforced disappearance, arbitrary detention, counterterrorism misuse, excessive force against peaceful protesters and censorship, particularly in Balochistan. Human Rights Watch's 2026 assessment also records arbitrary arrests/disappearances of journalists and extensive use of PECA against media. In August 2026 the government expanded reporting restrictions affecting Pakistani staff and associates of foreign media, requiring registration and permission for reporting outside major cities.
+The current record continues to document enforced disappearance, arbitrary detention, counterterrorism misuse, excessive force against peaceful protesters and censorship, particularly in Balochistan. Human Rights Watch's 2026 assessment also records arbitrary arrests/disappearances of journalists and extensive use of PECA against media.
+
+The historical scoped review additionally recorded an August 2026 expansion of reporting restrictions affecting Pakistani staff and associates of foreign media, including registration and permission requirements for reporting outside major cities. No exact locator for that discrete assertion is preserved in the repository surfaces audited for this normalization, so it is not treated as independently sourced current evidence here.
 
 ## 4. Counter-evidence and exergic institutions
 
@@ -42,11 +44,11 @@ Scope follows **military/intelligence/security and counterterrorism projects mat
 
 ## 6. Adversarial determination
 
-**UPHOLD / DEFINE S after prior R → S.** Fresh 2026 evidence confirms persistence of coercive security and media-control projects, but no evidence defeats the prior attribution correction that made a whole-State `R` overbroad.
+**UPHOLD / DEFINE S after prior R → S.** Current evidence confirms persistence of coercive security and media-control projects, but no evidence defeats the prior attribution correction that made a whole-State `R` overbroad.
 
 ## 7. Review / removal triggers
 
-Effective disappearance/torture investigations and remedies; restored civic/media freedoms; rights-compliant counterterrorism/preventive detention; repeal/non-use of coercive reporting restrictions; and effective civilian/parliamentary control of implicated security structures.
+Effective disappearance/torture investigations and remedies; restored civic/media freedoms; rights-compliant counterterrorism/preventive detention; repeal/non-use of coercive reporting restrictions where independently established; and effective civilian/parliamentary control of implicated security structures.
 
 ## 8. Sources
 
@@ -55,6 +57,15 @@ Effective disappearance/torture investigations and remedies; restored civic/medi
 - https://na.gov.pk/en/content.php?id=190
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=PAK+1%2F2025
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-03.md` and `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11), plus issue #131's earlier public adjudication comment.
+
+- **Status:** absorbed / already represented for the `R → S` attribution correction and the core Balochistan/security/PECA propositions. The surviving state-level tranche preserves the National Assembly and UN Special Procedures provenance underlying the downgrade, and the canonical dossier already reflects that decision.
+- Issue #131 comment `https://github.com/Papishushi/exergic-commons-license/issues/131#issuecomment-5248344321` is already represented substantively. Its legacy pointer to `ADVERSARIAL-REVIEW-2026-TRANCHE-3.md` is historical naming; the surviving repository record is `../../reviews/2026/adversarial/state-level/tranche-03.md`.
+- **Historical-only / locator incomplete:** the scoped tranche's discrete August 2026 foreign-media reporting-control assertion has no exact source locator preserved in the audited repository record. It is retained as historical provenance without manufacturing a URL or using it as the basis for a finer current project attribution.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-04-detention-digital.yml` controls the later renderable subset. Only the **National Cyber Crime Investigation Agency (NCCIA)** in qualifying PECA investigations/prosecutions against protected journalism/expression is `ready-narrowed-subset`. Enforced-disappearance/detention, protest-repression, non-PECA media-control and other surveillance projects remain residual unfrozen scope until separately frozen.
+
+## 10. Procedural history
 
 Issue #131 · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
