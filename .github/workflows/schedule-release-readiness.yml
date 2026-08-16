@@ -17,6 +17,7 @@ on:
       - "tools/test_schedule_compatibility_pass24.py"
       - "tools/test_schedule_compatibility_pass25.py"
       - "tools/test_schedule_compatibility_pass26.py"
+      - "tools/test_schedule_compatibility_pass27.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -36,6 +37,7 @@ on:
       - "tools/test_schedule_compatibility_pass24.py"
       - "tools/test_schedule_compatibility_pass25.py"
       - "tools/test_schedule_compatibility_pass26.py"
+      - "tools/test_schedule_compatibility_pass27.py"
       - "LICENSE"
       - "versions/licenses/**"
       - ".github/workflows/schedule-release-readiness.yml"
@@ -62,6 +64,7 @@ jobs:
           python -I tools/test_schedule_compatibility_pass24.py
           python -I tools/test_schedule_compatibility_pass25.py
           python -I tools/test_schedule_compatibility_pass26.py
+          python -I tools/test_schedule_compatibility_pass27.py
       - name: Validate State coverage
         run: |
           python -I - <<'PY'
