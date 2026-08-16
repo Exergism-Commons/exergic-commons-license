@@ -69,18 +69,18 @@ Lebanon, Lebanese people/nationality, the judiciary, parliament, media instituti
 - https://www.lp.gov.lb/ContentRecordDetails?Id=35898
 - https://www.lp.gov.lb/ContentRecordDetails?Id=35888
 
-The two Lebanese Parliament locators preserve exact reform/procedural provenance for the 2026 media-law counter-evidence. They are not evidence of the separate 2025 speech-summons or Al-Qaradawi extradition propositions.
+The Amnesty Lebanon country-report URL is the recoverable historical locator corresponding to the `Amnesty International Lebanon 2025/26` baseline cited by `../../reviews/2026/initial-adjudication.md` for the 2025 criminal-summons and Al-Qaradawi extradition/disappearance record. It is retained as proposition-associated historical provenance; the repository does not preserve a more granular article/case locator for each proposition. The two Lebanese Parliament locators preserve exact reform/procedural provenance for the 2026 media-law counter-evidence and are not substituted for the historical Amnesty baseline.
 
 ## 9. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-16:
 
-- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / partial locator gap remains**. Its historical speech/extradition record, 2026 reform counter-evidence, reversibility analysis, `S → U` downgrade and re-escalation/removal triggers are represented in §§1–8.
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / historical provenance recovered with granularity limitation**. Its historical speech/extradition record, 2026 reform counter-evidence, reversibility analysis, `S → U` downgrade and re-escalation/removal triggers are represented in §§1–8.
+- `../../reviews/2026/initial-adjudication.md` — **absorbed** for the `Amnesty International Lebanon 2025/26` baseline. The corresponding Amnesty Lebanon country-report locator in §8 is the preserved historical source associated with the 2025 summons and Al-Qaradawi propositions; no more granular proposition-specific article/case locator is preserved.
 - The exact 2026 Lebanese Parliament locators supporting the media-law reform/counter-evidence are retained in §8.
-- The reviewed repository surfaces did not preserve proposition-specific historical source locators for the tranche's separate 2025 criminal-summons pattern or for the Abdul Rahman Al-Qaradawi extradition/disappearance proposition. Repository search found those propositions in this dossier and tranche-05, but no exact underlying source locator to migrate. Those are explicit historical evidence-curation gaps and are not reconstructed from the web.
 - Issue #94 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
 
-These historical gaps do not invalidate the current `U`, nor do they reactivate the former `S`. This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+The recovered historical locator does not establish current persistence and does not reactivate the former `S`. Lebanon remains `U`. This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
 
 ## 10. Procedural history
 
