@@ -54,6 +54,14 @@ Review on measurable reduction and effective prosecution of attributable enforce
 - https://hist.cndh.org.mx/index.php/documento/recomendacion-206vg2026
 - https://www.gob.mx/segob/prensa/curp-biometrica-derecho-y-herramienta-de-justicia-social?idiom=es
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-06.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The article 34 CED decision, CNDH Recommendation 206VG/2026 and official biometric-infrastructure locator are preserved directly above and retain their distinct proposition roles.
+- The CED record supports the broader historical disappearance/accountability theory; it does not make every Mexican security body a Restricted party. The biometric locator establishes infrastructure/context only and is not evidence that biometrics are prohibited per se.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-07-identified-projects.yml` controls the directly frozen project: CNDH Recommendation 206VG/2026 in Guasave, Sinaloa, limited to materially participating Secretaría de Marina elements in that exact case. It does not create a generic SEMAR, armed-forces, police or biometric-infrastructure class. Other disappearance/torture or data-deployment propositions remain project-specific review candidates until separately frozen.
+
+## 10. Procedural history
 
 Issue #110 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-06.md`
