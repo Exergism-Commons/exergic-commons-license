@@ -60,12 +60,32 @@ Expressly excluded are Iraq, the Ministry of Justice, Supreme Judicial Council, 
 
 ## 8. Sources
 
+Current frozen-project sources:
+
 - https://www.sjc.iq/ncijcen.79111/
 - https://www.sjc.iq/view.79141/
 - https://www.hrw.org/news/2026/02/17/iraq-alleged-isis-detainees-transferred-from-syria-at-risk-of-abuse
 - https://www.aljazeera.com/news/2026/1/29/french-isil-suspects-transferred-from-syria-allege-torture-in-iraqi-prisons
 - https://www.hrw.org/news/2026/07/16/submission-to-the-universal-periodic-review-of-syrian-arab-republic
 
-## 9. Procedural history
+Historical/project-context provenance retained from the earlier Schedule translation:
+
+- https://tbinternet.ohchr.org/_layouts/TreatyBodyExternal/countries.aspx?CountryCode=IRQ&Lang=EN
+
+The treaty-body country portal is retained as context/provenance for the earlier enforced-disappearance review. It is not substituted for a proposition-specific locator for `CED/C/IRQ/OAI/2`, and it is not evidence for the later Al-Karkh allegations by itself.
+
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-16:
+
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **historical-only / superseded in scope; partial locator gap remains**. The tranche preserved a broader `S` theory around attributable enforced-disappearance, irregular-detention, reprisal and search/investigation-obstruction systems. The later 2026-08-14 status revalidation narrowed the renderable/current project to the Al-Karkh transferred-detainee cohort described in §§1–8; the older broader theory is not silently reactivated.
+- The tranche identifies the March 2026 Committee on Enforced Disappearances observations as `CED/C/IRQ/OAI/2`. No proposition-specific direct document locator for that identifier was preserved in the reviewed tranche, issue #80, canonical dossier, initial adjudication, Schedule batch or freeze surfaces. The OHCHR treaty-body country portal retained above is recoverable historical context only, not a replacement for that missing direct locator.
+- `../../registry/schedule-state-s-batches/batch-05-civic-security.yml` — **absorbed as historical project-context provenance**. Its broad Iraq translation remains governance history and does not override the later freeze.
+- `../../registry/schedule-state-s-freezes/batch-22b-irq-freeze.yml` — **already represented** in §§1–8, including its five exact identity/evidence locators and residual-scope boundary.
+- Issue #80 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
+
+This normalization changes no current outcome, scope, freeze, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+
+## 10. Procedural history
 
 Issue #80 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-05.md` · `../../reviews/2026/consistency/schedule-readiness.md`
