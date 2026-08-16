@@ -40,16 +40,21 @@ Scope follows the Prime-Minister-created Security Task Force, materially partici
 
 Independent investigation/prosecution, targeting/civilian-harm safeguards, compliant redesign/termination and effective judicial accountability.
 
-## 7. Historical evidence absorption
+## 7. Sources / project context
+
+- https://www.amnesty.org/en/location/americas/central-america-and-the-caribbean/haiti/report-haiti/ — precise Amnesty Haiti locator recovered from `../../registry/schedule-state-s-batches/batch-05-civic-security.yml`; retained as repository provenance associated with the capacity-limited Haiti security project. It is **not** treated here as a substitute for the still-missing exact BINUH/UN locator for the specialized drone programme or for the 2026 judicial-unit proposition.
+
+## 8. Historical evidence absorption
 
 Reviewed for ECL 1.0 normalization on 2026-08-15:
 
-- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The State-linked drone/summary-execution evidence, BINUH attribution to the Prime-Minister-created Task Force, contractor participation, judicial-unit counter-evidence, non-imputation of gang violence and removal triggers are reflected in §§1–6 above.
-- The tranche names BINUH/UN/rights reporting but gives no exact report or communication locator for the drone programme or the 2026 specialized judicial units. Repository search in this pass found no separate precise locator. No missing URL is reconstructed from memory or inference.
+- `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / partial locator recovery; proposition-specific gaps remain**. The State-linked drone/summary-execution evidence, BINUH attribution to the Prime-Minister-created Task Force, contractor participation, judicial-unit counter-evidence, non-imputation of gang violence and removal triggers are reflected in §§1–6 above.
+- Cross-checking `../../registry/schedule-state-s-batches/batch-05-civic-security.yml` recovered the Amnesty Haiti locator recorded in §7, so the earlier statement that no separate precise Haiti locator existed was too broad.
+- The historical tranche still gives no exact BINUH/UN report or communication locator for the drone programme and no exact locator for the 2026 specialized judicial units. Those proposition-specific gaps remain open; the Amnesty country-report locator is not promoted to prove them by inference.
 - Issue #72 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
 
-Exact source-locator recovery remains an evidence-curation gap. No Claim status, Evidence grade, `asOf`, contractor relation, attribution edge or governance outcome is created or changed by this absorption record.
+Remaining source-locator recovery is proposition-specific. No Claim status, Evidence grade, `asOf`, contractor relation, attribution edge or governance outcome is created or changed by this absorption record.
 
-## 8. Procedural history
+## 9. Procedural history
 
 Issue #72 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
