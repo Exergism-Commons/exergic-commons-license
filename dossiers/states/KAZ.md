@@ -62,7 +62,19 @@ The Constitutional Court, rights-protective judicial functions, unrelated State 
 - https://www.gov.kz/memleket/entities/ksrk/documents/details/1024707?lang=kk
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=KAZ+1%2F2026
 
-## 9. Procedural history
+`KAZ 2/2026` and `KAZ 3/2026` are also the exact locators preserved in `../../registry/schedule-state-s-batches/batch-06-detention-political.yml`; `KAZ 1/2026` retains the separate media/legal-representation proposition already summarized in §3.
+
+## 9. Historical evidence absorption
+
+Reviewed for ECL 1.0 normalization on 2026-08-16:
+
+- `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / already represented**. Its Atajurt, religious-enforcement, media/professional-retaliation, constitutional counter-evidence, narrowed attribution and removal triggers are represented in §§1–8 with exact UN locators.
+- `../../registry/schedule-state-s-batches/batch-06-detention-political.yml` — **already represented**. Its two exact UN locators are retained in §8 without expanding their proposition scope.
+- Issue #87 comment `#issuecomment-5248341521` — **already represented historical governance provenance** for the earlier `R → S` downgrade. Its Constitution/Constitutional Court reasoning is reflected in §§1, 4 and 6; the comment itself supplied no additional source locator requiring migration.
+
+This record does not re-adjudicate the prior downgrade or create a broader State restriction. No current outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision changes.
+
+## 10. Procedural history
 
 - Issue #87
 - `../../reviews/2026/initial-adjudication.md`
