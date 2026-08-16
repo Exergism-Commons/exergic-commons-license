@@ -29,7 +29,7 @@ operative: false
 
 ## 3. Evidence supporting the determination
 
-Amnesty International's 2025/26 record reports the continuing practice of unlawful pushbacks from North Macedonia to Greece at the southern border. The latest CPT baseline also identified credible allegations of police ill-treatment and longstanding detention deficiencies.
+Amnesty International's 2025/26 record reports the continuing practice of unlawful pushbacks from North Macedonia to Greece at the southern border. The historical scoped review also recorded a CPT baseline describing credible allegations of police ill-treatment and longstanding detention deficiencies. The surviving repository record does not preserve a proposition-specific CPT locator for that sub-proposition, so it is retained as historical provenance rather than represented here as independently recoverable source evidence.
 
 ## 4. Counter-evidence and exergic institutions
 
@@ -53,6 +53,14 @@ Independently verified cessation of unlawful pushbacks; effective access to asyl
 - https://www.coe.int/en/web/cooperation-in-police-and-deprivation-of-liberty/hf-iii-strengthening-the-capacities-of-the-penitentiary-system-in-north-macedonia
 - https://www.coe.int/en/web/cooperation-in-police-and-deprivation-of-liberty/-/senior-prison-police-officers-strengthen-capacity-to-prevent-ill-treatment-in-north-macedonia
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11).
+
+- **Status:** already represented substantively / open gap: locator incomplete for the CPT detention/ill-treatment sub-proposition. The Amnesty southern-border locator and Council of Europe reform/counter-evidence locators are preserved above; the scoped tranche's CPT reference is retained without inventing a missing report URL or finer source mapping.
+- The absence of a recovered proposition-specific CPT locator does not turn the reform/training sources into proof of historical ill-treatment. Those sources remain counter-evidence/context only.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-01-identity.yml` controls current renderability. The **Bureau for Public Security — Regional Center for Border Affairs South**, including subordinate border-check/surveillance stations, is renderable only in qualifying southern-border pushback/violence/protection-denial operations. The police/prison detention ill-treatment component remains residual unfrozen scope until an exact unit, facility or project is separately frozen.
+
+## 10. Procedural history
 
 Issue #128 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
