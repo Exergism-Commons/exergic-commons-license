@@ -53,6 +53,14 @@ Durable protection of peaceful assembly/defenders; dismissal/remedy of retaliato
 - https://www.amnesty.org/es/location/americas/south-america/paraguay/
 - https://www.iniciativa-amotocodie.org/2026/04/21/criminalization-indigenous-demands-paraguay-ayoreo/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented with preserved source granularity. The Amnesty Paraguay locator preserves the historical country-report source family for the broader protest/defender/Indigenous-rights proposition, while the Amotocodie locator directly preserves the Ayoreo criminalisation record.
+- The repository does not preserve a one-to-one event locator here for every Avá-Guaraní territorial/displacement sub-proposition. The broader country-report provenance is therefore retained without inventing a finer source-to-event mapping or treating non-attributable private land/agricultural conduct as State conduct.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-18c-pry-freeze.yml` controls current renderability. It freezes only the **Community 2 de Enero prosecution arising from the 16 August 2024 SEN food-delivery incident**, limited to the continuing proceeding against the three Ayoreo community members while the retaliation/due-process concern remains materially active. Other Indigenous-land/eviction, protest and defender scope remains governance-only until separately frozen.
+
+## 10. Procedural history
 
 Issue #136 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
