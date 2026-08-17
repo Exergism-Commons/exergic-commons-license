@@ -38,10 +38,20 @@ Expiry/termination without replacement, binding safeguards that remove the ECL-r
 
 ## 6. Sources
 
+- https://www.interieur.gouv.fr/actualites/actualites-du-ministere/experimentation-en-temps-reel-de-cameras-augmentees
 - https://www.conseil-etat.fr/actualites/nice-le-traitement-algorithmique-des-images-de-videosurveillance-de-la-voie-publique-n-est-en-l-etat-actuel-de-la-loi-pas-autorise
 - https://www.assemblee-nationale.fr/dyn/17/questions/QANR5L17QE6430
 - https://www.assemblee-nationale.fr/dyn/17/dossiers/DLR5L17N54339
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #60 · `../../reviews/2026/adversarial/scoped/tranche-01.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-01.md` (cutoff 2026-08-11). Later consistency controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`. Issue #60 contains no additional public evidence comment.
+
+- **Status:** absorbed, with binding remediation preserved. The initial adjudication classified France as `S`; scoped tranche 1 narrowed the active scope and expressly removed the Nice school-entrance algorithmic CCTV project after the Conseil d'État ruling. The later ECL 0.2 State Delta retained `S` without reversing that remediation.
+- The tranche also preserved `https://www.assemblee-nationale.fr/dyn/actualites-accueil-hub/adoption-en-premiere-lecture-du-projet-de-loi-visant-a-offrir-des-reponses-immediates-aux-phenomenes-troublant-l-ordre-public-la-securite-et-la`. This locator is retained here as **historical legislative-process provenance only**. It does not by itself establish enactment, deployment or prohibited conduct, and the current Schedule boundary expressly excludes mere legislative proposals.
+- The Interior Ministry locator above comes from the later Schedule translation and identifies the national algorithmic-video experiment. It is project/identity context; exact ECL restrictability still requires a materially deployed use that independently satisfies the surveillance/repression criteria.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-01.yml` controls current renderability. It covers the national Olympic-derived algorithmic video-surveillance experiment and any qualifying enacted continuation materially deployed through 31 December 2027, only where the deployment independently satisfies ECL surveillance/repression criteria. The Nice project, mere legislative proposals and lawful non-repressive video analysis are excluded.
+
+## 8. Procedural history
+
+Issue #60 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-01.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`

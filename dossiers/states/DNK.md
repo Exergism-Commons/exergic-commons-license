@@ -44,7 +44,17 @@ Independently auditable retirement/redesign, validated non-discrimination/propor
 
 - https://www.amnesty.org/en/documents/eur18/8709/2024/en/
 - https://www.amnesty.org/en/documents/eur18/9419/2025/en/
+- https://www.atp.dk/om-os/organisationen
+- https://www.atp.dk/karriere/udbetaling-danmark
 
-## 8. Procedural history
+## 8. Historical evidence absorption
 
-Issue #46 · `../../reviews/2026/adversarial/scoped/tranche-01.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-01.md` (cutoff 2026-08-11). Later consistency controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`. Issue #46 contains no additional public evidence comment.
+
+- **Status:** absorbed / already represented. The initial adjudication already classified Denmark as `S`; scoped tranche 1 upheld the tier while making the controlling attribution correction explicit: the finding follows specified Udbetaling Danmark/ATP fraud-risk profiling systems and materially connected workflows, not ATP generally, Udbetaling Danmark generally or Danish welfare administration generally. The later ECL 0.2 State Delta retained `S`.
+- The ATP organization and Udbetaling Danmark locators above come from the later Schedule translation and identify the institutional/workflow boundary. They are **identity/context provenance**, not proposition-specific proof that prohibited profiling occurred; the Amnesty technical records remain the conduct-evidence baseline.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-01.yml` controls current renderability. It freezes only specified Udbetaling Danmark automated fraud/risk-profiling models in qualifying discriminatory, opaque or disproportionate welfare-profiling capacities. ATP pension/investment activity, ordinary welfare-payment administration and systems independently retired, corrected and validated are excluded.
+
+## 9. Procedural history
+
+Issue #46 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-01.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`
