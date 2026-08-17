@@ -55,13 +55,14 @@ jobs:
 
       - name: Build canonical draft self-contained envelope
         run: |
+          mkdir -p "$RUNNER_TEMP/ecl"
           python tools/ecl_distribution.py build \
             --repo-root . \
             --bundle ECL-0.3-DRAFT@RP-EMPTY-1 \
-            --output "$RUNNER_TEMP/ecl-distribution" \
+            --output "$RUNNER_TEMP/ecl/ECL-0.3-DRAFT@RP-EMPTY-1" \
             --allow-draft
 
       - name: Verify canonical draft self-contained envelope
         run: |
           python tools/ecl_distribution.py verify \
-            --root "$RUNNER_TEMP/ecl-distribution"
+            --root "$RUNNER_TEMP/ecl/ECL-0.3-DRAFT@RP-EMPTY-1"
