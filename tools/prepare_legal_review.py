@@ -118,6 +118,18 @@ def _require_full_history(root: Path) -> None:
         )
 
 
+def _require_no_grafts(root: Path) -> None:
+    raw = _git(root, "rev-parse", "--git-path", "info/grafts").stdout.decode().strip()
+    grafts = Path(raw)
+    if not grafts.is_absolute():
+        grafts = root / grafts
+    if os.path.lexists(grafts):
+        raise ValueError(
+            "Git grafts are not permitted during legal-review preparation; "
+            "remove or convert the local info/grafts file before checking history"
+        )
+
+
 def _authoritative_remote_refs(root: Path) -> dict[str, str]:
     _git(root, "remote", "get-url", AUTHORITATIVE_REMOTE)
     output = _git(
@@ -305,11 +317,11 @@ def prepare_review_inputs(
     root = _require_repository_root(root)
     source_commit = _resolve_source_commit(root, source_commit)
     _require_full_history(root)
+    _require_no_grafts(root)
     _require_authoritative_refs_complete(root)
 
-    # The source commit itself must contain the legal-review workspace as a
-    # real tree. Child namespace absence is meaningful only after every required
-    # ancestor has been proven to be a tree in that same immutable commit.
+    # Child namespace absence is meaningful only after every required ancestor
+    # has been proven to be a tree in the same immutable source commit.
     _assert_commit_directory(
         root, source_commit, "reviews", label="reviews namespace in source_commit"
     )
