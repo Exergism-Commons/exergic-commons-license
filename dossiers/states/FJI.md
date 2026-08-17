@@ -48,7 +48,21 @@ Escalate toward `S` on substantiated responsibility, obstruction, recurrence or 
 
 - https://www.amnesty.org/en/latest/news/2026/04/fiji-death-of-man-in-military-custody-must-be-promptly-investigated/
 - https://www.fijitimes.com.fj/final-phase-in-probe-vakarisi-case-rfmf-interview-approval-sought/
+- Historical pre-revalidation country source: https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/fiji/report-fiji/
 
-## 9. Procedural history
+The Amnesty country locator is retained only as provenance for the superseded full-`U`-cohort `U → S` reasoning and broader civic/public-order context. It is not proof that the current custody investigation constitutes an active Restricted Project.
 
-Issue #58 · `../../reviews/2026/adversarial/under-review/full-cohort.md` · 2026-08-13 Schedule current-status revalidation
+## 9. Historical evidence absorption
+
+Historical transition sources: `../../reviews/2026/adversarial/under-review/full-cohort.md` and same-dossier pre-revalidation version `69425a7d87c2e0f1eee3422684a4d959e0466481:dossiers/states/FJI.md`. Current controlling governance overlay: `../../registry/state-outcome-overrides-02.yml`. Issue #58 contains no separate evidence comment.
+
+- **Historical `U → S` superseded.** The full-`U` cohort escalated Fiji to `S` around the Vakarisi custody-death and national-security/public-order concerns. The pre-revalidation dossier preserved the Amnesty Fiji country locator above.
+- **Later `S → U` controls.** The 13 August current-status review credited the active police/coronial investigation, extensive witness work and RFMF cooperation, leaving responsibility, project boundary and remediation status unresolved. `../../registry/state-outcome-overrides-02.yml` is the machine-readable controlling overlay and records Fiji `S → U`.
+- The current incident-specific Amnesty and Fiji Times locators are more precise for the revalidation. The older country locator remains historical/context provenance and cannot revive the broader `S`.
+- Independent investigation, coronial process and genuine accountability activity remain excluded/remedial functions, not evidence of prohibited conduct.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #58 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../registry/state-outcome-overrides-02.yml`
