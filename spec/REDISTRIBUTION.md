@@ -79,14 +79,19 @@ The Canonical Empty Schedule fallback remains subject to its additional exact re
 
 ## 5. Building an envelope
 
+The builder deliberately **does not create missing parent directories**. The output parent must already exist as a real, non-symlink-resolved directory; this keeps parent-path trust explicit instead of silently creating a hierarchy through an unexpected namespace. Create the intended packaging parent first, then ask the builder to create only the final envelope directory.
+
 For an operative Bundle:
 
 ```bash
+mkdir -p dist/ecl
 python tools/ecl_distribution.py build \
   --repo-root . \
   --bundle ECL-1.0.0@RP-2026.08.18.1 \
   --output dist/ecl/ECL-1.0.0@RP-2026.08.18.1
 ```
+
+The builder subsequently verifies that `dist/ecl` resolves exactly as that path and rejects a parent path that traverses a symlink. Therefore `mkdir -p` is only the explicit parent-creation step; it does not relax the builder's namespace check.
 
 Before copying bytes, the builder invokes the repository Bundle validator. Therefore an operative source Bundle must already satisfy its machine-verifiable completed legal-review gate.
 
