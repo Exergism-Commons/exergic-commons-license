@@ -131,6 +131,26 @@ def _open_directory_at(
     return fd
 
 
+def _same_inode(left: os.stat_result, right: os.stat_result) -> bool:
+    return (left.st_dev, left.st_ino) == (right.st_dev, right.st_ino)
+
+
+def _verify_directory_binding(
+    parent_fd: int,
+    name: str,
+    expected: os.stat_result,
+    *,
+    label: str,
+) -> None:
+    current_fd = _open_directory_at(parent_fd, name, label=label)
+    assert current_fd is not None
+    try:
+        if not _same_inode(os.fstat(current_fd), expected):
+            raise OSError(f"{label} changed during legal-review preparation: {name}")
+    finally:
+        os.close(current_fd)
+
+
 def _open_directory_chain(root_fd: int, segments: list[str], *, label: str) -> int:
     current_fd = os.dup(root_fd)
     try:
@@ -202,19 +222,28 @@ def _entry_exists(parent_fd: int, name: str) -> bool:
         return False
 
 
-def _record_consumes_id(legal_fd: int, review_id: str) -> bool:
-    records_fd = _open_directory_at(
+def _record_consumes_id(
+    legal_fd: int,
+    records_fd: int | None,
+    records_identity: os.stat_result | None,
+    review_id: str,
+) -> bool:
+    if records_fd is None:
+        if _entry_exists(legal_fd, "records"):
+            raise OSError(
+                "legal review records namespace appeared during preparation; "
+                "retry with a fresh review ID after inspecting the concurrent change"
+            )
+        return False
+
+    assert records_identity is not None
+    _verify_directory_binding(
         legal_fd,
         "records",
+        records_identity,
         label="legal review records namespace",
-        missing_ok=True,
     )
-    if records_fd is None:
-        return False
-    try:
-        return _entry_exists(records_fd, f"{review_id}.json")
-    finally:
-        os.close(records_fd)
+    return _entry_exists(records_fd, f"{review_id}.json")
 
 
 def _open_or_create_inputs(legal_fd: int) -> int:
@@ -298,10 +327,6 @@ def _rename_noreplace(parent_fd: int, source: str, destination: str) -> None:
     raise OSError(error, os.strerror(error))
 
 
-def _same_inode(left: os.stat_result, right: os.stat_result) -> bool:
-    return (left.st_dev, left.st_ino) == (right.st_dev, right.st_ino)
-
-
 def _remove_owned_snapshot(
     inputs_fd: int,
     name: str,
@@ -358,12 +383,18 @@ def prepare_review_inputs(
 
     root = root.resolve(strict=True)
     root_fd = os.open(root, _directory_flags())
+    reviews_fd: int | None = None
     legal_fd: int | None = None
+    records_fd: int | None = None
     inputs_fd: int | None = None
     snapshot_fd: int | None = None
     frozen_file_fds: list[int] = []
     published_name: str | None = None
     snapshot_identity: os.stat_result | None = None
+    reviews_identity: os.stat_result | None = None
+    legal_identity: os.stat_result | None = None
+    records_identity: os.stat_result | None = None
+    inputs_identity: os.stat_result | None = None
 
     try:
         license_bytes = _read_repository_file(
@@ -376,16 +407,35 @@ def prepare_review_inputs(
                 _read_repository_file(root_fd, source_path, label=f"canonical {key}"),
             )
 
-        legal_fd = _open_directory_chain(
-            root_fd, ["reviews", "legal"], label="legal review workspace"
+        reviews_fd = _open_directory_at(
+            root_fd, "reviews", label="reviews namespace"
         )
-        if _record_consumes_id(legal_fd, review_id):
+        assert reviews_fd is not None
+        reviews_identity = os.fstat(reviews_fd)
+
+        legal_fd = _open_directory_at(
+            reviews_fd, "legal", label="legal review workspace"
+        )
+        assert legal_fd is not None
+        legal_identity = os.fstat(legal_fd)
+
+        records_fd = _open_directory_at(
+            legal_fd,
+            "records",
+            label="legal review records namespace",
+            missing_ok=True,
+        )
+        records_identity = os.fstat(records_fd) if records_fd is not None else None
+        if _record_consumes_id(
+            legal_fd, records_fd, records_identity, review_id
+        ):
             raise ValueError(
                 f"review_id is permanently consumed by an existing completed-record "
                 f"path: reviews/legal/records/{review_id}.json"
             )
 
         inputs_fd = _open_or_create_inputs(legal_fd)
+        inputs_identity = os.fstat(inputs_fd)
         if _entry_exists(inputs_fd, review_id):
             raise ValueError(
                 f"legal review input snapshot already exists: "
@@ -416,7 +466,9 @@ def prepare_review_inputs(
             frozen_file_fds.append(_write_frozen_file(snapshot_fd, filename, data))
         os.fsync(snapshot_fd)
 
-        if _record_consumes_id(legal_fd, review_id):
+        if _record_consumes_id(
+            legal_fd, records_fd, records_identity, review_id
+        ):
             raise ValueError(
                 f"review_id became consumed by records/{review_id}.json during preparation"
             )
@@ -441,10 +493,29 @@ def prepare_review_inputs(
         finally:
             os.close(published_fd)
 
-        if _record_consumes_id(legal_fd, review_id):
+        if _record_consumes_id(
+            legal_fd, records_fd, records_identity, review_id
+        ):
             raise ValueError(
                 f"review_id became consumed by records/{review_id}.json during publication"
             )
+
+        assert reviews_identity is not None
+        assert legal_identity is not None
+        assert inputs_identity is not None
+        _verify_directory_binding(
+            root_fd, "reviews", reviews_identity, label="reviews namespace"
+        )
+        _verify_directory_binding(
+            reviews_fd, "legal", legal_identity, label="legal review workspace"
+        )
+        _verify_directory_binding(
+            legal_fd,
+            "inputs",
+            inputs_identity,
+            label="legal review input namespace",
+        )
+        _record_consumes_id(legal_fd, records_fd, records_identity, review_id)
 
         descriptor: dict[str, Any] = {
             "schema_version": 1,
@@ -488,10 +559,20 @@ def prepare_review_inputs(
                 except (OSError, ValueError) as exc:
                     cleanup_error = exc
 
+        if cleanup_error is None and snapshot_fd is not None:
+            try:
+                if os.fstat(snapshot_fd).st_nlink != 0:
+                    cleanup_error = OSError(
+                        "rollback could not prove that the helper-owned snapshot inode "
+                        "was unlinked; it may have been renamed or moved concurrently"
+                    )
+            except OSError as exc:
+                cleanup_error = exc
+
         if cleanup_error is not None:
             raise OSError(
                 "legal-review preparation failed and rollback could not verify cleanup; "
-                f"a residual snapshot may remain at reviews/legal/inputs/{cleanup_name}. "
+                f"a residual snapshot may remain near reviews/legal/inputs/{cleanup_name}. "
                 f"primary error: {primary_error!r}; rollback error: {cleanup_error!r}"
             ) from cleanup_error
         raise
@@ -505,8 +586,12 @@ def prepare_review_inputs(
             os.close(snapshot_fd)
         if inputs_fd is not None:
             os.close(inputs_fd)
+        if records_fd is not None:
+            os.close(records_fd)
         if legal_fd is not None:
             os.close(legal_fd)
+        if reviews_fd is not None:
+            os.close(reviews_fd)
         os.close(root_fd)
 
 
