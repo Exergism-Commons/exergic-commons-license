@@ -53,6 +53,14 @@ Durable cessation of speech/communications repression, independent review of pho
 - https://www.ilo.org/publications/state-qatar-and-ilo
 - https://www.ilo.org/resource/overview-qatars-labour-reforms
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented at the source granularity preserved by the repository. The Amnesty expression/labour source family and ILO reform counter-evidence are retained above; those reforms narrow attribution rather than proving prohibited conduct.
+- The broader historical `S` scope remains governance evidence only where an exact coercive project is separately attributable. Labour administration, employers, ministries and migrant work are not converted into a generic restricted class by historical normalization.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-19a-qat-freeze.yml` controls current renderability. Its frozen project is the **28 February–9 March 2026 speech-enforcement cohort involving 313 persons**, limited to materially participating enforcement functions where protected nonviolent expression was criminalized. Persons released after pledges are not themselves Restricted Parties; migrant-worker coercion, other cyber-surveillance/online-expression projects and the labour system remain residual governance-only scope unless separately frozen.
+
+## 10. Procedural history
 
 Issue #141 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`

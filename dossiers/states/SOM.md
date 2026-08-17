@@ -53,6 +53,14 @@ Release/remedy for peaceful-expression detainees, durable protection of journali
 - https://www.amnesty.org/en/location/africa/east-africa-the-horn-and-great-lakes/somalia/
 - https://www.amnesty.ie/urgent_action_somalia_release_arbitrarily_detained_activist_sadia_moalim_ali/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The Amnesty Somalia source family and Sadia Moalim Ali locator preserve the federal-journalism/activism propositions while the dossier retains the tranche's mandatory fragmentation boundary.
+- Somaliland, Al-Shabaab, clan actors and independent armed/de-facto authorities are not imported into the Federal Government scope by geography. Forced-eviction reporting likewise does not identify a generic federal police or municipal class without an exact attributable operation.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-02-statutory-agency.yml` controls current renderability. Only **National Intelligence and Security Agency (NISA)** federal detention/intimidation/censorship/prosecution activity against protected journalism, peaceful activism or civic expression is frozen as a narrowed subset. Somali Police Force projects and forced-eviction operations remain residual unfrozen scope pending exact unit/case/location attribution; courts, journalists, civil society and remediation remain excluded.
+
+## 10. Procedural history
 
 Issue #161 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`

@@ -55,6 +55,14 @@ Independent prosecution/remedy for coastal/Suwayda abuses, durable protection of
 - https://www.euaa.europa.eu/syria-country-focus/16-prison-conditions-and-treatment-detainees
 - https://www.euaa.europa.eu/syria-country-focus/272-alawites
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented for the tranche's transitional-security, detention, coastal/Suwayda and transitional-justice propositions at the source granularity preserved above. Transitional-justice and missing-person mechanisms remain counter-evidence/exclusions, not conduct evidence.
+- Fragmented control remains mandatory: SDF/AANES and independent/non-State armed actors are not imported into the transitional-government scope merely by geography or conflict association.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-19c-syr-freeze.yml` controls current renderability and is **narrower than the historical dossier scope**. It freezes only qualifying **Law No. 20 of 2022 cybercrime enforcement against protected peaceful expression**. Coastal/Suwayda abuses, enforced disappearance, arbitrary detention/custody abuse and other conflict/security projects remain governance-only unless separately frozen; ordinary cybercrime enforcement, independent investigations, courts and remediation are excluded.
+
+## 10. Procedural history
 
 Issue #171 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`
