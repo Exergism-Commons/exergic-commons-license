@@ -1,25 +1,25 @@
 import importlib.util
-import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "prepare_legal_review.py"
-SPEC = importlib.util.spec_from_file_location("prepare_legal_review_races", MODULE_PATH)
+SPEC = importlib.util.spec_from_file_location(
+    "prepare_legal_review_git_identity", MODULE_PATH
+)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
 
-class PrepareLegalReviewRaceTests(unittest.TestCase):
-    def setUp(self):
-        try:
-            MODULE._require_secure_runtime()
-        except OSError as exc:
-            self.skipTest(f"secure legal-review preparation unavailable: {exc}")
+def git(root: Path, *args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
 
-    def _write_repo(self, root: Path) -> None:
+
+class PrepareLegalReviewGitIdentityTests(unittest.TestCase):
+    def _repo(self, root: Path) -> str:
         (root / "spec").mkdir(parents=True)
         (root / "schemas").mkdir(parents=True)
         (root / "versions" / "licenses").mkdir(parents=True)
@@ -30,122 +30,121 @@ class PrepareLegalReviewRaceTests(unittest.TestCase):
         (root / "versions" / "licenses" / "ECL-1.0-RC1.md").write_bytes(
             b"candidate-license\n"
         )
+        (root / "reviews" / "legal" / "README.md").write_text(
+            "workspace\n", encoding="utf-8"
+        )
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "test@example.com"], cwd=root, check=True
+        )
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True)
+        subprocess.run(["git", "add", "."], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=root, check=True)
+        return git(root, "rev-parse", "HEAD")
 
-    def test_source_ancestor_move_cannot_rebind_candidate_license(self):
+    def test_post_clean_worktree_source_mutation_cannot_change_frozen_bytes(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self._write_repo(root)
-            original_read_all = MODULE._read_all
-            raced = False
+            commit = self._repo(root)
+            original_gate = MODULE._require_head_and_clean
 
-            def move_versions_after_open(fd: int) -> bytes:
-                nonlocal raced
-                if not raced:
-                    (root / "versions").rename(root / "versions-old")
-                    (root / "versions").mkdir()
-                    raced = True
-                return original_read_all(fd)
-
-            with mock.patch.object(
-                MODULE, "_read_all", side_effect=move_versions_after_open
-            ):
-                with self.assertRaisesRegex(
-                    OSError, "candidate License source directory changed"
-                ):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            self.assertFalse((root / "reviews" / "legal" / "inputs").exists())
-
-    def test_replaced_frozen_entry_after_precheck_is_rejected_post_publish(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            original_rename = MODULE._rename_noreplace
-
-            def replace_versioning_then_publish(
-                parent_fd: int, source: str, destination: str
-            ) -> None:
-                temp_fd = os.open(source, MODULE._directory_flags(), dir_fd=parent_fd)
-                try:
-                    os.unlink("VERSIONING.md", dir_fd=temp_fd)
-                    attacker_fd = os.open(
-                        "VERSIONING.md",
-                        MODULE._file_write_flags(),
-                        0o600,
-                        dir_fd=temp_fd,
-                    )
-                    try:
-                        MODULE._write_all(attacker_fd, b"attacker-bytes\n")
-                        os.fsync(attacker_fd)
-                    finally:
-                        os.close(attacker_fd)
-                    os.fsync(temp_fd)
-                finally:
-                    os.close(temp_fd)
-                original_rename(parent_fd, source, destination)
+            def mutate_after_gate(repo: Path, source: str) -> None:
+                original_gate(repo, source)
+                (root / "spec" / "VERSIONING.md").write_bytes(
+                    b"attacker-versioning\n"
+                )
+                (root / "schemas" / "bundle.schema.json").write_bytes(
+                    b"attacker-schema\n"
+                )
+                (
+                    root / "versions" / "licenses" / "ECL-1.0-RC1.md"
+                ).write_bytes(b"attacker-license\n")
 
             with mock.patch.object(
-                MODULE,
-                "_rename_noreplace",
-                side_effect=replace_versioning_then_publish,
+                MODULE, "_require_head_and_clean", side_effect=mutate_after_gate
             ):
-                with self.assertRaisesRegex(OSError, "frozen input entry changed"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
+                result = MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
 
-            self.assertFalse(
-                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
+            target = root / "reviews" / "legal" / "inputs" / "review-a"
+            self.assertEqual(
+                (target / "VERSIONING.md").read_bytes(), b"versioning\n"
+            )
+            self.assertEqual(
+                (target / "bundle.schema.json").read_bytes(), b'{"bundle": true}\n'
+            )
+            self.assertNotEqual(
+                result["license"]["sha256"], MODULE.sha256_bytes(b"attacker-license\n")
             )
 
-    def test_snapshot_renamed_before_cleanup_is_reported_as_residual(self):
+    def test_post_clean_source_directory_replacement_cannot_rebind_git_input(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self._write_repo(root)
-            original_remove = MODULE._remove_owned_snapshot
-            moved_names: list[str] = []
+            commit = self._repo(root)
+            original_gate = MODULE._require_head_and_clean
 
-            def move_snapshot_then_cleanup(
-                inputs_fd: int,
-                name: str,
-                expected: os.stat_result,
-                filenames: tuple[str, ...],
-            ) -> None:
-                moved = f"{name}-moved"
-                os.rename(
-                    name,
-                    moved,
-                    src_dir_fd=inputs_fd,
-                    dst_dir_fd=inputs_fd,
-                )
-                moved_names.append(moved)
-                original_remove(inputs_fd, name, expected, filenames)
+            def replace_versions_after_gate(repo: Path, source: str) -> None:
+                original_gate(repo, source)
+                (root / "versions").rename(root / "versions-old")
+                (root / "versions" / "licenses").mkdir(parents=True)
+                (
+                    root / "versions" / "licenses" / "ECL-1.0-RC1.md"
+                ).write_bytes(b"replacement\n")
 
             with mock.patch.object(
-                MODULE, "_record_consumes_id", side_effect=[False, True]
-            ), mock.patch.object(
-                MODULE,
-                "_remove_owned_snapshot",
-                side_effect=move_snapshot_then_cleanup,
+                MODULE, "_require_head_and_clean", side_effect=replace_versions_after_gate
             ):
-                with self.assertRaisesRegex(
-                    OSError, "rollback could not verify cleanup.*residual snapshot"
-                ):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
+                result = MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
 
-            self.assertEqual(len(moved_names), 1)
-            self.assertTrue(
-                (root / "reviews" / "legal" / "inputs" / moved_names[0]).is_dir()
+            self.assertEqual(result["source_commit"], commit)
+            self.assertEqual(
+                result["license"]["sha256"],
+                MODULE.sha256_bytes(b"candidate-license\n"),
+            )
+
+    def test_post_clean_canonical_directory_replacement_cannot_rebind_git_input(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root)
+            original_gate = MODULE._require_head_and_clean
+
+            def replace_spec_after_gate(repo: Path, source: str) -> None:
+                original_gate(repo, source)
+                (root / "spec").rename(root / "spec-old")
+                (root / "spec").mkdir()
+                (root / "spec" / "LEGAL-ADVERSARIAL-REVIEW.md").write_bytes(
+                    b"replacement-review\n"
+                )
+                (root / "spec" / "VERSIONING.md").write_bytes(
+                    b"replacement-versioning\n"
+                )
+
+            with mock.patch.object(
+                MODULE, "_require_head_and_clean", side_effect=replace_spec_after_gate
+            ):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+
+            target = root / "reviews" / "legal" / "inputs" / "review-a"
+            self.assertEqual(
+                (target / "LEGAL-ADVERSARIAL-REVIEW.md").read_bytes(),
+                b"review-spec\n",
+            )
+            self.assertEqual(
+                (target / "VERSIONING.md").read_bytes(), b"versioning\n"
             )
 
 
