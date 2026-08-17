@@ -41,7 +41,16 @@ Restoration of parliamentary oversight, transparent individualized nationality p
 - https://www.amnesty.org/en/location/middle-east-and-north-africa/kuwait/report-kuwait/
 - https://www.amnesty.org/en/latest/news/2026/06/gulf-states-more-than-1000-arrested-in-sweeping-war-related-crackdown-on-expression/
 - https://www.e.gov.kw/sites/kgoenglish/Pages/ApplicationPages/NewsDetail.aspx?nid=34684178
+- https://e.gov.kw/sites/kgoenglish/Pages/ApplicationPages/NewsDetail.aspx?nid=34680335
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #90 · `../../reviews/2026/adversarial/state-level/tranche-05.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-05.md` (cutoff 2026-08-11). Issue #90 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, including review-only official provenance. State-level tranche 5 **UPHELD `R`** after crediting formal courts, nationality-review mechanisms and government explanations invoking fraud/dual-citizenship grounds while finding that suspended parliamentary oversight and the cross-system nationality/political-enforcement record still supported whole-apparatus attribution.
+- The second official Kuwait-government locator, `https://e.gov.kw/sites/kgoenglish/Pages/ApplicationPages/NewsDetail.aspx?nid=34680335`, survives in tranche 5 but was never present in the audited same-dossier Git history. It is incorporated above as **historical official nationality-review/administrative context**, not described as a Git recovery and not treated as automatic proof of coercive conduct. Amnesty/current official records remain role-specific according to the propositions they support.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class exactly as the **central governmental, executive, security, judicial and nationality/deportation apparatus of Kuwait**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+## 8. Procedural history
+
+Issue #90 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-05.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
