@@ -53,6 +53,8 @@ The descriptor conforms to `schemas/distribution.schema.json` and binds:
 - exact Schedule ref, local path `ECL-SCHEDULE`, and SHA-256; and
 - a mandatory notice that packaging verification is not legal advice, legal review or a compliance determination.
 
+JSON object member names MUST be unique in both `ECL-DISTRIBUTION.json` and `ECL-BUNDLE.json`, including nested objects. The canonical tools reject duplicate member names rather than inheriting parser-dependent first-wins/last-wins behavior for legal identity metadata.
+
 The local paths are deliberately fixed. Profile v1 does not permit a descriptor to redirect the License, Schedule or Bundle manifest through `..`, an absolute path, a symlink, a mutable URL, a branch, a channel or another external namespace.
 
 `ECL-BUNDLE.json` is the byte-for-byte immutable Bundle manifest from the ECL release source. Its repository-relative component paths are provenance for the source repository; within this redistribution envelope, the fixed local paths in `ECL-DISTRIBUTION.json` identify the accompanying copies.
@@ -122,6 +124,7 @@ The verifier fails closed if, among other cases:
 
 - `LICENSE`, `ECL-SCHEDULE`, `ECL-BUNDLE.json` or `ECL-DISTRIBUTION.json` is missing;
 - any exact byte hash is corrupted or substituted;
+- either JSON identity document contains duplicate object member names;
 - the descriptor attempts to redirect one of the fixed local paths;
 - a required local file is a symlink;
 - the Bundle identifier contradicts the License/Schedule refs;
