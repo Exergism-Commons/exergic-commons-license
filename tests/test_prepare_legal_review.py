@@ -17,6 +17,17 @@ def git(root: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
 
 
+def configure_origin(root: Path) -> None:
+    origin = root / ".git" / "authoritative-origin.git"
+    subprocess.run(["git", "init", "--bare", "-q", str(origin)], check=True)
+    subprocess.run(["git", "remote", "add", "origin", str(origin)], cwd=root, check=True)
+    subprocess.run(
+        ["git", "push", "-q", "-u", "origin", "HEAD:refs/heads/main"],
+        cwd=root,
+        check=True,
+    )
+
+
 class PrepareLegalReviewTests(unittest.TestCase):
     def _repo(
         self,
@@ -56,6 +67,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
         subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True)
         subprocess.run(["git", "add", "."], cwd=root, check=True)
         subprocess.run(["git", "commit", "-qm", "baseline"], cwd=root, check=True)
+        configure_origin(root)
         return git(root, "rev-parse", "HEAD")
 
     def test_freezes_exact_commit_inputs_without_creating_record(self):
@@ -70,6 +82,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
             )
             self.assertEqual(result["schema_version"], 2)
             self.assertEqual(result["source_commit"], commit)
+            self.assertEqual(result["authoritative_remote"], "origin")
             self.assertEqual(result["status"], "prepared-not-reviewed")
             self.assertIn("NOT A LEGAL REVIEW RECORD", result["notice"])
             self.assertEqual(
@@ -199,6 +212,36 @@ class PrepareLegalReviewTests(unittest.TestCase):
                     source_commit=commit,
                 )
 
+    def test_missing_authoritative_remote_branch_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root)
+            original_branch = git(root, "branch", "--show-current")
+            subprocess.run(["git", "checkout", "-qb", "remote-only"], cwd=root, check=True)
+            (root / "remote-only.txt").write_text("remote\n", encoding="utf-8")
+            subprocess.run(["git", "add", "remote-only.txt"], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "remote-only"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "push", "-q", "origin", "HEAD:refs/heads/remote-only"],
+                cwd=root,
+                check=True,
+            )
+            subprocess.run(["git", "checkout", "-q", original_branch], cwd=root, check=True)
+            subprocess.run(["git", "branch", "-D", "remote-only"], cwd=root, check=True, stdout=subprocess.PIPE)
+            subprocess.run(
+                ["git", "update-ref", "-d", "refs/remotes/origin/remote-only"],
+                cwd=root,
+                check=True,
+            )
+            self.assertEqual(git(root, "rev-parse", "HEAD"), commit)
+            with self.assertRaisesRegex(ValueError, "authoritative remote refs are not fully fetched"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+
     def test_source_commit_must_equal_head(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -320,6 +363,33 @@ class PrepareLegalReviewTests(unittest.TestCase):
             )
             commit = git(root, "rev-parse", "HEAD")
             with self.assertRaisesRegex(ValueError, "real directory, not a symlink"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+            self.assertEqual(list(Path(outside).iterdir()), [])
+
+    def test_symlinked_records_namespace_is_rejected(self):
+        if not hasattr(os, "symlink"):
+            self.skipTest("symlink unavailable")
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as outside:
+            root = Path(tmp)
+            self._repo(root)
+            records = root / "reviews" / "legal" / "records"
+            try:
+                records.symlink_to(Path(outside), target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(str(exc))
+            subprocess.run(
+                ["git", "add", "reviews/legal/records"], cwd=root, check=True
+            )
+            subprocess.run(
+                ["git", "commit", "-qm", "bad records symlink"], cwd=root, check=True
+            )
+            commit = git(root, "rev-parse", "HEAD")
+            with self.assertRaisesRegex(ValueError, "legal review records namespace must be a real directory"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
