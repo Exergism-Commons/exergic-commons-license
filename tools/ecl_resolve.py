@@ -35,6 +35,14 @@ REVIEWED_MECHANISM_FILENAMES = {
     "bundle_schema": "bundle.schema.json",
 }
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+BUNDLE_REF_RE = re.compile(
+    r"^(?:ECL-[0-9]+\.[0-9]+\.[0-9]+@RP-[0-9]{4}\.[0-9]{2}\.[0-9]{2}"
+    r"(?:\.[0-9]+)?|ECL-0\.3-DRAFT@RP-EMPTY-1)$"
+)
+LICENSE_REF_RE = re.compile(r"^(?:ECL-[0-9]+\.[0-9]+\.[0-9]+|ECL-0\.3-DRAFT)$")
+SCHEDULE_REF_RE = re.compile(
+    r"^ECL-RP-(?:[0-9]{4}\.[0-9]{2}\.[0-9]{2}(?:\.[0-9]+)?|EMPTY-1)$"
+)
 CANONICAL_EMPTY_BUNDLES: dict[str, dict[str, Any]] = {
     "ECL-0.3-DRAFT@RP-EMPTY-1": {
         "operative": False,
@@ -104,20 +112,17 @@ def _uses_reserved_fallback_identity(actual: Any) -> bool:
 
 
 def validate_bundle_identity(bundle: dict[str, Any]) -> None:
-    """Enforce semantic identity for every Bundle and the empty fallback.
+    """Enforce immutable semantic identity for every Bundle and fallback.
 
-    The display/manifest Bundle identifier is not independent metadata: it must
-    name the exact License and Schedule refs actually carried by the manifest.
+    Bundle identity is the exact License/Schedule tuple, not a mutable label.
+    Release refs must use the immutable canonical namespaces and component paths
+    must point at the corresponding immutable release-artifact namespaces.
     Empty fallback identities are additionally opt-in rather than generative.
-    Their identifiers and every reserved component identity are a single
-    indivisible namespace: no reserved ref, path, or hash may be borrowed in
-    either the License or Schedule slot of an ordinary Bundle. A new fallback is
-    invalid until its exact state is registered here and in the Bundle schema.
     """
 
     bundle_ref = bundle.get("bundle")
-    if not isinstance(bundle_ref, str):
-        raise ValueError("bundle manifest is missing string bundle identity")
+    if not isinstance(bundle_ref, str) or BUNDLE_REF_RE.fullmatch(bundle_ref) is None:
+        raise ValueError("bundle manifest has invalid immutable bundle identity")
 
     license_component = bundle.get("license")
     schedule_component = bundle.get("schedule")
@@ -125,15 +130,29 @@ def validate_bundle_identity(bundle: dict[str, Any]) -> None:
         raise ValueError("bundle requires license and schedule components")
     license_ref = license_component.get("ref")
     schedule_ref = schedule_component.get("ref")
-    if not isinstance(license_ref, str) or not license_ref:
-        raise ValueError("bundle license ref must be a non-empty string")
-    if not isinstance(schedule_ref, str) or not schedule_ref.startswith("ECL-"):
-        raise ValueError("bundle schedule ref must be an ECL-prefixed identifier")
+    if not isinstance(license_ref, str) or LICENSE_REF_RE.fullmatch(license_ref) is None:
+        raise ValueError("bundle license ref is not an immutable ECL release identifier")
+    if not isinstance(schedule_ref, str) or SCHEDULE_REF_RE.fullmatch(schedule_ref) is None:
+        raise ValueError("bundle schedule ref is not an immutable ECL Schedule identifier")
+
     expected_bundle_ref = f"{license_ref}@{schedule_ref.removeprefix('ECL-')}"
     if bundle_ref != expected_bundle_ref:
         raise ValueError(
             "bundle identity does not match license/schedule refs: "
             f"expected {expected_bundle_ref}, got {bundle_ref}"
+        )
+
+    expected_license_path = f"versions/licenses/{license_ref}.md"
+    expected_schedule_path = f"schedules/{schedule_ref}.md"
+    if license_component.get("path") != expected_license_path:
+        raise ValueError(
+            "bundle license path must use immutable release namespace: "
+            f"expected {expected_license_path}"
+        )
+    if schedule_component.get("path") != expected_schedule_path:
+        raise ValueError(
+            "bundle schedule path must use immutable release namespace: "
+            f"expected {expected_schedule_path}"
         )
 
     expected = CANONICAL_EMPTY_BUNDLES.get(bundle_ref)
