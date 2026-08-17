@@ -53,6 +53,15 @@ Verified cessation of unlawful attacks/reprisals, effective command accountabili
 - https://www.amnesty.org/en/documents/afr54/1116/2026/en/
 - https://www.amnesty.org/en/latest/news/2026/07/sudan-rsf-atrocities-in-el-fasher-a-stain-on-the-conscience-of-humanity-new-report/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #167 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11). Later cross-entity control: `../../reviews/2026/consistency/cross-entity-reconciliation.md` and the synchronized Schedule surfaces described below.
+
+- **Status:** absorbed / already represented, with later cross-entity reconciliation made explicit here. The Amnesty SAF-attributable and RSF-separate locators above preserve the tranche's conflict evidence and fragmentation boundary.
+- The later reconciliation confirms that **SAF must not be duplicated under inconsistent State and organization scopes**. `../organizations/SUDANESE-ARMED-FORCES.md` is a subordinate synchronized organization view of this State scope, and `../../registry/schedule-armed-organization-freezes.yml` gives SAF `ready-by-state-scope-reference` status rather than an independently broader organization restriction.
+- **RSF remains separately attributed.** The Rapid Support Forces have their own armed-organization record; RSF conduct is not imported into the Sudan State/SAF scope merely because it occurs in Sudan. Other autonomous armed actors, unrelated civilian State functions and independent humanitarian/remedial activity are likewise excluded.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-sdn.yml` controls State renderability as the **canonical synchronized Sudan State scope** and is expressly no broader than the exact State-aligned project boundary already frozen by the cross-entity record. Historical SAF/state-aligned evidence does not create a generic Sudanese military/security class beyond that synchronized boundary.
+
+## 10. Procedural history
+
+Issue #167 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md` · `../../reviews/2026/consistency/cross-entity-reconciliation.md`
