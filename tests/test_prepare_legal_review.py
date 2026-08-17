@@ -38,7 +38,11 @@ class PrepareLegalReviewTests(unittest.TestCase):
         if not inputs.exists():
             return
         self.assertEqual(
-            [path.name for path in inputs.iterdir() if path.name.startswith(f".{review_id}.prepare-")],
+            [
+                path.name
+                for path in inputs.iterdir()
+                if path.name.startswith(f".{review_id}.prepare-")
+            ],
             [],
         )
 
@@ -107,7 +111,9 @@ class PrepareLegalReviewTests(unittest.TestCase):
             self._write_repo(root)
             records = root / "reviews" / "legal" / "records"
             records.mkdir()
-            (records / "review-a.json").write_text('{"status":"complete"}', encoding="utf-8")
+            (records / "review-a.json").write_text(
+                '{"status":"complete"}', encoding="utf-8"
+            )
 
             with self.assertRaisesRegex(ValueError, "permanently consumed"):
                 MODULE.prepare_review_inputs(
@@ -116,7 +122,9 @@ class PrepareLegalReviewTests(unittest.TestCase):
                     license_path="versions/licenses/ECL-1.0-RC1.md",
                 )
 
-            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self.assertFalse(
+                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
+            )
             self._assert_no_temp_snapshots(root, "review-a")
 
     def test_record_appearing_during_preparation_aborts_and_cleans_temp(self):
@@ -134,7 +142,9 @@ class PrepareLegalReviewTests(unittest.TestCase):
                         license_path="versions/licenses/ECL-1.0-RC1.md",
                     )
 
-            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self.assertFalse(
+                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
+            )
             self._assert_no_temp_snapshots(root, "review-a")
 
     def test_record_appearing_after_publication_removes_owned_snapshot(self):
@@ -152,8 +162,37 @@ class PrepareLegalReviewTests(unittest.TestCase):
                         license_path="versions/licenses/ECL-1.0-RC1.md",
                     )
 
-            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self.assertFalse(
+                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
+            )
             self._assert_no_temp_snapshots(root, "review-a")
+
+    def test_cleanup_failure_is_reported_with_residual_snapshot_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+
+            with mock.patch.object(
+                MODULE, "_record_consumes_id", side_effect=[False, True]
+            ), mock.patch.object(
+                MODULE,
+                "_remove_owned_snapshot",
+                side_effect=OSError("simulated cleanup failure"),
+            ):
+                with self.assertRaisesRegex(
+                    OSError, "rollback could not verify cleanup.*residual snapshot"
+                ) as caught:
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            self.assertIn("simulated cleanup failure", str(caught.exception))
+            inputs = root / "reviews" / "legal" / "inputs"
+            self.assertTrue(
+                any(path.name.startswith(".review-a.prepare-") for path in inputs.iterdir())
+            )
 
     def test_atomic_publish_never_overwrites_racing_existing_namespace(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -261,7 +300,9 @@ class PrepareLegalReviewTests(unittest.TestCase):
                     license_path="versions/licenses/ECL-1.0-RC1.md",
                 )
 
-            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self.assertFalse(
+                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
+            )
 
     def test_symlinked_input_namespace_is_rejected_without_external_write(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as outside:
