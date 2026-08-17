@@ -41,6 +41,16 @@ Narrowing/removal of vague nationality powers, durable expression/media reform, 
 - https://www.amnesty.org/en/location/middle-east-and-north-africa/middle-east/oman/report-oman/
 - https://gov.om/en/w/submit-a-request-for-renunciation-of-citizenship
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #130 · `../../reviews/2026/adversarial/state-level/tranche-07.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-07.md` (cutoff 2026-08-11). Issue #130 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 7 **UPHELD `R`** after crediting minimum domestic-worker standards, appellate review and structured nationality procedures, while finding those mechanisms insufficient to rebut the centralized nationality, speech/media, policing/prosecution and labour-migration coercive systems. Both exact historical locators are already canonical above.
+- The government nationality-service locator is administrative/identity and counter-evidence context; it is not transformed into proof of prohibited conduct. Likewise, the labour-standard and appellate-remedy propositions remain narrowing/remediation evidence rather than conduct evidence.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central governmental, security, surveillance, censorship, citizenship and coercive-labour administration apparatus of Oman`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #130 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-07.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

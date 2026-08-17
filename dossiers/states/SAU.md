@@ -42,6 +42,16 @@ Sustained political-prisoner releases, fair-trial reform, major execution reduct
 - https://www.amnesty.org/en/latest/news/2026/06/saudi-arabia-almost-100-people-executed-this-year-for-drug-related-offences/
 - https://www.amnesty.org/en/documents/mde23/9524/2025/en/
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #152 · `../../reviews/2026/adversarial/state-level/tranche-07.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-07.md` (cutoff 2026-08-11). Issue #152 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 7 **UPHELD `R`** while crediting releases and labour-governance reforms as material partial counter-evidence. All three exact historical locators are already canonical above.
+- Releases, labour reforms and contract/payment digitization remain remediation/counter-evidence. They are not transformed into proof of prohibited conduct. The future review must separately test whether labour reforms create real worker exit/agency sufficient to narrow affected labour-administration projects.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central governmental, security, judicial, detention and coercive administrative apparatus of Saudi Arabia`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #152 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-07.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

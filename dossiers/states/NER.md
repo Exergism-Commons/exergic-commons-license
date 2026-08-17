@@ -42,6 +42,16 @@ Civilian transition, political-prisoner remedy, restoration of media/union/oppos
 - https://www.amnesty.org/en/location/africa/west-and-central-africa/niger/
 - https://www.amnesty.org/en/documents/afr05/1319/2026/en/
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #125 · `../../reviews/2026/adversarial/state-level/tranche-07.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-07.md` (cutoff 2026-08-11). Issue #125 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 7 **UPHELD `R`** after crediting protective-policy examples and the continued existence of formal judicial/administrative institutions, while finding no independent counter-institution capable of restraining the military/de facto political-security apparatus. All three exact historical locators are already canonical above.
+- The national-consultation, migrant-repatriation and formal-institution material remains counter-evidence/context. The historical review does not preserve a finer one-to-one mapping from each counter-proposition to a distinct locator, so this normalization does not invent one.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`current military/de facto governing, security, detention and civic-control apparatus of Niger`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #125 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-07.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
