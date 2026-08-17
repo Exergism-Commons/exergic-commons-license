@@ -308,7 +308,8 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     review_path = validate_file_reference(root, component, label="legal review record")
     record = load_json(review_path)
 
-    if record.get("schema_version") != 1:
+    schema_version = record.get("schema_version")
+    if not isinstance(schema_version, int) or isinstance(schema_version, bool) or schema_version != 1:
         raise ValueError("unsupported legal review record schema_version")
     if record.get("status") != "complete":
         raise ValueError("operative bundle requires completed legal review record")
