@@ -42,6 +42,14 @@ Durable legal reform, elimination of political criminalization, independent reme
 - https://www.granma.cu/cuba/2026-04-02/anuncia-gobierno-cubano-decision-de-indultar-a-mas-de-2-mil-sancionados-02-04-2026-19-04-18
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=CUB+3%2F2025
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #42 · `../../reviews/2026/adversarial/state-level/tranche-02.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-02.md` (cutoff 2026-08-11). Issue #42 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 2 **UPHELD `R` while crediting 2026 clemency**: release of 51 prisoners and the pardon covering 2,010 convicted persons reduce individual harm but did not establish cessation of the political-surveillance/criminalization system or independent institutional restraint. All three exact tranche locators are preserved above.
+- The two Granma records are remediation/counter-evidence provenance. The UN Special Procedures communication is the conduct-evidence baseline; the clemency measures do not prove or expand unrelated coercive conduct.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central governmental, security, judicial, detention and information-control apparatus of Cuba**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate is non-operative absent an adopted Schedule.
+
+## 8. Procedural history
+
+Issue #42 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

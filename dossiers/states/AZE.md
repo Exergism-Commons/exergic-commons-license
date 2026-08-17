@@ -45,6 +45,14 @@ Release/remedy for political prisoners, implementation of leading ECtHR judgment
 - https://pace.coe.int/en/files/36229/html
 - https://pace.coe.int/en/files/35803/html
 
-## 8. Procedural history
+## 8. Historical evidence absorption
 
-Issue #11 · `../../reviews/2026/adversarial/state-level/tranche-02.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-02.md` (cutoff 2026-08-11). Issue #11 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 2 **UPHELD `R`** after crediting resumed CPT cooperation, formal courts and ECtHR jurisdiction while finding that those mechanisms had not effectively restrained the cross-institutional political-prisoner, prosecution, detention, media, party and NGO-control pattern. Both PACE locators are already preserved above.
+- The PACE records are the historical/current evidentiary baseline; no additional proposition locator is supplied by the issue surface and none is reconstructed externally.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central governmental, security, judicial and administrative apparatus of Azerbaijan**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate is non-operative absent an adopted Schedule.
+
+## 9. Procedural history
+
+Issue #11 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

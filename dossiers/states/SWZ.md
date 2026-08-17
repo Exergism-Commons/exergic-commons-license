@@ -40,6 +40,14 @@ Evidence of independent courts/rights bodies restraining political-security cond
 
 - https://tbinternet.ohchr.org/_layouts/15/treatybodyexternal/TBSearch.aspx?CountryID=167&Lang=En
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #56 · `../../reviews/2026/adversarial/state-level/tranche-02.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-02.md` (cutoff 2026-08-11). Issue #56 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, with the historical confidence limitation preserved. State-level tranche 2 **UPHELD `R`** but explicitly recorded thinner counter-institution evidence than for most other `R` cases and required a deeper institution-specific remediation pass before stable Schedule adoption. That limitation remains part of the canonical record and is not converted into higher confidence by normalization.
+- The OHCHR treaty-body search locator is review/counter-institution context showing engagement with treaty-body processes; it is not proposition-specific proof of prohibited conduct. No additional exact institutional-remedy locator is preserved in the audited tranche/current issue surfaces.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central monarchical governing, security, political-control and detention apparatus of Eswatini**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative and should retain the dossier's deeper-review requirement before stable adoption.
+
+## 8. Procedural history
+
+Issue #56 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
