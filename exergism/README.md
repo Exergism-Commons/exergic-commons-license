@@ -1,6 +1,12 @@
 # Formal Exergism assessments
 
-This directory contains machine-readable governance inputs for the formal Exergism layer defined in [`spec/EXERGIC-ANALYSIS.md`](../spec/EXERGIC-ANALYSIS.md).
+This directory contains **ECL-specific machine-readable governance inputs** for the formal Exergism application layer defined in [`spec/EXERGIC-ANALYSIS.md`](../spec/EXERGIC-ANALYSIS.md). It is not the canonical home of the Metafísica emergentista de la liberación.
+
+## Canonical upstream pin
+
+ECL currently pins its conceptual/formal upstream baseline to **Exergism `v0.1.0`**, exact Git commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2`. The machine-readable binding is [`exergism/upstream.json`](upstream.json), which also pins the SHA-256 identities of the upstream release manifest and source archive.
+
+This is a **lineage and reproducibility pin**, not an automatic normative import. ECL maintains an explicit application profile for its governance workflow. A later Exergism release does not alter ECL unless an explicit ECL change updates the pin and reviews downstream impact. ECL does not `owl:imports` the upstream ontology.
 
 > These records have **no licensing effect by themselves**. They do not replace evidence review, exact ECL criterion fit, attribution, adversarial review or Schedule incorporation.
 
