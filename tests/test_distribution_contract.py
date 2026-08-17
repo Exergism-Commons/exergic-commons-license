@@ -174,6 +174,39 @@ class DistributionContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "unsupported legal review record schema_version"):
                 RESOLVE.validate_legal_review(ROOT, bundle)
 
+    def test_nonoperative_absent_legal_review_is_allowed(self):
+        with mock.patch.object(RESOLVE, "validate_file_reference") as validate_file:
+            RESOLVE.validate_legal_review(ROOT, {"operative": False})
+            validate_file.assert_not_called()
+
+    def test_nonoperative_null_legal_review_is_rejected_by_resolver(self):
+        with self.assertRaisesRegex(ValueError, "bundle legal_review must contain exactly"):
+            RESOLVE.validate_legal_review(
+                ROOT, {"operative": False, "legal_review": None}
+            )
+
+    def test_nonoperative_null_legal_review_is_rejected_by_distribution(self):
+        bundle = self._draft_manifest()
+        bundle["legal_review"] = None
+        with self.assertRaisesRegex(ValueError, "bundle legal_review must contain exactly"):
+            DIST._validate_bundle_manifest_shape(bundle)
+
+    def test_nonoperative_present_valid_legal_review_metadata_is_shape_valid_only(self):
+        component = {
+            "ref": "review-test",
+            "path": "reviews/legal/records/review-test.json",
+            "sha256": "a" * 64,
+        }
+        with mock.patch.object(RESOLVE, "validate_file_reference") as validate_file:
+            RESOLVE.validate_legal_review(
+                ROOT, {"operative": False, "legal_review": component}
+            )
+            validate_file.assert_not_called()
+
+    def test_operative_absent_legal_review_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "requires immutable legal_review"):
+            RESOLVE.validate_legal_review(ROOT, {"operative": True})
+
 
 if __name__ == "__main__":
     unittest.main()
