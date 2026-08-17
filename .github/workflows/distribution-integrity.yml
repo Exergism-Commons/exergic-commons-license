@@ -15,6 +15,7 @@ on:
       - "tools/ecl_distribution.py"
       - "tests/test_ecl_resolve.py"
       - "tests/test_ecl_distribution.py"
+      - "tests/test_bundle_release_identity.py"
       - ".github/workflows/distribution-integrity.yml"
   pull_request:
     paths:
@@ -30,6 +31,7 @@ on:
       - "tools/ecl_distribution.py"
       - "tests/test_ecl_resolve.py"
       - "tests/test_ecl_distribution.py"
+      - "tests/test_bundle_release_identity.py"
       - ".github/workflows/distribution-integrity.yml"
 
 permissions:
@@ -46,7 +48,10 @@ jobs:
 
       - name: Run resolver and redistribution regressions
         run: |
-          python -m unittest tests.test_ecl_resolve tests.test_ecl_distribution
+          python -m unittest \
+            tests.test_ecl_resolve \
+            tests.test_ecl_distribution \
+            tests.test_bundle_release_identity
 
       - name: Build canonical draft self-contained envelope
         run: |
