@@ -45,6 +45,14 @@ Material repeal/non-enforcement of discriminatory decrees, restoration of women'
 - https://unama.unmissions.org/en/news/unama-statement-on-afghanistans-de-facto-authorities-decree-no-18-code-on-judicial
 - https://unama.unmissions.org/en/press-releases/unama-alarmed-by-arrests-of-women-in-herat-afghanistan-and-excessive-use-of
 
-## 8. Procedural history
+## 8. Historical evidence absorption
 
-Issue #1 · `../../reviews/2026/adversarial/state-level/tranche-02.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-02.md` (cutoff 2026-08-11). Issue #1 preserves the initial adjudication baseline but no separate adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 2 adversarially tested the Taliban de facto governing/enforcement finding and **UPHELD `R`** after crediting individual releases, humanitarian/development cooperation and limited formal-rights decrees. The two exact UNAMA locators used for the current conduct finding are already preserved above.
+- The issue #1 comment records the original State-adjudication baseline rather than a later adversarial result; the canonical adversarial provenance is therefore `state-level/tranche-02.md`, not an inferred issue-level update.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **Taliban de facto governing and enforcement apparatus in Afghanistan**. Common exclusions preserve the population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The freeze is provisional governance and non-operative absent an adopted Schedule.
+
+## 9. Procedural history
+
+Issue #1 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
