@@ -49,6 +49,17 @@ Escalate on capture/neutralization of judicial review combined with qualifying s
 - Amnesty International Report 2025/26 — Costa Rica country baseline.
 - Current August 2026 reporting on public mobilization defending judicial independence.
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #39 · `../../reviews/2026/initial-adjudication.md` · 2026 original-`N` full-cohort review.
+Historical source: `../../reviews/2026/adversarial/no-basis/full-cohort.md` (cutoff 2026-08-11). Earlier baseline: `../../reviews/2026/initial-adjudication.md`. Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`. Issue #39 contains no separate evidence comment.
+
+- **Status:** absorbed, with locator limitations preserved. The initial adjudication classified Costa Rica `N`; the original-`N` full-cohort review produced **`N → U`** because current pressure on judicial independence made a clean no-basis finding premature, while no qualifying surveillance, targeting or coercive information project was established.
+- **Historical-only / locator incomplete:** the detailed dossier created in commit `d8409feb705f420e3f84a5db2d79c1e6a40ec80c` already preserved the two source references above only at source-family/reporting-description level. The initial adjudication, full-cohort review, earlier dossier history and issue #39 contain no exact URL for the Costa Rica Amnesty baseline or the August 2026 mobilization reporting. Those gaps remain explicit rather than being filled from external search or inferred URLs.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` later **retained Costa Rica as `U`**. The new license wording supplied no missing deployment/attribution evidence and did not transform institutional pressure alone into an ECL Restricted Project.
+- Functioning courts, public contestation and rights-protective institutional resistance remain counter-evidence. They are not collapsed into the project under review.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #39 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/no-basis/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
