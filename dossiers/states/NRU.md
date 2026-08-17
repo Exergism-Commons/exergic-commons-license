@@ -50,6 +50,17 @@ Escalate to `S` if a specific Nauruan agency/project is shown materially deployi
 - Current 2026 reporting on conditions for asylum seekers on Nauru.
 - UN Human Rights Committee findings concerning offshore detention/control.
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #120 · `../../reviews/2026/initial-adjudication.md` · 2026 original-`N` full-cohort review.
+Historical source: `../../reviews/2026/adversarial/no-basis/full-cohort.md` (cutoff 2026-08-11). Earlier baseline: `../../reviews/2026/initial-adjudication.md`. Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`. Issue #120 contains no separate evidence comment.
+
+- **Status:** absorbed, with locator and attribution limitations preserved. The initial adjudication classified Nauru `N`; the original-`N` full-cohort review produced **`N → U`** because the current offshore asylum/resettlement regime defeated a clean no-basis finding while Australian/Nauruan control and the direct ECL technology nexus remained unresolved.
+- **Historical-only / locator incomplete:** the detailed dossier created in commit `48f7ab385f434a29a3897da0d3657bcc820f7c4d` already contained the three source descriptions above without exact URLs/document locators. The initial adjudication, full-cohort review, earlier dossier history and issue #120 preserve no finer locators. Those descriptions remain grouped historical provenance; no Australian commission URL, current-report URL or treaty-body decision locator is reconstructed externally.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` later **retained Nauru as `U`**, specifically because attribution remains fragmented and insufficiently granular. The broader §5.6 wording does not permit Australian control or historical offshore conduct to be silently reassigned to Nauruan organs.
+- Australian-controlled conduct, Nauruan ordinary services and independent remedial activity remain outside any inferred Nauruan project absent separate attribution evidence.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #120 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/no-basis/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
