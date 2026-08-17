@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import jsonschema
 
@@ -138,6 +139,40 @@ class DistributionContractTests(unittest.TestCase):
         bundle["released_at"] = "2026-02-31T00:00:00Z"
         with self.assertRaisesRegex(ValueError, "released_at must be an RFC3339"):
             DIST._validate_bundle_manifest_shape(bundle)
+
+    def test_bundle_schema_version_boolean_is_rejected(self):
+        bundle = self._draft_manifest()
+        bundle["schema_version"] = True
+        with self.assertRaisesRegex(ValueError, "unsupported bundle manifest schema_version"):
+            DIST._validate_bundle_manifest_shape(bundle)
+
+    def test_distribution_descriptor_schema_version_boolean_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output, _ = self._build(Path(tmp))
+            descriptor_path = output / DIST.DESCRIPTOR_NAME
+            descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+            descriptor["schema_version"] = True
+            descriptor_path.write_text(json.dumps(descriptor), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "unsupported distribution descriptor schema_version"):
+                DIST.verify_distribution(output)
+
+    def test_legal_review_schema_version_boolean_is_rejected(self):
+        bundle = {
+            "operative": True,
+            "legal_review": {
+                "ref": "review-test",
+                "path": "reviews/legal/records/review-test.json",
+                "sha256": "a" * 64,
+            },
+            "license": {"sha256": "b" * 64},
+        }
+        record = {"schema_version": True}
+        with (
+            mock.patch.object(RESOLVE, "validate_file_reference", return_value=Path("record.json")),
+            mock.patch.object(RESOLVE, "load_json", return_value=record),
+        ):
+            with self.assertRaisesRegex(ValueError, "unsupported legal review record schema_version"):
+                RESOLVE.validate_legal_review(ROOT, bundle)
 
 
 if __name__ == "__main__":
