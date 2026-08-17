@@ -341,8 +341,7 @@ def prepare_review_inputs(
 
     _require_secure_runtime()
     _validate_review_id(review_id)
-    license_segments = _path_segments(license_path, label="candidate License")
-    del license_segments  # validation is repeated by the descriptor-bound read helper
+    _path_segments(license_path, label="candidate License")
 
     root = root.resolve(strict=True)
     root_fd = os.open(root, _directory_flags())
@@ -471,7 +470,9 @@ def prepare_review_inputs(
                         if "frozen" in locals()
                         else (),
                     )
-                except OSError:
+                except (OSError, ValueError):
+                    # Rollback is best-effort. Never mask the primary failure with
+                    # an error caused by hostile concurrent namespace replacement.
                     pass
         raise
     finally:
