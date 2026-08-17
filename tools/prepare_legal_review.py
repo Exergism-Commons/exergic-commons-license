@@ -1,33 +1,32 @@
 #!/usr/bin/env python3
 """Prepare immutable inputs for an external ECL legal review.
 
-This tool performs repository/mechanism preparation only. It does not create a
-completed legal-review record, assess reviewer qualifications, make legal
-findings, or satisfy any part of the qualified-review minimum by itself.
+This helper is deliberately narrow. It materializes review inputs from an exact
+Git commit into ``reviews/legal/inputs/<review_id>/`` and prints a deterministic
+preparation descriptor. It does not perform legal review, attest reviewer
+qualifications, create a completed legal-review record, or satisfy the qualified
+review gate by itself.
 
-The completed record remains a separate human-reviewed artifact at
-``reviews/legal/records/<review_id>.json`` and is validated by ``ecl_resolve``.
-
-The preparation boundary is intentionally fail-closed. Secure preparation
-requires POSIX directory file-descriptor operations, ``O_NOFOLLOW`` and an
-atomic no-replace directory publication primitive (Linux ``renameat2``).
+Trust boundary: run this command in an isolated/trusted checkout with no
+untrusted concurrent writer. Source identity is taken from Git objects, not from
+mutable working-tree paths. The command requires the requested source commit to
+be the current HEAD and requires a clean working tree before publication.
 """
 
 from __future__ import annotations
 
 import argparse
-import ctypes
-import errno
 import hashlib
 import json
 import os
 import re
-import secrets
-import stat
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any
 
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+FULL_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 CANONICAL_INPUTS = {
     "review_spec": (
         "spec/LEGAL-ADVERSARIAL-REVIEW.md",
@@ -36,44 +35,10 @@ CANONICAL_INPUTS = {
     "incorporation_spec": ("spec/VERSIONING.md", "VERSIONING.md"),
     "bundle_schema": ("schemas/bundle.schema.json", "bundle.schema.json"),
 }
-RENAME_NOREPLACE = 1
-READ_CHUNK = 1024 * 1024
 
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
-
-
-def _require_secure_runtime() -> None:
-    missing: list[str] = []
-    for name in ("O_DIRECTORY", "O_NOFOLLOW"):
-        if not hasattr(os, name):
-            missing.append(name)
-    for function in (os.open, os.mkdir, os.stat, os.unlink, os.rmdir):
-        if function not in os.supports_dir_fd:
-            missing.append(f"dir_fd:{function.__name__}")
-    if os.stat not in os.supports_follow_symlinks:
-        missing.append("stat:follow_symlinks")
-
-    try:
-        renameat2 = ctypes.CDLL(None, use_errno=True).renameat2
-    except AttributeError:
-        missing.append("renameat2")
-    else:
-        renameat2.argtypes = [
-            ctypes.c_int,
-            ctypes.c_char_p,
-            ctypes.c_int,
-            ctypes.c_char_p,
-            ctypes.c_uint,
-        ]
-        renameat2.restype = ctypes.c_int
-
-    if missing:
-        raise OSError(
-            "secure legal-review preparation is unavailable on this runtime; "
-            "missing: " + ", ".join(sorted(set(missing)))
-        )
 
 
 def _validate_review_id(review_id: str) -> None:
@@ -84,626 +49,278 @@ def _validate_review_id(review_id: str) -> None:
 def _path_segments(raw_path: str, *, label: str) -> list[str]:
     if not isinstance(raw_path, str) or not raw_path:
         raise ValueError(f"{label} path must be a non-empty string")
-    if "\\" in raw_path or raw_path.startswith("/"):
+    if "\\" in raw_path or raw_path.startswith("/") or ":" in raw_path:
         raise ValueError(f"{label} path must be a repository-relative POSIX path")
-
     segments = raw_path.split("/")
     if any(segment in {"", ".", ".."} for segment in segments):
         raise ValueError(f"{label} path contains an unsafe path segment")
     return segments
 
 
-def _directory_flags() -> int:
-    return os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
-
-
-def _file_read_flags() -> int:
-    return os.O_RDONLY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
-
-
-def _file_write_flags() -> int:
-    return (
-        os.O_RDWR
-        | os.O_CREAT
-        | os.O_EXCL
-        | os.O_NOFOLLOW
-        | getattr(os, "O_CLOEXEC", 0)
+def _git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[bytes]:
+    process = subprocess.run(
+        ["git", *args],
+        cwd=root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
     )
+    if check and process.returncode != 0:
+        detail = process.stderr.decode("utf-8", errors="replace").strip()
+        raise ValueError(f"git {' '.join(args)} failed: {detail or process.returncode}")
+    return process
 
 
-def _open_directory_at(
-    parent_fd: int, name: str, *, label: str, missing_ok: bool = False
-) -> int | None:
-    try:
-        fd = os.open(name, _directory_flags(), dir_fd=parent_fd)
-    except FileNotFoundError:
-        if missing_ok:
-            return None
-        raise ValueError(f"missing {label}: {name}") from None
-    except OSError as exc:
+def _require_repository_root(root: Path) -> Path:
+    resolved = root.resolve(strict=True)
+    top = _git(resolved, "rev-parse", "--show-toplevel").stdout.decode().strip()
+    if Path(top).resolve() != resolved:
+        raise ValueError("root must be the Git repository top-level directory")
+    return resolved
+
+
+def _resolve_source_commit(root: Path, source_commit: str) -> str:
+    if FULL_COMMIT_RE.fullmatch(source_commit) is None:
+        raise ValueError("source_commit must be an explicit full 40-hex Git commit SHA")
+    normalized = source_commit.lower()
+    _git(root, "cat-file", "-e", f"{normalized}^{{commit}}")
+    actual = _git(root, "rev-parse", f"{normalized}^{{commit}}").stdout.decode().strip()
+    if actual != normalized:
+        raise ValueError("source_commit must identify the exact commit object")
+    return normalized
+
+
+def _require_head_and_clean(root: Path, source_commit: str) -> None:
+    head = _git(root, "rev-parse", "HEAD").stdout.decode().strip()
+    if head != source_commit:
         raise ValueError(
-            f"{label} must be a real directory without symbolic-link traversal: {name}"
-        ) from exc
-
-    if not stat.S_ISDIR(os.fstat(fd).st_mode):
-        os.close(fd)
-        raise ValueError(f"{label} must be a directory: {name}")
-    return fd
-
-
-def _same_inode(left: os.stat_result, right: os.stat_result) -> bool:
-    return (left.st_dev, left.st_ino) == (right.st_dev, right.st_ino)
-
-
-def _verify_directory_binding(
-    parent_fd: int,
-    name: str,
-    expected: os.stat_result,
-    *,
-    label: str,
-) -> None:
-    current_fd = _open_directory_at(parent_fd, name, label=label)
-    assert current_fd is not None
-    try:
-        if not _same_inode(os.fstat(current_fd), expected):
-            raise OSError(f"{label} changed during legal-review preparation: {name}")
-    finally:
-        os.close(current_fd)
-
-
-def _open_bound_directory_chain(
-    root_fd: int, segments: list[str], *, label: str
-) -> tuple[list[int], list[tuple[int, str, os.stat_result]]]:
-    """Open a path chain while retaining every parent needed for revalidation."""
-
-    opened: list[int] = []
-    bindings: list[tuple[int, str, os.stat_result]] = []
-    parent_fd = root_fd
-    try:
-        for segment in segments:
-            child_fd = _open_directory_at(parent_fd, segment, label=label)
-            assert child_fd is not None
-            identity = os.fstat(child_fd)
-            bindings.append((parent_fd, segment, identity))
-            opened.append(child_fd)
-            parent_fd = child_fd
-        return opened, bindings
-    except Exception:
-        for fd in reversed(opened):
-            os.close(fd)
-        raise
-
-
-def _verify_directory_chain(
-    bindings: list[tuple[int, str, os.stat_result]], *, label: str
-) -> None:
-    for parent_fd, name, identity in bindings:
-        _verify_directory_binding(parent_fd, name, identity, label=label)
-
-
-def _stat_fingerprint(value: os.stat_result) -> tuple[int, int, int, int, int]:
-    return (
-        value.st_dev,
-        value.st_ino,
-        value.st_size,
-        value.st_mtime_ns,
-        value.st_ctime_ns,
-    )
-
-
-def _read_all(fd: int) -> bytes:
-    os.lseek(fd, 0, os.SEEK_SET)
-    chunks: list[bytes] = []
-    while True:
-        chunk = os.read(fd, READ_CHUNK)
-        if not chunk:
-            return b"".join(chunks)
-        chunks.append(chunk)
-
-
-def _read_repository_file(root_fd: int, raw_path: str, *, label: str) -> bytes:
-    """Read a repository file while proving its entire path stayed canonical."""
-
-    segments = _path_segments(raw_path, label=label)
-    opened_dirs, bindings = _open_bound_directory_chain(
-        root_fd, segments[:-1], label=label
-    )
-    parent_fd = opened_dirs[-1] if opened_dirs else root_fd
-    file_fd: int | None = None
-    try:
-        try:
-            file_fd = os.open(segments[-1], _file_read_flags(), dir_fd=parent_fd)
-        except FileNotFoundError:
-            raise ValueError(f"missing {label}: {raw_path}") from None
-        except OSError as exc:
-            raise ValueError(
-                f"{label} must be a regular file without symbolic-link traversal: "
-                f"{raw_path}"
-            ) from exc
-
-        before = os.fstat(file_fd)
-        if not stat.S_ISREG(before.st_mode):
-            raise ValueError(f"{label} must be a regular file: {raw_path}")
-
-        data = _read_all(file_fd)
-        after_read = os.fstat(file_fd)
-        if _stat_fingerprint(before) != _stat_fingerprint(after_read):
-            raise OSError(f"{label} changed while it was being read: {raw_path}")
-
-        try:
-            entry = os.stat(
-                segments[-1], dir_fd=parent_fd, follow_symlinks=False
-            )
-        except FileNotFoundError:
-            raise OSError(f"{label} path disappeared during read: {raw_path}") from None
-        if not stat.S_ISREG(entry.st_mode) or not _same_inode(entry, after_read):
-            raise OSError(f"{label} file entry changed during read: {raw_path}")
-
-        _verify_directory_chain(bindings, label=f"{label} source directory")
-
-        final = os.fstat(file_fd)
-        if _stat_fingerprint(before) != _stat_fingerprint(final):
-            raise OSError(f"{label} changed before identity was finalized: {raw_path}")
-        return data
-    finally:
-        if file_fd is not None:
-            os.close(file_fd)
-        for fd in reversed(opened_dirs):
-            os.close(fd)
-
-
-def _entry_exists(parent_fd: int, name: str) -> bool:
-    try:
-        os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
-        return True
-    except FileNotFoundError:
-        return False
-
-
-def _record_consumes_id(
-    legal_fd: int,
-    records_fd: int | None,
-    records_identity: os.stat_result | None,
-    review_id: str,
-) -> bool:
-    if records_fd is None:
-        if _entry_exists(legal_fd, "records"):
-            raise OSError(
-                "legal review records namespace appeared during preparation; "
-                "retry with a fresh review ID after inspecting the concurrent change"
-            )
-        return False
-
-    assert records_identity is not None
-    _verify_directory_binding(
-        legal_fd,
-        "records",
-        records_identity,
-        label="legal review records namespace",
-    )
-    return _entry_exists(records_fd, f"{review_id}.json")
-
-
-def _open_or_create_inputs(legal_fd: int) -> int:
-    inputs_fd = _open_directory_at(
-        legal_fd,
-        "inputs",
-        label="legal review input namespace",
-        missing_ok=True,
-    )
-    if inputs_fd is not None:
-        return inputs_fd
-
-    try:
-        os.mkdir("inputs", mode=0o755, dir_fd=legal_fd)
-        os.fsync(legal_fd)
-    except FileExistsError:
-        pass
-    inputs_fd = _open_directory_at(
-        legal_fd,
-        "inputs",
-        label="legal review input namespace",
-    )
-    assert inputs_fd is not None
-    return inputs_fd
-
-
-def _write_all(fd: int, data: bytes) -> None:
-    view = memoryview(data)
-    offset = 0
-    while offset < len(view):
-        written = os.write(fd, view[offset:])
-        if written <= 0:
-            raise OSError("short write while freezing legal-review input")
-        offset += written
-
-
-def _write_frozen_file(directory_fd: int, filename: str, data: bytes) -> int:
-    fd = os.open(filename, _file_write_flags(), 0o600, dir_fd=directory_fd)
-    try:
-        _write_all(fd, data)
-        os.fsync(fd)
-        os.lseek(fd, 0, os.SEEK_SET)
-        if _read_all(fd) != data:
-            raise OSError(f"snapshot verification failed for {filename}")
-        os.fchmod(fd, 0o644)
-        os.fsync(fd)
-        return fd
-    except Exception:
-        os.close(fd)
-        raise
-
-
-def _verify_frozen_entries(
-    directory_fd: int,
-    frozen_handles: list[tuple[str, int, bytes]],
-) -> None:
-    """Bind every frozen directory entry to its retained descriptor and bytes."""
-
-    for filename, file_fd, expected in frozen_handles:
-        held_before = os.fstat(file_fd)
-        if not stat.S_ISREG(held_before.st_mode):
-            raise OSError(f"frozen input handle is no longer regular: {filename}")
-        try:
-            entry = os.stat(filename, dir_fd=directory_fd, follow_symlinks=False)
-        except FileNotFoundError:
-            raise OSError(f"frozen input entry disappeared: {filename}") from None
-        if not stat.S_ISREG(entry.st_mode) or not _same_inode(entry, held_before):
-            raise OSError(f"frozen input entry changed: {filename}")
-
-        actual = _read_all(file_fd)
-        held_after = os.fstat(file_fd)
-        if _stat_fingerprint(held_before) != _stat_fingerprint(held_after):
-            raise OSError(f"frozen input changed during verification: {filename}")
-        if actual != expected:
-            raise OSError(f"frozen input bytes changed: {filename}")
-
-
-def _rename_noreplace(parent_fd: int, source: str, destination: str) -> None:
-    try:
-        renameat2 = ctypes.CDLL(None, use_errno=True).renameat2
-    except AttributeError as exc:
-        raise OSError("secure atomic no-replace publication is unavailable") from exc
-
-    renameat2.argtypes = [
-        ctypes.c_int,
-        ctypes.c_char_p,
-        ctypes.c_int,
-        ctypes.c_char_p,
-        ctypes.c_uint,
-    ]
-    renameat2.restype = ctypes.c_int
-    result = renameat2(
-        parent_fd,
-        os.fsencode(source),
-        parent_fd,
-        os.fsencode(destination),
-        RENAME_NOREPLACE,
-    )
-    if result == 0:
-        return
-
-    error = ctypes.get_errno()
-    if error == errno.EEXIST:
+            f"source_commit must equal current HEAD; HEAD is {head}, requested {source_commit}"
+        )
+    status = _git(root, "status", "--porcelain=v1", "--untracked-files=all").stdout
+    if status:
         raise ValueError(
-            f"legal review input snapshot already exists: reviews/legal/inputs/{destination}"
+            "working tree must be clean before legal-review preparation; "
+            "commit/stash unrelated changes and retry"
         )
-    raise OSError(error, os.strerror(error))
 
 
-def _remove_owned_snapshot(
-    inputs_fd: int,
-    name: str,
-    expected: os.stat_result,
-    filenames: tuple[str, ...],
-) -> None:
-    directory_fd = _open_directory_at(
-        inputs_fd,
-        name,
-        label="legal review cleanup directory",
-        missing_ok=True,
-    )
-    if directory_fd is None:
-        return
+def _tree_entry(
+    root: Path, commit: str, raw_path: str, *, label: str
+) -> tuple[str, str, str] | None:
+    _path_segments(raw_path, label=label)
+    output = _git(root, "ls-tree", "-z", commit, "--", raw_path).stdout
+    if not output:
+        return None
+    records = [record for record in output.split(b"\0") if record]
+    if len(records) != 1:
+        raise ValueError(f"{label} does not resolve to one Git tree entry: {raw_path}")
+    metadata, path_bytes = records[0].split(b"\t", 1)
+    mode, object_type, object_id = metadata.decode("ascii").split()
+    path = path_bytes.decode("utf-8")
+    if path != raw_path:
+        raise ValueError(f"{label} resolved to unexpected Git path: {path}")
+    return mode, object_type, object_id
+
+
+def _read_blob(root: Path, commit: str, raw_path: str, *, label: str) -> bytes:
+    entry = _tree_entry(root, commit, raw_path, label=label)
+    if entry is None:
+        raise ValueError(f"missing {label} in source commit: {raw_path}")
+    mode, object_type, object_id = entry
+    if object_type != "blob" or mode not in {"100644", "100755"}:
+        raise ValueError(
+            f"{label} must be a regular tracked file, not mode/type "
+            f"{mode}/{object_type}: {raw_path}"
+        )
+    return _git(root, "cat-file", "blob", object_id).stdout
+
+
+def _commit_path_exists(root: Path, commit: str, raw_path: str) -> bool:
+    return _tree_entry(root, commit, raw_path, label="consumed review path") is not None
+
+
+def _lexists(path: Path) -> bool:
+    return os.path.lexists(path)
+
+
+def _assert_real_directory(path: Path, *, label: str) -> None:
+    if not _lexists(path):
+        raise ValueError(f"missing {label}: {path}")
+    if path.is_symlink() or not path.is_dir():
+        raise ValueError(f"{label} must be a real directory, not a symlink: {path}")
+
+
+def _fsync_directory(path: Path) -> None:
+    flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+    fd = os.open(path, flags)
     try:
-        if not _same_inode(os.fstat(directory_fd), expected):
-            raise OSError(
-                f"rollback could not verify ownership of reviews/legal/inputs/{name}"
-            )
-        for filename in filenames:
-            try:
-                os.unlink(filename, dir_fd=directory_fd)
-            except FileNotFoundError:
-                pass
-        os.fsync(directory_fd)
+        os.fsync(fd)
     finally:
-        os.close(directory_fd)
+        os.close(fd)
 
+
+def _write_snapshot(target: Path, frozen: dict[str, tuple[str, bytes]]) -> None:
+    target.mkdir(mode=0o755)
     try:
-        current = os.stat(name, dir_fd=inputs_fd, follow_symlinks=False)
-    except FileNotFoundError:
-        return
-    if not _same_inode(current, expected) or not stat.S_ISDIR(current.st_mode):
-        raise OSError(
-            f"rollback lost ownership of reviews/legal/inputs/{name}; residual namespace may remain"
-        )
-
-    os.rmdir(name, dir_fd=inputs_fd)
-    os.fsync(inputs_fd)
-    if _entry_exists(inputs_fd, name):
-        raise OSError(
-            f"rollback left a residual namespace at reviews/legal/inputs/{name}"
-        )
+        for filename, data in frozen.values():
+            path = target / filename
+            with path.open("xb") as handle:
+                handle.write(data)
+                handle.flush()
+                os.fsync(handle.fileno())
+            if path.read_bytes() != data:
+                raise OSError(f"snapshot verification failed for {filename}")
+        _fsync_directory(target)
+        _fsync_directory(target.parent)
+    except Exception as primary:
+        try:
+            shutil.rmtree(target)
+            _fsync_directory(target.parent)
+        except Exception as cleanup:
+            raise OSError(
+                "legal-review preparation failed and cleanup also failed; "
+                f"residual snapshot may remain at {target}; "
+                f"primary error: {primary!r}; cleanup error: {cleanup!r}"
+            ) from cleanup
+        raise
 
 
 def prepare_review_inputs(
-    root: Path, *, review_id: str, license_path: str
+    root: Path,
+    *,
+    review_id: str,
+    license_path: str,
+    source_commit: str,
 ) -> dict[str, Any]:
-    """Freeze canonical mechanism inputs and return a non-review descriptor."""
+    """Materialize exact review inputs from one immutable Git commit."""
 
-    _require_secure_runtime()
     _validate_review_id(review_id)
     _path_segments(license_path, label="candidate License")
+    root = _require_repository_root(root)
+    source_commit = _resolve_source_commit(root, source_commit)
 
-    root = root.resolve(strict=True)
-    root_fd = os.open(root, _directory_flags())
-    reviews_fd: int | None = None
-    legal_fd: int | None = None
-    records_fd: int | None = None
-    inputs_fd: int | None = None
-    snapshot_fd: int | None = None
-    frozen_file_fds: list[tuple[str, int, bytes]] = []
-    published_name: str | None = None
-    snapshot_identity: os.stat_result | None = None
-    reviews_identity: os.stat_result | None = None
-    legal_identity: os.stat_result | None = None
-    records_identity: os.stat_result | None = None
-    inputs_identity: os.stat_result | None = None
+    legal = root / "reviews" / "legal"
+    _assert_real_directory(root / "reviews", label="reviews namespace")
+    _assert_real_directory(legal, label="legal review workspace")
 
-    try:
-        license_bytes = _read_repository_file(
-            root_fd, license_path, label="candidate License"
+    target_rel = f"reviews/legal/inputs/{review_id}"
+    record_rel = f"reviews/legal/records/{review_id}.json"
+    target = root / target_rel
+    record = root / record_rel
+
+    # A review ID is permanently consumed by either historical Git state or the
+    # current workspace. Check this before the cleanliness gate so rerunning an
+    # already-prepared ID produces the more useful consumed-ID error.
+    if _commit_path_exists(root, source_commit, target_rel) or _lexists(target):
+        raise ValueError(f"legal review input snapshot already exists: {target_rel}")
+    if _commit_path_exists(root, source_commit, record_rel) or _lexists(record):
+        raise ValueError(
+            "review_id is permanently consumed by an existing completed-record "
+            f"path: {record_rel}"
         )
-        frozen: dict[str, tuple[str, bytes]] = {}
-        for key, (source_path, filename) in CANONICAL_INPUTS.items():
-            frozen[key] = (
-                filename,
-                _read_repository_file(root_fd, source_path, label=f"canonical {key}"),
-            )
 
-        reviews_fd = _open_directory_at(
-            root_fd, "reviews", label="reviews namespace"
-        )
-        assert reviews_fd is not None
-        reviews_identity = os.fstat(reviews_fd)
+    _require_head_and_clean(root, source_commit)
 
-        legal_fd = _open_directory_at(
-            reviews_fd, "legal", label="legal review workspace"
-        )
-        assert legal_fd is not None
-        legal_identity = os.fstat(legal_fd)
-
-        records_fd = _open_directory_at(
-            legal_fd,
-            "records",
-            label="legal review records namespace",
-            missing_ok=True,
-        )
-        records_identity = os.fstat(records_fd) if records_fd is not None else None
-        if _record_consumes_id(
-            legal_fd, records_fd, records_identity, review_id
-        ):
-            raise ValueError(
-                f"review_id is permanently consumed by an existing completed-record "
-                f"path: reviews/legal/records/{review_id}.json"
-            )
-
-        inputs_fd = _open_or_create_inputs(legal_fd)
-        inputs_identity = os.fstat(inputs_fd)
-        if _entry_exists(inputs_fd, review_id):
-            raise ValueError(
-                f"legal review input snapshot already exists: "
-                f"reviews/legal/inputs/{review_id}"
-            )
-
-        temp_name = ""
-        for _ in range(32):
-            candidate = f".{review_id}.prepare-{secrets.token_hex(16)}"
-            try:
-                os.mkdir(candidate, mode=0o700, dir_fd=inputs_fd)
-            except FileExistsError:
-                continue
-            temp_name = candidate
-            break
-        if not temp_name:
-            raise OSError("unable to allocate a private legal-review snapshot directory")
-
-        snapshot_fd = _open_directory_at(
-            inputs_fd,
-            temp_name,
-            label="private legal review preparation directory",
-        )
-        assert snapshot_fd is not None
-        snapshot_identity = os.fstat(snapshot_fd)
-
-        for filename, data in frozen.values():
-            file_fd = _write_frozen_file(snapshot_fd, filename, data)
-            frozen_file_fds.append((filename, file_fd, data))
-        _verify_frozen_entries(snapshot_fd, frozen_file_fds)
-        os.fsync(snapshot_fd)
-
-        if _record_consumes_id(
-            legal_fd, records_fd, records_identity, review_id
-        ):
-            raise ValueError(
-                f"review_id became consumed by records/{review_id}.json during preparation"
-            )
-        if _entry_exists(inputs_fd, review_id):
-            raise ValueError(
-                f"legal review input snapshot appeared during preparation: {review_id}"
-            )
-
-        _verify_frozen_entries(snapshot_fd, frozen_file_fds)
-        _rename_noreplace(inputs_fd, temp_name, review_id)
-        published_name = review_id
-        os.fsync(inputs_fd)
-
-        published_fd = _open_directory_at(
-            inputs_fd,
-            review_id,
-            label="published legal review input snapshot",
-        )
-        assert published_fd is not None
-        try:
-            if not _same_inode(os.fstat(published_fd), snapshot_identity):
-                raise OSError("published legal-review snapshot identity changed")
-            _verify_frozen_entries(published_fd, frozen_file_fds)
-        finally:
-            os.close(published_fd)
-
-        if _record_consumes_id(
-            legal_fd, records_fd, records_identity, review_id
-        ):
-            raise ValueError(
-                f"review_id became consumed by records/{review_id}.json during publication"
-            )
-
-        assert reviews_identity is not None
-        assert legal_identity is not None
-        assert inputs_identity is not None
-        _verify_directory_binding(
-            root_fd, "reviews", reviews_identity, label="reviews namespace"
-        )
-        _verify_directory_binding(
-            reviews_fd, "legal", legal_identity, label="legal review workspace"
-        )
-        _verify_directory_binding(
-            legal_fd,
-            "inputs",
-            inputs_identity,
-            label="legal review input namespace",
-        )
-        _record_consumes_id(legal_fd, records_fd, records_identity, review_id)
-
-        final_fd = _open_directory_at(
-            inputs_fd,
-            review_id,
-            label="final legal review input snapshot",
-        )
-        assert final_fd is not None
-        try:
-            if not _same_inode(os.fstat(final_fd), snapshot_identity):
-                raise OSError("final legal-review snapshot identity changed")
-            _verify_frozen_entries(final_fd, frozen_file_fds)
-        finally:
-            os.close(final_fd)
-
-        descriptor: dict[str, Any] = {
-            "schema_version": 1,
-            "kind": "ecl-legal-review-input-preparation",
-            "status": "prepared-not-reviewed",
-            "review_id": review_id,
-            "notice": (
-                "NOT A LEGAL REVIEW RECORD. This snapshot does not count as a "
-                "qualified, independent, or adversarial legal review."
+    license_bytes = _read_blob(
+        root, source_commit, license_path, label="candidate License"
+    )
+    frozen: dict[str, tuple[str, bytes]] = {}
+    for key, (source_path, filename) in CANONICAL_INPUTS.items():
+        frozen[key] = (
+            filename,
+            _read_blob(
+                root,
+                source_commit,
+                source_path,
+                label=f"canonical {key}",
             ),
-            "license": {
-                "path": license_path,
-                "sha256": sha256_bytes(license_bytes),
-            },
-            "completed_record_path": f"reviews/legal/records/{review_id}.json",
-            "completed_record_schema": "schemas/legal-review-record.schema.json",
-        }
-        for key, (filename, data) in frozen.items():
-            descriptor[key] = {
-                "path": f"reviews/legal/inputs/{review_id}/{filename}",
-                "sha256": sha256_bytes(data),
-            }
-        return descriptor
-    except Exception as primary_error:
-        cleanup_error: Exception | None = None
-        cleanup_name: str | None = None
-        if inputs_fd is not None and snapshot_identity is not None:
-            cleanup_name = published_name
-            if cleanup_name is None and "temp_name" in locals() and temp_name:
-                cleanup_name = temp_name
-            if cleanup_name is not None:
-                try:
-                    _remove_owned_snapshot(
-                        inputs_fd,
-                        cleanup_name,
-                        snapshot_identity,
-                        tuple(filename for filename, _ in frozen.values())
-                        if "frozen" in locals()
-                        else (),
-                    )
-                except (OSError, ValueError) as exc:
-                    cleanup_error = exc
+        )
 
-        if cleanup_error is None and snapshot_fd is not None:
-            try:
-                if os.fstat(snapshot_fd).st_nlink != 0:
-                    cleanup_error = OSError(
-                        "rollback could not prove that the helper-owned snapshot inode "
-                        "was unlinked; it may have been renamed or moved concurrently"
-                    )
-            except OSError as exc:
-                cleanup_error = exc
+    inputs = legal / "inputs"
+    if _lexists(inputs):
+        _assert_real_directory(inputs, label="legal review input namespace")
+    else:
+        inputs.mkdir(mode=0o755)
+        _fsync_directory(legal)
 
-        if cleanup_error is not None:
+    # The checkout is a trusted isolated workspace by contract, but still fail
+    # closed if a cooperative process created either namespace after our first
+    # check.
+    if _lexists(target) or _lexists(record):
+        raise ValueError(f"review_id became consumed during preparation: {review_id}")
+
+    _write_snapshot(target, frozen)
+
+    if _lexists(record):
+        try:
+            shutil.rmtree(target)
+            _fsync_directory(inputs)
+        except Exception as cleanup:
             raise OSError(
-                "legal-review preparation failed and rollback could not verify cleanup; "
-                f"a residual snapshot may remain near reviews/legal/inputs/{cleanup_name}. "
-                f"primary error: {primary_error!r}; rollback error: {cleanup_error!r}"
-            ) from cleanup_error
-        raise
-    finally:
-        for _, fd, _ in frozen_file_fds:
-            try:
-                os.close(fd)
-            except OSError:
-                pass
-        if snapshot_fd is not None:
-            os.close(snapshot_fd)
-        if inputs_fd is not None:
-            os.close(inputs_fd)
-        if records_fd is not None:
-            os.close(records_fd)
-        if legal_fd is not None:
-            os.close(legal_fd)
-        if reviews_fd is not None:
-            os.close(reviews_fd)
-        os.close(root_fd)
+                "completed record appeared during preparation and rollback failed; "
+                f"residual snapshot may remain at {target}: {cleanup!r}"
+            ) from cleanup
+        raise ValueError(f"review_id became consumed by completed record: {record_rel}")
+
+    for _, (filename, data) in frozen.items():
+        if (target / filename).read_bytes() != data:
+            raise OSError(f"published frozen input changed before completion: {filename}")
+
+    descriptor: dict[str, Any] = {
+        "schema_version": 2,
+        "kind": "ecl-legal-review-input-preparation",
+        "status": "prepared-not-reviewed",
+        "review_id": review_id,
+        "source_commit": source_commit,
+        "notice": (
+            "NOT A LEGAL REVIEW RECORD. This snapshot does not count as a "
+            "qualified, independent, or adversarial legal review."
+        ),
+        "license": {
+            "path": license_path,
+            "sha256": sha256_bytes(license_bytes),
+        },
+        "completed_record_path": record_rel,
+        "completed_record_schema": "schemas/legal-review-record.schema.json",
+    }
+    for key, (filename, data) in frozen.items():
+        descriptor[key] = {
+            "path": f"{target_rel}/{filename}",
+            "sha256": sha256_bytes(data),
+        }
+    return descriptor
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Freeze the exact non-License inputs for a qualified ECL legal review. "
-            "This command never creates a completed legal-review record."
-        )
-    )
-    parser.add_argument("review_id", help="immutable review identifier")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("review_id")
+    parser.add_argument("--license", required=True, dest="license_path")
     parser.add_argument(
-        "--license",
+        "--source-commit",
         required=True,
-        dest="license_path",
-        help="repository-relative path to the exact candidate License",
+        help="exact full Git commit SHA whose blobs are the review inputs",
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path(__file__).resolve().parents[1],
+        help="repository root (defaults to this script's repository)",
     )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    root = Path(__file__).resolve().parents[1]
     try:
         descriptor = prepare_review_inputs(
-            root, review_id=args.review_id, license_path=args.license_path
+            args.root,
+            review_id=args.review_id,
+            license_path=args.license_path,
+            source_commit=args.source_commit,
         )
     except (OSError, ValueError) as exc:
-        print(f"legal-review preparation failed: {exc}")
-        return 1
-
+        print(f"error: {exc}", file=os.sys.stderr)
+        return 2
     print(json.dumps(descriptor, indent=2, sort_keys=True))
     return 0
 
