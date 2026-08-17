@@ -52,7 +52,15 @@ Review after measurable implementation of the 2026–2030 action plan and revise
 - https://en.moj.gov.cn/2026-05/06/c_1184021.htm
 - https://www.court.gov.cn/zixun/xiangqing/492671.html
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-- Discussion: issue #36
-- Adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-01.md` (cutoff 2026-08-11). Public provenance: issue #36. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. The initial adjudication classified China as `R`; state-level tranche 1 adversarially tested the finding and **UPHELD `R`** after crediting the 2026–2030 action plan, revised Prison Law and Supreme People's Court accountability signals. The current dossier preserves every proposition-specific and reform/counter-evidence locator used by that tranche.
+- The issue #36 comment records the same result but points to the legacy name `ADVERSARIAL-REVIEW-2026.md`; the surviving canonical historical record is `state-level/tranche-01.md`. No legacy path is required to reconstruct the reasoning.
+- Reform and court locators above are future-review/counter-evidence. They are not proof of the prohibited conduct; the UN/OHCHR record carries the conduct baseline.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central and materially controlled regional coercive-security, judicial, surveillance and assimilation apparatus of the People's Republic of China**. Its common exclusions preserve population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The freeze is a governance candidate and remains non-operative absent an adopted Schedule.
+
+## 10. Procedural history
+
+Issue #36 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-01.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

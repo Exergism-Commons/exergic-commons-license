@@ -50,8 +50,17 @@ Cessation of occupation-related unlawful conduct, verified withdrawal/remediatio
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=RUS+3%2F2026
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=RUS+14%2F2025
 - https://www.ksrf.ru/en/Rulings/Rulings.php
+- https://special.kremlin.ru/catalog/keywords/28/events
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-- Discussion: issue #144
-- Adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-01.md` (cutoff 2026-08-11). Public provenance: issue #144. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, with historical counter-evidence locator restored. The initial adjudication classified Russia as `R`; state-level tranche 1 **UPHELD `R`** after crediting formal Constitutional Court, legal-aid and detention-law mechanisms but finding no effective restraint sufficient to rebut the domestic/occupation coercive record.
+- The Kremlin legal-change locator above was preserved by tranche 1 but was absent from the shorter canonical source list. It is restored solely as **formal legal/counter-evidence context** and does not prove prohibited conduct. OHCHR and UN Special Procedures remain the proposition-specific conduct baseline.
+- The issue #144 comment records the same uphold result but points to the legacy `ADVERSARIAL-REVIEW-2026.md`; `state-level/tranche-01.md` is the surviving historical record.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central governmental, military, occupation, security, judicial, surveillance and information-control apparatus of the Russian Federation**, subject to the common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains non-operative absent an adopted Schedule.
+
+## 10. Procedural history
+
+Issue #144 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-01.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

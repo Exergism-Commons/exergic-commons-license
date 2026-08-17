@@ -72,12 +72,19 @@ Because the criminal case is pending, acquittal, material withdrawal/dismissal o
 - https://dbr.gov.ua/news/dbr-rozslidue-obstavini-smerti-cholovika-pislya-perebuvannya-u-kremenchuckomu-rtck-ta-sp
 - https://ombudsman.gov.ua/en/news_details/pravove-reaguvannya-na-porushennya-u-miscyah-nesvobodi-vid-fiksaciyi-do-kriminalnoyi-vidpovidalnosti
 
-## 9. Schedule normalization
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-01.md` (cutoff 2026-08-11). Public provenance: issue #184. Later controlling surface: the 2026-08-14 incident-level revalidation and `../../registry/schedule-state-s-freezes/batch-21c-ukr-freeze.yml`.
+
+- **Status:** absorbed / later incident freeze controls. State-level tranche 1 produced the material **narrowing of `S`** from the overbroad phrase `territorial recruitment, military-conscription` to identified abusive TCC units/personnel and specifically substantiated coercive mobilization/detention practices, while crediting SBI and Ombudsman/NPM accountability. The issue #184 comment records the same narrowing under a legacy review filename; `state-level/tranche-01.md` is the surviving historical source.
+- Historical same-dossier Git review confirms that all four state-level SBI/Ombudsman locators remain preserved above; no missing locator mapping is reconstructed. The later 2026-08-14 dossier adds two incident-specific SBI locators and a narrower attributable project, so the historical broader TCC evidence must not displace that later boundary.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-21c-ukr-freeze.yml` freezes only the **May 2025 Kyiv TCC mobilized-person transport death incident — Podilskyi deputy-head / Shevchenkivskyi soldier case**, limited to the charged conduct and materially participating functions. The freeze is not a finding of individual guilt and expressly excludes generic TCC/mobilisation administration, ordinary lawful conscription, non-participating personnel, investigators/prosecutors/courts/defence/Ombudsman and conduct later withdrawn, dismissed, acquitted or otherwise shown not attributable. Other TCC, conscientious-objection and collaboration/security scope remains governance-only until separately frozen.
+
+## 10. Schedule normalization
 
 - `../../registry/schedule-state-s-freezes/batch-21c-ukr-freeze.yml` freezes only the May 2025 Kyiv transport incident and the specifically charged materially participating functions.
 - Other TCC violence/detention cases, conscientious-objection matters and collaboration-prosecution/security projects remain governance-only until separately frozen.
 
-## 10. Procedural history
+## 11. Procedural history
 
-- Discussion: issue #184
-- Adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
+Issue #184 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-01.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-s-freezes/batch-21c-ukr-freeze.yml`

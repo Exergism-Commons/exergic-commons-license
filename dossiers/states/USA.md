@@ -83,16 +83,21 @@ In formal terms, durable remediation should raise `A`, `V_ep`, `L` and `O` and l
 - https://www.gao.gov/about
 - https://www.uscourts.gov/about-federal-courts/court-role-and-structure
 - https://www.gao.gov/products/gao-26-108886
+- https://www.gao.gov/products/gao-25-107580
 - https://www.pclob.gov/Oversight
 - https://oig.justice.gov/news/press-release/bop-correctional-officer-indicted-civil-rights-violations-against-inmates
 - https://www.gao.gov/products/gao-24-106257
+- https://www.centcom.mil/OPERATIONS-AND-EXERCISES/EPIC-FURY/
 
-## 10. Procedural history
+## 10. Historical evidence absorption
 
-- Discussion: issue #187
-- Initial adjudication: `../../reviews/2026/initial-adjudication.md`
-- Whole-State adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
-- Global license-fit audit: `../../reviews/2026/consistency/global-license-fit-audit.md`
-- ECL 0.2 State delta audit: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
-- Formal Exergism pilot: `../../exergism/assessments/USA.json`
-- Current registry: `../../registry/states.yml`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-01.md` (cutoff 2026-08-11). Public provenance: issue #187. Later controlling records: `../../reviews/2026/consistency/global-license-fit-audit.md`, `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md`, the formal Exergism pilot and the post-delta Schedule freeze.
+
+- **Status:** absorbed / historical tier superseded. State-level tranche 1 **UPHELD the then-current whole-federal `R`** while requiring an accountability/remediation carve-out. The later ECL 0.2 State Delta superseded that scope and produced the current **`R → S` correction** because the Federal Judiciary, GAO, inspectors general and other remedial functions are materially distinct. Historical `R` must not be reconstructed as a current blanket Federal Government restriction.
+- Historical same-dossier Git review recovered `https://www.gao.gov/products/gao-25-107580`, which was present in the pre-delta dossier and displaced by the later rewrite. It is restored above as **detention-accountability/counter-evidence provenance**, not as proof of prohibited conduct.
+- The issue #187 comment records the state-level uphold and carve-out requirement under a legacy review filename. The surviving historical source is `state-level/tranche-01.md`; ECL 0.2's Independent Remediation Activity and narrowest-attribution rules are the later controlling implementation of that concern.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-03a-usa.yml` controls current State renderability and freezes only **Operation Epic Fury — the 28 February 2026 Minab targeting chain**, exactly as frozen in `../../registry/schedule-project-freezes.yml` and audited in `../../dossiers/projects/OPERATION-EPIC-FURY-MINAB-TARGETING.md`. The CENTCOM locator above is project/operation identity context; no blanket federal, military, contractor or supplier class follows from it. Specific immigration/detention and surveillance/security scope remains governance-only until separately frozen, and Federal Judiciary/GAO/IG/legal-defence/remediation functions remain excluded.
+
+## 11. Procedural history
+
+Issue #187 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-01.md` · `../../reviews/2026/consistency/global-license-fit-audit.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../exergism/assessments/USA.json` · `../../registry/schedule-state-s-freezes/batch-03a-usa.yml`
