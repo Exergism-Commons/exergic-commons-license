@@ -7,6 +7,10 @@
     "repository": "Exergism-Commons/exergism",
     "release": "v0.1.0",
     "git_commit": "4ca5207244f30060c486ca342f2f0af0d2a80fa2",
+    "formal_model": {
+      "path": "formal/sistema_analitico_exergico.json",
+      "role": "canonical formal Exergism source for ECL analytical implementation"
+    },
     "release_manifest": {
       "asset": "release-manifest.json",
       "sha256": "41fcd650ead5b568f384656009e3152f3b0b9fc4bca7aab7ee32b716e9386e67"
@@ -18,7 +22,7 @@
   },
   "ecl_binding": {
     "kind": "non-operative lineage pin",
-    "application_profile": "ECL maintains its own explicit analytical application profile; this pin does not assert byte-for-byte equivalence with upstream formal artifacts.",
+    "application_profile": "ECL implements the pinned canonical formal model while adding explicit evidence, uncertainty, scope and governance constraints required by the license workflow. ECL-specific constraints may narrow use of the analysis but must not silently replace upstream formulas.",
     "adoption_rule": "A later Exergism release changes ECL only through an explicit ECL repository change that updates this pin and reviews downstream impact.",
     "legal_effect": false,
     "schedule_effect": false,
