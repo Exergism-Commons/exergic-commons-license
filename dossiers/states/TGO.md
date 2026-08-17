@@ -41,6 +41,16 @@ Investigations/prosecutions, resolution of disappearance cases, repeal/narrowing
 - https://spcommreports.ohchr.org/TmSearch/Mandates?m=44
 - https://www.amnesty.org/en/location/africa/west-and-central-africa/togo/
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #176 · `../../reviews/2026/adversarial/state-level/tranche-08.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-08.md` (cutoff 2026-08-11). Issue #176 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 8 **UPHELD `R`** but made a **mandatory remediation-milestone review** part of the result. The new constitutional/governance phase and the UN experts' stated opportunity for justice/accountability/non-repetition remain counter-evidence and a future governance milestone, not completed remediation. Both historical locators are already canonical above.
+- No inference is made that constitutional change itself restrained the reviewed coercive system; re-review depends on demonstrated investigations, prosecutions, remedies, independent oversight and non-recurrence.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central governing, security, information-control and political-detention apparatus of Togo`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #176 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-08.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`

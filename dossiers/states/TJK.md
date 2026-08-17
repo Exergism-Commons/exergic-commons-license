@@ -41,6 +41,16 @@ Independent torture accountability, release/remedy in political cases, protectio
 - https://www.amnesty.org/en/location/europe-and-central-asia/eastern-europe-and-central-asia/tajikistan/
 - https://tbinternet.ohchr.org/_layouts/15/TreatyBodyExternal/Countries.aspx?CountryCode=TJK&Lang=EN
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #172 · `../../reviews/2026/adversarial/state-level/tranche-08.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-08.md` (cutoff 2026-08-11). Issue #172 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 8 **UPHELD `R`** while crediting the decriminalization of merely 'liking' critical posts and continued UN Committee against Torture participation as limited legal/review counter-evidence. Both exact historical locators are already canonical above.
+- The treaty-body locator and narrow expression-law reform remain counter-evidence/remediation context; they are not transformed into proof of the reviewed security/detention/judicial conduct.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central governmental, security, judicial, detention and political-control apparatus of Tajikistan`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #172 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-08.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
