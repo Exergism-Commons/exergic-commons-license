@@ -61,6 +61,14 @@ Independent validation, corrected models/data, privacy/equality compliance, mean
 - https://www.inspectie-jenv.nl/actueel/nieuws/2026/02/12/risicovol-algoritmegebruik-door-reclassering
 - https://www.inspectie-jenv.nl/documenten/2026/02/12/rapport-risicovol-algoritmegebruik
 
-## 10. Procedural history
+## 10. Historical evidence absorption
 
-Issue #122 · `../../reviews/2026/adversarial/scoped/tranche-01.md` · 2026-08-13 Schedule current-status revalidation · `../../exergism/assessments/NLD.json`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-01.md` (cutoff 2026-08-11). Later controlling records: the 2026-08-13 Schedule current-status revalidation, `../../registry/schedule-state-s-freezes/status-resolved-nld.yml`, `../../reviews/2026/consistency/schedule-readiness.md`, and the 2026-08-14 formal Exergism pilot. Issue #122 contains no additional public evidence comment.
+
+- **Status:** absorbed / later scope supersedes the generic historical formulation. Scoped tranche 1 narrowed the original `S` to identified government profiling/risk systems that remained deployed despite substantiated discriminatory, materially defective or non-contestable operation. A later 2026-08-13 current-status review narrowed the operative governance object further to named probation risk tools and credited the announced OXREC suspension as material remediation. The 2026-08-14 dossier/formal pilot preserved that later status; historical profiling concerns do not reactivate OXREC or generic Dutch algorithm use.
+- Historical tranche-1 context/counter-evidence locators that are no longer needed to prove the current named-tool finding are preserved here: `https://www.rijksoverheid.nl/documenten/2026/02/16/impact-assessment-mensenrechten-en-algoritmes`, `https://www.staatscommissietegendiscriminatieenracisme.nl/documenten/2026/05/07/principes-voor-profilering`, and `https://www.nldigitalgovernment.nl/news/technical-agreement-on-testing-profiling-algorithm-now-available/`. They document governance safeguards, broader discrimination findings and testing methodology; they do **not** widen the current Schedule class beyond the named probation workflows.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/status-resolved-nld.yml` controls current renderability. It freezes only the `STATIC-99R`, `STABLE-2007` and `ACUTE-2007` probation risk-assessment workflows while the February 2026 Inspectorate finding of non-demonstrably-responsible use remains unremediated. OXREC while suspended, withdrawn/corrected and independently validated systems, courts exercising independent judgment, and oversight/remediation are excluded.
+
+## 11. Procedural history
+
+Issue #122 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-01.md` · 2026-08-13 Schedule current-status revalidation · `../../reviews/2026/consistency/schedule-readiness.md` · `../../exergism/assessments/NLD.json`
