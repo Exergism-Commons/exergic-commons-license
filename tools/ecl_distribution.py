@@ -158,22 +158,6 @@ def _validate_metadata_path(value: Any, *, label: str) -> str:
     return value
 
 
-def _validate_review_metadata(value: Any, *, required: bool) -> None:
-    if value is None:
-        if required:
-            raise ValueError("operative bundle manifest requires immutable legal_review metadata")
-        return
-    if not isinstance(value, dict) or set(value) != {"ref", "path", "sha256"}:
-        raise ValueError("bundle legal_review must contain exactly ref, path and sha256")
-    review_ref = value.get("ref")
-    if not isinstance(review_ref, str) or not ecl_resolve.valid_review_id(review_ref):
-        raise ValueError("bundle legal_review ref must be a safe immutable review identifier")
-    expected_path = f"reviews/legal/records/{review_ref}.json"
-    if value.get("path") != expected_path:
-        raise ValueError(f"bundle legal_review path must be exactly {expected_path}")
-    _validate_sha256(value.get("sha256"), label="bundle legal_review sha256")
-
-
 def _validate_optional_bundle_metadata(bundle: dict[str, Any]) -> None:
     if "knowledge_snapshot" in bundle:
         snapshot = bundle["knowledge_snapshot"]
@@ -209,7 +193,11 @@ def _validate_bundle_manifest_shape(bundle: Any) -> dict[str, Any]:
         _validate_metadata_path(component.get("path"), label=f"bundle {key}")
         _validate_sha256(component.get("sha256"), label=f"bundle {key} sha256")
 
-    _validate_review_metadata(bundle.get("legal_review"), required=bundle["operative"])
+    if "legal_review" in bundle:
+        ecl_resolve.validate_legal_review_component_metadata(bundle["legal_review"])
+    elif bundle["operative"]:
+        raise ValueError("operative bundle manifest requires immutable legal_review metadata")
+
     _validate_optional_bundle_metadata(bundle)
     ecl_resolve.validate_bundle_identity(bundle)
     return bundle
