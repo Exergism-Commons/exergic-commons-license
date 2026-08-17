@@ -61,9 +61,18 @@ Courts, independent remedies, unrelated state governments/agencies and ordinary 
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=IND+3%2F2026
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=IND+6%2F2026
 - https://www.sci.gov.in/jurisdiction/
+- https://www.sci.gov.in/constitution/
 - https://www.amnesty.org/en/latest/news/2026/07/india-crackdown-on-peaceful-protesters-in-new-delhi-raises-serious-human-rights-concerns/
 - https://www.amnesty.org/en/latest/news/2026/04/india-proposed-changes-to-digital-media-regulation-would-facilitate-abusive-powers-over-users-content-new-amnesty-legal-analysis/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #77 · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-02.md` and `../../reviews/2026/adversarial/scoped/tranche-10.md` (cutoff 2026-08-11). Public provenance: issue #77. Later consistency controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`.
+
+- **Status:** absorbed, with tier correction and later narrowing preserved. The initial adjudication classified India as whole-State `R`; state-level tranche 2 produced the historical **`R → S` correction** because federalism and Supreme Court constitutional review defeat blanket attribution. Scoped tranche 10 then narrowed the active governance scope by removing punitive demolition absent sufficiently current recurrence; the later ECL 0.2 State Delta retained `S` without reviving that removed component.
+- Historical Git review recovered `https://www.sci.gov.in/constitution/`, which was present in the earlier detailed `R → S` dossier but displaced by the scoped rewrite. It is restored above as constitutional/counter-evidence provenance and is not prohibited-conduct evidence.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-10a-ind-freeze.yml` controls current renderability and freezes only **IND 5/2026 — the Umar Khalid continued-detention project**, including materially participating prosecution/custody processes, while that named-case ECL finding remains applicable. UAPA/counterterrorism enforcement generally, other detainees/cases, courts and remediation are excluded. Other Union/state security, public-order and digital-control scope remains governance-only until separately frozen.
+
+## 10. Procedural history
+
+Issue #77 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`
