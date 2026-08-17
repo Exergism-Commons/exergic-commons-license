@@ -197,9 +197,9 @@ def _read_static_file(root: Path, name: str, *, label: str) -> bytes:
 
 def _load_descriptor(root: Path) -> dict[str, Any]:
     raw = _read_static_file(root, DESCRIPTOR_NAME, label="distribution descriptor")
-    data = json.loads(raw.decode("utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError("distribution descriptor must contain a JSON object")
+    data = ecl_resolve.parse_json_object(
+        raw.decode("utf-8"), label="distribution descriptor"
+    )
     if set(data) != DESCRIPTOR_KEYS:
         missing = sorted(DESCRIPTOR_KEYS - set(data))
         extra = sorted(set(data) - DESCRIPTOR_KEYS)
@@ -254,7 +254,11 @@ def verify_distribution(root: Path) -> dict[str, Any]:
     manifest_bytes = _read_static_file(root, BUNDLE_NAME, label="bundle manifest")
     if sha256_bytes(manifest_bytes) != manifest_locator["sha256"]:
         raise ValueError("SHA-256 mismatch for ECL-BUNDLE.json")
-    manifest = _validate_bundle_manifest_shape(json.loads(manifest_bytes.decode("utf-8")))
+    manifest = _validate_bundle_manifest_shape(
+        ecl_resolve.parse_json_object(
+            manifest_bytes.decode("utf-8"), label="ECL-BUNDLE.json"
+        )
+    )
 
     if manifest["bundle"] != descriptor["bundle"]:
         raise ValueError("distribution bundle identity does not match ECL-BUNDLE.json")
@@ -319,7 +323,11 @@ def build_distribution(
     repo_root = _canonical_existing_root(repo_root, label="repository root")
     manifest_path = _safe_bundle_manifest_path(repo_root, bundle_ref)
     manifest_bytes = manifest_path.read_bytes()
-    manifest = _validate_bundle_manifest_shape(json.loads(manifest_bytes.decode("utf-8")))
+    manifest = _validate_bundle_manifest_shape(
+        ecl_resolve.parse_json_object(
+            manifest_bytes.decode("utf-8"), label=str(manifest_path)
+        )
+    )
     if manifest["bundle"] != bundle_ref:
         raise ValueError("Bundle manifest identity does not match requested bundle")
     if not manifest["operative"] and not allow_draft:
