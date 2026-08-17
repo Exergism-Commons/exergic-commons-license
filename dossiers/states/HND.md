@@ -42,14 +42,16 @@ Re-escalate to `S` if new emergency/security projects reproduce arbitrary detent
 
 ## 7. Historical evidence absorption
 
-Reviewed for ECL 1.0 normalization on 2026-08-15:
+Reviewed for ECL 1.0 normalization on 2026-08-15 and completed with later revalidation provenance during the full-cohort normalization pass:
 
 - `../../reviews/2026/adversarial/scoped/tranche-04.md` — **already represented substantively / open gap: locator incomplete**. The former nationwide state-of-exception abuses, January 2026 termination, post-emergency review scope, reversibility reasoning and re-escalation/removal triggers are reflected in §§1–6 above.
-- The historical tranche references CONADEH complaints, Amnesty/rights reporting and later government security-policy statements without exact source URLs or document identifiers. Repository search in this pass found no independent precise locator beyond the tranche/dossier text. Those references are not promoted into fabricated citations.
-- Issue #74 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the time of this normalization pass.
+- The historical tranche references CONADEH complaints, Amnesty/rights reporting and later government security-policy statements without exact source URLs or document identifiers. Repository review found no independent precise locator beyond the tranche/dossier text. Those references are not promoted into fabricated citations.
+- `../../reviews/2026/adversarial/under-review/full-cohort.md` — **absorbed as later revalidation**. The full `U` cohort explicitly retained Honduras as `U`: the nationwide emergency project had ended in January 2026; legacy severity still requires accountability review before movement to `N`; and no current stable project supplied a basis to restore `S`. This review introduced no additional Honduras-specific locator requiring migration.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` — **absorbed as later normative-consistency revalidation**. The ECL 0.2 audit again retained Honduras as `U`, identifying insufficient current recurrence/persistence rather than a license-language gap. The new §5.6 wording therefore does not revive the terminated emergency project or supply missing evidence.
+- Issue #74 — **already reviewed / no separate issue evidence to absorb**. The public review thread contained no evidence comments at the historical normalization pass.
 
-Exact source-locator recovery remains an evidence-curation gap. Historical emergency abuse remains provenance and does not by itself revive the terminated nationwide project or change the current `U` outcome.
+Exact source-locator recovery for the older emergency record remains an evidence-curation gap. Historical emergency abuse remains provenance and does not by itself revive the terminated nationwide project or change the current `U` outcome. No later revalidation supplies a new `S` freeze or a new current Restricted Project by implication.
 
 ## 8. Procedural history
 
-Issue #74 · `../../reviews/2026/adversarial/scoped/tranche-04.md`
+Issue #74 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-04.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
