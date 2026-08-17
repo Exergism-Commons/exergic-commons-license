@@ -39,7 +39,7 @@ The helper requires:
 
 The full-history requirement enforces permanent review-ID consumption. If `reviews/legal/inputs/<review_id>/` or `reviews/legal/records/<review_id>.json` existed in reachable repository history and was later deleted, that ID still cannot be rebound to new bytes.
 
-The candidate License and canonical mechanism inputs are read from the immutable Git objects reachable from the exact source commit. Their source paths in the preparation descriptor therefore mean **paths inside `source_commit`**, not whatever bytes a later working tree happens to expose at the same pathname.
+The candidate License and canonical mechanism inputs are read from the immutable Git objects reachable from the exact source commit. Their source paths in the preparation descriptor therefore mean **paths inside `source_commit`**, not whatever bytes a later working tree happens to expose at the same pathname. The preparer also disables Git replacement-object rewriting (`refs/replace`) and strips ambient Git repository/object-directory environment overrides from its subprocesses so that the advertised commit SHA cannot be locally rebound to a different tree through those mechanisms.
 
 The command materializes byte-for-byte copies of the three non-License mechanism inputs required by the review specification:
 
@@ -65,7 +65,7 @@ The tool never creates `reviews/legal/records/<review_id>.json`, never attests r
 
 The helper is an identity/reproducibility tool, **not a sandbox against a hostile process that already has write access to the same checkout or `.git` object database**. Run it in an isolated trusted checkout with no untrusted concurrent writer, such as a fresh full-history CI job, dedicated worktree/container or otherwise controlled operator environment.
 
-This boundary is deliberate. Earlier filesystem-hardening prototypes attempted to defend every pathname against arbitrary concurrent renames and replacement. That model cannot provide a meaningful final guarantee once an untrusted process has equivalent write authority over the repository. The current design instead makes source identity content-addressed by Git, requires a clean exact-HEAD checkout and complete history, and states the remaining local trust assumption explicitly.
+This boundary is deliberate. Earlier filesystem-hardening prototypes attempted to defend every pathname against arbitrary concurrent renames and replacement. That model cannot provide a meaningful final guarantee once an untrusted process has equivalent write authority over the repository. The current design instead makes source identity content-addressed by Git, requires a clean exact-HEAD checkout and complete history, disables replace-object rebinding, and states the remaining local trust assumption explicitly.
 
 After preparation, inspect and **commit the frozen snapshot before substantive qualified review is finalized**. The eventual legal-review record must hash the committed frozen copies. Git history plus the record hashes provide the historical identity; the preparer itself is not the legal attestation.
 
@@ -76,6 +76,7 @@ After preparation, inspect and **commit the frozen snapshot before substantive q
 - Shallow repositories are rejected because they cannot prove historical review-ID consumption.
 - The working tree must be clean before publication.
 - Source files must be regular tracked Git blobs; committed symlinks are rejected.
+- Git `refs/replace` rewriting is ignored by the preparer, and ambient `GIT_DIR`/`GIT_WORK_TREE`/object-directory overrides are stripped from its Git subprocesses.
 - Paths must be repository-relative POSIX paths and may not traverse `..` or use absolute/backslash/colon forms.
 - A `review_id` is permanently consumed once either `reviews/legal/inputs/<review_id>/` or `reviews/legal/records/<review_id>.json` has existed in reachable Git history or exists in the current workspace.
 - The tool refuses to overwrite an existing snapshot even if the bytes are identical.
