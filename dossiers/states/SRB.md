@@ -42,6 +42,14 @@ Independent investigation/accountability, verified cessation of unlawful spyware
 - https://securitylab.amnesty.org/latest/2025/03/journalists-targeted-with-pegasus-spyware/
 - https://www.amnesty.eu/news/serbia-amnesty-international-submission-for-the-european-union-enlargement-package-2026/
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #154 · `../../reviews/2026/adversarial/scoped/tranche-01.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-01.md` (cutoff 2026-08-11). Later consistency controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`. Issue #154 contains no additional public evidence comment.
+
+- **Status:** absorbed / already represented. Scoped tranche 1 upheld `S` but narrowed it to BIA/police or other State-linked spyware/mobile-forensic deployments against journalists, activists or lawful opposition where attribution is established, plus specifically substantiated protest-repression operations. The later ECL 0.2 State Delta retained that scoped result.
+- Cellebrite's halt of product use in Serbia is historical counter-evidence showing that a supplier intervention can reduce a technical capability. It does not make Cellebrite part of the Serbian State attribution chain, and supplier status alone does not propagate a Restricted Party finding. A supplier would require its own Material Participation analysis.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-01.yml` controls current renderability. It freezes the **BIA / Ministry of Internal Affairs repressive spyware and mobile-forensic deployment class** only for materially evidenced repressive digital surveillance or separately substantiated protest-repression operations. Policing/intelligence generally, suppliers absent their own Material Participation, and independent journalism/civil society are excluded.
+
+## 8. Procedural history
+
+Issue #154 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-01.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`
