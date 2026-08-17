@@ -35,6 +35,7 @@ REVIEWED_MECHANISM_FILENAMES = {
     "bundle_schema": "bundle.schema.json",
 }
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+CHANNEL_NAME_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
 BUNDLE_REF_RE = re.compile(
     r"^(?:ECL-[0-9]+\.[0-9]+\.[0-9]+@RP-[0-9]{4}\.[0-9]{2}\.[0-9]{2}"
     r"(?:\.[0-9]+)?|ECL-0\.3-DRAFT@RP-EMPTY-1)$"
@@ -395,13 +396,13 @@ def validate_bundle_components(root: Path, bundle: dict[str, Any]) -> None:
 
 def resolve_follow(policy: dict[str, Any], root: Path, allow_draft: bool) -> dict[str, Any]:
     channel_name = policy.get("channel")
-    if not isinstance(channel_name, str) or not channel_name:
-        raise ValueError("follow mode requires channel")
+    if not isinstance(channel_name, str) or CHANNEL_NAME_RE.fullmatch(channel_name) is None:
+        raise ValueError("follow mode requires a safe channel identifier")
     channel = load_json(root / "channels" / f"{channel_name}.json")
     if not channel.get("operative") and not allow_draft:
         raise ValueError(f"channel {channel_name!r} is non-operative/draft")
     bundle_ref = channel.get("bundle")
-    if not isinstance(bundle_ref, str) or not bundle_ref:
+    if not isinstance(bundle_ref, str) or BUNDLE_REF_RE.fullmatch(bundle_ref) is None:
         raise ValueError(f"channel {channel_name!r} does not resolve an immutable bundle")
     path = root / "releases" / "bundles" / f"{bundle_ref}.json"
     bundle = load_json(path)
@@ -428,8 +429,8 @@ def resolve_follow(policy: dict[str, Any], root: Path, allow_draft: bool) -> dic
 
 def resolve_pinned(policy: dict[str, Any], root: Path, allow_draft: bool) -> dict[str, Any]:
     bundle_ref = policy.get("bundle")
-    if not isinstance(bundle_ref, str) or not bundle_ref:
-        raise ValueError("pinned mode requires bundle")
+    if not isinstance(bundle_ref, str) or BUNDLE_REF_RE.fullmatch(bundle_ref) is None:
+        raise ValueError("pinned mode requires an immutable Bundle identifier")
     path = root / "releases" / "bundles" / f"{bundle_ref}.json"
     bundle = load_json(path)
     if bundle.get("bundle") != bundle_ref:
