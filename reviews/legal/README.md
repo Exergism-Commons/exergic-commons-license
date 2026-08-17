@@ -43,11 +43,19 @@ It prints a deterministic JSON preparation descriptor containing:
 
 The tool never creates `reviews/legal/records/<review_id>.json`, never attests reviewer competence, and never increments qualified-review counts.
 
+## Secure runtime boundary
+
+Snapshot preparation is an identity/security boundary, not a convenience copy command. The helper therefore requires filesystem primitives that let it bind validation, reads, writes and publication to pinned file/directory descriptors without following symbolic links. The current implementation requires a Linux/POSIX environment providing `dir_fd` operations, `O_NOFOLLOW`, `O_DIRECTORY` and atomic no-replace `renameat2` publication.
+
+If those primitives are unavailable, the command **fails closed**. There is intentionally no insecure pathname-based fallback. Run preparation in a supported environment such as the repository's Linux CI runner, Linux host or compatible WSL environment. Manual copying/hashing is not an equivalent substitute for the content-addressed preparation path and must not be presented as satisfying this mechanism.
+
 ## Fail-closed rules
 
 - `--license` is mandatory; there is no implicit `LICENSE` or `latest` candidate.
 - Paths must be repository-relative POSIX paths and must not traverse symlinks.
-- A `review_id` is immutable once prepared. The tool refuses to overwrite an existing snapshot even if the bytes are identical.
+- A `review_id` is permanently consumed once either `reviews/legal/inputs/<review_id>/` **or** `reviews/legal/records/<review_id>.json` exists. Deleting one side must never permit the ID to be rebound to later canonical bytes.
+- Preparation reads canonical inputs and the candidate License through pinned descriptors and publishes a fully written private snapshot with atomic no-replace semantics.
+- The tool refuses to overwrite an existing snapshot even if the bytes are identical.
 - If a material candidate or review-mechanism input changes, prepare a **new** review ID/delta-review snapshot. Do not mutate the old snapshot.
 - A preparation failure must not be worked around by manually pointing a completed record at mutable canonical files.
 
