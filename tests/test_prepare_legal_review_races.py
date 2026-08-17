@@ -177,9 +177,6 @@ class PrepareLegalReviewGitIdentityTests(unittest.TestCase):
             subprocess.run(["git", "reset", "--hard", "-q", baseline], cwd=root, check=True)
             subprocess.run(["git", "replace", baseline, replacement], cwd=root, check=True)
 
-            # Ordinary Git traversal now sees replacement bytes for the baseline
-            # commit, proving that the fixture would be dangerous without
-            # GIT_NO_REPLACE_OBJECTS.
             replaced_versioning = subprocess.check_output(
                 ["git", "show", f"{baseline}:spec/VERSIONING.md"], cwd=root
             )
@@ -199,6 +196,29 @@ class PrepareLegalReviewGitIdentityTests(unittest.TestCase):
                 MODULE.sha256_bytes(b"candidate-license\n"),
             )
             self.assertEqual(result["source_commit"], baseline)
+
+    def test_commit_namespace_validation_rejects_hidden_symlink(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as outside:
+            root = Path(tmp)
+            self._repo(root)
+            records = root / "reviews" / "legal" / "records"
+            try:
+                records.symlink_to(Path(outside), target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(str(exc))
+            subprocess.run(["git", "add", "reviews/legal/records"], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "records symlink"], cwd=root, check=True)
+            commit = git(root, "rev-parse", "HEAD")
+
+            # This assertion is deliberately against the Git tree rather than
+            # the materialized pathname, covering sparse/skip-worktree cases.
+            with self.assertRaisesRegex(ValueError, "must be a directory in source_commit"):
+                MODULE._assert_commit_directory_or_absent(
+                    root,
+                    commit,
+                    "reviews/legal/records",
+                    label="legal review records namespace in source_commit",
+                )
 
 
 if __name__ == "__main__":
