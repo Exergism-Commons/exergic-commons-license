@@ -73,17 +73,21 @@ The Amnesty Lebanon country-report URL is the recoverable historical locator cor
 
 ## 9. Historical evidence absorption
 
-Reviewed for ECL 1.0 normalization on 2026-08-16:
+Reviewed for ECL 1.0 normalization on 2026-08-16 and completed with later revalidation provenance during the full-cohort normalization pass:
 
 - `../../reviews/2026/adversarial/scoped/tranche-05.md` — **absorbed / historical provenance recovered with granularity limitation**. Its historical speech/extradition record, 2026 reform counter-evidence, reversibility analysis, `S → U` downgrade and re-escalation/removal triggers are represented in §§1–8.
 - `../../reviews/2026/initial-adjudication.md` — **absorbed** for the `Amnesty International Lebanon 2025/26` baseline. The corresponding Amnesty Lebanon country-report locator in §8 is the preserved historical source associated with the 2025 summons and Al-Qaradawi propositions; no more granular proposition-specific article/case locator is preserved.
 - The exact 2026 Lebanese Parliament locators supporting the media-law reform/counter-evidence are retained in §8.
+- `../../reviews/2026/adversarial/under-review/full-cohort.md` — **absorbed as later revalidation**. The full `U` cohort explicitly retained Lebanon as `U`: the prior speech/extradition pattern remained serious, while 2026 reform and lack of sufficiently fresh recurrence prevented a stable current `S`. The full-cohort record introduces no additional Lebanon-specific locator beyond the canonical sources above.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` — **absorbed as later normative-consistency revalidation**. The ECL 0.2 audit again retained Lebanon as `U` because current recurrence/persistence remained insufficient. Section 5.6 supplies no missing factual deployment and therefore does not reactivate the former `S`.
 - Issue #94 — **already reviewed / no separate issue evidence to absorb**; its public thread contained no evidence comments at this pass.
 
-The recovered historical locator does not establish current persistence and does not reactivate the former `S`. Lebanon remains `U`. This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
+The recovered historical locator does not establish current persistence and does not reactivate the former `S`. Later full-cohort and ECL 0.2 revalidations confirm that the remaining uncertainty is factual/persistence-based. Lebanon remains `U`. This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision.
 
 ## 10. Procedural history
 
 - Issue #94
 - `../../reviews/2026/initial-adjudication.md`
 - `../../reviews/2026/adversarial/scoped/tranche-05.md`
+- `../../reviews/2026/adversarial/under-review/full-cohort.md`
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
