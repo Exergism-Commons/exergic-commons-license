@@ -38,9 +38,20 @@ Transparent completion of political-prisoner releases; restored judicial/prosecu
 
 ## 6. Sources
 
-- UN Fact-Finding Mission reporting to the Human Rights Council, March 2026
+- UN Fact-Finding Mission reporting to the Human Rights Council, March 2026 — historical source reference; exact locator not preserved in the audited repository record
 - https://www.hrw.org/world-report/2026/country-chapters/venezuela
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #191 · `../../reviews/2026/adversarial/state-level/tranche-09.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-09.md` (cutoff 2026-08-11). Issue #191 contains no additional public adversarial comment. Same-dossier Git history was checked for the March 2026 UN fact-finding source. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, with one historical locator gap preserved. State-level tranche 9 **UPHELD `R` provisionally** while requiring a **mandatory transition review**. The amnesty framework, prisoner releases, humanitarian detention access and announced reforms remain material counter-evidence that can trigger rapid reclassification if they become structural remediation; they are not treated as completed remediation at the historical cutoff.
+- **Historical-only / locator incomplete:** both tranche 9 and the earlier detailed same-dossier Git version identify March 2026 UN Fact-Finding Mission reporting to the Human Rights Council, but neither preserves an exact source URL/document locator. The source reference remains canonical as historical provenance without manufacturing a locator or finer source mapping externally.
+- The HRW country locator above remains the exact URL preserved in the dossier/review source set. It does not cure the missing exact UN locator by substitution.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central governmental, security, intelligence, judicial, detention and political-control apparatus of Venezuela`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #191 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
