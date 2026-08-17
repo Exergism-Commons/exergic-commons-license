@@ -49,6 +49,17 @@ Escalate to `S` on evidence of systematic unlawful targeting, data-driven discri
 - Reuters, 12 March 2025 — Austria freezes family reunification for asylum claimants.
 - Current 2025/26 Austria asylum/return reporting and European legal oversight.
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #10 · `../../reviews/2026/initial-adjudication.md` · 2026 original-`N` full-cohort review.
+Historical source: `../../reviews/2026/adversarial/no-basis/full-cohort.md` (cutoff 2026-08-11). Earlier baseline: `../../reviews/2026/initial-adjudication.md`. Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`. Issue #10 contains no separate evidence comment.
+
+- **Status:** absorbed, with locator limitations preserved. The initial adjudication placed Austria at `N`; the original-`N` full-cohort review produced the historical **`N → U` escalation** because active 2025/26 asylum/family-reunification and return measures defeated a clean no-basis conclusion while still failing to establish a sufficiently specific ECL §5 surveillance/targeting/automated-discrimination project.
+- **Historical-only / locator incomplete:** the canonical detailed dossier created in commit `418c903de29c4d6a51bc2bf30a5a7531b7056c5e` already contained the two source references above rather than exact URLs. Earlier dossier history, the initial adjudication, the full-cohort review and issue #10 do not preserve a more precise locator. The Reuters item retains outlet/date/title-level provenance; the broader 2025/26 reporting remains grouped descriptive provenance. No external URL or one-to-one source mapping is manufactured here.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` later **retained Austria as `U`**. ECL 0.2 did not supply missing factual deployment or attribution; the residual uncertainty remained partly prospective and project-specific.
+- Counter-institutions and European legal oversight remain narrowing/remediation context. Neither the restrictive policy nor its severity alone is treated as a Restricted Project absent the required ECL nexus.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #10 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/no-basis/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
