@@ -41,6 +41,14 @@ Credible independent investigation, prosecutions, public findings, compensation,
 - https://spcommreports.ohchr.org/TmSearch/SummaryPrint?id=30556
 - https://spcommreports.ohchr.org/LatestReports/CommunicationSent?page=20
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #173 · `../../reviews/2026/adversarial/state-level/tranche-04.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-04.md` (cutoff 2026-08-11). Issue #173 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, with accountability milestone preserved. State-level tranche 4 **UPHELD `R` provisionally** because the review had not identified public prosecutions, binding institutional findings or reparations sufficient to demonstrate effective constraint of the election-period security/political apparatus. Both exact Special Procedures/communications-index locators are preserved above.
+- The existence of formal investigative/judicial institutions and public commitments to examine violence is counter-evidence/future-remediation context, not conduct proof. A future downgrade review becomes mandatory if credible independent investigation produces prosecutions, public findings, compensation, institutional reform and non-recurrence safeguards.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class exactly as the **central governmental, security, electoral/public-order and political-control apparatus of Tanzania**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative and subject to the dossier's accountability-milestone review.
+
+## 8. Procedural history
+
+Issue #173 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
