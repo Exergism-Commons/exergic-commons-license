@@ -11,7 +11,7 @@ on:
       - "tools/ecl_resolve.py"
       - "tools/prepare_legal_review.py"
       - "tests/test_ecl_resolve.py"
-      - "tests/test_prepare_legal_review.py"
+      - "tests/test_prepare_legal_review*.py"
       - ".github/workflows/legal-review-integrity.yml"
   pull_request:
     paths:
@@ -23,7 +23,7 @@ on:
       - "tools/ecl_resolve.py"
       - "tools/prepare_legal_review.py"
       - "tests/test_ecl_resolve.py"
-      - "tests/test_prepare_legal_review.py"
+      - "tests/test_prepare_legal_review*.py"
       - ".github/workflows/legal-review-integrity.yml"
 
 permissions:
@@ -39,7 +39,7 @@ jobs:
           python-version: "3.12"
 
       - name: Test legal review snapshot preparation
-        run: python -m unittest discover -s tests -p 'test_prepare_legal_review.py'
+        run: python -m unittest discover -s tests -p 'test_prepare_legal_review*.py'
 
       - name: Test operative Bundle legal-review gate
         run: python -m unittest discover -s tests -p 'test_ecl_resolve.py'
