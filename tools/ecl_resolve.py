@@ -36,6 +36,7 @@ REVIEWED_MECHANISM_FILENAMES = {
 }
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
 CHANNEL_NAME_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 BUNDLE_REF_RE = re.compile(
     r"^(?:ECL-[0-9]+\.[0-9]+\.[0-9]+@RP-[0-9]{4}\.[0-9]{2}\.[0-9]{2}"
     r"(?:\.[0-9]+)?|ECL-0\.3-DRAFT@RP-EMPTY-1)$"
@@ -113,6 +114,23 @@ def major_from_constraint(value: str) -> int | None:
 
 def valid_review_id(value: str) -> bool:
     return REVIEW_ID_RE.fullmatch(value) is not None
+
+
+def validate_legal_review_component_metadata(component: Any) -> dict[str, str]:
+    """Validate schema-level identity for a present legal_review component."""
+
+    if not isinstance(component, dict) or set(component) != {"ref", "path", "sha256"}:
+        raise ValueError("bundle legal_review must contain exactly ref, path and sha256")
+    review_ref = component.get("ref")
+    if not isinstance(review_ref, str) or not valid_review_id(review_ref):
+        raise ValueError("bundle legal_review ref must be a safe immutable review identifier")
+    expected_path = f"reviews/legal/records/{review_ref}.json"
+    if component.get("path") != expected_path:
+        raise ValueError(f"bundle legal_review path must be exactly {expected_path}")
+    review_sha = component.get("sha256")
+    if not isinstance(review_sha, str) or SHA256_RE.fullmatch(review_sha) is None:
+        raise ValueError("bundle legal_review sha256 must be a lowercase 64-hex SHA-256")
+    return component
 
 
 def _validate_component_identity_fields(actual: Any) -> None:
@@ -299,12 +317,16 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
     validity of historical Bundles when the project evolves after release.
     """
 
-    if not bundle.get("operative"):
+    operative = bundle.get("operative") is True
+    if "legal_review" not in bundle:
+        if operative:
+            raise ValueError("operative bundle requires immutable legal_review component")
         return
 
-    component = bundle.get("legal_review")
-    if not isinstance(component, dict):
-        raise ValueError("operative bundle requires immutable legal_review component")
+    component = validate_legal_review_component_metadata(bundle["legal_review"])
+    if not operative:
+        return
+
     review_path = validate_file_reference(root, component, label="legal review record")
     record = load_json(review_path)
 
@@ -319,11 +341,6 @@ def validate_legal_review(root: Path, bundle: dict[str, Any]) -> None:
         raise ValueError("legal review record has invalid review_id")
     if component.get("ref") != review_id:
         raise ValueError("bundle legal_review ref does not match legal review record review_id")
-    expected_record_path = f"reviews/legal/records/{review_id}.json"
-    if component.get("path") != expected_record_path:
-        raise ValueError(
-            f"bundle legal_review path must match immutable record path {expected_record_path}"
-        )
 
     license_component = bundle.get("license")
     if not isinstance(license_component, dict):
