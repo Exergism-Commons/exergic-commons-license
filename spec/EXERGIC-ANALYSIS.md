@@ -2,6 +2,12 @@
 
 > **Status: Draft analytical specification.** This document formalizes the Exergism model used to interrogate ECL governance records. It does **not** create licensing restrictions, replace the operative ECL text, or map a numerical score directly to `R`, `S`, `U`, or `N`.
 
+## 0. Pinned upstream lineage
+
+The canonical philosophical/formal upstream currently adopted by this ECL analytical profile is **Exergism `v0.1.0`**, exact Git commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2`. The machine-readable pin is [`exergism/upstream.json`](../exergism/upstream.json), including the SHA-256 identities of the upstream release manifest and source archive.
+
+This specification is an **ECL application profile**, not a byte-for-byte mirror of the upstream corpus. ECL-specific scope discipline, evidence rules, uncertainty requirements and governance boundaries remain explicit here. A later Exergism release does not change this ECL profile without an explicit ECL repository change and downstream-impact review. This repository does not import the upstream OWL ontology, and the pin itself does not create licensing restrictions, Schedule entries or governance outcomes.
+
 ## 1. Purpose
 
 ECL uses exergy both as a normative concept and, in governance, as a formal multicriteria analysis. The formal layer is intended to make hidden assumptions visible and testable before a designation decision is translated into legal scope.

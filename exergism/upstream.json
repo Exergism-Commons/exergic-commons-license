@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "relationship": "conceptual-formal-upstream",
+  "upstream": {
+    "project": "Exergism",
+    "formal_name": "Metafisica emergentista de la liberacion",
+    "repository": "Exergism-Commons/exergism",
+    "release": "v0.1.0",
+    "git_commit": "4ca5207244f30060c486ca342f2f0af0d2a80fa2",
+    "release_manifest": {
+      "asset": "release-manifest.json",
+      "sha256": "41fcd650ead5b568f384656009e3152f3b0b9fc4bca7aab7ee32b716e9386e67"
+    },
+    "source_archive": {
+      "asset": "exergism-0.1.0.tar.gz",
+      "sha256": "722b4654482e4405a78a279a0dfc041dcfbf8c19da8e5ad91e3c7102cb1beddb"
+    }
+  },
+  "ecl_binding": {
+    "kind": "non-operative lineage pin",
+    "application_profile": "ECL maintains its own explicit analytical application profile; this pin does not assert byte-for-byte equivalence with upstream formal artifacts.",
+    "adoption_rule": "A later Exergism release changes ECL only through an explicit ECL repository change that updates this pin and reviews downstream impact.",
+    "legal_effect": false,
+    "schedule_effect": false,
+    "governance_outcome_effect": false,
+    "ontology_import": false
+  }
+}
