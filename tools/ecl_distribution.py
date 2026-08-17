@@ -92,6 +92,11 @@ def _canonical_existing_root(root: Path, *, label: str) -> Path:
     return resolved
 
 
+def _require_schema_version_one(value: Any, *, label: str) -> None:
+    if not isinstance(value, int) or isinstance(value, bool) or value != 1:
+        raise ValueError(f"unsupported {label} schema_version")
+
+
 def _validate_sha256(value: Any, *, label: str) -> str:
     if not isinstance(value, str) or SHA256_RE.fullmatch(value) is None:
         raise ValueError(f"{label} must be a lowercase 64-hex SHA-256")
@@ -187,8 +192,7 @@ def _validate_bundle_manifest_shape(bundle: Any) -> dict[str, Any]:
     for required in ("schema_version", "bundle", "operative", "license", "schedule"):
         if required not in bundle:
             raise ValueError(f"bundle manifest is missing {required}")
-    if bundle.get("schema_version") != 1:
-        raise ValueError("unsupported bundle manifest schema_version")
+    _require_schema_version_one(bundle.get("schema_version"), label="bundle manifest")
     bundle_ref = bundle.get("bundle")
     if not isinstance(bundle_ref, str) or BUNDLE_REF_RE.fullmatch(bundle_ref) is None:
         raise ValueError("bundle manifest has invalid immutable bundle identifier")
@@ -239,8 +243,7 @@ def _load_descriptor(root: Path) -> dict[str, Any]:
         if extra:
             detail.append(f"unsupported {', '.join(extra)}")
         raise ValueError(f"distribution descriptor fields invalid: {'; '.join(detail)}")
-    if data.get("schema_version") != 1:
-        raise ValueError("unsupported distribution descriptor schema_version")
+    _require_schema_version_one(data.get("schema_version"), label="distribution descriptor")
     if data.get("profile") != PROFILE:
         raise ValueError(f"distribution profile must be exactly {PROFILE}")
     if data.get("notice") != NOTICE:
