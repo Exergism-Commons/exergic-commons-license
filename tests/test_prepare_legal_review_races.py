@@ -147,6 +147,47 @@ class PrepareLegalReviewGitIdentityTests(unittest.TestCase):
                 (target / "VERSIONING.md").read_bytes(), b"versioning\n"
             )
 
+    def test_replace_ref_cannot_rebind_exact_source_commit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            baseline = self._repo(root)
+
+            (root / "spec" / "VERSIONING.md").write_bytes(b"replacement-versioning\n")
+            (
+                root / "versions" / "licenses" / "ECL-1.0-RC1.md"
+            ).write_bytes(b"replacement-license\n")
+            subprocess.run(["git", "add", "."], cwd=root, check=True)
+            subprocess.run(
+                ["git", "commit", "-qm", "replacement target"], cwd=root, check=True
+            )
+            replacement = git(root, "rev-parse", "HEAD")
+
+            subprocess.run(["git", "reset", "--hard", "-q", baseline], cwd=root, check=True)
+            subprocess.run(["git", "replace", baseline, replacement], cwd=root, check=True)
+
+            # Ordinary Git traversal now sees replacement bytes for the baseline
+            # commit, proving that the fixture would be dangerous without
+            # GIT_NO_REPLACE_OBJECTS.
+            replaced_versioning = subprocess.check_output(
+                ["git", "show", f"{baseline}:spec/VERSIONING.md"], cwd=root
+            )
+            self.assertEqual(replaced_versioning, b"replacement-versioning\n")
+
+            result = MODULE.prepare_review_inputs(
+                root,
+                review_id="review-a",
+                license_path="versions/licenses/ECL-1.0-RC1.md",
+                source_commit=baseline,
+            )
+
+            target = root / "reviews" / "legal" / "inputs" / "review-a"
+            self.assertEqual((target / "VERSIONING.md").read_bytes(), b"versioning\n")
+            self.assertEqual(
+                result["license"]["sha256"],
+                MODULE.sha256_bytes(b"candidate-license\n"),
+            )
+            self.assertEqual(result["source_commit"], baseline)
+
 
 if __name__ == "__main__":
     unittest.main()
