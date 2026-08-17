@@ -42,8 +42,10 @@ NOTICE = (
 )
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 RFC3339_RE = re.compile(
-    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}"
-    r"(?:\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2})$"
+    r"^(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})[Tt]"
+    r"(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2}):(?P<second>[0-9]{2})"
+    r"(?:\.(?P<fraction>[0-9]+))?"
+    r"(?P<zone>[Zz]|(?P<sign>[+-])(?P<offset_hour>[0-9]{2}):(?P<offset_minute>[0-9]{2}))$"
 )
 BUNDLE_REF_RE = re.compile(
     r"^(?:ECL-[0-9]+\.[0-9]+\.[0-9]+@RP-[0-9]{4}\.[0-9]{2}\.[0-9]{2}"
@@ -103,18 +105,69 @@ def _validate_sha256(value: Any, *, label: str) -> str:
     return value
 
 
+def _rfc3339_error(label: str) -> ValueError:
+    return ValueError(f"{label} must be an RFC3339 date-time string")
+
+
 def _validate_rfc3339(value: Any, *, label: str) -> str:
-    if not isinstance(value, str) or RFC3339_RE.fullmatch(value) is None:
-        raise ValueError(f"{label} must be an RFC3339 date-time string")
-    normalized = value.replace("t", "T")
-    if normalized.endswith(("Z", "z")):
-        normalized = normalized[:-1] + "+00:00"
+    """Validate RFC3339 syntax/calendar semantics, including leap seconds.
+
+    Python's ``datetime.fromisoformat`` rejects ``time-second = 60`` even though
+    RFC3339 permits a positive leap second. We validate the calendar, time and
+    numeric offset explicitly. For ``:60`` we require that the represented local
+    time maps to 23:59 UTC on the final day of a month. This verifies the RFC3339
+    structural location of a positive leap second without embedding a mutable
+    IERS leap-second announcement table in an immutable release verifier.
+    """
+
+    if not isinstance(value, str):
+        raise _rfc3339_error(label)
+    match = RFC3339_RE.fullmatch(value)
+    if match is None:
+        raise _rfc3339_error(label)
+
+    year = int(match.group("year"))
+    month = int(match.group("month"))
+    day = int(match.group("day"))
+    hour = int(match.group("hour"))
+    minute = int(match.group("minute"))
+    second = int(match.group("second"))
+
     try:
-        parsed = dt.datetime.fromisoformat(normalized)
+        dt.date(year, month, day)
     except ValueError as exc:
-        raise ValueError(f"{label} must be an RFC3339 date-time string") from exc
-    if parsed.tzinfo is None:
-        raise ValueError(f"{label} must include an RFC3339 timezone")
+        raise _rfc3339_error(label) from exc
+    if hour > 23 or minute > 59 or second > 60:
+        raise _rfc3339_error(label)
+
+    zone = match.group("zone")
+    if zone in {"Z", "z"}:
+        offset = dt.timedelta(0)
+    else:
+        offset_hour = int(match.group("offset_hour"))
+        offset_minute = int(match.group("offset_minute"))
+        if offset_hour > 23 or offset_minute > 59:
+            raise _rfc3339_error(label)
+        offset = dt.timedelta(hours=offset_hour, minutes=offset_minute)
+        if match.group("sign") == "-":
+            offset = -offset
+
+    if second == 60:
+        local_before_leap = dt.datetime(
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            59,
+            tzinfo=dt.timezone(offset),
+        )
+        utc_before_leap = local_before_leap.astimezone(dt.timezone.utc)
+        if utc_before_leap.hour != 23 or utc_before_leap.minute != 59:
+            raise _rfc3339_error(label)
+        if (utc_before_leap.date() + dt.timedelta(days=1)).day != 1:
+            raise _rfc3339_error(label)
+
     return value
 
 
