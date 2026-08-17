@@ -61,6 +61,17 @@ Escalate toward `S` only on authoritative evidence of a current attributable ope
 - https://www.defensoria.gob.bo/noticias/pronunciamiento-ante-la-emision-del-decreto-supremo-de-declaratoria-de-estado-de-excepcion
 - https://www.defensoria.gob.bo/contenido/monitoreo-defensorial-del-estado-de-excepcion
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #21 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · 2026-08-13 Schedule current-status revalidation
+Historical transition sources: `../../reviews/2026/adversarial/under-review/full-cohort.md` and same-dossier pre-revalidation version `c2111f3679eef3c09d18677016022fc035195da2:dossiers/states/BOL.md`. Current controlling governance overlay: `../../registry/state-outcome-overrides.yml`. Issue #21 contains no separate evidence comment.
+
+- **Historical `U → S` superseded.** The full-`U` cohort temporarily escalated Bolivia to `S` on the inference that emergency military/police blockade-clearing deployments supplied a current attributable coercive project. The pre-revalidation dossier preserved only generic source-family locators `https://www.oas.org/en/iachr/` and `https://www.defensoria.gob.bo/` for that reasoning.
+- **Later `S → U` controls.** The 13 August current-status review added more precise IACHR and Defensoría locators, including monitoring of the state of exception, and found that later independent monitoring materially weakened the emergency-deployment inference. `../../registry/state-outcome-overrides.yml` is the machine-readable controlling overlay and records the same `S → U` result.
+- The two older generic home-page locators remain historical source-family provenance only. They are superseded by the more precise current locators in §8 and are not restored as evidence of an active Restricted Project.
+- Issue #21 adds no independent locator or proposition mapping.
+
+The historical `S` is not revived by preserving its provenance. Current `U`, exclusions and re-escalation triggers remain controlling. This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #21 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../registry/state-outcome-overrides.yml`

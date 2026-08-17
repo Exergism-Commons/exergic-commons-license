@@ -46,10 +46,28 @@ Escalate toward `S` on authoritative evidence of a named return operation system
 
 ## 8. Sources
 
+Current-status sources:
 - https://www.bundesregierung.de/breg-de/aktuelles/pressekonferenzen/regierungspressekonferenz-vom-12-januar-2026-2402420
 - https://www.bundesregierung.de/breg-de/aktuelles/regierungspressekonferenz-vom-22-juni-2026-2444374
 - https://www.bundesregierung.de/breg-de/aktuelles/regierungspressekonferenz-vom-29-juli-2026-2448716
 
-## 9. Procedural history
+Historical pre-revalidation sources:
+- https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/germany/report-germany/
+- https://www.amnesty.org/en/latest/news/2026/06/eu-must-abandon-afghanistan-deportation-plans-and-stop-readmission-talks-with-the-taliban/
 
-Issue #64 · `../../reviews/2026/adversarial/under-review/full-cohort.md` · 2026-08-13 Schedule current-status revalidation
+The Amnesty locators are retained as provenance for the superseded `U → S` stage and the human-rights/non-refoulement concern. They do not establish that the later official record lacked individualized protection review or revive a generic German return project.
+
+## 9. Historical evidence absorption
+
+Historical transition sources: `../../reviews/2026/adversarial/under-review/full-cohort.md` and same-dossier pre-revalidation version `b99c864c60b9eb2985c6f77420857a8dc363f9cb:dossiers/states/DEU.md`. Current controlling governance overlay: `../../registry/state-outcome-overrides-02.yml`. Issue #64 contains no separate evidence comment.
+
+- **Historical `U → S` superseded.** The full-`U` cohort escalated Germany to `S` around current Afghanistan/Syria return and protest-policing concerns. The pre-revalidation dossier preserved the two Amnesty locators above.
+- **Later `S → U` controls.** The 13 August current-status review added direct Federal Government records showing active returns together with individualized asylum/protection decision-making and federal/Land allocation of responsibility. That defeated the prior generic unsafe-return inference. `../../registry/state-outcome-overrides-02.yml` is the machine-readable controlling overlay and records Germany `S → U`.
+- The human-rights concern remains reviewable, but deportation or controversial policy alone is not a Restricted Project. A future `S` requires a named operation with independently established bypass of meaningful protection safeguards or another qualifying ECL project.
+- Courts, independent review and rights-protective functions remain excluded/remedial activity.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #64 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../registry/state-outcome-overrides-02.yml`
