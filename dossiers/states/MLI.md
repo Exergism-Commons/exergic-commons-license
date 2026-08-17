@@ -42,6 +42,14 @@ Restoration of genuine political competition, independent judicial remedies, end
 - https://www.amnesty.org/en/latest/news/2026/02/mali-moussa-mara/
 - https://www.amnesty.org/en/documents/afr05/1319/2026/en/
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #105 · `../../reviews/2026/adversarial/state-level/tranche-06.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-06.md` (cutoff 2026-08-11). Issue #105 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 6 **UPHELD `R`** after crediting formal courts, the Justice Ministry and the National Charter for Peace and Reconciliation while finding no sufficiently independent or effective restraint of the military political-control system. All three exact Amnesty locators are already preserved above.
+- Formal institutions and reconciliation policy are counter-evidence/governance context; they do not independently prove prohibited conduct or remediation.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class exactly as the **current military/transitional governing, security and political-control apparatus of Mali**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+## 8. Procedural history
+
+Issue #105 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-06.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
