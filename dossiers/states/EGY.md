@@ -42,6 +42,14 @@ Post-1 October 2026 implementation data; reduced arbitrary/pretrial detention; i
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=EGY+1%2F2026
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=EGY+8%2F2025
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #51 · `../../reviews/2026/adversarial/state-level/tranche-02.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-02.md` (cutoff 2026-08-11). Public provenance: issue #51. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, with future review obligation preserved. State-level tranche 2 **UPHELD `R`** because the new Criminal Procedure Law was prospective at the cutoff and could not rebut the then-current North Sinai/security record. Issue #51 preserves the same adversarial result and explicitly requires a fresh review after **1 October 2026**.
+- As of this normalization pass on 17 August 2026, **1 October 2026 is still in the future**. No implementation finding, downgrade or remediation outcome is inferred in advance. The Presidency locator above is legal/reform context; the UN Special Procedures locators remain conduct evidence.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central governmental, security, prosecution, judicial, detention and administrative apparatus of Egypt**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains non-operative absent an adopted Schedule and remains subject to the mandatory post-reform review trigger.
+
+## 8. Procedural history
+
+Issue #51 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-02.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
