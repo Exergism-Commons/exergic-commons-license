@@ -50,6 +50,14 @@ Release or fair independent review of political detainees, sustained protection 
 
 - https://www.amnesty.org/en/location/africa/west-and-central-africa/congo/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The Amnesty Congo country locator preserves the historical source family for the election-period political-security, assembly and detention propositions at the granularity the repository retains.
+- The historical apparatus-level wording remains governance context; it does not make every police, prosecutorial, detention, judicial or public-service function a Restricted Party by institutional association.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-12a-cog-freeze.yml` controls current renderability and narrows it to the **Jean-Marie Michel Mokoko** and **André Okombi Salissa** continued political-detention projects. Other opposition, prison, detention, court, security or public-order scope remains governance-only until separately frozen; independent review/remediation is excluded.
+
+## 10. Procedural history
 
 Issue #142 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`
