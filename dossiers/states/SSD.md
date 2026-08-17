@@ -64,7 +64,17 @@ Rival armed/opposition actors require separate attribution. The Judiciary, mobil
 - https://unmiss.unmissions.org/en/node/135155
 - https://unmiss.unmissions.org/en/news/first-judicial-mission-to-remote-duk-county-brings-fresh-hope-for-justice
 - https://unmiss.unmissions.org/en/node/134575
+- https://www.hrw.org/news/2026/02/19/south-sudan-extend-un-investigations-stand-ready-to-respond-to-any-further
+- https://www.hrw.org/news/2026/07/03/south-sudan-grave-rights-violations-amid-deteriorating-political-and-security
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #164 · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-03.md` and `../../reviews/2026/adversarial/scoped/tranche-10.md` (cutoff 2026-08-11). Public provenance: issue #164. Later consistency controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`.
+
+- **Status:** absorbed, with tier correction and fragmented attribution preserved. The initial adjudication classified South Sudan as whole-State `R`; state-level tranche 3 produced the historical **`R → S` correction** because mobile courts, prosecutors/investigators and other justice/remediation functions produced actual contrary outcomes. Scoped tranche 10 then strengthened the defined security/military governance scope without re-capturing the Judiciary; the later ECL 0.2 State Delta retained `S`.
+- The issue #164 comment records the same correction but points to a legacy review filename; the surviving canonical historical record is `state-level/tranche-03.md`. Earlier same-dossier Git history contained the UNMISS judicial/remediation locators already preserved above, so no additional proposition mapping is invented.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-19d-ssd-freeze.yml` controls current renderability and freezes only the **South Sudan National Security Service in qualifying arrest, detention, surveillance, search or intimidation activity against protected critics, opposition, journalists, lawyers or civic actors**, and only where the exact conduct independently satisfies ECL 0.2 political-repression, arbitrary-detention or repressive-surveillance criteria. Other military, police and State-aligned conflict scope remains governance-only absent separate freezes. The two HRW locators restored above are the freeze's current identity/context sources and do not create a generic South Sudan security-services class.
+
+## 10. Procedural history
+
+Issue #164 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`
