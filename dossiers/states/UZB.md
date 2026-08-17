@@ -58,6 +58,14 @@ Independent Karakalpakstan accountability, effective torture remediation, cessat
 - https://www.amnesty.org/en/location/europe-and-central-asia/eastern-europe-and-central-asia/uzbekistan/report-uzbekistan/
 - https://ombudsman.uz/en/news/2026/05/18/tergov-hibsxonalarida-saqlanayotgan-shaxslar-uchun-moddiy-va-huquqiy-kafolatlar-kengaytirilmoqda
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #189 · `../../reviews/2026/adversarial/state-level/tranche-10.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-10.md` and `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Public provenance: issue #189. Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`.
+
+- **Status:** absorbed, with audit correction and tier history preserved. The initial adjudication classified Uzbekistan as whole-State `R`; state-level tranche 10 corrected the working-count omission and produced the historical **`R → S` scope correction** after crediting Ombudsman/NPM monitoring, legislative intervention and real torture-accountability outcomes. The issue #189 comment records the same correction but references a legacy review filename; the surviving canonical historical record is `state-level/tranche-10.md`. Scoped tranche 9 then upheld `S`, and the 2026-08-13 ECL 0.2 State Delta retained it without tier change.
+- Additional counter-evidence/legal-context locators preserved by tranche 10 are `https://ombudsman.uz/en/news/2026/03/04/inson-huquqlarini-taminlashga-oid-masalalar-muhokama-qilindi` and `https://constitution.gov.uz/en`. They document remedial/legal context and do not prove prohibited conduct.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-19b-uzb-freeze.yml` controls current renderability and freezes only the **Javokhir Muminov June 2026 detention/prosecution project**, beginning with the 5 June arrest in Karshi and including materially participating custody/prosecution functions while the proceeding remains materially active and unremediated. Other Karakalpakstan, agriculture, LGBTI, eviction, political-prosecution and detention scope remains governance-only until separately frozen; release, dismissal, acquittal or effective remediation is excluded from the frozen project.
+
+## 10. Procedural history
+
+Issue #189 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-10.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

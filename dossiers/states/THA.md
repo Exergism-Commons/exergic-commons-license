@@ -58,6 +58,14 @@ Durable non-use/reform of criminal provisions against protected speech, release/
 - https://www.hrw.org/news/2026/04/08/submission-to-the-universal-periodic-review-of-thailand
 - https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/thailand/report-thailand/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #174 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` (2026-08-13).
+
+- **Status:** absorbed / already represented. The tranche's current political-expression/public-order and cyber-control propositions, together with the accountability counter-evidence, are preserved in the canonical dossier above. The initial adjudication's broader refoulement component is historical only: tranche 9 expressly removed it from active `S` absent sufficiently fresh recurrence, and it remains a review trigger rather than a current restricted project.
+- The 2026-08-13 ECL 0.2 State Delta retained Thailand as `S`; that later revalidation does not broaden the scoped dossier or revive the removed refoulement component.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-06-statutory-cases.yml` is authoritative for current renderability. It freezes only **Bangkok Criminal Court black case Aor.498/2567 arising from the 29 November 2020 demonstration**, limited to the prosecution/detention enforcement concerning protected peaceful expression and materially participating prosecution/detention functions. The registry locator `https://www3.ago.go.th/center/crim/` is an identity/organizational locator for the prosecution function, not proposition-specific proof of prohibited conduct. Other Section 112/public-order matters and the separately described coordinated State cyber/information-control project remain governance-only until separately frozen.
+
+## 10. Procedural history
+
+Issue #174 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

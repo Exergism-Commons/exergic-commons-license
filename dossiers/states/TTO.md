@@ -60,6 +60,14 @@ Review is limited to **actual deportation/return practice, access to protection/
 - https://www.amnesty.org/en/location/americas/central-america-and-the-caribbean/trinidad-and-tobago/
 - https://ombudsman.gov.tt/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #178 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Later revalidations: `../../reviews/2026/adversarial/under-review/full-cohort.md` and `../../reviews/2026/consistency/ecl-0.2-state-delta.md`.
+
+- **Status:** absorbed / superseded tier history preserved. The initial adjudication classified the migration/border/asylum project as `S`; scoped tranche 9 is the controlling historical origin of the **`S → U` downgrade**, because the review could not establish sufficiently fresh systematic 2026 summary-return persistence and credited the registration, inquiry, appeal and Ombudsman counter-evidence preserved above.
+- The later full-`U` cohort revalidated `U`, expressly citing structural asylum/detention risk together with 2026 registration/inquiry/appeal mechanisms and insufficient fresh summary-return recurrence. The 2026-08-13 ECL 0.2 State Delta retained `U` again because the remaining uncertainty is factual/persistence-based, not a license-language gap.
+- **Schedule boundary:** the current `../../registry/schedule-state-s-freezes/` registry contains no Trinidad and Tobago `S` freeze after these revalidations. Historical migration/border evidence therefore must not be used to reconstruct or revive an operative/renderable `S` subset. Re-escalation requires fresh attributable evidence meeting the triggers above and a new explicit Schedule freeze.
+
+## 10. Procedural history
+
+Issue #178 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

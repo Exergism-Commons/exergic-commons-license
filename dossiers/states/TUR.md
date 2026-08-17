@@ -59,6 +59,14 @@ Implementation of Constitutional Court/ECtHR rulings, cessation/remedy of politi
 - https://www.echr.coe.int/w/grand-chamber-judgement-concerning-t%C3%BCrkiye
 - https://www.anayasa.gov.tr/en/news/individual-application/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #180 · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-04.md` and `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`.
+
+- **Status:** absorbed / already represented. The initial adjudication classified Türkiye as whole-State `R`; state-level tranche 4 produced the controlling historical **`R → S` scope correction** after crediting Constitutional Court and ECtHR counter-institutions. Scoped tranche 9 then re-tested and upheld the narrowed `S` using the UN Special Procedures and judicial locators already preserved above. The 2026-08-13 ECL 0.2 State Delta retained `S` without tier change.
+- The historical counterterrorism, public-order, association-control and information-blocking pattern remains governance evidence. It does not recreate a generic Turkish security/prosecution/judicial class or swallow the counter-institutions that caused the `R → S` correction.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-13a-tur-freeze.yml` controls current renderability and freezes only **TUR 6/2026 — Esra Işık / Halime Şaman enforcement project**: the named arrest/pre-trial detention/prosecution and judicial/administrative measures, limited to materially burdening protected environmental or human-rights activity. Other defender cases, public-order, association-control and information-blocking scope remains governance-only until separately frozen; independent judicial/remedial activity remains excluded.
+
+## 10. Procedural history
+
+Issue #180 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

@@ -59,6 +59,14 @@ Release/remedy in expression-only cases, rights-compliant narrowing/interpretati
 - https://www.amnesty.org/fr/documents/afr63/1328/2026/en/
 - https://www.hrw.org/world-report/2026/country-chapters/zambia
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #194 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`.
+
+- **Status:** absorbed / already represented. The MacPherson Mukuka and Xavier Chungu matters, broader cyber/surveillance/public-order concerns and judicial/constitutional counter-evidence preserve the tranche's substantive basis above. The 2026-08-13 ECL 0.2 State Delta retained Zambia as `S` without converting statutory capability or the wider police apparatus into a generic restriction.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-02-statutory-agency.yml` controls current renderability. It freezes case-specific Zambia Police Service enforcement under the Cyber Crimes Act No. 4 of 2025 against protected journalism/expression, including the **MacPherson Mukuka** matter, and the **Xavier Chungu** State-security/sedition detention after protected political expression, only where each exact use independently satisfies ECL criteria. Surveillance/interception deployments and other opposition-meeting/public-order incidents remain residual governance-only scope pending an exact system/operator or operation/unit freeze.
+- The registry locators `https://www.parliament.gov.zm/acts-of-parliament?page=5`, `https://zambiapolice.gov.zm/about-the-zambia-police-service/` and `https://zambiapolice.gov.zm/legal-documents/` preserve statutory/identity context for the frozen boundary. They are not proposition-specific proof that the named agencies or powers engaged in prohibited conduct.
+
+## 10. Procedural history
+
+Issue #194 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

@@ -60,6 +60,14 @@ Actor-specific release/remedy, cessation of arbitrary detention/disappearance/to
 - https://www.hrw.org/world-report/2026/country-chapters/yemen
 - https://www.amnesty.org/en/location/middle-east-and-north-africa/middle-east/yemen/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #193 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`.
+
+- **Status:** absorbed / already represented. The tranche's Huthi, internationally recognised-government, STC/UAE-backed and other actor-specific detention/security evidence is preserved above together with the mandatory fragmentation rule. The 2026-08-13 ECL 0.2 State Delta retained Yemen as `S` without turning the fragmented dossier into a unitary State restriction.
+- Actor separation is substantive, not merely descriptive: conduct by Huthi authorities, internationally recognised-government units, STC/UAE-backed structures or other armed actors does not propagate across rival actors or to the Yemeni population by geography or nationality.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-20a-yem-freeze.yml` controls current renderability and freezes only the **continued detention of the 73 United Nations personnel identified by the UN on 10 June 2026**, attributed to Houthi de facto authorities, together with materially participating detention/security functions. Other Houthi activity, internationally recognised-government or STC/UAE-backed activity, other detainees and broader conflict/security scope remain governance-only absent separate freezes; humanitarian, dialogue and release/remediation mechanisms remain excluded.
+
+## 10. Procedural history
+
+Issue #193 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
