@@ -16,11 +16,16 @@ and must conform to `schemas/legal-review-record.schema.json`. That schema accep
 
 ## Prepare immutable reviewer inputs
 
-Preparation is based on an **exact Git commit**, not on mutable working-tree bytes. Start from an isolated clean checkout with **complete Git history** and pass the full candidate commit SHA explicitly:
+Preparation is based on an **exact Git commit**, not on mutable working-tree bytes. Start from an isolated clean checkout, make `origin` the authoritative ECL remote, fetch **all** of its branch heads and tags, and pass the full candidate commit SHA explicitly:
 
 ```bash
 # If necessary, convert a shallow clone first:
-git fetch --unshallow
+git fetch --unshallow origin
+
+# Materialize every currently authoritative origin branch/tag locally.
+git fetch --prune origin \
+  '+refs/heads/*:refs/remotes/origin/*' \
+  '+refs/tags/*:refs/tags/*'
 
 SOURCE_COMMIT=$(git rev-parse HEAD)
 
@@ -34,12 +39,15 @@ The helper requires:
 
 - `--source-commit` to be a full 40-hex commit SHA;
 - that commit to equal the checkout's current `HEAD`;
-- a non-shallow repository with complete reachable history; and
+- a non-shallow repository;
+- every current branch head and tag exposed by authoritative remote `origin` to exist locally at the same object ID; and
 - a clean working tree before it writes anything.
 
-The full-history requirement enforces permanent review-ID consumption. If `reviews/legal/inputs/<review_id>/` or `reviews/legal/records/<review_id>.json` existed in reachable repository history and was later deleted, that ID still cannot be rebound to new bytes.
+A non-shallow clone is **not by itself** proof of complete authoritative history: a single-branch clone may omit another current remote branch. The preparer therefore queries `origin` live with `git ls-remote` and compares every advertised head/tag with the corresponding local remote-tracking ref/tag before historical review-ID checks run.
 
-The candidate License and canonical mechanism inputs are read from the immutable Git objects reachable from the exact source commit. Their source paths in the preparation descriptor therefore mean **paths inside `source_commit`**, not whatever bytes a later working tree happens to expose at the same pathname. The preparer also disables Git replacement-object rewriting (`refs/replace`) and strips ambient Git repository/object-directory environment overrides from its subprocesses so that the advertised commit SHA cannot be locally rebound to a different tree through those mechanisms.
+The authoritative-ref check makes permanent review-ID consumption meaningful across the repository histories currently published by `origin`. If `reviews/legal/inputs/<review_id>/` or `reviews/legal/records/<review_id>.json` existed in any fetched authoritative history and was later deleted, that ID still cannot be rebound to new bytes. As with any Git remote, future force-pushes or deletion of authoritative history are governance events outside this preparation transaction and must not be used to recycle review IDs.
+
+The candidate License and canonical mechanism inputs are read from immutable Git objects reachable from the exact source commit. Their source paths in the preparation descriptor mean **paths inside `source_commit`**, not whatever bytes a later working tree exposes at the same pathname. The preparer disables Git replacement-object rewriting (`refs/replace`) and strips ambient Git repository/object-directory overrides from its subprocesses so that the advertised commit SHA cannot be locally rebound through those mechanisms.
 
 The command materializes byte-for-byte copies of the three non-License mechanism inputs required by the review specification:
 
@@ -53,7 +61,7 @@ reviews/legal/inputs/<review_id>/
 It prints a deterministic JSON preparation descriptor containing:
 
 - `status: prepared-not-reviewed`;
-- the exact `source_commit`;
+- the exact `source_commit` and authoritative remote name;
 - the candidate License path-in-commit and SHA-256;
 - the path and SHA-256 of each frozen input;
 - the future completed-record path; and
@@ -63,24 +71,25 @@ The tool never creates `reviews/legal/records/<review_id>.json`, never attests r
 
 ## Trust boundary
 
-The helper is an identity/reproducibility tool, **not a sandbox against a hostile process that already has write access to the same checkout or `.git` object database**. Run it in an isolated trusted checkout with no untrusted concurrent writer, such as a fresh full-history CI job, dedicated worktree/container or otherwise controlled operator environment.
+The helper is an identity/reproducibility tool, **not a sandbox against a hostile process that already has write access to the same checkout, `.git` object database, or authoritative remote**. Run it in an isolated trusted checkout with no untrusted concurrent writer and with `origin` configured to the canonical ECL repository.
 
-This boundary is deliberate. Earlier filesystem-hardening prototypes attempted to defend every pathname against arbitrary concurrent renames and replacement. That model cannot provide a meaningful final guarantee once an untrusted process has equivalent write authority over the repository. The current design instead makes source identity content-addressed by Git, requires a clean exact-HEAD checkout and complete history, disables replace-object rebinding, and states the remaining local trust assumption explicitly.
+Earlier filesystem-hardening prototypes attempted to defend every pathname against arbitrary concurrent renames and replacement. That model cannot provide a meaningful final guarantee once an untrusted process has equivalent write authority. The current design instead makes source identity content-addressed by Git, verifies the current authoritative remote-ref set, requires a clean exact-HEAD checkout, disables replace-object rebinding, and states the remaining trust assumption explicitly.
 
-**Do not begin substantive qualified review from an uncommitted preparation directory.** After preparation, inspect and commit the frozen snapshot first; only then provide that committed snapshot to qualified reviewers as the review input set. The eventual legal-review record must hash those committed frozen copies. Git history plus the record hashes provide the historical identity; the preparer itself is not the legal attestation.
+**Do not begin substantive qualified review from an uncommitted preparation directory.** After preparation, inspect and commit the frozen snapshot first; only then provide that committed snapshot to qualified reviewers. The eventual legal-review record must hash those committed frozen copies. Git history plus the record hashes provide the historical identity; the preparer itself is not the legal attestation.
 
 ## Fail-closed rules
 
 - `--license` is mandatory; there is no implicit `LICENSE` or `latest` candidate.
 - `--source-commit` is mandatory and must be an exact full commit equal to current `HEAD`.
-- Shallow repositories are rejected because they cannot prove historical review-ID consumption.
+- Shallow repositories are rejected.
+- Current authoritative `origin` heads/tags must all be fetched locally at the exact object IDs advertised by the remote.
 - The working tree must be clean before publication.
 - Source files must be regular tracked Git blobs; committed symlinks are rejected.
 - Git `refs/replace` rewriting is ignored by the preparer, and ambient `GIT_DIR`/`GIT_WORK_TREE`/object-directory overrides are stripped from its Git subprocesses.
+- Existing `reviews/legal/inputs` and `reviews/legal/records` namespaces must be real directories, never symlinks or non-directories.
 - Paths must be repository-relative POSIX paths and may not traverse `..` or use absolute/backslash/colon forms.
-- A `review_id` is permanently consumed once either `reviews/legal/inputs/<review_id>/` or `reviews/legal/records/<review_id>.json` has existed in reachable Git history or exists in the current workspace.
+- A `review_id` is permanently consumed once either `reviews/legal/inputs/<review_id>/` or `reviews/legal/records/<review_id>.json` has existed in fetched authoritative/local Git history or exists in the current workspace.
 - The tool refuses to overwrite an existing snapshot even if the bytes are identical.
-- The output namespace itself must be a real directory, not a symlink.
 - If a material candidate or mechanism input changes, use a **new review ID** and a new exact source commit. Do not mutate the old snapshot.
 - Write or final-verification failures attempt rollback; if rollback also fails, the error explicitly identifies that a residual snapshot may remain.
 - A preparation failure must not be worked around by pointing a completed record at mutable canonical files.
