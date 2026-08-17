@@ -48,7 +48,7 @@ Historical source: `../../reviews/2026/adversarial/state-level/tranche-04.md` (c
 
 - **Status:** absorbed / already represented. State-level tranche 4 **UPHELD `R`** after crediting Iran's replies to some UN communications and formal judicial/legal institutions, while finding no demonstrated counter-institution capable of restraining the cross-institutional coercive system. All three exact Special Procedures locators are already canonical above.
 - Replies and formal institutions are procedural/counter-evidence context and are not transformed into proof of prohibited conduct by this normalization.
-- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central governmental, intelligence, security, police, prosecution, judicial and detention apparatus of Iran**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class exactly as the **central governmental, security, intelligence, judicial and coercive administrative apparatus of the Islamic Republic of Iran**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
 
 ## 8. Procedural history
 
