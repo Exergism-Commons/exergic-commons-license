@@ -67,7 +67,7 @@ The helper is an identity/reproducibility tool, **not a sandbox against a hostil
 
 This boundary is deliberate. Earlier filesystem-hardening prototypes attempted to defend every pathname against arbitrary concurrent renames and replacement. That model cannot provide a meaningful final guarantee once an untrusted process has equivalent write authority over the repository. The current design instead makes source identity content-addressed by Git, requires a clean exact-HEAD checkout and complete history, disables replace-object rebinding, and states the remaining local trust assumption explicitly.
 
-After preparation, inspect and **commit the frozen snapshot before substantive qualified review is finalized**. The eventual legal-review record must hash the committed frozen copies. Git history plus the record hashes provide the historical identity; the preparer itself is not the legal attestation.
+**Do not begin substantive qualified review from an uncommitted preparation directory.** After preparation, inspect and commit the frozen snapshot first; only then provide that committed snapshot to qualified reviewers as the review input set. The eventual legal-review record must hash those committed frozen copies. Git history plus the record hashes provide the historical identity; the preparer itself is not the legal attestation.
 
 ## Fail-closed rules
 
