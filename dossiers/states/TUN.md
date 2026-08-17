@@ -42,6 +42,16 @@ Restoration of NGO/civic space, release/remedy for political cases, independent 
 - https://www.amnesty.org/en/location/middle-east-and-north-africa/north-africa/tunisia/report-tunisia/
 - https://www.amnesty.org/en/latest/news/2026/07/tunisia-refugees-and-asylum-seekers-trapped-in-cycle-of-abuse-after-authorities-dismantle-crucial-safeguards/
 
-## 7. Procedural history
+## 7. Historical evidence absorption
 
-Issue #179 · `../../reviews/2026/adversarial/state-level/tranche-08.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-08.md` (cutoff 2026-08-11). Issue #179 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 8 **UPHELD `R`** after crediting continued resistance by lawyers, courts and independent civil society while finding that legal/judicial mechanisms were themselves materially implicated and regional remedy access had been weakened. All three exact historical locators are already canonical above.
+- Independent legal/civil-society activity remains counter-evidence and potentially qualifying remediation; its existence is not converted into proof of the executive, judicial-administrative, migration or civic-control conduct under review.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central executive, judicial, security, migration and civic-control apparatus of Tunisia`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 8. Procedural history
+
+Issue #179 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-08.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
