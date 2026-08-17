@@ -318,7 +318,9 @@ def _remove_owned_snapshot(
         return
     try:
         if not _same_inode(os.fstat(directory_fd), expected):
-            return
+            raise OSError(
+                f"rollback could not verify ownership of reviews/legal/inputs/{name}"
+            )
         for filename in filenames:
             try:
                 os.unlink(filename, dir_fd=directory_fd)
@@ -328,10 +330,21 @@ def _remove_owned_snapshot(
     finally:
         os.close(directory_fd)
 
-    current = os.stat(name, dir_fd=inputs_fd, follow_symlinks=False)
-    if _same_inode(current, expected) and stat.S_ISDIR(current.st_mode):
-        os.rmdir(name, dir_fd=inputs_fd)
-        os.fsync(inputs_fd)
+    try:
+        current = os.stat(name, dir_fd=inputs_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return
+    if not _same_inode(current, expected) or not stat.S_ISDIR(current.st_mode):
+        raise OSError(
+            f"rollback lost ownership of reviews/legal/inputs/{name}; residual namespace may remain"
+        )
+
+    os.rmdir(name, dir_fd=inputs_fd)
+    os.fsync(inputs_fd)
+    if _entry_exists(inputs_fd, name):
+        raise OSError(
+            f"rollback left a residual namespace at reviews/legal/inputs/{name}"
+        )
 
 
 def prepare_review_inputs(
@@ -455,7 +468,9 @@ def prepare_review_inputs(
                 "sha256": sha256_bytes(data),
             }
         return descriptor
-    except Exception:
+    except Exception as primary_error:
+        cleanup_error: Exception | None = None
+        cleanup_name: str | None = None
         if inputs_fd is not None and snapshot_identity is not None:
             cleanup_name = published_name
             if cleanup_name is None and "temp_name" in locals() and temp_name:
@@ -470,10 +485,15 @@ def prepare_review_inputs(
                         if "frozen" in locals()
                         else (),
                     )
-                except (OSError, ValueError):
-                    # Rollback is best-effort. Never mask the primary failure with
-                    # an error caused by hostile concurrent namespace replacement.
-                    pass
+                except (OSError, ValueError) as exc:
+                    cleanup_error = exc
+
+        if cleanup_error is not None:
+            raise OSError(
+                "legal-review preparation failed and rollback could not verify cleanup; "
+                f"a residual snapshot may remain at reviews/legal/inputs/{cleanup_name}. "
+                f"primary error: {primary_error!r}; rollback error: {cleanup_error!r}"
+            ) from cleanup_error
         raise
     finally:
         for fd in frozen_file_fds:
