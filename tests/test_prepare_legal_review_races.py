@@ -18,6 +18,17 @@ def git(root: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
 
 
+def configure_origin(root: Path) -> None:
+    origin = root / ".git" / "authoritative-origin.git"
+    subprocess.run(["git", "init", "--bare", "-q", str(origin)], check=True)
+    subprocess.run(["git", "remote", "add", "origin", str(origin)], cwd=root, check=True)
+    subprocess.run(
+        ["git", "push", "-q", "-u", "origin", "HEAD:refs/heads/main"],
+        cwd=root,
+        check=True,
+    )
+
+
 class PrepareLegalReviewGitIdentityTests(unittest.TestCase):
     def _repo(self, root: Path) -> str:
         (root / "spec").mkdir(parents=True)
@@ -40,6 +51,7 @@ class PrepareLegalReviewGitIdentityTests(unittest.TestCase):
         subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True)
         subprocess.run(["git", "add", "."], cwd=root, check=True)
         subprocess.run(["git", "commit", "-qm", "baseline"], cwd=root, check=True)
+        configure_origin(root)
         return git(root, "rev-parse", "HEAD")
 
     def test_post_clean_worktree_source_mutation_cannot_change_frozen_bytes(self):
