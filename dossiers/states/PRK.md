@@ -49,6 +49,15 @@ Independent access/monitoring, closure/remediation of political detention system
 - https://seoul.ohchr.org/en/reports
 - https://seoul.ohchr.org/en/speical-rapporteur-reports
 
-## 8. Procedural history
+## 8. Historical evidence absorption
 
-Issue #127 · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../exergism/assessments/PRK.json`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-04.md` (cutoff 2026-08-11). Issue #127 contains no additional public adversarial comment. Later controlling records include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md`, the 2026-08-14 formal Exergism pilot and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 4 **UPHELD `R` with high confidence** after crediting government claims of improved living standards and isolated improvements identified by the Special Rapporteur while finding no rebuttal to the centralized surveillance, political-control, detention, information and movement-control structure. Both exact historical locators are preserved above.
+- Historical same-dossier review confirms that the later formal-Exergism rewrite retained the tranche's complete source set and review triggers; no locator was displaced by that later analytical layer.
+- The formal assessment is later analytical evidence about the already-defined governance object and does not retroactively alter the 2026-08-11 historical source record or mechanically create restriction.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class as the **central governmental, political-control, surveillance, security, detention, information and movement-control apparatus of the Democratic People's Republic of Korea**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+## 9. Procedural history
+
+Issue #127 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../exergism/assessments/PRK.json` · `../../registry/schedule-state-r-freeze.yml`
