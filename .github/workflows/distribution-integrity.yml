@@ -17,6 +17,7 @@ on:
       - "tests/test_ecl_distribution.py"
       - "tests/test_bundle_release_identity.py"
       - "tests/test_distribution_contract.py"
+      - "tests/test_resolver_selector_boundary.py"
       - ".github/workflows/distribution-integrity.yml"
   pull_request:
     paths:
@@ -34,6 +35,7 @@ on:
       - "tests/test_ecl_distribution.py"
       - "tests/test_bundle_release_identity.py"
       - "tests/test_distribution_contract.py"
+      - "tests/test_resolver_selector_boundary.py"
       - ".github/workflows/distribution-integrity.yml"
 
 permissions:
@@ -57,7 +59,8 @@ jobs:
             tests.test_ecl_resolve \
             tests.test_ecl_distribution \
             tests.test_bundle_release_identity \
-            tests.test_distribution_contract
+            tests.test_distribution_contract \
+            tests.test_resolver_selector_boundary
 
       - name: Build canonical draft self-contained envelope
         run: |
