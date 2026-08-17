@@ -46,9 +46,26 @@ Escalate on authoritative evidence of new summary returns, force, arbitrary dete
 
 ## 8. Sources
 
+Current-status sources:
 - https://spcommreports.ohchr.org/TmSearch/RelCom?code=CYP+3%2F2024
 - https://spcommreports.ohchr.org/TmSearch/SearchCode?code=CYP+2%2F2021%3B+CYP+3%2F2024
 
-## 9. Procedural history
+Historical pre-revalidation source:
+- https://www.amnesty.org/en/location/europe-and-central-asia/western-central-and-south-eastern-europe/cyprus/report-cyprus/
 
-Issue #43 · `../../reviews/2026/adversarial/under-review/full-cohort.md` · 2026-08-13 Schedule current-status revalidation
+The Amnesty country locator is retained as provenance for the superseded full-`U`-cohort `U → S` stage and broader historical pushback/public-order concern. It is not evidence of a fresh 2026 operation and cannot by itself revive `S`.
+
+## 9. Historical evidence absorption
+
+Historical transition sources: `../../reviews/2026/adversarial/under-review/full-cohort.md` and same-dossier pre-revalidation version `53e03dd54f923ab01a74501037a45147ff6015f9:dossiers/states/CYP.md`. Current controlling governance overlay: `../../registry/state-outcome-overrides-03.yml`. Issue #43 contains no separate evidence comment.
+
+- **Historical `U → S` superseded.** The full-`U` cohort escalated Cyprus to `S` around maritime summary-return/non-refoulement and specifically evidenced public-order concerns. The pre-revalidation dossier preserved the Amnesty Cyprus country locator above.
+- **Later `S → U` controls.** The 13 August current-status review concluded that the strongest objectively knowable pushback records were historical rather than a sufficiently fresh 2026 project. `../../registry/state-outcome-overrides-03.yml` is the machine-readable controlling overlay and records Cyprus `S → U` for that reason.
+- The current UN Special Procedures locators preserve the identifiable historical operations without inferring present recurrence. Current concern does not silently become continuing deployment.
+- Courts, independent remedies, humanitarian activity and ordinary lawful border/migration administration remain excluded.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #43 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/under-review/full-cohort.md` · `../../registry/state-outcome-overrides-03.yml`
