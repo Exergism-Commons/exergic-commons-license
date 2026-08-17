@@ -104,9 +104,11 @@ def _uses_reserved_fallback_identity(actual: Any) -> bool:
 
 
 def validate_bundle_identity(bundle: dict[str, Any]) -> None:
-    """Enforce semantic identity for canonical empty-Schedule fallback Bundles.
+    """Enforce semantic identity for every Bundle and the empty fallback.
 
-    Empty fallback identities are intentionally opt-in rather than generative.
+    The display/manifest Bundle identifier is not independent metadata: it must
+    name the exact License and Schedule refs actually carried by the manifest.
+    Empty fallback identities are additionally opt-in rather than generative.
     Their identifiers and every reserved component identity are a single
     indivisible namespace: no reserved ref, path, or hash may be borrowed in
     either the License or Schedule slot of an ordinary Bundle. A new fallback is
@@ -116,6 +118,23 @@ def validate_bundle_identity(bundle: dict[str, Any]) -> None:
     bundle_ref = bundle.get("bundle")
     if not isinstance(bundle_ref, str):
         raise ValueError("bundle manifest is missing string bundle identity")
+
+    license_component = bundle.get("license")
+    schedule_component = bundle.get("schedule")
+    if not isinstance(license_component, dict) or not isinstance(schedule_component, dict):
+        raise ValueError("bundle requires license and schedule components")
+    license_ref = license_component.get("ref")
+    schedule_ref = schedule_component.get("ref")
+    if not isinstance(license_ref, str) or not license_ref:
+        raise ValueError("bundle license ref must be a non-empty string")
+    if not isinstance(schedule_ref, str) or not schedule_ref.startswith("ECL-"):
+        raise ValueError("bundle schedule ref must be an ECL-prefixed identifier")
+    expected_bundle_ref = f"{license_ref}@{schedule_ref.removeprefix('ECL-')}"
+    if bundle_ref != expected_bundle_ref:
+        raise ValueError(
+            "bundle identity does not match license/schedule refs: "
+            f"expected {expected_bundle_ref}, got {bundle_ref}"
+        )
 
     expected = CANONICAL_EMPTY_BUNDLES.get(bundle_ref)
     if expected is not None:
