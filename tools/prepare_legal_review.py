@@ -27,6 +27,7 @@ from typing import Any
 
 REVIEW_ID_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
 FULL_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+AUTHORITATIVE_REMOTE = "origin"
 CANONICAL_INPUTS = {
     "review_spec": (
         "spec/LEGAL-ADVERSARIAL-REVIEW.md",
@@ -116,6 +117,57 @@ def _require_full_history(root: Path) -> None:
         raise ValueError(
             "legal-review preparation requires complete Git history; "
             "fetch/unshallow the repository before preparing a review ID"
+        )
+
+
+def _authoritative_remote_refs(root: Path) -> dict[str, str]:
+    # Query the authoritative remote live. A non-shallow single-branch clone is
+    # still incomplete for permanent review-ID consumption, so the local ref
+    # set alone is not enough.
+    _git(root, "remote", "get-url", AUTHORITATIVE_REMOTE)
+    output = _git(
+        root,
+        "ls-remote",
+        "--refs",
+        AUTHORITATIVE_REMOTE,
+        "refs/heads/*",
+        "refs/tags/*",
+    ).stdout.decode("utf-8")
+    refs: dict[str, str] = {}
+    for line in output.splitlines():
+        if not line:
+            continue
+        object_id, ref = line.split("\t", 1)
+        if FULL_COMMIT_RE.fullmatch(object_id) is None:
+            raise ValueError(f"authoritative remote returned invalid object id for {ref}")
+        refs[ref] = object_id.lower()
+    if not any(ref.startswith("refs/heads/") for ref in refs):
+        raise ValueError("authoritative remote exposes no branch heads")
+    return refs
+
+
+def _require_authoritative_refs_complete(root: Path) -> None:
+    missing_or_stale: list[str] = []
+    for remote_ref, remote_object in sorted(_authoritative_remote_refs(root).items()):
+        if remote_ref.startswith("refs/heads/"):
+            suffix = remote_ref.removeprefix("refs/heads/")
+            local_ref = f"refs/remotes/{AUTHORITATIVE_REMOTE}/{suffix}"
+        elif remote_ref.startswith("refs/tags/"):
+            local_ref = remote_ref
+        else:
+            continue
+        local = _git(root, "show-ref", "--verify", "--hash", local_ref, check=False)
+        local_object = local.stdout.decode("utf-8").strip().lower()
+        if local.returncode != 0 or local_object != remote_object:
+            missing_or_stale.append(f"{remote_ref} -> {local_ref}")
+    if missing_or_stale:
+        sample = ", ".join(missing_or_stale[:5])
+        if len(missing_or_stale) > 5:
+            sample += f", ... (+{len(missing_or_stale) - 5} more)"
+        raise ValueError(
+            "authoritative remote refs are not fully fetched and current; "
+            f"missing/stale mappings: {sample}. Fetch all origin heads/tags "
+            "before legal-review preparation"
         )
 
 
@@ -230,15 +282,23 @@ def prepare_review_inputs(
     root = _require_repository_root(root)
     source_commit = _resolve_source_commit(root, source_commit)
     _require_full_history(root)
+    _require_authoritative_refs_complete(root)
 
     legal = root / "reviews" / "legal"
     _assert_real_directory(root / "reviews", label="reviews namespace")
     _assert_real_directory(legal, label="legal review workspace")
 
+    inputs = legal / "inputs"
+    records = legal / "records"
+    if _lexists(inputs):
+        _assert_real_directory(inputs, label="legal review input namespace")
+    if _lexists(records):
+        _assert_real_directory(records, label="legal review records namespace")
+
     target_rel = f"reviews/legal/inputs/{review_id}"
     record_rel = f"reviews/legal/records/{review_id}.json"
-    target = root / target_rel
-    record = root / record_rel
+    target = inputs / review_id
+    record = records / f"{review_id}.json"
 
     # A review ID is permanently consumed by either historical Git state or the
     # current workspace. Check this before the cleanliness gate so rerunning an
@@ -268,10 +328,7 @@ def prepare_review_inputs(
             ),
         )
 
-    inputs = legal / "inputs"
-    if _lexists(inputs):
-        _assert_real_directory(inputs, label="legal review input namespace")
-    else:
+    if not _lexists(inputs):
         inputs.mkdir(mode=0o755)
         _fsync_directory(legal)
 
@@ -318,6 +375,7 @@ def prepare_review_inputs(
         "status": "prepared-not-reviewed",
         "review_id": review_id,
         "source_commit": source_commit,
+        "authoritative_remote": AUTHORITATIVE_REMOTE,
         "notice": (
             "NOT A LEGAL REVIEW RECORD. This snapshot does not count as a "
             "qualified, independent, or adversarial legal review."
