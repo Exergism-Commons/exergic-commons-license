@@ -15,6 +15,7 @@ alternative route.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import hashlib
 import json
 import os
@@ -40,6 +41,10 @@ NOTICE = (
     "legal advice, a qualified legal review, or a determination of ECL compliance."
 )
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+RFC3339_RE = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2})$"
+)
 BUNDLE_REF_RE = re.compile(
     r"^(?:ECL-[0-9]+\.[0-9]+\.[0-9]+@RP-[0-9]{4}\.[0-9]{2}\.[0-9]{2}"
     r"(?:\.[0-9]+)?|ECL-0\.3-DRAFT@RP-EMPTY-1)$"
@@ -90,6 +95,21 @@ def _canonical_existing_root(root: Path, *, label: str) -> Path:
 def _validate_sha256(value: Any, *, label: str) -> str:
     if not isinstance(value, str) or SHA256_RE.fullmatch(value) is None:
         raise ValueError(f"{label} must be a lowercase 64-hex SHA-256")
+    return value
+
+
+def _validate_rfc3339(value: Any, *, label: str) -> str:
+    if not isinstance(value, str) or RFC3339_RE.fullmatch(value) is None:
+        raise ValueError(f"{label} must be an RFC3339 date-time string")
+    normalized = value.replace("t", "T")
+    if normalized.endswith(("Z", "z")):
+        normalized = normalized[:-1] + "+00:00"
+    try:
+        parsed = dt.datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ValueError(f"{label} must be an RFC3339 date-time string") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"{label} must include an RFC3339 timezone")
     return value
 
 
@@ -149,6 +169,15 @@ def _validate_review_metadata(value: Any, *, required: bool) -> None:
     _validate_sha256(value.get("sha256"), label="bundle legal_review sha256")
 
 
+def _validate_optional_bundle_metadata(bundle: dict[str, Any]) -> None:
+    if "knowledge_snapshot" in bundle:
+        snapshot = bundle["knowledge_snapshot"]
+        if snapshot is not None and not isinstance(snapshot, str):
+            raise ValueError("bundle knowledge_snapshot must be a string or null")
+    if "released_at" in bundle:
+        _validate_rfc3339(bundle["released_at"], label="bundle released_at")
+
+
 def _validate_bundle_manifest_shape(bundle: Any) -> dict[str, Any]:
     if not isinstance(bundle, dict):
         raise ValueError("ECL-BUNDLE.json must contain a JSON object")
@@ -177,6 +206,7 @@ def _validate_bundle_manifest_shape(bundle: Any) -> dict[str, Any]:
         _validate_sha256(component.get("sha256"), label=f"bundle {key} sha256")
 
     _validate_review_metadata(bundle.get("legal_review"), required=bundle["operative"])
+    _validate_optional_bundle_metadata(bundle)
     ecl_resolve.validate_bundle_identity(bundle)
     return bundle
 
