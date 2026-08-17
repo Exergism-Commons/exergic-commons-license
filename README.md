@@ -11,7 +11,7 @@ ECL is an experimental software-license project focused on human agency, contest
 - [`knowledge/`](knowledge/) — Git-native JSON-LD ABox records.
 - [`ontology/`](ontology/) — OWL TBox, JSON-LD context and SHACL shapes.
 - [`monitoring/`](monitoring/) — source-monitor contracts and change-detection policy.
-- [`exergism/`](exergism/) — machine-readable formal Exergism assessments and explicit parameter profiles.
+- [`exergism/`](exergism/) — ECL-specific machine-readable Exergism assessments, pinned upstream context profiles and immutable upstream binding.
 - [`dossiers/`](dossiers/) — canonical human-readable evidence/governance records during migration.
 - [`reviews/`](reviews/) — adjudication, adversarial-review and consistency history.
 - [`registry/`](registry/) — transitional machine-readable governance, translation, freeze and override views; intended to become generated from accepted decisions.
@@ -23,13 +23,15 @@ The immutable ECL 0.1 snapshot is [`versions/licenses/ECL-0.1.md`](versions/lice
 
 ## Formal Exergism layer
 
-ECL distinguishes the philosophical/normative use of exergy from the **formal Exergism analysis** defined in [`spec/EXERGIC-ANALYSIS.md`](spec/EXERGIC-ANALYSIS.md).
+The canonical philosophical and formal upstream for ECL is **[Exergism](https://github.com/Exergism-Commons/exergism)**, maintained separately in `Exergism-Commons/exergism`. ECL currently pins **[Exergism `v0.1.0`](https://github.com/Exergism-Commons/exergism/releases/tag/v0.1.0)** at exact commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2`; [`exergism/upstream.json`](exergism/upstream.json) records the immutable release and artifact identities.
 
-The formal layer evaluates a precisely attributed object through normalized, evidence-backed intervals for transformative power, autonomy, epistemic truth access, liberation capacity, openness, exergic utility, capture, structural harm, relapse risk and ecological cost. It preserves separate immediate-ethical (`E_i`), strategic-historical (`X_h`), structural (`B_0`) and temporal (`N_t`) analyses.
+ECL distinguishes the philosophical/normative use of exergy from the **formal Exergism analysis** applied to ECL governance records in [`spec/EXERGIC-ANALYSIS.md`](spec/EXERGIC-ANALYSIS.md). That application now follows the pinned canonical formal source `formal/sistema_analitico_exergico.json` rather than a locally invented universal profile.
 
-There is deliberately **no numerical score-to-tier mapping**. Formal Exergism is an upstream diagnostic and falsification layer; restriction still requires exact ECL criterion fit, evidence, attribution, adversarial review, Schedule knowability and explicit incorporation.
+The formal layer evaluates a precisely attributed object through normalized, evidence-backed intervals for transformative power, autonomy, epistemic truth access, liberation capacity, openness, exergic utility, capture, structural harm, relapse risk and ecological cost. Where evidence supports the canonical advanced layer, it also evaluates imputable agency, intentionality, lucidity, gratuitous harm, justification-of-cruelty risk, non-compensatory atrocity and strong moral imputation. Immediate-ethical, strategic-historical, structural, imputability and temporal outputs remain distinct.
 
-The cross-tier pilot and calculator are documented in [`exergism/README.md`](exergism/README.md).
+There is deliberately **no numerical score-to-tier mapping**. Formal Exergism is an upstream diagnostic and falsification layer; restriction still requires exact ECL criterion fit, evidence, attribution, adversarial review, Schedule knowability and explicit incorporation. A later Exergism release does not alter ECL unless ECL explicitly updates its immutable pin and reviews downstream impact.
+
+The pinned profiles, pilot and calculator are documented in [`exergism/README.md`](exergism/README.md).
 
 ## Knowledge model and living updates
 
