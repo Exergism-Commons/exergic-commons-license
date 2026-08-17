@@ -35,6 +35,15 @@ CANONICAL_INPUTS = {
     "incorporation_spec": ("spec/VERSIONING.md", "VERSIONING.md"),
     "bundle_schema": ("schemas/bundle.schema.json", "bundle.schema.json"),
 }
+GIT_ENV_REMOVE = {
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_COMMON_DIR",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_NAMESPACE",
+}
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -57,10 +66,21 @@ def _path_segments(raw_path: str, *, label: str) -> list[str]:
     return segments
 
 
+def _git_environment() -> dict[str, str]:
+    env = os.environ.copy()
+    for name in GIT_ENV_REMOVE:
+        env.pop(name, None)
+    # Local replace refs must never make one advertised commit SHA traverse a
+    # different commit/tree while review inputs are being frozen.
+    env["GIT_NO_REPLACE_OBJECTS"] = "1"
+    return env
+
+
 def _git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[bytes]:
     process = subprocess.run(
         ["git", *args],
         cwd=root,
+        env=_git_environment(),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
