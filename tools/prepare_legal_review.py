@@ -198,6 +198,20 @@ def _tree_entry(
     return mode, object_type, object_id
 
 
+def _assert_commit_directory(
+    root: Path, commit: str, raw_path: str, *, label: str
+) -> None:
+    entry = _tree_entry(root, commit, raw_path, label=label)
+    if entry is None:
+        raise ValueError(f"missing {label} in source_commit: {raw_path}")
+    mode, object_type, _ = entry
+    if mode != "040000" or object_type != "tree":
+        raise ValueError(
+            f"{label} must be a directory in source_commit, "
+            f"not mode/type {mode}/{object_type}: {raw_path}"
+        )
+
+
 def _assert_commit_directory_or_absent(
     root: Path, commit: str, raw_path: str, *, label: str
 ) -> None:
@@ -292,6 +306,19 @@ def prepare_review_inputs(
     source_commit = _resolve_source_commit(root, source_commit)
     _require_full_history(root)
     _require_authoritative_refs_complete(root)
+
+    # The source commit itself must contain the legal-review workspace as a
+    # real tree. Child namespace absence is meaningful only after every required
+    # ancestor has been proven to be a tree in that same immutable commit.
+    _assert_commit_directory(
+        root, source_commit, "reviews", label="reviews namespace in source_commit"
+    )
+    _assert_commit_directory(
+        root,
+        source_commit,
+        "reviews/legal",
+        label="legal review workspace in source_commit",
+    )
 
     legal = root / "reviews" / "legal"
     _assert_real_directory(root / "reviews", label="reviews namespace")
