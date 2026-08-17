@@ -57,6 +57,7 @@ If those primitives are unavailable, the command **fails closed**. There is inte
 - Preparation reads canonical inputs and the candidate License through pinned descriptors and publishes a fully written private snapshot with atomic no-replace semantics.
 - The tool refuses to overwrite an existing snapshot even if the bytes are identical.
 - If a material candidate or review-mechanism input changes, prepare a **new** review ID/delta-review snapshot. Do not mutate the old snapshot.
+- If preparation fails, rollback verifies that the helper-owned temporary/published namespace was removed. If rollback itself cannot be verified, the command reports an explicit residual-snapshot warning and path. Treat that namespace as quarantined and the review ID as consumed until a maintainer inspects it; do not silently retry or reuse the ID.
 - A preparation failure must not be worked around by manually pointing a completed record at mutable canonical files.
 
 ## What qualified reviewers must still do
