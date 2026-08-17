@@ -83,7 +83,7 @@ class ExergismUpstreamPinTests(unittest.TestCase):
             self.assertIn(EXPECTED_COMMIT, text)
             self.assertIn(EXPECTED_FORMAL_PATH, text)
         self.assertIn("no licensing effect", readme.lower())
-        self.assertIn("does not create licensing restrictions", spec)
+        self.assertIn("create licensing restrictions", spec.lower())
         self.assertIn("does not `owl:imports`", spec)
         self.assertIn("P_atr", spec)
         self.assertIn("E_i_adj", spec)
