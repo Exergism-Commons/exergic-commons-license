@@ -90,6 +90,15 @@ def _resolve_source_commit(root: Path, source_commit: str) -> str:
     return normalized
 
 
+def _require_full_history(root: Path) -> None:
+    shallow = _git(root, "rev-parse", "--is-shallow-repository").stdout.decode().strip()
+    if shallow != "false":
+        raise ValueError(
+            "legal-review preparation requires complete Git history; "
+            "fetch/unshallow the repository before preparing a review ID"
+        )
+
+
 def _require_head_and_clean(root: Path, source_commit: str) -> None:
     head = _git(root, "rev-parse", "HEAD").stdout.decode().strip()
     if head != source_commit:
@@ -135,8 +144,10 @@ def _read_blob(root: Path, commit: str, raw_path: str, *, label: str) -> bytes:
     return _git(root, "cat-file", "blob", object_id).stdout
 
 
-def _commit_path_exists(root: Path, commit: str, raw_path: str) -> bool:
-    return _tree_entry(root, commit, raw_path, label="consumed review path") is not None
+def _history_path_exists(root: Path, raw_path: str) -> bool:
+    _path_segments(raw_path, label="consumed review path")
+    output = _git(root, "log", "--all", "--format=%H", "--", raw_path).stdout
+    return bool(output.strip())
 
 
 def _lexists(path: Path) -> bool:
@@ -198,6 +209,7 @@ def prepare_review_inputs(
     _path_segments(license_path, label="candidate License")
     root = _require_repository_root(root)
     source_commit = _resolve_source_commit(root, source_commit)
+    _require_full_history(root)
 
     legal = root / "reviews" / "legal"
     _assert_real_directory(root / "reviews", label="reviews namespace")
@@ -211,9 +223,9 @@ def prepare_review_inputs(
     # A review ID is permanently consumed by either historical Git state or the
     # current workspace. Check this before the cleanliness gate so rerunning an
     # already-prepared ID produces the more useful consumed-ID error.
-    if _commit_path_exists(root, source_commit, target_rel) or _lexists(target):
+    if _history_path_exists(root, target_rel) or _lexists(target):
         raise ValueError(f"legal review input snapshot already exists: {target_rel}")
-    if _commit_path_exists(root, source_commit, record_rel) or _lexists(record):
+    if _history_path_exists(root, record_rel) or _lexists(record):
         raise ValueError(
             "review_id is permanently consumed by an existing completed-record "
             f"path: {record_rel}"
@@ -262,9 +274,23 @@ def prepare_review_inputs(
             ) from cleanup
         raise ValueError(f"review_id became consumed by completed record: {record_rel}")
 
-    for _, (filename, data) in frozen.items():
-        if (target / filename).read_bytes() != data:
-            raise OSError(f"published frozen input changed before completion: {filename}")
+    try:
+        for _, (filename, data) in frozen.items():
+            if (target / filename).read_bytes() != data:
+                raise OSError(
+                    f"published frozen input changed before completion: {filename}"
+                )
+    except Exception as primary:
+        try:
+            shutil.rmtree(target)
+            _fsync_directory(inputs)
+        except Exception as cleanup:
+            raise OSError(
+                "final frozen-input verification failed and rollback also failed; "
+                f"residual snapshot may remain at {target}; "
+                f"primary error: {primary!r}; cleanup error: {cleanup!r}"
+            ) from cleanup
+        raise
 
     descriptor: dict[str, Any] = {
         "schema_version": 2,
