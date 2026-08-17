@@ -61,10 +61,14 @@ Move toward `U/N` on repeal/narrowing or demonstrably rights-compliant/non-repre
 - https://www.judiciary.gov.sg/judgments/case-briefs-by-smu/the-online-citizen-pte-ltd-v-attorney-general-and-another-appeal-and-other-matters
 - https://www.mlaw.gov.sg/issuance-of-correction-direction-under-the-protection-from-online-falsehoods-and-manipulation-act/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-- Issue #157
-- `../../reviews/2026/adversarial/state-level/tranche-04.md`
-- `../../reviews/2026/adversarial/scoped/tranche-10.md`
-- `../../reviews/2026/consistency/global-license-fit-audit.md`
-- `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-04.md` and `../../reviews/2026/adversarial/scoped/tranche-10.md` (cutoff 2026-08-11). Later controlling consistency records: `../../reviews/2026/consistency/global-license-fit-audit.md`, `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`.
+
+- **Status:** absorbed / partially superseded. The initial adjudication classified Singapore as whole-State `R`; state-level tranche 4 produced the historical **`R → S` correction** because POFMA judicial review and constitutional adjudication defeat blanket attribution. Scoped tranche 10 upheld `S` but still treated capital-punishment/execution projects as an ECL basis. The later ECL 0.2 consistency audit and State Delta **supersede that component**: capital punishment is not a standalone ECL criterion, while POFMA/information-control and qualifying public-order repression remain the current basis.
+- The pre-delta dossier preserved two execution-specific Amnesty locators — `https://www.amnesty.org/en/documents/act50/0723/2026/en/` and `https://www.amnesty.org/en/documents/act50/0892/2026/en/`. They are retained here solely as **historical provenance for the superseded tranche-10 execution component**. They do not establish a current Restricted Project unless an execution-related system independently satisfies an operative ECL criterion on separate facts.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-sgp.yml` is the later authoritative renderability surface. It freezes the **POFMA direction/prosecution and qualifying public-order project class** only where the exact order, prosecution or operation materially burdens protected political, journalistic or rights expression. High Court/Court of Appeal review, independent legal defence, unrelated administration and capital punishment absent an independent ECL criterion are expressly excluded.
+
+## 10. Procedural history
+
+Issue #157 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md` · `../../reviews/2026/consistency/global-license-fit-audit.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`
