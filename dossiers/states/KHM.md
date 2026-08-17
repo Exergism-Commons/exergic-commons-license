@@ -46,6 +46,14 @@ Independent judicial restraint, effective political competition, accountability 
 - https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/cambodia/report-cambodia/
 - https://www.amnesty.org/es/documents/asa23/1093/2026/en/
 
-## 8. Procedural history
+## 8. Historical evidence absorption
 
-Issue #30 · `../../reviews/2026/adversarial/state-level/tranche-05.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-05.md` (cutoff 2026-08-11). Issue #30 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed / already represented. State-level tranche 5 **UPHELD `R` with an accountability/reform carve-out** after crediting OHCHR-supported judicial/prison reform, independent monitoring, legal aid and victim-protection work while finding no counter-institution independently restraining the central political coercive system. All three historical locators are preserved above.
+- The OHCHR rule-of-law locator is reform/accountability provenance. It does not prove prohibited conduct and must remain protected when the relevant activity independently qualifies as remediation or accountability work.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class exactly as the **central governmental, security, judicial and administrative apparatus of Cambodia**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+## 9. Procedural history
+
+Issue #30 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-05.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
