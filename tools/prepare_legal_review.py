@@ -71,8 +71,6 @@ def _git_environment() -> dict[str, str]:
     env = os.environ.copy()
     for name in GIT_ENV_REMOVE:
         env.pop(name, None)
-    # Local replace refs must never make one advertised commit SHA traverse a
-    # different commit/tree while review inputs are being frozen.
     env["GIT_NO_REPLACE_OBJECTS"] = "1"
     return env
 
@@ -121,9 +119,6 @@ def _require_full_history(root: Path) -> None:
 
 
 def _authoritative_remote_refs(root: Path) -> dict[str, str]:
-    # Query the authoritative remote live. A non-shallow single-branch clone is
-    # still incomplete for permanent review-ID consumption, so the local ref
-    # set alone is not enough.
     _git(root, "remote", "get-url", AUTHORITATIVE_REMOTE)
     output = _git(
         root,
@@ -201,6 +196,20 @@ def _tree_entry(
     if path != raw_path:
         raise ValueError(f"{label} resolved to unexpected Git path: {path}")
     return mode, object_type, object_id
+
+
+def _assert_commit_directory_or_absent(
+    root: Path, commit: str, raw_path: str, *, label: str
+) -> None:
+    entry = _tree_entry(root, commit, raw_path, label=label)
+    if entry is None:
+        return
+    mode, object_type, _ = entry
+    if mode != "040000" or object_type != "tree":
+        raise ValueError(
+            f"{label} must be a directory in source_commit when present, "
+            f"not mode/type {mode}/{object_type}: {raw_path}"
+        )
 
 
 def _read_blob(root: Path, commit: str, raw_path: str, *, label: str) -> bytes:
@@ -290,6 +299,18 @@ def prepare_review_inputs(
 
     inputs = legal / "inputs"
     records = legal / "records"
+    _assert_commit_directory_or_absent(
+        root,
+        source_commit,
+        "reviews/legal/inputs",
+        label="legal review input namespace in source_commit",
+    )
+    _assert_commit_directory_or_absent(
+        root,
+        source_commit,
+        "reviews/legal/records",
+        label="legal review records namespace in source_commit",
+    )
     if _lexists(inputs):
         _assert_real_directory(inputs, label="legal review input namespace")
     if _lexists(records):
@@ -300,9 +321,6 @@ def prepare_review_inputs(
     target = inputs / review_id
     record = records / f"{review_id}.json"
 
-    # A review ID is permanently consumed by either historical Git state or the
-    # current workspace. Check this before the cleanliness gate so rerunning an
-    # already-prepared ID produces the more useful consumed-ID error.
     if _history_path_exists(root, target_rel) or _lexists(target):
         raise ValueError(f"legal review input snapshot already exists: {target_rel}")
     if _history_path_exists(root, record_rel) or _lexists(record):
@@ -332,9 +350,6 @@ def prepare_review_inputs(
         inputs.mkdir(mode=0o755)
         _fsync_directory(legal)
 
-    # The checkout is a trusted isolated workspace by contract, but still fail
-    # closed if a cooperative process created either namespace after our first
-    # check.
     if _lexists(target) or _lexists(record):
         raise ValueError(f"review_id became consumed during preparation: {review_id}")
 
