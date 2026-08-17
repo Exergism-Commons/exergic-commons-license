@@ -151,18 +151,34 @@ def _verify_directory_binding(
         os.close(current_fd)
 
 
-def _open_directory_chain(root_fd: int, segments: list[str], *, label: str) -> int:
-    current_fd = os.dup(root_fd)
+def _open_bound_directory_chain(
+    root_fd: int, segments: list[str], *, label: str
+) -> tuple[list[int], list[tuple[int, str, os.stat_result]]]:
+    """Open a path chain while retaining every parent needed for revalidation."""
+
+    opened: list[int] = []
+    bindings: list[tuple[int, str, os.stat_result]] = []
+    parent_fd = root_fd
     try:
         for segment in segments:
-            next_fd = _open_directory_at(current_fd, segment, label=label)
-            assert next_fd is not None
-            os.close(current_fd)
-            current_fd = next_fd
-        return current_fd
+            child_fd = _open_directory_at(parent_fd, segment, label=label)
+            assert child_fd is not None
+            identity = os.fstat(child_fd)
+            bindings.append((parent_fd, segment, identity))
+            opened.append(child_fd)
+            parent_fd = child_fd
+        return opened, bindings
     except Exception:
-        os.close(current_fd)
+        for fd in reversed(opened):
+            os.close(fd)
         raise
+
+
+def _verify_directory_chain(
+    bindings: list[tuple[int, str, os.stat_result]], *, label: str
+) -> None:
+    for parent_fd, name, identity in bindings:
+        _verify_directory_binding(parent_fd, name, identity, label=label)
 
 
 def _stat_fingerprint(value: os.stat_result) -> tuple[int, int, int, int, int]:
@@ -186,8 +202,13 @@ def _read_all(fd: int) -> bytes:
 
 
 def _read_repository_file(root_fd: int, raw_path: str, *, label: str) -> bytes:
+    """Read a repository file while proving its entire path stayed canonical."""
+
     segments = _path_segments(raw_path, label=label)
-    parent_fd = _open_directory_chain(root_fd, segments[:-1], label=label)
+    opened_dirs, bindings = _open_bound_directory_chain(
+        root_fd, segments[:-1], label=label
+    )
+    parent_fd = opened_dirs[-1] if opened_dirs else root_fd
     file_fd: int | None = None
     try:
         try:
@@ -203,15 +224,32 @@ def _read_repository_file(root_fd: int, raw_path: str, *, label: str) -> bytes:
         before = os.fstat(file_fd)
         if not stat.S_ISREG(before.st_mode):
             raise ValueError(f"{label} must be a regular file: {raw_path}")
+
         data = _read_all(file_fd)
-        after = os.fstat(file_fd)
-        if _stat_fingerprint(before) != _stat_fingerprint(after):
+        after_read = os.fstat(file_fd)
+        if _stat_fingerprint(before) != _stat_fingerprint(after_read):
             raise OSError(f"{label} changed while it was being read: {raw_path}")
+
+        try:
+            entry = os.stat(
+                segments[-1], dir_fd=parent_fd, follow_symlinks=False
+            )
+        except FileNotFoundError:
+            raise OSError(f"{label} path disappeared during read: {raw_path}") from None
+        if not stat.S_ISREG(entry.st_mode) or not _same_inode(entry, after_read):
+            raise OSError(f"{label} file entry changed during read: {raw_path}")
+
+        _verify_directory_chain(bindings, label=f"{label} source directory")
+
+        final = os.fstat(file_fd)
+        if _stat_fingerprint(before) != _stat_fingerprint(final):
+            raise OSError(f"{label} changed before identity was finalized: {raw_path}")
         return data
     finally:
         if file_fd is not None:
             os.close(file_fd)
-        os.close(parent_fd)
+        for fd in reversed(opened_dirs):
+            os.close(fd)
 
 
 def _entry_exists(parent_fd: int, name: str) -> bool:
@@ -258,6 +296,7 @@ def _open_or_create_inputs(legal_fd: int) -> int:
 
     try:
         os.mkdir("inputs", mode=0o755, dir_fd=legal_fd)
+        os.fsync(legal_fd)
     except FileExistsError:
         pass
     inputs_fd = _open_directory_at(
@@ -293,6 +332,31 @@ def _write_frozen_file(directory_fd: int, filename: str, data: bytes) -> int:
     except Exception:
         os.close(fd)
         raise
+
+
+def _verify_frozen_entries(
+    directory_fd: int,
+    frozen_handles: list[tuple[str, int, bytes]],
+) -> None:
+    """Bind every frozen directory entry to its retained descriptor and bytes."""
+
+    for filename, file_fd, expected in frozen_handles:
+        held_before = os.fstat(file_fd)
+        if not stat.S_ISREG(held_before.st_mode):
+            raise OSError(f"frozen input handle is no longer regular: {filename}")
+        try:
+            entry = os.stat(filename, dir_fd=directory_fd, follow_symlinks=False)
+        except FileNotFoundError:
+            raise OSError(f"frozen input entry disappeared: {filename}") from None
+        if not stat.S_ISREG(entry.st_mode) or not _same_inode(entry, held_before):
+            raise OSError(f"frozen input entry changed: {filename}")
+
+        actual = _read_all(file_fd)
+        held_after = os.fstat(file_fd)
+        if _stat_fingerprint(held_before) != _stat_fingerprint(held_after):
+            raise OSError(f"frozen input changed during verification: {filename}")
+        if actual != expected:
+            raise OSError(f"frozen input bytes changed: {filename}")
 
 
 def _rename_noreplace(parent_fd: int, source: str, destination: str) -> None:
@@ -388,7 +452,7 @@ def prepare_review_inputs(
     records_fd: int | None = None
     inputs_fd: int | None = None
     snapshot_fd: int | None = None
-    frozen_file_fds: list[int] = []
+    frozen_file_fds: list[tuple[str, int, bytes]] = []
     published_name: str | None = None
     snapshot_identity: os.stat_result | None = None
     reviews_identity: os.stat_result | None = None
@@ -463,7 +527,9 @@ def prepare_review_inputs(
         snapshot_identity = os.fstat(snapshot_fd)
 
         for filename, data in frozen.values():
-            frozen_file_fds.append(_write_frozen_file(snapshot_fd, filename, data))
+            file_fd = _write_frozen_file(snapshot_fd, filename, data)
+            frozen_file_fds.append((filename, file_fd, data))
+        _verify_frozen_entries(snapshot_fd, frozen_file_fds)
         os.fsync(snapshot_fd)
 
         if _record_consumes_id(
@@ -477,6 +543,7 @@ def prepare_review_inputs(
                 f"legal review input snapshot appeared during preparation: {review_id}"
             )
 
+        _verify_frozen_entries(snapshot_fd, frozen_file_fds)
         _rename_noreplace(inputs_fd, temp_name, review_id)
         published_name = review_id
         os.fsync(inputs_fd)
@@ -490,6 +557,7 @@ def prepare_review_inputs(
         try:
             if not _same_inode(os.fstat(published_fd), snapshot_identity):
                 raise OSError("published legal-review snapshot identity changed")
+            _verify_frozen_entries(published_fd, frozen_file_fds)
         finally:
             os.close(published_fd)
 
@@ -516,6 +584,19 @@ def prepare_review_inputs(
             label="legal review input namespace",
         )
         _record_consumes_id(legal_fd, records_fd, records_identity, review_id)
+
+        final_fd = _open_directory_at(
+            inputs_fd,
+            review_id,
+            label="final legal review input snapshot",
+        )
+        assert final_fd is not None
+        try:
+            if not _same_inode(os.fstat(final_fd), snapshot_identity):
+                raise OSError("final legal-review snapshot identity changed")
+            _verify_frozen_entries(final_fd, frozen_file_fds)
+        finally:
+            os.close(final_fd)
 
         descriptor: dict[str, Any] = {
             "schema_version": 1,
@@ -577,7 +658,7 @@ def prepare_review_inputs(
             ) from cleanup_error
         raise
     finally:
-        for fd in frozen_file_fds:
+        for _, fd, _ in frozen_file_fds:
             try:
                 os.close(fd)
             except OSError:
