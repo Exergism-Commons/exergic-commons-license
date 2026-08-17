@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Reproducible calculator for the ECL formal Exergism analysis layer.
+"""Reproducible ECL application calculator for canonical Exergism v0.1.0.
 
-This tool performs mechanical calculations only. It does not assign ECL
-R/S/U/N outcomes and does not validate the underlying evidence.
+The formulas implemented here are an ECL application of the formal model pinned
+in ``exergism/upstream.json``. The calculator is diagnostic only: it never maps
+scores to ECL R/S/U/N outcomes and never substitutes for evidence or exact
+license-criterion review.
 """
 
 from __future__ import annotations
@@ -16,7 +18,8 @@ from typing import Any
 
 POSITIVE = ("P", "A", "V_ep", "L", "O", "U")
 PENALTY = ("C", "S", "R", "Ecol")
-ALL_VARS = POSITIVE + PENALTY + ("D_p",)
+CORE_VARS = POSITIVE + PENALTY + ("D_p",)
+ADVANCED_VARS = ("D_a", "I", "Lz", "G", "Rj")
 SCORING_STATES = {"scorable", "insufficient_evidence", "not_applicable"}
 
 
@@ -68,21 +71,11 @@ def validate_interval(raw: Any, label: str) -> dict[str, float]:
 
 def validate_profile(profile: dict[str, Any]) -> dict[str, float]:
     required_nonnegative = (
-        "pc",
-        "pr",
-        "pe",
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a5",
-        "b1",
-        "b2",
-        "b3",
-        "b4",
-        "b5",
-        "b6",
-        "lambda",
+        "pc", "pr", "pe",
+        "a1", "a2", "a3", "a4", "a5",
+        "b1", "b2", "b3", "b4", "b5", "b6",
+        "m1", "m2", "m3", "m4", "m5",
+        "r1", "r2", "r3",
     )
     out: dict[str, float] = {}
     for key in required_nonnegative:
@@ -93,42 +86,40 @@ def validate_profile(profile: dict[str, Any]) -> dict[str, float]:
         out[key] = number(profile.get(key), f"profile.{key}")
         if out[key] <= 0:
             raise InputError(f"profile.{key} must be > 0")
+    for key in ("S_crit", "C_crit"):
+        out[key] = unit(profile.get(key), f"profile.{key}")
+    if "lambda" in profile:
+        out["lambda"] = number(profile["lambda"], "profile.lambda")
+        if out["lambda"] < 0:
+            raise InputError("profile.lambda must be >= 0")
     return out
 
 
 def scalar_scores(values: dict[str, float], p: dict[str, float]) -> dict[str, float]:
-    P = values["P"]
-    A = values["A"]
-    V = values["V_ep"]
-    L = values["L"]
-    O = values["O"]
-    U = values["U"]
-    C = values["C"]
-    S = values["S"]
-    R = values["R"]
-    E = values["Ecol"]
+    P, A, V, L, O, U = (values[name] for name in POSITIVE)
+    C, S, R, E = (values[name] for name in PENALTY)
     D = values["D_p"]
 
     ex_b = (P * A * V * L * O * U) ** (1.0 / 6.0)
-    pen = p["pc"] * (C ** p["qC"]) + p["pr"] * R + p["pe"] * E
+    pen = p["pc"] * C**p["qC"] + p["pr"] * R + p["pe"] * E
     ex_r = ex_b / (1.0 + pen)
     e_i = D * (
         p["a1"] * (A * V)
         + p["a2"] * (L * O * U)
-        - p["a3"] * (S ** p["qS"])
-        - p["a4"] * (C ** p["qC"])
+        - p["a3"] * S**p["qS"]
+        - p["a4"] * C**p["qC"]
         - p["a5"] * E
     )
     x_h = ((P * O * A * U) ** (1.0 / 4.0)) / (1.0 + pen)
     b_0 = (
         p["b1"] * ex_b
         + p["b2"] * L
-        - p["b3"] * (C ** p["qC"])
-        - p["b4"] * (S ** p["qS"])
+        - p["b3"] * C**p["qC"]
+        - p["b4"] * S**p["qS"]
         - p["b5"] * R
         - p["b6"] * E
     )
-    return {
+    result = {
         "Ex_b": ex_b,
         "Pen": pen,
         "Ex_r": ex_r,
@@ -137,183 +128,202 @@ def scalar_scores(values: dict[str, float], p: dict[str, float]) -> dict[str, fl
         "B_0": b_0,
     }
 
+    if all(name in values for name in ADVANCED_VARS):
+        p_atr = (
+            p["r1"] * max(0.0, S - p["S_crit"]) ** 2
+            + p["r2"] * max(0.0, C - p["C_crit"]) ** 2
+            + p["r3"] * values["Rj"]
+        )
+        m_f = D * values["D_a"] * (
+            p["m1"] * values["I"]
+            + p["m2"] * values["Lz"]
+            + p["m3"] * values["G"]
+            + p["m4"] * C
+            + p["m5"] * S
+        )
+        result.update(
+            {
+                "P_atr": p_atr,
+                "E_i_adj": e_i - p_atr,
+                "M_f": m_f,
+            }
+        )
+    return result
+
 
 def project(intervals: dict[str, dict[str, float]], side: str) -> dict[str, float]:
     return {name: interval[side] for name, interval in intervals.items()}
 
 
-def conservative_bounds(
+def _core_extremes(
     intervals: dict[str, dict[str, float]], p: dict[str, float]
 ) -> dict[str, dict[str, float]]:
     central = scalar_scores(project(intervals, "central"), p)
-
-    # Formula-aware conservative bounds. These are epistemic envelopes, not
-    # probability intervals.
-    low_pos_high_pen = {
+    low_values = {
         **{name: intervals[name]["low"] for name in POSITIVE},
         "C": intervals["C"]["high"],
         "S": intervals["S"]["high"],
         "R": intervals["R"]["high"],
         "Ecol": intervals["Ecol"]["high"],
-        "D_p": intervals["D_p"]["high"],
+        "D_p": intervals["D_p"]["central"],
     }
-    high_pos_low_pen = {
+    high_values = {
         **{name: intervals[name]["high"] for name in POSITIVE},
         "C": intervals["C"]["low"],
         "S": intervals["S"]["low"],
         "R": intervals["R"]["low"],
         "Ecol": intervals["Ecol"]["low"],
-        "D_p": intervals["D_p"]["high"],
+        "D_p": intervals["D_p"]["central"],
     }
-
-    low_scores = scalar_scores(low_pos_high_pen, p)
-    high_scores = scalar_scores(high_pos_low_pen, p)
-
-    # E_i is multiplied by D_p and can cross zero. Evaluate D_p endpoints too.
-    e_candidates = []
-    b_candidates = []
-    for capacity_side in ("low", "high"):
-        for penalty_side in ("low", "high"):
-            for d_side in ("low", "high"):
-                vals = {
-                    **{
-                        name: intervals[name][capacity_side]
-                        for name in POSITIVE
-                    },
-                    **{
-                        name: intervals[name][penalty_side]
-                        for name in PENALTY
-                    },
-                    "D_p": intervals["D_p"][d_side],
-                }
-                scores = scalar_scores(vals, p)
-                e_candidates.append(scores["E_i"])
-                b_candidates.append(scores["B_0"])
+    low_scores = scalar_scores(low_values, p)
+    high_scores = scalar_scores(high_values, p)
 
     bounds: dict[str, dict[str, float]] = {}
-    for key in ("Ex_b", "Pen", "Ex_r", "X_h"):
-        if key == "Pen":
-            low = scalar_scores(
-                {
-                    **{
-                        name: intervals[name]["central"]
-                        for name in POSITIVE
-                    },
-                    "C": intervals["C"]["low"],
-                    "S": intervals["S"]["central"],
-                    "R": intervals["R"]["low"],
-                    "Ecol": intervals["Ecol"]["low"],
-                    "D_p": intervals["D_p"]["central"],
-                },
-                p,
-            )[key]
-            high = scalar_scores(
-                {
-                    **{
-                        name: intervals[name]["central"]
-                        for name in POSITIVE
-                    },
-                    "C": intervals["C"]["high"],
-                    "S": intervals["S"]["central"],
-                    "R": intervals["R"]["high"],
-                    "Ecol": intervals["Ecol"]["high"],
-                    "D_p": intervals["D_p"]["central"],
-                },
-                p,
-            )[key]
-        else:
-            low = low_scores[key]
-            high = high_scores[key]
+    for key in ("Ex_b", "Ex_r", "X_h", "B_0"):
         bounds[key] = {
-            "low": min(low, high),
+            "low": low_scores[key],
             "central": central[key],
-            "high": max(low, high),
+            "high": high_scores[key],
         }
 
+    pen_low = scalar_scores(
+        {**project(intervals, "central"), "C": intervals["C"]["low"], "R": intervals["R"]["low"], "Ecol": intervals["Ecol"]["low"]},
+        p,
+    )["Pen"]
+    pen_high = scalar_scores(
+        {**project(intervals, "central"), "C": intervals["C"]["high"], "R": intervals["R"]["high"], "Ecol": intervals["Ecol"]["high"]},
+        p,
+    )["Pen"]
+    bounds["Pen"] = {"low": pen_low, "central": central["Pen"], "high": pen_high}
+
+    e_candidates = []
+    for capacity_side, penalty_side, d_side in (
+        ("low", "high", "low"),
+        ("low", "high", "high"),
+        ("high", "low", "low"),
+        ("high", "low", "high"),
+    ):
+        values = {
+            **{name: intervals[name][capacity_side] for name in POSITIVE},
+            **{name: intervals[name][penalty_side] for name in PENALTY},
+            "D_p": intervals["D_p"][d_side],
+        }
+        e_candidates.append(scalar_scores(values, p)["E_i"])
     bounds["E_i"] = {
         "low": min(e_candidates),
         "central": central["E_i"],
         "high": max(e_candidates),
     }
-    bounds["B_0"] = {
-        "low": min(b_candidates),
-        "central": central["B_0"],
-        "high": max(b_candidates),
-    }
     return bounds
 
 
-def temporal_scores(
-    snapshots: Any, p: dict[str, float]
-) -> dict[str, dict[str, float]] | None:
-    if snapshots is None:
-        return None
-    if not isinstance(snapshots, list) or not snapshots:
-        raise InputError("temporal must be a non-empty array when supplied")
+def conservative_bounds(
+    intervals: dict[str, dict[str, float]], p: dict[str, float]
+) -> dict[str, dict[str, float]]:
+    bounds = _core_extremes({name: intervals[name] for name in CORE_VARS}, p)
+    if not all(name in intervals for name in ADVANCED_VARS):
+        return bounds
 
-    totals = {
-        "low": [0.0, 0.0],
-        "central": [0.0, 0.0],
-        "high": [0.0, 0.0],
-    }
+    central_values = project(intervals, "central")
+    central = scalar_scores(central_values, p)
+    p_atr_low = scalar_scores(
+        {**central_values, "S": intervals["S"]["low"], "C": intervals["C"]["low"], "Rj": intervals["Rj"]["low"]},
+        p,
+    )["P_atr"]
+    p_atr_high = scalar_scores(
+        {**central_values, "S": intervals["S"]["high"], "C": intervals["C"]["high"], "Rj": intervals["Rj"]["high"]},
+        p,
+    )["P_atr"]
+    bounds["P_atr"] = {"low": p_atr_low, "central": central["P_atr"], "high": p_atr_high}
+
+    low_e = bounds["E_i"]["low"] - p_atr_high
+    high_e = bounds["E_i"]["high"] - p_atr_low
+    bounds["E_i_adj"] = {"low": low_e, "central": central["E_i_adj"], "high": high_e}
+
+    mf_low_values = {name: intervals[name]["low"] for name in intervals}
+    mf_high_values = {name: intervals[name]["high"] for name in intervals}
+    mf_low = scalar_scores(mf_low_values, p)["M_f"]
+    mf_high = scalar_scores(mf_high_values, p)["M_f"]
+    bounds["M_f"] = {"low": mf_low, "central": central["M_f"], "high": mf_high}
+    return bounds
+
+
+def temporal_scores(raw: Any, p: dict[str, float]) -> dict[str, dict[str, float]] | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise InputError("temporal must be an object with lambda and snapshots")
+    decay_lambda = number(raw.get("lambda"), "temporal.lambda")
+    if decay_lambda < 0:
+        raise InputError("temporal.lambda must be >= 0")
+    snapshots = raw.get("snapshots")
+    if not isinstance(snapshots, list) or not snapshots:
+        raise InputError("temporal.snapshots must be a non-empty array")
+
+    benefit_totals = {side: 0.0 for side in ("low", "central", "high")}
+    damage_totals = {side: 0.0 for side in ("low", "central", "high")}
     for index, snapshot in enumerate(snapshots):
         if not isinstance(snapshot, dict):
-            raise InputError(f"temporal[{index}] must be an object")
-        t = number(snapshot.get("t"), f"temporal[{index}].t")
+            raise InputError(f"temporal.snapshots[{index}] must be an object")
+        t = number(snapshot.get("t"), f"temporal.snapshots[{index}].t")
         if t < 0:
-            raise InputError(f"temporal[{index}].t must be >= 0")
-        gamma = unit(snapshot.get("gamma"), f"temporal[{index}].gamma")
-        delta = unit(snapshot.get("delta"), f"temporal[{index}].delta")
+            raise InputError(f"temporal.snapshots[{index}].t must be >= 0")
+        gamma = unit(snapshot.get("gamma"), f"temporal.snapshots[{index}].gamma")
+        delta = unit(snapshot.get("delta"), f"temporal.snapshots[{index}].delta")
+        irr = unit(snapshot.get("irreversibility"), f"temporal.snapshots[{index}].irreversibility")
         raw_vars = snapshot.get("variables")
         if not isinstance(raw_vars, dict):
-            raise InputError(f"temporal[{index}].variables must be an object")
+            raise InputError(f"temporal.snapshots[{index}].variables must be an object")
+        required = CORE_VARS + ("Rj",)
         intervals = {
-            name: validate_interval(
-                raw_vars.get(name), f"temporal[{index}].variables.{name}"
-            )
-            for name in ALL_VARS
+            name: validate_interval(raw_vars.get(name), f"temporal.snapshots[{index}].variables.{name}")
+            for name in required
         }
-        decay = math.exp(-p["lambda"] * t)
-
+        decay = math.exp(-decay_lambda * t)
         for side in ("low", "central", "high"):
             values = project(intervals, side)
-            ex_b = scalar_scores(values, p)["Ex_b"]
-            benefit = (
-                ex_b + values["O"] + values["A"] * values["V_ep"]
+            base = scalar_scores(values, p)
+            p_atr = (
+                p["r1"] * max(0.0, values["S"] - p["S_crit"]) ** 2
+                + p["r2"] * max(0.0, values["C"] - p["C_crit"]) ** 2
+                + p["r3"] * values["Rj"]
+            )
+            benefit_totals[side] += (
+                base["Ex_b"] + values["O"] + values["A"] * values["V_ep"] + values["L"]
             ) * decay * gamma
-            destruction = (
-                values["S"] + values["Ecol"] + values["C"]
-            ) * decay * delta
-            totals[side][0] += benefit
-            totals[side][1] += destruction
+            damage_totals[side] += (
+                values["S"] ** p["qS"]
+                + values["Ecol"]
+                + values["C"] ** p["qC"]
+                + p_atr
+            ) * decay * delta * (1.0 + irr)
 
-    b_low = totals["low"][0]
-    b_c = totals["central"][0]
-    b_high = totals["high"][0]
-    d_low = totals["low"][1]
-    d_c = totals["central"][1]
-    d_high = totals["high"][1]
     return {
-        "B_acc": {"low": b_low, "central": b_c, "high": b_high},
-        "D_acc": {"low": d_low, "central": d_c, "high": d_high},
+        "B_acc": {
+            "low": benefit_totals["low"],
+            "central": benefit_totals["central"],
+            "high": benefit_totals["high"],
+        },
+        "D_acc": {
+            "low": damage_totals["low"],
+            "central": damage_totals["central"],
+            "high": damage_totals["high"],
+        },
         "N_t": {
-            "low": b_low - d_high,
-            "central": b_c - d_c,
-            "high": b_high - d_low,
+            "low": benefit_totals["low"] - damage_totals["high"],
+            "central": benefit_totals["central"] - damage_totals["central"],
+            "high": benefit_totals["high"] - damage_totals["low"],
         },
     }
 
 
-def calculate(
-    assessment: dict[str, Any], profile: dict[str, Any]
-) -> dict[str, Any]:
+def calculate(assessment: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
     state = assessment.get("scoring_status")
     if state not in SCORING_STATES:
         raise InputError(
-            "assessment.scoring_status must be one of: "
-            + ", ".join(sorted(SCORING_STATES))
+            "assessment.scoring_status must be one of: " + ", ".join(sorted(SCORING_STATES))
         )
-
+    p = validate_profile(profile)
     result: dict[str, Any] = {
         "assessment_id": assessment.get("assessment_id"),
         "entity": assessment.get("entity"),
@@ -321,29 +331,42 @@ def calculate(
         "scoring_status": state,
         "profile": profile.get("name"),
         "profile_status": profile.get("status"),
+        "context": profile.get("context"),
+        "upstream_release": profile.get("upstream_release"),
         "legal_effect": "none",
         "tier_mapping": "forbidden",
     }
-
     if state != "scorable":
-        result["reason"] = assessment.get("reason")
-        result["scores"] = None
-        result["temporal"] = None
+        result.update({"reason": assessment.get("reason"), "scores": None, "temporal": None})
         return result
 
     raw_vars = assessment.get("variables")
     if not isinstance(raw_vars, dict):
-        raise InputError(
-            "assessment.variables must be an object for scorable assessments"
-        )
-
+        raise InputError("assessment.variables must be an object for scorable assessments")
     intervals = {
-        name: validate_interval(
-            raw_vars.get(name), f"assessment.variables.{name}"
-        )
-        for name in ALL_VARS
+        name: validate_interval(raw_vars.get(name), f"assessment.variables.{name}")
+        for name in CORE_VARS
     }
-    p = validate_profile(profile)
+    advanced_present = [name for name in ADVANCED_VARS if name in raw_vars]
+    if advanced_present and len(advanced_present) != len(ADVANCED_VARS):
+        missing = sorted(set(ADVANCED_VARS) - set(advanced_present))
+        raise InputError(
+            "advanced Exergism variables must be supplied as a complete set; missing: "
+            + ", ".join(missing)
+        )
+    if len(advanced_present) == len(ADVANCED_VARS):
+        intervals.update(
+            {
+                name: validate_interval(raw_vars.get(name), f"assessment.variables.{name}")
+                for name in ADVANCED_VARS
+            }
+        )
+        result["formal_completeness"] = "canonical-static-complete"
+        result["missing_canonical_variables"] = []
+    else:
+        result["formal_completeness"] = "core-only"
+        result["missing_canonical_variables"] = list(ADVANCED_VARS)
+
     result["scores"] = conservative_bounds(intervals, p)
     result["temporal"] = temporal_scores(assessment.get("temporal"), p)
     return result
@@ -355,7 +378,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--profile",
         type=Path,
-        default=Path("exergism/profiles/reference-balanced-v2.json"),
+        required=True,
+        help="Explicit pinned Exergism context profile; no context is guessed.",
     )
     parser.add_argument("--pretty", action="store_true")
     args = parser.parse_args(argv)
@@ -368,12 +392,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    json.dump(
-        result,
-        sys.stdout,
-        indent=2 if args.pretty else None,
-        sort_keys=True,
-    )
+    json.dump(result, sys.stdout, indent=2 if args.pretty else None, sort_keys=True)
     sys.stdout.write("\n")
     return 0
 
