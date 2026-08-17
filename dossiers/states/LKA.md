@@ -56,6 +56,14 @@ Repeal of the PTA and adoption/implementation of rights-compliant replacement la
 - https://www.hrcsl.lk/documentation/statements-general-recommendations/
 - https://moj.gov.lk/index.php/en/departments-institutes/institutions/office-on-missing-persons
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The Amnesty, UN Special Procedures, HRCSL and OMP locators above preserve the tranche's current PTA/detention evidence and reform/remediation context.
+- The proposed Counter Terrorism Protection replacement framework remains **legal/reform context and counter-evidence**, not a prohibited project merely because historical reviewers identified rights risks. Only enacted or materially implemented coercive use can enter active ECL scope.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-02-statutory-agency.yml` controls current renderability. It freezes only **Sri Lanka Police — Counter Terrorist Investigation Division (CTID)** in actual PTA/counterterrorism detention, investigation or surveillance of protected journalism, memorialisation or defender activity where the specific use independently satisfies ECL criteria. Draft replacement legislation, HRCSL/NPM, OMP and courts/remediation are excluded; prison torture/custody-death and security/intelligence harassment outside an attributable CTID/PTA project remain residual unfrozen scope.
+
+## 10. Procedural history
 
 Issue #166 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`
