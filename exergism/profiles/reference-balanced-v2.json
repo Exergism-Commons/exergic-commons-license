@@ -1,7 +1,7 @@
 {
   "name": "reference-balanced-v2",
-  "status": "mechanical-reference-only",
-  "notes": "Equalized reference weights for regression tests and pilot sensitivity only. These values are not canonical Exergism constants and must not be used as a score-to-tier rule.",
+  "status": "deprecated-legacy-mechanical-reference",
+  "notes": "Legacy ECL regression profile created before the recovered canonical Exergism formal model was available. It is retained only for historical/regression comparison and MUST NOT be treated as Exergism-canonical, used as the default calculator profile, or used to justify governance outcomes.",
   "pc": 0.3333333333333333,
   "pr": 0.3333333333333333,
   "pe": 0.3333333333333333,
