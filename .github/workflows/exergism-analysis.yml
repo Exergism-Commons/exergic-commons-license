@@ -31,11 +31,18 @@ jobs:
           python-version: "3.12"
       - name: Unit tests
         run: python -m unittest tests/test_exergic_analysis.py tests/test_exergism_upstream.py
-      - name: Validate all committed assessments
+      - name: Validate all committed assessments against every pinned upstream context
         shell: bash
         run: |
           set -euo pipefail
+          profiles=(
+            exergism/profiles/upstream-transition-v0.1.0.json
+            exergism/profiles/upstream-liberated-society-v0.1.0.json
+            exergism/profiles/upstream-mundane-interaction-v0.1.0.json
+          )
           for assessment in exergism/assessments/*.json; do
-            echo "checking ${assessment}"
-            python tools/exergic_analysis.py "${assessment}" --pretty >/dev/null
+            for profile in "${profiles[@]}"; do
+              echo "checking ${assessment} with ${profile}"
+              python tools/exergic_analysis.py "${assessment}" --profile "${profile}" --pretty >/dev/null
+            done
           done
