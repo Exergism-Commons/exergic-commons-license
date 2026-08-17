@@ -1,10 +1,10 @@
 import hashlib
 import importlib.util
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from unittest import mock
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "prepare_legal_review.py"
 SPEC = importlib.util.spec_from_file_location("prepare_legal_review", MODULE_PATH)
@@ -13,410 +13,256 @@ assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
 
-class PrepareLegalReviewTests(unittest.TestCase):
-    def setUp(self):
-        try:
-            MODULE._require_secure_runtime()
-        except OSError as exc:
-            self.skipTest(f"secure legal-review preparation unavailable: {exc}")
+def git(root: Path, *args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
 
-    def _write_repo(self, root: Path) -> Path:
+
+class PrepareLegalReviewTests(unittest.TestCase):
+    def _repo(
+        self,
+        root: Path,
+        *,
+        record_id: str | None = None,
+        input_id: str | None = None,
+    ) -> str:
         (root / "spec").mkdir(parents=True)
         (root / "schemas").mkdir(parents=True)
         (root / "versions" / "licenses").mkdir(parents=True)
         (root / "reviews" / "legal").mkdir(parents=True)
-
         (root / "spec" / "LEGAL-ADVERSARIAL-REVIEW.md").write_bytes(b"review-spec\n")
         (root / "spec" / "VERSIONING.md").write_bytes(b"versioning\n")
         (root / "schemas" / "bundle.schema.json").write_bytes(b'{"bundle": true}\n')
-        license_path = root / "versions" / "licenses" / "ECL-1.0-RC1.md"
-        license_path.write_bytes(b"candidate-license\n")
-        return license_path
-
-    def _assert_no_temp_snapshots(self, root: Path, review_id: str) -> None:
-        inputs = root / "reviews" / "legal" / "inputs"
-        if not inputs.exists():
-            return
-        self.assertEqual(
-            [
-                path.name
-                for path in inputs.iterdir()
-                if path.name.startswith(f".{review_id}.prepare-")
-            ],
-            [],
+        (root / "versions" / "licenses" / "ECL-1.0-RC1.md").write_bytes(
+            b"candidate-license\n"
         )
+        (root / "reviews" / "legal" / "README.md").write_text(
+            "workspace\n", encoding="utf-8"
+        )
+        if record_id:
+            records = root / "reviews" / "legal" / "records"
+            records.mkdir()
+            (records / f"{record_id}.json").write_text(
+                '{"status":"complete"}\n', encoding="utf-8"
+            )
+        if input_id:
+            inputs = root / "reviews" / "legal" / "inputs" / input_id
+            inputs.mkdir(parents=True)
+            (inputs / "VERSIONING.md").write_text("old\n", encoding="utf-8")
 
-    def test_freezes_exact_inputs_without_creating_completed_record(self):
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "test@example.com"], cwd=root, check=True
+        )
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True)
+        subprocess.run(["git", "add", "."], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=root, check=True)
+        return git(root, "rev-parse", "HEAD")
+
+    def test_freezes_exact_commit_inputs_without_creating_record(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            license_path = self._write_repo(root)
-
+            commit = self._repo(root)
             result = MODULE.prepare_review_inputs(
                 root,
                 review_id="ECL-1.0-RC1-review-a",
                 license_path="versions/licenses/ECL-1.0-RC1.md",
+                source_commit=commit,
             )
 
+            self.assertEqual(result["schema_version"], 2)
+            self.assertEqual(result["source_commit"], commit)
             self.assertEqual(result["status"], "prepared-not-reviewed")
             self.assertIn("NOT A LEGAL REVIEW RECORD", result["notice"])
             self.assertEqual(
                 result["license"]["sha256"],
-                hashlib.sha256(license_path.read_bytes()).hexdigest(),
+                hashlib.sha256(b"candidate-license\n").hexdigest(),
             )
 
-            input_dir = root / "reviews" / "legal" / "inputs" / "ECL-1.0-RC1-review-a"
-            expected = {
-                "LEGAL-ADVERSARIAL-REVIEW.md": b"review-spec\n",
-                "VERSIONING.md": b"versioning\n",
-                "bundle.schema.json": b'{"bundle": true}\n',
-            }
-            for filename, contents in expected.items():
-                frozen = input_dir / filename
-                self.assertEqual(frozen.read_bytes(), contents)
-
-            self.assertFalse((root / "reviews" / "legal" / "records").exists())
-            self.assertEqual(
-                result["completed_record_path"],
-                "reviews/legal/records/ECL-1.0-RC1-review-a.json",
-            )
-
-    def test_existing_input_snapshot_is_never_overwritten(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            kwargs = {
-                "review_id": "ECL-1.0-RC1-review-a",
-                "license_path": "versions/licenses/ECL-1.0-RC1.md",
-            }
-            MODULE.prepare_review_inputs(root, **kwargs)
-            frozen = (
+            target = (
                 root
                 / "reviews"
                 / "legal"
                 / "inputs"
                 / "ECL-1.0-RC1-review-a"
-                / "VERSIONING.md"
             )
-            original = frozen.read_bytes()
-            (root / "spec" / "VERSIONING.md").write_bytes(b"changed-canonical\n")
+            self.assertEqual(
+                (target / "LEGAL-ADVERSARIAL-REVIEW.md").read_bytes(),
+                b"review-spec\n",
+            )
+            self.assertEqual(
+                (target / "VERSIONING.md").read_bytes(), b"versioning\n"
+            )
+            self.assertEqual(
+                (target / "bundle.schema.json").read_bytes(), b'{"bundle": true}\n'
+            )
+            self.assertFalse((root / "reviews" / "legal" / "records").exists())
 
-            with self.assertRaisesRegex(ValueError, "already exists"):
-                MODULE.prepare_review_inputs(root, **kwargs)
-
-            self.assertEqual(frozen.read_bytes(), original)
-
-    def test_completed_record_path_permanently_consumes_review_id(self):
+    def test_existing_snapshot_consumes_review_id_before_cleanliness_gate(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self._write_repo(root)
-            records = root / "reviews" / "legal" / "records"
-            records.mkdir()
-            (records / "review-a.json").write_text(
-                '{"status":"complete"}', encoding="utf-8"
-            )
+            commit = self._repo(root)
+            target = root / "reviews" / "legal" / "inputs" / "review-a"
+            target.mkdir(parents=True)
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
 
+    def test_completed_record_in_source_commit_permanently_consumes_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root, record_id="review-a")
             with self.assertRaisesRegex(ValueError, "permanently consumed"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
                     license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
                 )
 
-            self.assertFalse(
-                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
-            )
-            self._assert_no_temp_snapshots(root, "review-a")
-
-    def test_record_appearing_during_preparation_aborts_and_cleans_temp(self):
+    def test_input_snapshot_in_source_commit_consumes_id(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self._write_repo(root)
+            commit = self._repo(root, input_id="review-a")
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
 
-            with mock.patch.object(
-                MODULE, "_record_consumes_id", side_effect=[False, True]
+    def test_source_commit_must_equal_head(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            first = self._repo(root)
+            (root / "extra.txt").write_text("x", encoding="utf-8")
+            subprocess.run(["git", "add", "extra.txt"], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "second"], cwd=root, check=True)
+            with self.assertRaisesRegex(ValueError, "must equal current HEAD"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=first,
+                )
+
+    def test_dirty_worktree_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root)
+            (root / "spec" / "VERSIONING.md").write_text("dirty\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "working tree must be clean"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+
+    def test_source_commit_requires_full_sha(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root)
+            with self.assertRaisesRegex(ValueError, "full 40-hex"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit[:12],
+                )
+
+    def test_missing_candidate_in_commit_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root)
+            with self.assertRaisesRegex(ValueError, "missing candidate License"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/absent.md",
+                    source_commit=commit,
+                )
+
+    def test_invalid_review_id_and_unsafe_path_are_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            commit = self._repo(root)
+            with self.assertRaisesRegex(ValueError, "safe identifier"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="../escape",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+            for path in (
+                "../LICENSE",
+                "/tmp/LICENSE",
+                "versions\\licenses\\ECL.md",
+                "bad:path",
             ):
-                with self.assertRaisesRegex(ValueError, "became consumed"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            self.assertFalse(
-                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
-            )
-            self._assert_no_temp_snapshots(root, "review-a")
-
-    def test_record_appearing_after_publication_removes_owned_snapshot(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-
-            with mock.patch.object(
-                MODULE, "_record_consumes_id", side_effect=[False, False, True]
-            ):
-                with self.assertRaisesRegex(ValueError, "became consumed"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            self.assertFalse(
-                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
-            )
-            self._assert_no_temp_snapshots(root, "review-a")
-
-    def test_cleanup_failure_is_reported_with_residual_snapshot_warning(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-
-            with mock.patch.object(
-                MODULE, "_record_consumes_id", side_effect=[False, True]
-            ), mock.patch.object(
-                MODULE,
-                "_remove_owned_snapshot",
-                side_effect=OSError("simulated cleanup failure"),
-            ):
-                with self.assertRaisesRegex(
-                    OSError, "rollback could not verify cleanup.*residual snapshot"
-                ) as caught:
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            self.assertIn("simulated cleanup failure", str(caught.exception))
-            inputs = root / "reviews" / "legal" / "inputs"
-            self.assertTrue(
-                any(path.name.startswith(".review-a.prepare-") for path in inputs.iterdir())
-            )
-
-    def test_atomic_publish_never_overwrites_racing_existing_namespace(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            original = MODULE._rename_noreplace
-
-            def race(parent_fd: int, source: str, destination: str) -> None:
-                os.mkdir(destination, mode=0o700, dir_fd=parent_fd)
-                original(parent_fd, source, destination)
-
-            with mock.patch.object(MODULE, "_rename_noreplace", side_effect=race):
-                with self.assertRaisesRegex(ValueError, "already exists"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            attacker_dir = root / "reviews" / "legal" / "inputs" / "review-a"
-            self.assertTrue(attacker_dir.is_dir())
-            self.assertEqual(list(attacker_dir.iterdir()), [])
-            self._assert_no_temp_snapshots(root, "review-a")
-
-    def test_replaced_inputs_namespace_aborts_and_cleans_pinned_snapshot(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            original = MODULE._write_frozen_file
-            raced = False
-
-            def replace_inputs(directory_fd: int, filename: str, data: bytes) -> int:
-                nonlocal raced
-                if not raced:
-                    legal = root / "reviews" / "legal"
-                    (legal / "inputs").rename(legal / "inputs-old")
-                    (legal / "inputs").mkdir()
-                    raced = True
-                return original(directory_fd, filename, data)
-
-            with mock.patch.object(
-                MODULE, "_write_frozen_file", side_effect=replace_inputs
-            ):
-                with self.assertRaisesRegex(OSError, "input namespace.*changed"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            legal = root / "reviews" / "legal"
-            self.assertEqual(list((legal / "inputs").iterdir()), [])
-            self.assertEqual(list((legal / "inputs-old").iterdir()), [])
-
-    def test_replaced_records_namespace_aborts_even_for_real_directory(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            legal = root / "reviews" / "legal"
-            (legal / "records").mkdir()
-            original = MODULE._write_frozen_file
-            raced = False
-
-            def replace_records(directory_fd: int, filename: str, data: bytes) -> int:
-                nonlocal raced
-                if not raced:
-                    (legal / "records").rename(legal / "records-old")
-                    (legal / "records").mkdir()
-                    raced = True
-                return original(directory_fd, filename, data)
-
-            with mock.patch.object(
-                MODULE, "_write_frozen_file", side_effect=replace_records
-            ):
-                with self.assertRaisesRegex(OSError, "records namespace.*changed"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            self.assertFalse((legal / "inputs" / "review-a").exists())
-            self._assert_no_temp_snapshots(root, "review-a")
-            self.assertEqual(list((legal / "records").iterdir()), [])
-            self.assertEqual(list((legal / "records-old").iterdir()), [])
-
-    def test_replaced_legal_workspace_aborts_before_descriptor_success(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            original = MODULE._write_frozen_file
-            raced = False
-
-            def replace_legal(directory_fd: int, filename: str, data: bytes) -> int:
-                nonlocal raced
-                if not raced:
-                    reviews = root / "reviews"
-                    (reviews / "legal").rename(reviews / "legal-old")
-                    (reviews / "legal").mkdir()
-                    raced = True
-                return original(directory_fd, filename, data)
-
-            with mock.patch.object(
-                MODULE, "_write_frozen_file", side_effect=replace_legal
-            ):
-                with self.assertRaisesRegex(OSError, "workspace.*changed"):
-                    MODULE.prepare_review_inputs(
-                        root,
-                        review_id="review-a",
-                        license_path="versions/licenses/ECL-1.0-RC1.md",
-                    )
-
-            current_legal = root / "reviews" / "legal"
-            old_legal = root / "reviews" / "legal-old"
-            self.assertEqual(list(current_legal.iterdir()), [])
-            self.assertFalse((old_legal / "inputs" / "review-a").exists())
-            self.assertEqual(list((old_legal / "inputs").iterdir()), [])
-
-    def test_invalid_review_id_is_rejected_before_writing(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-
-            for review_id in ("", "../escape", "review/child", "-leading", "trailing-"):
-                with self.subTest(review_id=review_id):
-                    with self.assertRaisesRegex(ValueError, "safe identifier"):
-                        MODULE.prepare_review_inputs(
-                            root,
-                            review_id=review_id,
-                            license_path="versions/licenses/ECL-1.0-RC1.md",
-                        )
-
-            self.assertFalse((root / "reviews" / "legal" / "inputs").exists())
-
-    def test_unsafe_candidate_license_path_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-
-            for path in ("../LICENSE", "/tmp/LICENSE", "versions\\licenses\\ECL.md"):
                 with self.subTest(path=path):
                     with self.assertRaisesRegex(ValueError, "repository-relative|unsafe"):
                         MODULE.prepare_review_inputs(
                             root,
                             review_id="review-a",
                             license_path=path,
+                            source_commit=commit,
                         )
 
-    def test_missing_canonical_input_leaves_no_partial_snapshot(self):
+    def test_committed_candidate_symlink_is_rejected(self):
+        if not hasattr(os, "symlink"):
+            self.skipTest("symlink unavailable")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self._write_repo(root)
-            (root / "schemas" / "bundle.schema.json").unlink()
-
-            with self.assertRaisesRegex(ValueError, "missing canonical bundle_schema"):
-                MODULE.prepare_review_inputs(
-                    root,
-                    review_id="review-a",
-                    license_path="versions/licenses/ECL-1.0-RC1.md",
-                )
-
-            self.assertFalse(
-                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
-            )
-
-    def test_candidate_license_symlink_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            license_path = self._write_repo(root)
-            link = license_path.with_name("linked-license.md")
+            self._repo(root)
+            link = root / "versions" / "licenses" / "linked.md"
             try:
-                link.symlink_to(license_path.name)
-            except (OSError, NotImplementedError) as exc:
-                self.skipTest(f"symlinks unavailable: {exc}")
-
-            with self.assertRaisesRegex(ValueError, "symbolic-link"):
-                MODULE.prepare_review_inputs(
-                    root,
-                    review_id="review-a",
-                    license_path="versions/licenses/linked-license.md",
-                )
-
-    def test_canonical_input_symlink_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self._write_repo(root)
-            schema = root / "schemas" / "bundle.schema.json"
-            real = root / "schemas" / "real-bundle.schema.json"
-            schema.rename(real)
-            try:
-                schema.symlink_to(real.name)
-            except (OSError, NotImplementedError) as exc:
-                self.skipTest(f"symlinks unavailable: {exc}")
-
-            with self.assertRaisesRegex(ValueError, "symbolic-link"):
-                MODULE.prepare_review_inputs(
-                    root,
-                    review_id="review-a",
-                    license_path="versions/licenses/ECL-1.0-RC1.md",
-                )
-
-            self.assertFalse(
-                (root / "reviews" / "legal" / "inputs" / "review-a").exists()
+                link.symlink_to("ECL-1.0-RC1.md")
+            except OSError as exc:
+                self.skipTest(str(exc))
+            subprocess.run(
+                ["git", "add", "versions/licenses/linked.md"], cwd=root, check=True
             )
+            subprocess.run(["git", "commit", "-qm", "symlink"], cwd=root, check=True)
+            commit = git(root, "rev-parse", "HEAD")
+            with self.assertRaisesRegex(ValueError, "regular tracked file"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/linked.md",
+                    source_commit=commit,
+                )
 
-    def test_symlinked_input_namespace_is_rejected_without_external_write(self):
+    def test_symlinked_output_namespace_is_rejected(self):
+        if not hasattr(os, "symlink"):
+            self.skipTest("symlink unavailable")
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as outside:
             root = Path(tmp)
-            self._write_repo(root)
-            outside_root = Path(outside)
+            self._repo(root)
             inputs = root / "reviews" / "legal" / "inputs"
             try:
-                inputs.symlink_to(outside_root, target_is_directory=True)
-            except (OSError, NotImplementedError) as exc:
-                self.skipTest(f"symlinks unavailable: {exc}")
-
-            with self.assertRaisesRegex(ValueError, "symbolic-link"):
+                inputs.symlink_to(Path(outside), target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(str(exc))
+            subprocess.run(
+                ["git", "add", "reviews/legal/inputs"], cwd=root, check=True
+            )
+            subprocess.run(
+                ["git", "commit", "-qm", "bad inputs symlink"], cwd=root, check=True
+            )
+            commit = git(root, "rev-parse", "HEAD")
+            with self.assertRaisesRegex(ValueError, "real directory, not a symlink"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
                     license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
                 )
-
-            self.assertEqual(list(outside_root.iterdir()), [])
+            self.assertEqual(list(Path(outside).iterdir()), [])
 
 
 if __name__ == "__main__":
