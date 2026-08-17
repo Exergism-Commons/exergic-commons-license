@@ -62,7 +62,16 @@ The Public Defender, Constitutional Court, genuinely independent prosecution/acc
 - https://www.coe.int/en/web/commissioner/-/georgia-council-of-europe-commissioner-calls-for-accountability-of-law-enforcement-and-expresses-concerns-regarding-mounting-restrictions-on-democratic-freedoms
 - https://www.ombudsman.ge/eng/191018050024siakhleebi/sakhalkho-damtsveli-shekrebebisa-da-manifestatsiebis-chatarebis-tsestan-dakavshirebul-akrdzalvebsa-da-pasukhismgeblobis-normebs-sakonstitutsio-sasamartloshi-asachivrebs
 - https://www.ombudsman.ge/eng/akhali-ambebi/sakonstitutsio-sasamartlom-daakmaqofila-sakhalkho-damtsvelis-konstitutsiuri-sarcheli-idzulebiti-fsikiatriuli-mkurnalobastan-dakavshirebit
+- https://www.coe.int/en/web/venice-commission/georgia
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #63 · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-03.md` and `../../reviews/2026/adversarial/scoped/tranche-10.md` (cutoff 2026-08-11). Public provenance: issue #63. Later consistency controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and `../../reviews/2026/consistency/schedule-readiness.md`.
+
+- **Status:** absorbed / already represented. The initial adjudication classified Georgia as whole-State `R`; state-level tranche 3 produced the historical **`R → S` correction** after crediting the Public Defender, Constitutional Court and actual police-accountability proceedings. Scoped tranche 10 re-tested and upheld that narrowed `S`; the later ECL 0.2 State Delta retained it without tier change.
+- The issue #63 comment preserves the same `R → S` reasoning but references a legacy review filename. The surviving canonical historical record is `state-level/tranche-03.md`; no dead filename is required to reconstruct the current dossier.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-16a-geo-freeze.yml` controls current renderability and freezes only the **implementation of the 4 March 2026 amendments identified in Venice Commission Opinion 1291/2026**, limited to implementation materially burdening protected association, independent civic activity, media activity or peaceful political participation. Other protest, prosecution and media-control scope remains governance-only until separately frozen. The Venice Commission locator above is statutory/project-identity provenance for that boundary, not proof that every implementation is prohibited conduct.
+
+## 10. Procedural history
+
+Issue #63 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-03.md` · `../../reviews/2026/adversarial/scoped/tranche-10.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md`
