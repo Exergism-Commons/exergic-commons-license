@@ -53,6 +53,14 @@ Compliance with judicial release orders; independent torture investigations/pros
 - https://www.un.org/unispal/document/ohchr-palestinian-authorities-must-stop-practices-arbitrary-detention-torture-and-ill-treatment-en-ar/
 - https://palestine.un.org/en/node/8760
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-07.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The July 2026 OHCHR locator and the tranche's arbitrary-detention, torture/ill-treatment, judicial-release-order and protected-journalism/dissent propositions are represented directly above.
+- The historical adjudication's attribution split is preserved as a substantive boundary: this State dossier concerns Palestinian Authority conduct in the West Bank. Hamas and other de facto/non-State armed structures are not imported into the PA scope by geographic or political association.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-18a-pse-freeze.yml` controls current renderability. The frozen subset is the **Crime Prevention Act No. 7 of 1954 post-2023 detention process**, limited to continued West Bank use of the post-ruling detention workflow identified by the January 2023 Supreme Constitutional Court ruling and July 2026 OHCHR record. Other PA security, intelligence, prosecution, torture or dissent-repression scope remains governance-only until separately frozen.
+
+## 10. Procedural history
 
 Issue #133 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-07.md`
