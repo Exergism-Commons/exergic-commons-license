@@ -50,8 +50,17 @@ Independent investigation/remedy of retaliation cases, cessation of surveillance
 - https://spcommreports.ohchr.org/TmSearch/SearchCode?code=MAR+3%2F2022%3B+MAR+3%2F2025%3B+MAR+5%2F2025%3B+MAR+1%2F2026%3B+MAR+2%2F2026
 - https://justice.gov.ma/2026/05/09/
 - https://justice.gov.ma/2026/04/22/
+- https://justice.gov.ma/2026/03/19/15475/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-- Discussion: issue #116
-- Adversarial review: `../../reviews/2026/adversarial/state-level/tranche-01.md`
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-01.md` (cutoff 2026-08-11). Public provenance: issue #116. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `S` freeze.
+
+- **Status:** absorbed, with historical counter-evidence locator restored. State-level tranche 1 **UPHELD `S`** after crediting criminal-procedure reform, Justice Ministry/CNDH victim-protection cooperation and royal pardons while finding that those general reforms did not specifically remediate the Western Sahara/dissent conduct.
+- The Justice Ministry 19 March 2026 locator above was preserved by tranche 1 but omitted from the shorter canonical source list. It is restored as **reform/counter-evidence provenance**, not as proof of the prohibited conduct. The UN Special Procedures locators remain the proposition-specific conduct baseline.
+- The issue #116 comment records the same result but references the legacy `ADVERSARIAL-REVIEW-2026.md`; the surviving historical record is `state-level/tranche-01.md`.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-11b-mar-freeze.yml` controls current renderability and freezes only the **M'hamed Hali professional-exclusion project — MAR 2/2026**, to the extent the continued exclusion from legal practice is materially maintained as retaliation for protected expression/self-determination advocacy. Moroccan courts, bar associations, intelligence or the legal profession generally, draft legislation, and independent remediation are excluded; other Sahrawi surveillance/policing/prosecution scope remains governance-only until separately frozen.
+
+## 10. Procedural history
+
+Issue #116 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-01.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-s-freezes/batch-11b-mar-freeze.yml`
