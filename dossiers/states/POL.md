@@ -54,6 +54,14 @@ Repeal/non-use of the asylum-suspension mechanism, individualized non-refoulemen
 - https://www.amnesty.org/en/documents/eur37/9322/2025/en/
 - https://www.amnesty.org.pl/piatka-z-hajnowki-prawomocnie-uniewinniona/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/scoped/tranche-08.md` (cutoff 2026-08-11).
+
+- **Status:** absorbed / already represented. The operative-measure, buffer-zone, Amnesty pushback and Hajnówka acquittal locators are preserved above, so the tranche is no longer needed to reconstruct the current Poland determination.
+- The Hajnówka acquittal is counter-evidence limiting attribution; it is not evidence for the prohibited border project and does not convert humanitarian actors or the justice system into restricted parties.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/promoted-ready-02.yml` is the controlling later renderability surface. It promotes only the **Polish Border Guard / Interior Belarus-border asylum-suspension and pushback project**, limited to implementation materially denying or bypassing individualized protection/non-refoulement review or obstructing independent monitoring. Courts, prosecutorial remediation, humanitarian assistance and unrelated migration/public-order functions remain excluded.
+
+## 10. Procedural history
 
 Issue #139 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/scoped/tranche-08.md`
