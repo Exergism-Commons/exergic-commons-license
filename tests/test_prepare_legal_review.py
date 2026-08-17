@@ -89,20 +89,11 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 result["license"]["sha256"],
                 hashlib.sha256(b"candidate-license\n").hexdigest(),
             )
-            target = (
-                root
-                / "reviews"
-                / "legal"
-                / "inputs"
-                / "ECL-1.0-RC1-review-a"
-            )
+            target = root / "reviews" / "legal" / "inputs" / "ECL-1.0-RC1-review-a"
             self.assertEqual(
-                (target / "LEGAL-ADVERSARIAL-REVIEW.md").read_bytes(),
-                b"review-spec\n",
+                (target / "LEGAL-ADVERSARIAL-REVIEW.md").read_bytes(), b"review-spec\n"
             )
-            self.assertEqual(
-                (target / "VERSIONING.md").read_bytes(), b"versioning\n"
-            )
+            self.assertEqual((target / "VERSIONING.md").read_bytes(), b"versioning\n")
             self.assertEqual(
                 (target / "bundle.schema.json").read_bytes(), b'{"bundle": true}\n'
             )
@@ -156,11 +147,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 check=True,
                 stdout=subprocess.PIPE,
             )
-            subprocess.run(
-                ["git", "commit", "-qm", "delete historical snapshot"],
-                cwd=root,
-                check=True,
-            )
+            subprocess.run(["git", "commit", "-qm", "delete historical snapshot"], cwd=root, check=True)
             commit = git(root, "rev-parse", "HEAD")
             with self.assertRaisesRegex(ValueError, "already exists"):
                 MODULE.prepare_review_inputs(
@@ -180,11 +167,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 check=True,
                 stdout=subprocess.PIPE,
             )
-            subprocess.run(
-                ["git", "commit", "-qm", "delete historical record"],
-                cwd=root,
-                check=True,
-            )
+            subprocess.run(["git", "commit", "-qm", "delete historical record"], cwd=root, check=True)
             commit = git(root, "rev-parse", "HEAD")
             with self.assertRaisesRegex(ValueError, "permanently consumed"):
                 MODULE.prepare_review_inputs(
@@ -227,7 +210,12 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 check=True,
             )
             subprocess.run(["git", "checkout", "-q", original_branch], cwd=root, check=True)
-            subprocess.run(["git", "branch", "-D", "remote-only"], cwd=root, check=True, stdout=subprocess.PIPE)
+            subprocess.run(
+                ["git", "branch", "-D", "remote-only"],
+                cwd=root,
+                check=True,
+                stdout=subprocess.PIPE,
+            )
             subprocess.run(
                 ["git", "update-ref", "-d", "refs/remotes/origin/remote-only"],
                 cwd=root,
@@ -331,9 +319,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 link.symlink_to("ECL-1.0-RC1.md")
             except OSError as exc:
                 self.skipTest(str(exc))
-            subprocess.run(
-                ["git", "add", "versions/licenses/linked.md"], cwd=root, check=True
-            )
+            subprocess.run(["git", "add", "versions/licenses/linked.md"], cwd=root, check=True)
             subprocess.run(["git", "commit", "-qm", "symlink"], cwd=root, check=True)
             commit = git(root, "rev-parse", "HEAD")
             with self.assertRaisesRegex(ValueError, "regular tracked file"):
@@ -355,14 +341,10 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 inputs.symlink_to(Path(outside), target_is_directory=True)
             except OSError as exc:
                 self.skipTest(str(exc))
-            subprocess.run(
-                ["git", "add", "reviews/legal/inputs"], cwd=root, check=True
-            )
-            subprocess.run(
-                ["git", "commit", "-qm", "bad inputs symlink"], cwd=root, check=True
-            )
+            subprocess.run(["git", "add", "reviews/legal/inputs"], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "bad inputs symlink"], cwd=root, check=True)
             commit = git(root, "rev-parse", "HEAD")
-            with self.assertRaisesRegex(ValueError, "real directory, not a symlink"):
+            with self.assertRaisesRegex(ValueError, "must be a directory in source_commit"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
@@ -382,14 +364,10 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 records.symlink_to(Path(outside), target_is_directory=True)
             except OSError as exc:
                 self.skipTest(str(exc))
-            subprocess.run(
-                ["git", "add", "reviews/legal/records"], cwd=root, check=True
-            )
-            subprocess.run(
-                ["git", "commit", "-qm", "bad records symlink"], cwd=root, check=True
-            )
+            subprocess.run(["git", "add", "reviews/legal/records"], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "bad records symlink"], cwd=root, check=True)
             commit = git(root, "rev-parse", "HEAD")
-            with self.assertRaisesRegex(ValueError, "legal review records namespace must be a real directory"):
+            with self.assertRaisesRegex(ValueError, "must be a directory in source_commit"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
