@@ -68,7 +68,6 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 license_path="versions/licenses/ECL-1.0-RC1.md",
                 source_commit=commit,
             )
-
             self.assertEqual(result["schema_version"], 2)
             self.assertEqual(result["source_commit"], commit)
             self.assertEqual(result["status"], "prepared-not-reviewed")
@@ -77,7 +76,6 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 result["license"]["sha256"],
                 hashlib.sha256(b"candidate-license\n").hexdigest(),
             )
-
             target = (
                 root
                 / "reviews"
@@ -130,6 +128,72 @@ class PrepareLegalReviewTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "already exists"):
                 MODULE.prepare_review_inputs(
                     root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+
+    def test_deleted_historical_snapshot_still_consumes_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._repo(root, input_id="review-a")
+            subprocess.run(
+                ["git", "rm", "-r", "reviews/legal/inputs/review-a"],
+                cwd=root,
+                check=True,
+                stdout=subprocess.PIPE,
+            )
+            subprocess.run(
+                ["git", "commit", "-qm", "delete historical snapshot"],
+                cwd=root,
+                check=True,
+            )
+            commit = git(root, "rev-parse", "HEAD")
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+
+    def test_deleted_historical_record_still_consumes_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._repo(root, record_id="review-a")
+            subprocess.run(
+                ["git", "rm", "reviews/legal/records/review-a.json"],
+                cwd=root,
+                check=True,
+                stdout=subprocess.PIPE,
+            )
+            subprocess.run(
+                ["git", "commit", "-qm", "delete historical record"],
+                cwd=root,
+                check=True,
+            )
+            commit = git(root, "rev-parse", "HEAD")
+            with self.assertRaisesRegex(ValueError, "permanently consumed"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                    source_commit=commit,
+                )
+
+    def test_shallow_repository_is_rejected(self):
+        with tempfile.TemporaryDirectory() as source_tmp, tempfile.TemporaryDirectory() as clone_tmp:
+            source = Path(source_tmp)
+            self._repo(source)
+            clone = Path(clone_tmp) / "clone"
+            subprocess.run(
+                ["git", "clone", "-q", "--depth", "1", f"file://{source}", str(clone)],
+                check=True,
+            )
+            commit = git(clone, "rev-parse", "HEAD")
+            with self.assertRaisesRegex(ValueError, "requires complete Git history"):
+                MODULE.prepare_review_inputs(
+                    clone,
                     review_id="review-a",
                     license_path="versions/licenses/ECL-1.0-RC1.md",
                     source_commit=commit,
