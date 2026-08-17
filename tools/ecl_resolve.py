@@ -99,6 +99,15 @@ def valid_review_id(value: str) -> bool:
     return REVIEW_ID_RE.fullmatch(value) is not None
 
 
+def _validate_component_identity_fields(actual: Any) -> None:
+    if not isinstance(actual, dict):
+        raise ValueError("bundle requires license and schedule components")
+    for key in ("ref", "path", "sha256"):
+        value = actual.get(key)
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"bundle component {key} must be a non-empty string")
+
+
 def _uses_reserved_fallback_identity(actual: Any) -> bool:
     if not isinstance(actual, dict):
         return False
@@ -114,47 +123,26 @@ def _uses_reserved_fallback_identity(actual: Any) -> bool:
 def validate_bundle_identity(bundle: dict[str, Any]) -> None:
     """Enforce immutable semantic identity for every Bundle and fallback.
 
-    Bundle identity is the exact License/Schedule tuple, not a mutable label.
-    Release refs must use the immutable canonical namespaces and component paths
-    must point at the corresponding immutable release-artifact namespaces.
-    Empty fallback identities are additionally opt-in rather than generative.
+    Validation order deliberately preserves the historical fallback diagnostics:
+    malformed component dimensions and reserved fallback substitution are
+    rejected before the newer immutable-ref/path checks. The newer invariants
+    therefore strengthen, rather than shadow, earlier adversarial guarantees.
     """
 
     bundle_ref = bundle.get("bundle")
-    if not isinstance(bundle_ref, str) or BUNDLE_REF_RE.fullmatch(bundle_ref) is None:
-        raise ValueError("bundle manifest has invalid immutable bundle identity")
+    if not isinstance(bundle_ref, str):
+        raise ValueError("bundle manifest is missing string bundle identity")
 
     license_component = bundle.get("license")
     schedule_component = bundle.get("schedule")
     if not isinstance(license_component, dict) or not isinstance(schedule_component, dict):
         raise ValueError("bundle requires license and schedule components")
-    license_ref = license_component.get("ref")
-    schedule_ref = schedule_component.get("ref")
-    if not isinstance(license_ref, str) or LICENSE_REF_RE.fullmatch(license_ref) is None:
-        raise ValueError("bundle license ref is not an immutable ECL release identifier")
-    if not isinstance(schedule_ref, str) or SCHEDULE_REF_RE.fullmatch(schedule_ref) is None:
-        raise ValueError("bundle schedule ref is not an immutable ECL Schedule identifier")
+    _validate_component_identity_fields(license_component)
+    _validate_component_identity_fields(schedule_component)
 
-    expected_bundle_ref = f"{license_ref}@{schedule_ref.removeprefix('ECL-')}"
-    if bundle_ref != expected_bundle_ref:
-        raise ValueError(
-            "bundle identity does not match license/schedule refs: "
-            f"expected {expected_bundle_ref}, got {bundle_ref}"
-        )
-
-    expected_license_path = f"versions/licenses/{license_ref}.md"
-    expected_schedule_path = f"schedules/{schedule_ref}.md"
-    if license_component.get("path") != expected_license_path:
-        raise ValueError(
-            "bundle license path must use immutable release namespace: "
-            f"expected {expected_license_path}"
-        )
-    if schedule_component.get("path") != expected_schedule_path:
-        raise ValueError(
-            "bundle schedule path must use immutable release namespace: "
-            f"expected {expected_schedule_path}"
-        )
-
+    # Registered fallback Bundles are indivisible exact tuples. Keep this check
+    # before general immutable-ref validation so any altered fallback dimension
+    # remains diagnosed as a fallback-identity violation.
     expected = CANONICAL_EMPTY_BUNDLES.get(bundle_ref)
     if expected is not None:
         if bundle.get("operative") is not expected["operative"]:
@@ -171,15 +159,49 @@ def validate_bundle_identity(bundle: dict[str, Any]) -> None:
                 )
         return
 
+    # Any unregistered EMPTY Bundle is invalid even if its text happens to match
+    # a broader-looking identifier. Fallbacks are registered, never generated.
     if "@RP-EMPTY-" in bundle_ref:
         raise ValueError(f"unsupported canonical empty fallback bundle: {bundle_ref}")
 
+    # Reserved fallback dimensions cannot be borrowed or moved across slots in
+    # an ordinary Bundle. Preserve this historical invariant before tuple checks.
     for component_name in ("license", "schedule"):
         if _uses_reserved_fallback_identity(bundle.get(component_name)):
             raise ValueError(
                 f"bundle {bundle_ref} uses reserved canonical empty fallback "
                 f"identity in {component_name} slot"
             )
+
+    if BUNDLE_REF_RE.fullmatch(bundle_ref) is None:
+        raise ValueError("bundle manifest has invalid immutable bundle identity")
+
+    license_ref = license_component["ref"]
+    schedule_ref = schedule_component["ref"]
+    if LICENSE_REF_RE.fullmatch(license_ref) is None:
+        raise ValueError("bundle license ref is not an immutable ECL release identifier")
+    if SCHEDULE_REF_RE.fullmatch(schedule_ref) is None:
+        raise ValueError("bundle schedule ref is not an immutable ECL Schedule identifier")
+
+    expected_bundle_ref = f"{license_ref}@{schedule_ref.removeprefix('ECL-')}"
+    if bundle_ref != expected_bundle_ref:
+        raise ValueError(
+            "bundle identity does not match license/schedule refs: "
+            f"expected {expected_bundle_ref}, got {bundle_ref}"
+        )
+
+    expected_license_path = f"versions/licenses/{license_ref}.md"
+    expected_schedule_path = f"schedules/{schedule_ref}.md"
+    if license_component["path"] != expected_license_path:
+        raise ValueError(
+            "bundle license path must use immutable release namespace: "
+            f"expected {expected_license_path}"
+        )
+    if schedule_component["path"] != expected_schedule_path:
+        raise ValueError(
+            "bundle schedule path must use immutable release namespace: "
+            f"expected {expected_schedule_path}"
+        )
 
 
 def validate_file_reference(
