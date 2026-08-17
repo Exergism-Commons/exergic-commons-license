@@ -76,11 +76,26 @@ def load_toml(path: Path) -> dict[str, Any]:
     return data
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
+def _reject_duplicate_json_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON object member: {key}")
+        result[key] = value
+    return result
+
+
+def parse_json_object(text: str, *, label: str) -> dict[str, Any]:
+    """Parse a JSON object while rejecting duplicate member names at any depth."""
+
+    data = json.loads(text, object_pairs_hook=_reject_duplicate_json_members)
     if not isinstance(data, dict):
-        raise ValueError(f"{path} must contain a JSON object")
+        raise ValueError(f"{label} must contain a JSON object")
     return data
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    return parse_json_object(path.read_text(encoding="utf-8"), label=str(path))
 
 
 def sha256(path: Path) -> str:
