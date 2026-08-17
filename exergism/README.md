@@ -1,72 +1,84 @@
 # Formal Exergism assessments
 
-This directory contains **ECL-specific machine-readable governance inputs** for the formal Exergism application layer defined in [`spec/EXERGIC-ANALYSIS.md`](../spec/EXERGIC-ANALYSIS.md). It is not the canonical home of the Metafísica emergentista de la liberación.
+This directory contains **ECL-specific machine-readable governance inputs** for the Exergism application layer defined in [`spec/EXERGIC-ANALYSIS.md`](../spec/EXERGIC-ANALYSIS.md). It is not the canonical home of the Metafísica emergentista de la liberación.
 
-## Canonical upstream pin
+## Canonical upstream
 
-The canonical upstream repository is **[`Exergism-Commons/exergism`](https://github.com/Exergism-Commons/exergism)**. ECL currently pins its conceptual/formal upstream baseline to **[Exergism `v0.1.0`](https://github.com/Exergism-Commons/exergism/releases/tag/v0.1.0)**, exact Git commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2`. The machine-readable binding is [`exergism/upstream.json`](upstream.json), which also pins the SHA-256 identities of the upstream release manifest and source archive.
+The canonical repository is **[`Exergism-Commons/exergism`](https://github.com/Exergism-Commons/exergism)**. ECL pins **[Exergism `v0.1.0`](https://github.com/Exergism-Commons/exergism/releases/tag/v0.1.0)** at exact commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2`.
 
-This is a **lineage and reproducibility pin**, not an automatic normative import. ECL maintains an explicit application profile for its governance workflow. A later Exergism release does not alter ECL unless an explicit ECL change updates the pin and reviews downstream impact. ECL does not `owl:imports` the upstream ontology.
+The machine-readable contract is [`upstream.json`](upstream.json). The canonical formal source within that pinned release is `formal/sistema_analitico_exergico.json`.
 
-> These records have **no licensing effect by themselves**. They do not replace evidence review, exact ECL criterion fit, attribution, adversarial review or Schedule incorporation.
+This is a lineage/reproducibility dependency, not an automatic normative import. Later Exergism releases do not alter ECL until ECL explicitly updates the pin and reviews downstream impact. ECL does not `owl:imports` the upstream ontology.
 
-## Run the calculator
+> Exergism assessments have **no licensing effect by themselves**. They do not replace evidence review, exact ECL criterion fit, attribution, adversarial review or Schedule incorporation.
 
-The calculator uses only the Python standard library:
+## Calculator
 
-```bash
-python tools/exergic_analysis.py exergism/assessments/PRK.json --pretty
-```
+The calculator implements the canonical static formulas and temporal integration from pinned Exergism `v0.1.0`. It requires an **explicit context profile**; ECL does not guess one.
 
-A different explicit parameter profile may be supplied:
+Example:
 
 ```bash
 python tools/exergic_analysis.py \
   exergism/assessments/PRK.json \
-  --profile path/to/profile.json \
+  --profile exergism/profiles/upstream-transition-v0.1.0.json \
   --pretty
 ```
 
-The committed [`reference-balanced-v2.json`](profiles/reference-balanced-v2.json) profile is **mechanical-reference-only**. Its weights are deliberately non-canonical because the original formal system did not define universal numerical constants. Governance conclusions require sensitivity analysis before ECL 1.0 readiness.
+Pinned upstream context profiles:
+
+- [`upstream-transition-v0.1.0.json`](profiles/upstream-transition-v0.1.0.json)
+- [`upstream-liberated-society-v0.1.0.json`](profiles/upstream-liberated-society-v0.1.0.json)
+- [`upstream-mundane-interaction-v0.1.0.json`](profiles/upstream-mundane-interaction-v0.1.0.json)
+
+CI runs every committed assessment against all three profiles as a **mechanical sensitivity/regression check**. That does not assert that every context is normatively appropriate to every assessed object.
+
+[`reference-balanced-v2.json`](profiles/reference-balanced-v2.json) is retained only as a deprecated legacy ECL regression profile from before the canonical upstream formal model was recovered. It is not an Exergism-canonical profile and is not a default.
+
+## Canonical completeness
+
+The early ECL pilot assessments contain the original core variables:
+
+`P`, `A`, `V_ep`, `L`, `O`, `U`, `C`, `S`, `R`, `Ecol`, `D_p`.
+
+Pinned Exergism `v0.1.0` also requires evidence for `D_a`, `I`, `Lz`, `G` and `Rj` to compute the non-compensatory/imputability layer:
+
+```text
+P_atr
+E_i_adj
+M_f
+```
+
+The calculator therefore labels legacy scorable records without those variables as **`core-only`**. It does not manufacture missing values. A static assessment becomes `canonical-static-complete` only when the complete advanced set is supplied.
+
+The upstream temporal model additionally requires an explicit timeline, `lambda`, persistence weights and irreversibility. No temporal score is fabricated where those inputs do not exist.
 
 ## Assessment states
 
-- `scorable` — a sufficiently defined object exists and all formal variables can be bounded from evidence.
-- `insufficient_evidence` — the object or evidence is not yet strong enough to assign values without manufacturing precision.
+- `scorable` — the exact object is sufficiently defined for at least the supplied formal layer.
+- `insufficient_evidence` — assigning the required variables would manufacture precision.
 - `not_applicable` — no current ECL-relevant object exists at the required scope.
 
 Missing evidence must never be silently converted to `0.5`.
 
-## Initial cross-tier pilot
+## Current pilot
 
-The first pilot intentionally spans distinct governance outcomes:
+The initial five-record pilot still spans distinct ECL governance situations:
 
-- [`PRK.json`](assessments/PRK.json) — `R`, scoped coercive State apparatus, scorable.
-- [`USA.json`](assessments/USA.json) — `S`, only the defined federal project scope, scorable.
-- [`NLD.json`](assessments/NLD.json) — `S`, narrow probation risk-algorithm scope, scorable.
-- [`JPN.json`](assessments/JPN.json) — `U`, insufficiently defined Software/project nexus, therefore deliberately unscored.
-- [`NZL.json`](assessments/NZL.json) — `N`, no current ECL-relevant object after adversarial review, therefore deliberately unscored.
+- [`PRK.json`](assessments/PRK.json) — scoped coercive State apparatus, currently core-only.
+- [`USA.json`](assessments/USA.json) — scoped federal project set, currently core-only.
+- [`NLD.json`](assessments/NLD.json) — narrow probation-tool scope, currently core-only.
+- [`JPN.json`](assessments/JPN.json) — insufficiently defined object, deliberately unscored.
+- [`NZL.json`](assessments/NZL.json) — no current object at the required scope, deliberately unscored.
 
-Using the non-normative reference profile, the current pilot produces the following mechanical envelopes:
-
-| Case | `Ex_r` | `E_i` | `B_0` | Formal reading |
-| --- | --- | --- | --- | --- |
-| PRK | `0.0241–0.0854` (`0.0526`) | `-0.8564–-0.6455` (`-0.7551`) | `-0.8626–-0.6163` (`-0.7436`) | robustly destructive under the pilot assumptions |
-| USA scoped projects | `0.1381–0.3684` (`0.2373`) | `-0.6648–-0.2655` (`-0.4746`) | `-0.5463–-0.0046` (`-0.2818`) | negative across the current interval, but materially less captured than PRK |
-| NLD probation tools | `0.2980–0.5906` (`0.4334`) | `-0.2662–0.2867` (`-0.0168`) | `-0.0864–0.4513` (`0.1853`) | composite balance is uncertainty-sensitive; exact ECL criterion and remediation evidence remain decisive |
-| JPN | not computed | not computed | not computed | insufficiently defined ECL-relevant technology/project object |
-| NZL | not computed | not computed | not computed | no current object to score at the required scope |
-
-Values in parentheses are central estimates. The ranges are epistemic envelopes, not statistical confidence intervals.
-
-The pilot deliberately demonstrates why there is no score-to-tier mapping. The Netherlands can remain a narrowly scoped `S` governance case because exact algorithmic conduct may satisfy an operative criterion even though aggregate formal balances cross zero under plausible variable bounds. Conversely, a negative formal score without exact ECL Section 5 fit cannot create a restriction.
+Historical numerical envelopes produced with the deprecated balanced profile are no longer presented as the current Exergism baseline. Recompute explicitly against one or more pinned upstream context profiles and interpret the sensitivity, rather than treating one profile as universally correct.
 
 ## Next analytical gate
 
 Before treating the 195-State corpus as **formal-exergism-complete**, each dossier should either:
 
-1. link a `scorable` assessment with evidence-backed intervals and sensitivity review;
-2. document `insufficient_evidence` and the exact missing facts; or
+1. provide a canonical-complete assessment with evidence-backed intervals, explicit context and sensitivity review;
+2. document exactly which canonical variables remain unsupported and why; or
 3. document `not_applicable` because no current ECL-relevant object exists.
 
-That gate is separate from the already completed factual/adversarial normalization. It is intended to test whether the ECL corpus actually implements the Exergism theory rather than merely borrowing its vocabulary.
+That gate is separate from factual/adversarial normalization. Its purpose is to test whether ECL genuinely implements Exergism rather than borrowing its vocabulary.
