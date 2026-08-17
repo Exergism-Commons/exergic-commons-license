@@ -1,96 +1,88 @@
 # Formal Exergism Analysis
 
-> **Status: Draft analytical specification.** This document formalizes the Exergism model used to interrogate ECL governance records. It does **not** create licensing restrictions, replace the operative ECL text, or map a numerical score directly to `R`, `S`, `U`, or `N`.
+> **Status: ECL application profile of pinned Exergism `v0.1.0`.** This specification applies the canonical formal Exergism model to ECL governance records. It does **not** create licensing restrictions, replace the operative ECL text, or map any numerical result directly to `R`, `S`, `U`, or `N`.
 
-## 0. Pinned upstream lineage
+## 0. Canonical upstream
 
-The canonical philosophical/formal upstream currently adopted by this ECL analytical profile is **Exergism `v0.1.0`**, exact Git commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2`. The machine-readable pin is [`exergism/upstream.json`](../exergism/upstream.json), including the SHA-256 identities of the upstream release manifest and source archive.
+The canonical philosophical/formal upstream is `Exergism-Commons/exergism`. ECL pins Exergism `v0.1.0` at commit `4ca5207244f30060c486ca342f2f0af0d2a80fa2` through `exergism/upstream.json`.
 
-This specification is an **ECL application profile**, not a byte-for-byte mirror of the upstream corpus. ECL-specific scope discipline, evidence rules, uncertainty requirements and governance boundaries remain explicit here. A later Exergism release does not change this ECL profile without an explicit ECL repository change and downstream-impact review. This repository does not import the upstream OWL ontology, and the pin itself does not create licensing restrictions, Schedule entries or governance outcomes.
+The canonical formal source is `formal/sistema_analitico_exergico.json` in that pinned release. ECL MUST NOT silently replace an upstream formula with a locally invented one. ECL may add narrower evidence, uncertainty, scope and governance constraints required by the license workflow.
 
-## 1. Purpose
+A later Exergism release has no effect on ECL until an explicit ECL change updates the immutable pin and reviews downstream impact. ECL does not `owl:imports` the upstream ontology.
 
-ECL uses exergy both as a normative concept and, in governance, as a formal multicriteria analysis. The formal layer is intended to make hidden assumptions visible and testable before a designation decision is translated into legal scope.
+## 1. Method boundary
 
-The analytical chain is:
+The formal model is multicriteria, not a single moral score. ECL uses it as a diagnostic/falsification layer:
 
 ```text
-evidence
-  -> scorable object and scope
-  -> normalized exergism variables + uncertainty
-  -> immediate / strategic / structural / temporal analyses
-  -> causal interpretation and sensitivity review
-  -> exact ECL criterion fit
-  -> attribution / exclusions / adversarial review
-  -> provisional R/S/U/N governance outcome
-  -> Schedule translation
+evidence -> exact object -> normalized variables + uncertainty
+         -> canonical Exergism analysis -> sensitivity/disagreement
+         -> exact ECL criterion fit -> attribution/adversarial review
+         -> governance outcome -> Schedule translation
 ```
 
-The model is deliberately **multilayer**. A high strategic-historical value may never by itself cancel severe immediate harm, and no aggregate score substitutes for legal or evidentiary analysis.
+No Exergism result has licensing effect by itself.
 
-## 2. Scope discipline before scoring
+## 2. Scope and normalization
 
-An assessment MUST identify the object being scored: a project, system, deployment, agency function, apparatus, institution, action, process, or event.
+An assessment MUST identify the exact object being analysed. Whole-State scoring MUST NOT be inferred from a narrower project or apparatus.
 
-A whole State MUST NOT be scored merely because evidence exists about one project or agency. The object must follow the narrowest accurate attribution rule in `DESIGNATION-STANDARD.md`.
+Finite operational variables are normalized to `[0,1]` against ex-ante hypothetical minima/maxima or an explicit structured rubric. ECL records each value as an epistemic interval `low <= central <= high`, with rationale, evidence references, basis and uncertainty. Missing evidence remains missing; it is never silently replaced by a midpoint.
 
-If the object is not sufficiently defined, the correct analytical state is `insufficient_evidence`, not an invented midpoint score. If no current ECL-relevant object exists, the correct state is `not_applicable`.
+## 3. Canonical variables
 
-## 3. Normalized variables
+Constitutive/capacity variables:
 
-All operational variables are normalized to `[0,1]`. Each value MUST be recorded as an uncertainty interval (`low`, `central`, `high`) with a rationale and evidence references.
+- `P` — real transformative power.
+- `A` — effective autonomy.
+- `V_ep` — partial epistemic truth orientation/access.
+- `L` — non-manipulative liberating orientation.
+- `O` — opening of possibilities.
+- `U` — exergic utility.
 
-### Positive / capacity variables
+Structural variables:
 
-- `P` — **real transformative power**: capacity of the assessed object to materially transform conditions rather than merely exist formally.
-- `A` — **effective autonomy**: practical ability of affected persons to choose, refuse, contest and act.
-- `V_ep` — **epistemic truth access**: access to material reality, inspectability, freedom from systematic deception, and ability to distinguish evidence from manipulation.
-- `L` — **liberation capacity**: capacity to reduce domination, restore agency, remedy prior capture, or create conditions for emancipation.
-- `O` — **openness**: availability of exit, alternatives, interoperability, dissent, reversibility and non-captured future pathways.
-- `U` — **exergic utility**: useful capability delivered to affected persons or communities without defining usefulness solely from the viewpoint of the dominant actor.
+- `C` — demiurgic capture.
+- `S` — structural suffering/damage.
+- `R` — relapse/reproduction risk.
+- `Ecol` — ecological impact.
 
-### Penalty / destruction variables
+Moral/imputability variables:
 
-- `C` — **demiurgic capture**: concentration of effective capacity in a structure that disables others' autonomy, knowledge, bargaining power, alternatives or ability to exit.
-- `S` — **structural suffering / damage**: material human or morally relevant harm produced or maintained by the object.
-- `R` — **relapse / reproduction risk**: probability and structural propensity that the object reproduces, entrenches or restores the pattern of domination being evaluated.
-- `Ecol` — **ecological cost**: destruction or degradation of ecological conditions that support durable human and collective capacity.
+- `D_p` — moral-patient coefficient.
+- `D_a` — imputable-agency coefficient.
+- `I` — intentionality of domination/harm.
+- `Lz` — agent lucidity.
+- `G` — gratuitousness of harm.
+- `Rj` — risk of justifying cruelty; a component of upstream relapse decomposition and an input to the atrocity penalty.
 
-### Moral-domain coefficient
+For ordinary ECL human-domain assessments, `D_p = 1` unless a defensible non-discriminatory reason says otherwise.
 
-- `D_p` — **moral-domain coefficient**, normalized to `[0,1]`, used only where an analysis genuinely spans different moral domains. For ordinary ECL State/project assessments concerning human beings, `D_p = 1` unless the record states a defensible reason otherwise.
+## 4. Upstream decompositions
 
-`D_p` MUST NOT be used to discount the moral standing of populations on the basis of nationality, ethnicity, religion, disability, class, citizenship or political status.
+The pinned model includes:
 
-## 4. Core formulas
+```text
+A    = (Ai + Am + As + Ac) / 4
+V_ep = (Co + Cr + Ce + Rs) / 4
+L    = (Lm + Ln + La + Lt) / 4
+C    = (Cp + Ci + Cs + Ct) / 4
+R    = (Rh + Rj + Rp + Rc) / 4
+Ecol = (Ed + El + Ep + Er) / 4
+U    = Tr / (Tr + De + e)
+```
 
-### 4.1 Base exergy
+The upstream suggested technical `e` is `0.01`. ECL may score aggregates directly when the evidence supports them, but component-level reasoning is preferred where it materially improves traceability.
 
-The v2 formal model uses a geometric mean so that a near-zero collapse in one constitutive capacity cannot be hidden by a very high value elsewhere:
+## 5. Canonical formulas
 
 ```text
 Ex_b = (P * A * V_ep * L * O * U)^(1/6)
-```
 
-### 4.2 Penalty term
+Pen = pc * C^q_C + pr * R + pe * Ecol
 
-```text
-Pen = p_c * C^q_C + p_r * R + p_e * Ecol
-```
-
-where `p_c`, `p_r`, `p_e >= 0` are explicit contextual weights and `q_C > 0` controls the non-linearity of capture.
-
-### 4.3 Relative exergy
-
-```text
 Ex_r = Ex_b / (1 + Pen)
-```
 
-`Ex_r` is a comparative structural indicator, not a moral verdict.
-
-### 4.4 Immediate ethics
-
-```text
 E_i = D_p * [
     a1 * (A * V_ep)
   + a2 * (L * O * U)
@@ -98,122 +90,135 @@ E_i = D_p * [
   - a4 * C^q_C
   - a5 * Ecol
 ]
-```
 
-`E_i` asks what the object is doing to affected beings **now**. Strategic promise is not a defence to severe immediate harm.
-
-### 4.5 Strategic-historical potential
-
-```text
 X_h = (P * O * A * U)^(1/4) / (1 + Pen)
+
+B_0 = b1 * Ex_b + b2 * L
+    - b3 * C^q_C - b4 * S^q_S - b5 * R - b6 * Ecol
 ```
 
-`X_h` measures transformative potential under conditions of autonomy, openness and utility, discounted by capture, relapse and ecological cost.
+These metrics answer different questions and MUST NOT be collapsed into one ECL governance score.
 
-### 4.6 Structural balance
+## 6. Non-compensatory layer and imputability
+
+Suggested upstream `v0.1.0` values:
 
 ```text
-B_0 =
-    b1 * Ex_b
-  + b2 * L
-  - b3 * C^q_C
-  - b4 * S^q_S
-  - b5 * R
-  - b6 * Ecol
+q_S = 2.0
+q_C = 2.0
+S_crit = 0.85
+C_crit = 0.80
 ```
 
-`B_0` is an explicit balance of liberating capacity against structural destruction. It is secondary to the decomposed variables and must always be read with `E_i` and `X_h`.
-
-## 5. Temporal balance
-
-Where a defensible time series exists, use the temporal layer inherited from the formal model:
+Canonical additional formulas:
 
 ```text
-B_acc = sum_t [
-  (Ex_b_t + O_t + A_t * V_ep_t)
-  * exp(-lambda * t)
-  * gamma_t
+P_atr = r1 * max(0, S - S_crit)^2
+      + r2 * max(0, C - C_crit)^2
+      + r3 * Rj
+
+E_i_adj = E_i - P_atr
+
+M_f = D_p * D_a * (
+    m1 * I + m2 * Lz + m3 * G + m4 * C + m5 * S
+)
+```
+
+`M_f` distinguishes destructive effect from strong imputability. ECL MUST NOT invent `D_a`, `I`, `Lz`, `G` or `Rj` from outcome severity alone.
+
+Existing pilots without the complete advanced variable set are explicitly `core-only`. The calculator does not emit `P_atr`, `E_i_adj` or `M_f` until all required advanced variables are evidenced.
+
+## 7. Canonical context profiles
+
+ECL stores exact pinned context-weight copies in `exergism/profiles/`.
+
+`transicion`:
+
+```text
+a = [0.22, 0.18, 0.22, 0.16, 0.12]
+b = [0.28, 0.12, 0.16, 0.16, 0.14, 0.14]
+(pc, pr, pe) = (0.40, 0.30, 0.30)
+m = [0.25, 0.20, 0.20, 0.20, 0.15]
+r = [0.50, 0.30, 0.20]
+```
+
+Known upstream ambiguity: `a1..a5` sum to `0.90`. ECL preserves this exactly and does not silently renormalize it.
+
+`sociedad_liberada`:
+
+```text
+a = [0.24, 0.16, 0.24, 0.18, 0.18]
+b = [0.24, 0.14, 0.18, 0.18, 0.13, 0.13]
+(pc, pr, pe) = (0.45, 0.30, 0.25)
+m = [0.20, 0.20, 0.20, 0.20, 0.20]
+r = [0.45, 0.35, 0.20]
+```
+
+`interaccion_mundana`:
+
+```text
+a = [0.26, 0.16, 0.24, 0.20, 0.14]
+b = [0.26, 0.14, 0.18, 0.18, 0.12, 0.12]
+(pc, pr, pe) = (0.40, 0.25, 0.35)
+m = [0.25, 0.20, 0.25, 0.15, 0.15]
+r = [0.50, 0.30, 0.20]
+```
+
+ECL does not guess a context. The CLI requires an explicit profile. CI evaluates committed assessments against all three pinned profiles as a mechanical sensitivity/regression check; that does not imply that every context is applicable to every object.
+
+`reference-balanced-v2.json` is deprecated legacy ECL regression material, not canonical Exergism.
+
+## 8. Canonical temporal integration
+
+For a defensible timeline:
+
+```text
+D_acc = SUM_t [
+    (S_t^q_S + Ecol_t + C_t^q_C + P_atr_t)
+    * exp(-lambda * t) * delta_t * (1 + Irr_t)
 ]
 
-D_acc = sum_t [
-  (S_t + Ecol_t + C_t)
-  * exp(-lambda * t)
-  * delta_t
+B_acc = SUM_t [
+    (Ex_b_t + O_t + A_t * V_ep_t + L_t)
+    * exp(-lambda * t) * gamma_t
 ]
 
 N_t = B_acc - D_acc
 ```
 
-- `lambda >= 0` is an explicit temporal discount/decay parameter.
-- `gamma_t` and `delta_t` are explicit confidence/relevance multipliers and MUST NOT be silently defaulted in a governance assessment.
-- `N_t > 0` means accumulated capacity dominates under the stated assumptions; `N_t < 0` means accumulated destruction dominates. The sign is not an ECL tier mapping.
+The pinned upstream does not provide a universal numeric `lambda`; ECL therefore requires it explicitly for temporal calculation. `gamma_t`, `delta_t` and irreversibility must also be explicit. A positive `N_t` is not automatic moral absolution.
 
-A dossier without a defensible time series MUST leave `N_t` uncomputed rather than fabricate historical observations.
+## 9. Macroevents
 
-## 6. Parameters are not universal constants
+The upstream model supports hierarchical subevents and macroevent aggregation. The current ECL calculator implements the canonical static formulas and canonical timeline integration but does **not** yet claim full macroevent aggregation support. ECL MUST NOT fabricate aggregate whole-State results while that layer remains unimplemented.
 
-The original formal system did not canonize universal numerical values for `p_*`, `q_*`, `a*`, `b*`, `lambda`, `gamma_t` or `delta_t`.
+## 10. Mandatory ECL rules
 
-Therefore:
+- No score-to-tier function.
+- No moral laundering between immediate, strategic, structural and temporal layers.
+- No midpoint fabrication.
+- No whole-State inflation.
+- No pseudoprecision.
+- No partisan parameter tuning.
+- Counter-institutions and remediation matter when evidenced.
+- Ecology remains explicit.
+- Intent/imputability variables require their own evidence.
+- Formula changes belong upstream in Exergism or require an explicit documented ECL application delta.
 
-1. every composite calculation MUST identify the parameter profile used;
-2. governance conclusions MUST be sensitivity-tested against plausible alternative profiles before claiming robustness;
-3. a parameter profile may be published for mechanical regression testing, but it MUST be labelled non-normative until independently calibrated and adopted through governance; and
-4. no maintainer may tune weights after seeing a target actor merely to force a desired tier.
+## 11. Dossier completeness gate
 
-## 7. Uncertainty and traceability
+Before a dossier is `formal-exergism-complete` for ECL 1.0 readiness, it should contain or link:
 
-For every variable, record:
+1. exact object/scope;
+2. assessment state;
+3. normalization anchors/rubric;
+4. evidence-backed intervals;
+5. explicit context profile(s) and sensitivity review;
+6. `Ex_b`, `Pen`, `Ex_r`, `E_i`, `X_h`, `B_0`;
+7. `D_a`, `I`, `Lz`, `G`, `Rj`, `P_atr`, `E_i_adj`, `M_f` when evidence permits canonical-complete static analysis;
+8. `B_acc`, `D_acc`, `N_t` where a defensible timeline exists;
+9. counter-institutions, exclusions and disagreement notes;
+10. explanation of exact ECL criterion relevance; and
+11. adversarial determination.
 
-- `low`, `central`, `high` in `[0,1]`;
-- a concise operational rationale;
-- evidence references;
-- whether the value is primarily `observed`, `inferred`, or `mixed`;
-- the reviewer and review date where available.
-
-The interval is epistemic uncertainty, not statistical confidence unless the underlying evidence supports a statistical interpretation.
-
-When interval arithmetic is used, the analysis SHOULD report conservative bounds: low positive capacities with high penalties for the lower bound, and high positive capacities with low penalties for the upper bound.
-
-## 8. Interpretation rules
-
-The following rules are mandatory:
-
-- **No score-to-tier function.** `R/S/U/N` remains a governance/legal outcome based on evidence, exact ECL criteria, attribution and Schedule knowability.
-- **No moral laundering.** A high `X_h`, `P` or `U` cannot automatically absolve severe `E_i` harm, capture or suffering.
-- **No midpoint fabrication.** Missing evidence is `insufficient_evidence`, not `0.5`.
-- **No whole-State inflation.** A project score does not become a State score without evidence of cross-institutional scope.
-- **No pseudoprecision.** Two decimal places do not make weak evidence strong. Ranges and rationales are primary.
-- **No partisan parameterization.** The same scoring definitions and parameter profiles must be available for ideologically opposed actors.
-- **Counter-institutions matter.** Courts, auditors, ombuds institutions, inspectors, remediation and meaningful exit must affect `A`, `V_ep`, `L`, `O`, `C` and/or `R` where the evidence supports it.
-- **Ecology is not optional in the model.** If `Ecol` cannot be estimated responsibly, mark it uncertain and test sensitivity rather than silently setting it to zero.
-
-## 9. Relationship to ECL criteria
-
-Formal exergism analysis is an **upstream diagnostic layer**. It can reveal why an object is exergically destructive or liberating, but ECL restriction still requires exact normative fit with the operative license.
-
-Examples of conceptual bridges include:
-
-- low `A`/`O` + high `C` -> possible irreversible coercive capture;
-- low `V_ep` + high `C` -> possible deceptive manipulation or information-control capture;
-- high `S` + high `C` + low `A` -> possible coercive domination;
-- high `P` with low `A`/`O` -> powerful but exergically captured capability;
-- high `L`/`O` with falling `C`/`R` -> evidence of remediation or narrowing.
-
-These are diagnostic relationships, not replacements for Section 5 elements.
-
-## 10. Required place in the dossier workflow
-
-Before a dossier can be treated as analytically complete for ECL 1.0 readiness, it should contain or link:
-
-1. the exact scorable object;
-2. formal exergism assessment status;
-3. variable intervals and rationales where scorable;
-4. parameter profile(s) used;
-5. `Ex_b`, `Ex_r`, `E_i`, `X_h`, `B_0`, and `N_t` where data permit;
-6. sensitivity / disagreement notes;
-7. explanation of how the formal result does or does not support the exact ECL criterion;
-8. counter-institutions and exclusions; and
-9. the adversarial determination.
-
-The formal analysis may confirm, weaken, narrow, or expose an inconsistency in a prior governance result. It does not retroactively create licensing restrictions.
+Formal Exergism may confirm, weaken, narrow or expose an inconsistency in a governance result. It cannot create licensing restrictions by itself.
