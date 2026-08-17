@@ -45,7 +45,21 @@ Binding remedies in politically sensitive detention/security cases, verified end
 - https://www.ombudsman.gov.rw/en/about-us/powers
 - https://www.ombudsman.gov.rw/en/news/others/urwego-rwumuvunyi-rwakemuye-ibibazo-105-mu-minsi-4
 - https://www.un.org/sg/en/content/sg/statements/2025-01-23/statement-attributable-the-spokesperson-for-the-secretary-general-the-democratic-republic-of-the-congo-scroll-down-for-french-version
+- https://docstore.ohchr.org/
 
-## 8. Procedural history
+The `docstore.ohchr.org` locator is preserved by `../../reviews/2026/adversarial/state-level/tranche-07.md` only as the generic source surface for the March 2026 Human Rights Committee/treaty-body counter-record. The audited dossier history does not preserve the exact document URL or a finer proposition-to-document mapping. It is therefore retained as historical treaty-body/remediation context and is not conduct proof for the political-security or external-military propositions.
 
-Issue #145 · `../../reviews/2026/adversarial/state-level/tranche-07.md`
+## 8. Historical evidence absorption
+
+Historical source: `../../reviews/2026/adversarial/state-level/tranche-07.md` (cutoff 2026-08-11). Issue #145 contains no additional public adversarial comment. Later consistency controls include `../../reviews/2026/consistency/ecl-0.2-state-delta.md`, `../../reviews/2026/consistency/schedule-readiness.md` and the State `R` identity freeze.
+
+- **Status:** absorbed, with one historical source-granularity limitation preserved. State-level tranche 7 **UPHELD `R` provisionally** while requiring an Ombudsman/accountability carve-out and a mandatory effectiveness review if independent institutions begin producing binding remedies in politically sensitive cases or if Rwanda verifiably ends the reviewed external-security conduct and provides accountability.
+- The two Ombudsman locators and the UN Secretary-General locator were already canonical. The generic `https://docstore.ohchr.org/` locator existed only in tranche 7 and is now retained above as review-only treaty-body counter-evidence provenance. It is not described as a Git recovery, and no exact treaty-body document is manufactured.
+- The Ombudsman/Supreme Court functions remain qualifying remediation/accountability functions where genuinely independent; their existence does not prove or widen prohibited conduct.
+- **Schedule boundary:** `../../registry/schedule-state-r-freeze.yml` freezes the candidate class verbatim as **`central governmental, security, political-control and materially directed external-security apparatus of Rwanda`**, subject to common exclusions for population/nationality, independent private actors, unrelated non-controlled entities and qualifying Independent Remediation Activity. The candidate remains provisional/non-operative absent an adopted Schedule.
+
+This absorption changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 9. Procedural history
+
+Issue #145 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-07.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../reviews/2026/consistency/schedule-readiness.md` · `../../registry/schedule-state-r-freeze.yml`
