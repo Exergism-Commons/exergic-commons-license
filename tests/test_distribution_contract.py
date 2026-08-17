@@ -22,6 +22,7 @@ DIST = load_module("ecl_distribution_contract", ROOT / "tools" / "ecl_distributi
 SCHEMA = json.loads((ROOT / "schemas" / "distribution.schema.json").read_text(encoding="utf-8"))
 VALIDATOR = jsonschema.Draft202012Validator(SCHEMA)
 DRAFT_BUNDLE = "ECL-0.3-DRAFT@RP-EMPTY-1"
+DRAFT_BUNDLE_PATH = ROOT / "releases" / "bundles" / f"{DRAFT_BUNDLE}.json"
 
 
 class DistributionContractTests(unittest.TestCase):
@@ -38,6 +39,9 @@ class DistributionContractTests(unittest.TestCase):
             allow_draft=True,
         )
         return output, descriptor
+
+    def _draft_manifest(self):
+        return RESOLVE.load_json(DRAFT_BUNDLE_PATH)
 
     def test_builder_descriptor_conforms_to_distribution_schema(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -104,6 +108,36 @@ class DistributionContractTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "duplicate JSON object member: bundle"):
                 DIST.verify_distribution(output)
+
+    def test_optional_bundle_metadata_accepts_schema_compatible_values(self):
+        bundle = self._draft_manifest()
+        bundle["knowledge_snapshot"] = "urn:ecl:knowledge:snapshot:test"
+        bundle["released_at"] = "2026-08-18T00:00:00Z"
+        self.assertIs(DIST._validate_bundle_manifest_shape(bundle), bundle)
+
+    def test_optional_knowledge_snapshot_rejects_non_schema_type(self):
+        bundle = self._draft_manifest()
+        bundle["knowledge_snapshot"] = {"mutable": True}
+        with self.assertRaisesRegex(ValueError, "knowledge_snapshot must be a string or null"):
+            DIST._validate_bundle_manifest_shape(bundle)
+
+    def test_optional_released_at_rejects_non_string(self):
+        bundle = self._draft_manifest()
+        bundle["released_at"] = 123
+        with self.assertRaisesRegex(ValueError, "released_at must be an RFC3339"):
+            DIST._validate_bundle_manifest_shape(bundle)
+
+    def test_optional_released_at_rejects_invalid_string(self):
+        bundle = self._draft_manifest()
+        bundle["released_at"] = "not-a-date"
+        with self.assertRaisesRegex(ValueError, "released_at must be an RFC3339"):
+            DIST._validate_bundle_manifest_shape(bundle)
+
+    def test_optional_released_at_rejects_impossible_calendar_date(self):
+        bundle = self._draft_manifest()
+        bundle["released_at"] = "2026-02-31T00:00:00Z"
+        with self.assertRaisesRegex(ValueError, "released_at must be an RFC3339"):
+            DIST._validate_bundle_manifest_shape(bundle)
 
 
 if __name__ == "__main__":
