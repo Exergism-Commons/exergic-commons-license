@@ -217,6 +217,100 @@ class PrepareLegalReviewTests(unittest.TestCase):
             self.assertEqual(list(attacker_dir.iterdir()), [])
             self._assert_no_temp_snapshots(root, "review-a")
 
+    def test_replaced_inputs_namespace_aborts_and_cleans_pinned_snapshot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+            original = MODULE._write_frozen_file
+            raced = False
+
+            def replace_inputs(directory_fd: int, filename: str, data: bytes) -> int:
+                nonlocal raced
+                if not raced:
+                    legal = root / "reviews" / "legal"
+                    (legal / "inputs").rename(legal / "inputs-old")
+                    (legal / "inputs").mkdir()
+                    raced = True
+                return original(directory_fd, filename, data)
+
+            with mock.patch.object(
+                MODULE, "_write_frozen_file", side_effect=replace_inputs
+            ):
+                with self.assertRaisesRegex(OSError, "input namespace.*changed"):
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            legal = root / "reviews" / "legal"
+            self.assertEqual(list((legal / "inputs").iterdir()), [])
+            self.assertEqual(list((legal / "inputs-old").iterdir()), [])
+
+    def test_replaced_records_namespace_aborts_even_for_real_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+            legal = root / "reviews" / "legal"
+            (legal / "records").mkdir()
+            original = MODULE._write_frozen_file
+            raced = False
+
+            def replace_records(directory_fd: int, filename: str, data: bytes) -> int:
+                nonlocal raced
+                if not raced:
+                    (legal / "records").rename(legal / "records-old")
+                    (legal / "records").mkdir()
+                    raced = True
+                return original(directory_fd, filename, data)
+
+            with mock.patch.object(
+                MODULE, "_write_frozen_file", side_effect=replace_records
+            ):
+                with self.assertRaisesRegex(OSError, "records namespace.*changed"):
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            self.assertFalse((legal / "inputs" / "review-a").exists())
+            self._assert_no_temp_snapshots(root, "review-a")
+            self.assertEqual(list((legal / "records").iterdir()), [])
+            self.assertEqual(list((legal / "records-old").iterdir()), [])
+
+    def test_replaced_legal_workspace_aborts_before_descriptor_success(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+            original = MODULE._write_frozen_file
+            raced = False
+
+            def replace_legal(directory_fd: int, filename: str, data: bytes) -> int:
+                nonlocal raced
+                if not raced:
+                    reviews = root / "reviews"
+                    (reviews / "legal").rename(reviews / "legal-old")
+                    (reviews / "legal").mkdir()
+                    raced = True
+                return original(directory_fd, filename, data)
+
+            with mock.patch.object(
+                MODULE, "_write_frozen_file", side_effect=replace_legal
+            ):
+                with self.assertRaisesRegex(OSError, "workspace.*changed"):
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            current_legal = root / "reviews" / "legal"
+            old_legal = root / "reviews" / "legal-old"
+            self.assertEqual(list(current_legal.iterdir()), [])
+            self.assertFalse((old_legal / "inputs" / "review-a").exists())
+            self.assertEqual(list((old_legal / "inputs").iterdir()), [])
+
     def test_invalid_review_id_is_rejected_before_writing(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
