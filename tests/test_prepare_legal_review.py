@@ -1,8 +1,10 @@
 import hashlib
 import importlib.util
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "prepare_legal_review.py"
 SPEC = importlib.util.spec_from_file_location("prepare_legal_review", MODULE_PATH)
@@ -12,6 +14,12 @@ SPEC.loader.exec_module(MODULE)
 
 
 class PrepareLegalReviewTests(unittest.TestCase):
+    def setUp(self):
+        try:
+            MODULE._require_secure_runtime()
+        except OSError as exc:
+            self.skipTest(f"secure legal-review preparation unavailable: {exc}")
+
     def _write_repo(self, root: Path) -> Path:
         (root / "spec").mkdir(parents=True)
         (root / "schemas").mkdir(parents=True)
@@ -24,6 +32,15 @@ class PrepareLegalReviewTests(unittest.TestCase):
         license_path = root / "versions" / "licenses" / "ECL-1.0-RC1.md"
         license_path.write_bytes(b"candidate-license\n")
         return license_path
+
+    def _assert_no_temp_snapshots(self, root: Path, review_id: str) -> None:
+        inputs = root / "reviews" / "legal" / "inputs"
+        if not inputs.exists():
+            return
+        self.assertEqual(
+            [path.name for path in inputs.iterdir() if path.name.startswith(f".{review_id}.prepare-")],
+            [],
+        )
 
     def test_freezes_exact_inputs_without_creating_completed_record(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -59,7 +76,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 "reviews/legal/records/ECL-1.0-RC1-review-a.json",
             )
 
-    def test_existing_review_id_is_never_overwritten(self):
+    def test_existing_input_snapshot_is_never_overwritten(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self._write_repo(root)
@@ -83,6 +100,83 @@ class PrepareLegalReviewTests(unittest.TestCase):
                 MODULE.prepare_review_inputs(root, **kwargs)
 
             self.assertEqual(frozen.read_bytes(), original)
+
+    def test_completed_record_path_permanently_consumes_review_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+            records = root / "reviews" / "legal" / "records"
+            records.mkdir()
+            (records / "review-a.json").write_text('{"status":"complete"}', encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "permanently consumed"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                )
+
+            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self._assert_no_temp_snapshots(root, "review-a")
+
+    def test_record_appearing_during_preparation_aborts_and_cleans_temp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+
+            with mock.patch.object(
+                MODULE, "_record_consumes_id", side_effect=[False, True]
+            ):
+                with self.assertRaisesRegex(ValueError, "became consumed"):
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self._assert_no_temp_snapshots(root, "review-a")
+
+    def test_record_appearing_after_publication_removes_owned_snapshot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+
+            with mock.patch.object(
+                MODULE, "_record_consumes_id", side_effect=[False, False, True]
+            ):
+                with self.assertRaisesRegex(ValueError, "became consumed"):
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
+            self._assert_no_temp_snapshots(root, "review-a")
+
+    def test_atomic_publish_never_overwrites_racing_existing_namespace(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+            original = MODULE._rename_noreplace
+
+            def race(parent_fd: int, source: str, destination: str) -> None:
+                os.mkdir(destination, mode=0o700, dir_fd=parent_fd)
+                original(parent_fd, source, destination)
+
+            with mock.patch.object(MODULE, "_rename_noreplace", side_effect=race):
+                with self.assertRaisesRegex(ValueError, "already exists"):
+                    MODULE.prepare_review_inputs(
+                        root,
+                        review_id="review-a",
+                        license_path="versions/licenses/ECL-1.0-RC1.md",
+                    )
+
+            attacker_dir = root / "reviews" / "legal" / "inputs" / "review-a"
+            self.assertTrue(attacker_dir.is_dir())
+            self.assertEqual(list(attacker_dir.iterdir()), [])
+            self._assert_no_temp_snapshots(root, "review-a")
 
     def test_invalid_review_id_is_rejected_before_writing(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -141,12 +235,33 @@ class PrepareLegalReviewTests(unittest.TestCase):
             except (OSError, NotImplementedError) as exc:
                 self.skipTest(f"symlinks unavailable: {exc}")
 
-            with self.assertRaisesRegex(ValueError, "symbolic links"):
+            with self.assertRaisesRegex(ValueError, "symbolic-link"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
                     license_path="versions/licenses/linked-license.md",
                 )
+
+    def test_canonical_input_symlink_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_repo(root)
+            schema = root / "schemas" / "bundle.schema.json"
+            real = root / "schemas" / "real-bundle.schema.json"
+            schema.rename(real)
+            try:
+                schema.symlink_to(real.name)
+            except (OSError, NotImplementedError) as exc:
+                self.skipTest(f"symlinks unavailable: {exc}")
+
+            with self.assertRaisesRegex(ValueError, "symbolic-link"):
+                MODULE.prepare_review_inputs(
+                    root,
+                    review_id="review-a",
+                    license_path="versions/licenses/ECL-1.0-RC1.md",
+                )
+
+            self.assertFalse((root / "reviews" / "legal" / "inputs" / "review-a").exists())
 
     def test_symlinked_input_namespace_is_rejected_without_external_write(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as outside:
@@ -159,7 +274,7 @@ class PrepareLegalReviewTests(unittest.TestCase):
             except (OSError, NotImplementedError) as exc:
                 self.skipTest(f"symlinks unavailable: {exc}")
 
-            with self.assertRaisesRegex(ValueError, "symbolic links"):
+            with self.assertRaisesRegex(ValueError, "symbolic-link"):
                 MODULE.prepare_review_inputs(
                     root,
                     review_id="review-a",
