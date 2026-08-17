@@ -61,6 +61,14 @@ Release/remedy for political detainees, independent investigation/prosecution of
 - https://www.hrw.org/news/2026/07/16/uganda-military-seizing-government-critics
 - https://uhrc.ug/page/about-tribunal
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #183 · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md`
+Historical sources: `../../reviews/2026/adversarial/state-level/tranche-04.md` and `../../reviews/2026/adversarial/scoped/tranche-09.md` (cutoff 2026-08-11). Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`.
+
+- **Status:** absorbed, with prior tier correction preserved. The initial adjudication classified Uganda as whole-State `R`; state-level tranche 4 produced the historical **`R → S` correction** because UHRC has real tribunal/remedial powers and documented institutional activity. Scoped tranche 9 then upheld `S` and broadened the governance scope for the 2026 election/post-election coercive record without re-capturing the whole State. The 2026-08-13 ECL 0.2 State Delta retained `S` without tier change.
+- Additional historical counter-evidence locators preserved by state-level tranche 4 are `https://uhrc.ug/about/` and `https://uhrc.ug/download-category/annual-reports/`. They document UHRC identity/functions and reporting and therefore constrain attribution; they are not proof of prohibited conduct.
+- **Schedule boundary:** `../../registry/schedule-state-s-freezes/batch-13b-uga-freeze.yml` controls current renderability and freezes only the **Erias Lukwago June 2026 detention and prosecution project**: the 15–22 June military seizure, incommunicado holding, transfer to police/court process and associated prosecution, including materially participating military/security functions. Other election, intelligence, media and civic-control concerns remain governance-only until separately frozen; UPDF, police and courts are not generic Restricted Parties.
+
+## 10. Procedural history
+
+Issue #183 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/state-level/tranche-04.md` · `../../reviews/2026/adversarial/scoped/tranche-09.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`
