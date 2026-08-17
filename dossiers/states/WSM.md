@@ -50,6 +50,17 @@ Escalate to `S` on systematic enforced religious targeting using surveillance, a
 - UN Committee on Enforced Disappearances, `CED/C/WSM/RQ/1`.
 - https://www.amnesty.org/en/location/asia-and-the-pacific/south-east-asia-and-the-pacific/samoa/
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #149 · `../../reviews/2026/initial-adjudication.md` · 2026 original-`N` full-cohort review.
+Historical source: `../../reviews/2026/adversarial/no-basis/full-cohort.md` (cutoff 2026-08-11). Earlier baseline: `../../reviews/2026/initial-adjudication.md`. Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`. Issue #149 contains no separate evidence comment.
+
+- **Status:** absorbed with preserved source granularity. The initial adjudication classified Samoa `N`; the original-`N` full-cohort review produced **`N → U`** because the 2026 religious-observance communication/proposals defeated a clean no-basis conclusion while deployment and the direct technological/prohibited-use nexus remained unresolved.
+- The exact `WSM 1/2026` Special Procedures URL and Amnesty Samoa country locator are already canonical above. The CED treaty-body item survives by official document code `CED/C/WSM/RQ/1`; the audited historical record does not preserve an exact URL for that document, so the identifier is retained without manufacturing a locator.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` later **retained Samoa as `U`**, identifying the deployment question as still prospective/insufficiently current. Neither a proclamation nor a proposal is treated as a deployed ECL Restricted Project merely because coercive capacity exists on paper.
+- Treaty-body engagement remains counter-evidence/international-review context, not proof of discriminatory enforcement.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #149 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/no-basis/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

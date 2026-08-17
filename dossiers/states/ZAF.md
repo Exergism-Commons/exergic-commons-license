@@ -50,6 +50,17 @@ Escalate to `S` on evidence of State-deployed profiling/surveillance, automated 
 - Amnesty/partner statement, 25 May 2026, on State officials and coercive migrant verification/removal.
 - Current 2026 government, court and civil-society migration-enforcement reporting.
 
-## 9. Procedural history
+## 9. Historical evidence absorption
 
-Issue #162 · `../../reviews/2026/initial-adjudication.md` · 2026 original-`N` full-cohort review.
+Historical source: `../../reviews/2026/adversarial/no-basis/full-cohort.md` (cutoff 2026-08-11). Earlier baseline: `../../reviews/2026/initial-adjudication.md`. Later consistency control: `../../reviews/2026/consistency/ecl-0.2-state-delta.md`. Issue #162 contains no separate evidence comment.
+
+- **Status:** absorbed, with locator and actor-attribution limitations preserved. The initial adjudication classified South Africa `N`; the original-`N` full-cohort review produced **`N → U`** because current State-linked migration-enforcement operations defeated a clean no-basis conclusion while non-State xenophobic conduct and the exact ECL data/surveillance nexus remained attribution questions.
+- **Historical-only / locator incomplete:** the detailed dossier created in commit `7a84a5dbb2870b41c1cdefce6611a487e8b93d0e` already contained the three source descriptions above without exact URLs. The initial adjudication, full-cohort review, earlier dossier history and issue #162 preserve no finer locator set. The Amnesty country record, 25 May 2026 partner statement and broader government/court/civil-society reporting remain source-family/bibliographic provenance only; no URL is fabricated or inferred.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` later **retained South Africa as `U`**, specifically because attribution remains fragmented/insufficiently granular. The broader license language does not collapse private or vigilante xenophobic conduct into the State.
+- Courts, SAHRC, civil society and humanitarian/remedial activity remain counter-evidence/excluded functions. Any future `S` requires a specifically attributable State project and qualifying ECL nexus.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 10. Procedural history
+
+Issue #162 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/no-basis/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md`

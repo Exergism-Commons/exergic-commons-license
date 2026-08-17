@@ -62,6 +62,17 @@ A future scorable assessment requires enough evidence to bound the exact object'
 - https://www.amnesty.org/en/location/asia-and-the-pacific/east-asia/japan/
 - https://www.amnesty.org/en/latest/news/2025/06/japan-cruel-execution-a-stain-on-countrys-human-rights-record/
 
-## 10. Procedural history
+## 10. Historical evidence absorption
 
-Issue #85 · `../../reviews/2026/initial-adjudication.md` · 2026 original-`N` full-cohort review · `../../exergism/assessments/JPN.json`
+Historical source: `../../reviews/2026/adversarial/no-basis/full-cohort.md` (cutoff 2026-08-11). Earlier baseline: `../../reviews/2026/initial-adjudication.md`. Later controls: `../../reviews/2026/consistency/ecl-0.2-state-delta.md` and the formal Exergism pilot in `../../exergism/assessments/JPN.json`. Issue #85 contains no separate evidence comment.
+
+- **Status:** absorbed / source-complete for the preserved historical URL set. The initial adjudication classified Japan `N`; the original-`N` full-cohort review produced **`N → U`** after the resumption of executions and continuing prolonged-pretrial-detention concerns defeated a clean no-basis conclusion, while the direct ECL software/prohibited-use nexus remained unresolved.
+- Same-dossier audit of pre-pilot commit `5d8779efeec54c76eab7712327bddee12241b5bb` confirms that the later formal Exergism rewrite retained all three historical URLs above; no locator was displaced by the pilot.
+- `../../reviews/2026/consistency/ecl-0.2-state-delta.md` later **retained Japan as `U`**. It clarified that systematic arbitrary detention can potentially engage §5.6, but the current record still did not close systematicity/attribution/remedy strongly enough for stable `S`; capital punishment itself remains outside the standalone ECL criterion.
+- The 2026-08-14 formal Exergism assessment is a later analytical layer. Its `insufficient_evidence` result does not mechanically determine the tier and does not retroactively alter the historical `N → U` evidence record.
+
+This normalization changes no outcome, scope, Claim/Evidence status, grade, `asOf`, actor relationship or governance decision and does not bump `last_reviewed`.
+
+## 11. Procedural history
+
+Issue #85 · `../../reviews/2026/initial-adjudication.md` · `../../reviews/2026/adversarial/no-basis/full-cohort.md` · `../../reviews/2026/consistency/ecl-0.2-state-delta.md` · `../../exergism/assessments/JPN.json`
