@@ -60,7 +60,7 @@ jobs:
           python tools/audit_schedule_reference_coverage.py --self-test
           python tools/audit_private_org_mentions.py --self-test
 
-      - name: Generate full-corpus audits and reject unknown curated references
+      - name: Generate full-corpus audits and reject unknown high-confidence references
         run: |
           mkdir -p build
           python tools/audit_state_dossier_entities.py \
@@ -73,7 +73,8 @@ jobs:
             --fail-on-unresolved-curated
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
-            --markdown build/private-org-mention-audit.md
+            --markdown build/private-org-mention-audit.md \
+            --fail-on-unresolved-private
 
       - name: Prove deterministic output
         run: |
@@ -93,7 +94,8 @@ jobs:
             --fail-on-unresolved-curated
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
-            --markdown build/private-org-mention-audit.md
+            --markdown build/private-org-mention-audit.md \
+            --fail-on-unresolved-private
           cmp build/state-dossier-entity-audit.first.json build/state-dossier-entity-audit.json
           cmp build/state-dossier-entity-audit.first.md build/state-dossier-entity-audit.md
           cmp build/schedule-reference-coverage.first.json build/schedule-reference-coverage.json
