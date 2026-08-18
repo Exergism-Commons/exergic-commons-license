@@ -194,7 +194,7 @@ def evidence_svg(entity: dict) -> str:
         x=412, y=244, max_width=240, font_size=13, max_lines=2, line_height=16,
         clip_id="proposition-footer-clip", weight="400", fill="#667085")
     identity_footer = text_block("Identity ≠ participation / culpability",
-        x=762, y=252, max_width=240, font_size=14, max_lines=1, line_height=16,
+        x=762, y=252, max_width=276, font_size=14, max_lines=1, line_height=16,
         clip_id="identity-footer-clip", weight="400", fill="#667085")
     boundary_block = text_block(
         f"{boundary} · no partOf/control/operation/participation/supplier inference",
