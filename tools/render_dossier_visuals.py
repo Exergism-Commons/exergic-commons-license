@@ -42,6 +42,119 @@ def load_entities(manifest_dir: Path) -> list[dict]:
     return rows
 
 
+def glyph_width(ch: str, font_size: int) -> float:
+    """Conservative Arial-like width estimate used only for deterministic wrapping.
+
+    Hard clipPaths are still applied to every dynamic text region, so browser/font
+    metric differences cannot paint text into a neighbouring visual element.
+    """
+    if ch in " il.,'`|!:;":
+        factor = 0.32
+    elif ch in "mwMW@#%&":
+        factor = 0.90
+    elif ch.isupper():
+        factor = 0.72
+    elif ch.isdigit():
+        factor = 0.62
+    else:
+        factor = 0.60
+    return font_size * factor
+
+
+def measured_width(text: str, font_size: int) -> float:
+    return sum(glyph_width(ch, font_size) for ch in text)
+
+
+def _split_token(token: str, max_width: int, font_size: int) -> list[str]:
+    chunks: list[str] = []
+    current = ""
+    for ch in token:
+        if current and measured_width(current + ch, font_size) > max_width:
+            chunks.append(current)
+            current = ch
+        else:
+            current += ch
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+def wrap_lines(text: str, max_width: int, font_size: int, max_lines: int) -> list[str]:
+    """Wrap text into a deterministic bounded line set.
+
+    The estimator is deliberately conservative. If the content still cannot fit
+    within max_lines, the final line is ellipsized. The complete text remains in
+    the dossier/manifest and, for names, in SVG title/description metadata.
+    """
+    words = str(text).split()
+    lines: list[str] = []
+    current = ""
+    index = 0
+
+    while index < len(words) and len(lines) < max_lines:
+        word = words[index]
+        candidate = word if not current else f"{current} {word}"
+        if measured_width(candidate, font_size) <= max_width:
+            current = candidate
+            index += 1
+            continue
+
+        if current:
+            lines.append(current)
+            current = ""
+            continue
+
+        chunks = _split_token(word, max_width, font_size)
+        for chunk in chunks:
+            if len(lines) == max_lines:
+                break
+            lines.append(chunk)
+        index += 1
+
+    if current and len(lines) < max_lines:
+        lines.append(current)
+
+    complete = " ".join(words)
+    rendered = " ".join(lines)
+    if rendered != complete and lines:
+        ellipsis = "…"
+        last = lines[-1]
+        while last and measured_width(last + ellipsis, font_size) > max_width:
+            last = last[:-1]
+        lines[-1] = last.rstrip() + ellipsis
+
+    return lines
+
+
+def text_block(
+    text: str,
+    *,
+    x: int,
+    y: int,
+    max_width: int,
+    font_size: int,
+    max_lines: int,
+    line_height: int,
+    clip_id: str,
+    weight: str = "700",
+    fill: str = "#101828",
+) -> str:
+    lines = wrap_lines(text, max_width, font_size, max_lines)
+    tspans: list[str] = []
+    for idx, line in enumerate(lines):
+        if idx == 0:
+            attrs = f'x="{x}" y="{y}"'
+        else:
+            attrs = f'x="{x}" dy="{line_height}"'
+        tspans.append(f'    <tspan {attrs}>{esc(line)}</tspan>')
+    return (
+        f'  <text font-family="Arial, Helvetica, sans-serif" font-size="{font_size}" '
+        f'font-weight="{weight}" fill="{fill}" clip-path="url(#{clip_id})">\n'
+        + "\n".join(tspans)
+        + "\n  </text>"
+    )
+
+
 def status_svg(entity: dict, palette: dict) -> str:
     state = entity["stateContext"]
     swatch = palette["states"][state]
@@ -49,19 +162,46 @@ def status_svg(entity: dict, palette: dict) -> str:
     state_code = entity["state"]
     label = swatch["label"]
     color = swatch["hex"]
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="960" height="260" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+
+    name_block = text_block(
+        name,
+        x=54,
+        y=88,
+        max_width=780,
+        font_size=26,
+        max_lines=2,
+        line_height=30,
+        clip_id="status-name-clip",
+    )
+    badge_block = text_block(
+        f"{state} · {label}",
+        x=76,
+        y=177,
+        max_width=250,
+        font_size=18,
+        max_lines=2,
+        line_height=21,
+        clip_id="status-badge-clip",
+        fill="#FFFFFF",
+    )
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
   <title id="title">{esc(name)} — State dossier context {esc(state)}</title>
   <desc id="desc">Derived status card. The {esc(state_code)} State dossier is {esc(state)} — {esc(label)}. This status is context only and is not inherited by {esc(name)}.</desc>
-  <rect width="960" height="260" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
-  <rect width="18" height="260" rx="9" fill="{esc(color)}"/>
-  <text x="54" y="58" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#101828">STATE DOSSIER CONTEXT</text>
-  <text x="54" y="104" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#101828">{esc(name)}</text>
-  <rect x="54" y="130" width="250" height="58" rx="12" fill="{esc(color)}"/>
-  <text x="76" y="168" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF">{esc(state)} · {esc(label)}</text>
-  <text x="330" y="153" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#344054">{esc(state_code)} State dossier</text>
-  <text x="330" y="181" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475467">Context only — no entity-level governance inheritance</text>
-  <line x1="54" y1="212" x2="906" y2="212" stroke="#EAECF0"/>
-  <text x="54" y="239" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#667085">Color is never the sole signal: the state letter and label are always rendered.</text>
+  <defs>
+    <clipPath id="status-name-clip"><rect x="54" y="64" width="800" height="66"/></clipPath>
+    <clipPath id="status-badge-clip"><rect x="54" y="150" width="300" height="66" rx="12"/></clipPath>
+  </defs>
+  <rect width="960" height="300" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
+  <rect width="18" height="300" rx="9" fill="{esc(color)}"/>
+  <text x="54" y="48" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#344054">STATE DOSSIER CONTEXT</text>
+{name_block}
+  <rect x="54" y="150" width="300" height="66" rx="12" fill="{esc(color)}"/>
+{badge_block}
+  <text x="382" y="177" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#344054">{esc(state_code)} State dossier</text>
+  <text x="382" y="205" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475467">Context only — no entity-level governance inheritance</text>
+  <line x1="54" y1="246" x2="906" y2="246" stroke="#EAECF0"/>
+  <text x="54" y="275" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#667085">Color is never the sole signal: the state letter and label are always rendered.</text>
 </svg>
 '''
 
@@ -73,37 +213,87 @@ def evidence_svg(entity: dict) -> str:
     boundary = entity["visualModel"]["boundary"]
     granularity = entity["sourceGranularity"]
     granularity_label = "direct locator" if granularity == "direct" else "partial locator / explicit gap"
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360" role="img" aria-labelledby="title desc">
+
+    source_block = text_block(
+        source,
+        x=62,
+        y=180,
+        max_width=240,
+        font_size=15,
+        max_lines=3,
+        line_height=20,
+        clip_id="source-box-clip",
+    )
+    proposition_block = text_block(
+        proposition,
+        x=412,
+        y=180,
+        max_width=240,
+        font_size=15,
+        max_lines=3,
+        line_height=20,
+        clip_id="proposition-box-clip",
+    )
+    identity_block = text_block(
+        name,
+        x=762,
+        y=180,
+        max_width=240,
+        font_size=15,
+        max_lines=3,
+        line_height=20,
+        clip_id="identity-box-clip",
+    )
+    boundary_block = text_block(
+        f"{boundary} · no partOf/control/operation/participation/supplier inference",
+        x=172,
+        y=326,
+        max_width=828,
+        font_size=15,
+        max_lines=2,
+        line_height=20,
+        clip_id="boundary-box-clip",
+        weight="400",
+        fill="#475467",
+    )
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="390" viewBox="0 0 1100 390" role="img" aria-labelledby="title desc">
   <title id="title">{esc(name)} — derived evidence diagram</title>
   <desc id="desc">Derived evidence diagram linking the curated source surface to the dossier proposition and then to the entity identity, while preserving a no-governance-inheritance boundary.</desc>
-  <rect width="1100" height="360" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
+  <defs>
+    <clipPath id="source-box-clip"><rect x="52" y="158" width="276" height="70"/></clipPath>
+    <clipPath id="proposition-box-clip"><rect x="402" y="158" width="276" height="70"/></clipPath>
+    <clipPath id="identity-box-clip"><rect x="752" y="158" width="276" height="70"/></clipPath>
+    <clipPath id="boundary-box-clip"><rect x="172" y="304" width="828" height="48"/></clipPath>
+  </defs>
+  <rect width="1100" height="390" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
   <text x="40" y="48" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#101828">DERIVED EVIDENCE DIAGRAM</text>
   <text x="40" y="76" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#667085">Not a source facsimile · textual equivalent is preserved in the dossier</text>
 
-  <rect x="40" y="118" width="285" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
-  <text x="62" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
-  <text x="62" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">{esc(source)}</text>
-  <text x="62" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">{esc(granularity_label)}</text>
+  <rect x="40" y="118" width="300" height="156" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
+  <text x="62" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
+{source_block}
+  <text x="62" y="252" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">{esc(granularity_label)}</text>
 
-  <line x1="325" y1="183" x2="395" y2="183" stroke="#667085" stroke-width="2"/>
-  <polygon points="395,183 383,176 383,190" fill="#667085"/>
+  <line x1="340" y1="196" x2="388" y2="196" stroke="#667085" stroke-width="2"/>
+  <polygon points="388,196 376,189 376,203" fill="#667085"/>
 
-  <rect x="405" y="118" width="285" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
-  <text x="427" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
-  <text x="427" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">{esc(proposition)}</text>
-  <text x="427" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Prose evidence; no Claim/EvidenceItem invented</text>
+  <rect x="390" y="118" width="300" height="156" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
+  <text x="412" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
+{proposition_block}
+  <text x="412" y="252" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#667085">Prose evidence; no Claim/EvidenceItem invented</text>
 
-  <line x1="690" y1="183" x2="760" y2="183" stroke="#667085" stroke-width="2"/>
-  <polygon points="760,183 748,176 748,190" fill="#667085"/>
+  <line x1="690" y1="196" x2="738" y2="196" stroke="#667085" stroke-width="2"/>
+  <polygon points="738,196 726,189 726,203" fill="#667085"/>
 
-  <rect x="770" y="118" width="290" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
-  <text x="792" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">IDENTITY BOUNDARY</text>
-  <text x="792" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">{esc(name)}</text>
-  <text x="792" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Identity ≠ participation / culpability</text>
+  <rect x="740" y="118" width="320" height="156" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
+  <text x="762" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">IDENTITY BOUNDARY</text>
+{identity_block}
+  <text x="762" y="252" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Identity ≠ participation / culpability</text>
 
-  <rect x="40" y="284" width="1020" height="46" rx="10" fill="#F2F4F7"/>
-  <text x="60" y="313" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#344054">BOUNDARY:</text>
-  <text x="160" y="313" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475467">{esc(boundary)} · no partOf/control/operation/participation/supplier inference</text>
+  <rect x="40" y="304" width="1020" height="58" rx="10" fill="#F2F4F7"/>
+  <text x="60" y="326" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#344054">BOUNDARY:</text>
+{boundary_block}
 </svg>
 '''
 
@@ -111,23 +301,44 @@ def evidence_svg(entity: dict) -> str:
 def legend_svg(palette: dict) -> str:
     order = ["R", "S", "U", "N", "UNKNOWN"]
     x = 40
-    blocks = []
-    for key in order:
+    clip_defs: list[str] = []
+    blocks: list[str] = []
+    for idx, key in enumerate(order):
         item = palette["states"][key]
+        clip_id = f"legend-{idx}-clip"
+        clip_defs.append(
+            f'    <clipPath id="{clip_id}"><rect x="{x+12}" y="126" width="144" height="42"/></clipPath>'
+        )
+        label_block = text_block(
+            item["label"],
+            x=x + 18,
+            y=146,
+            max_width=132,
+            font_size=12,
+            max_lines=2,
+            line_height=16,
+            clip_id=clip_id,
+            weight="400",
+            fill="#FFFFFF",
+        )
         blocks.append(
-            f'  <rect x="{x}" y="92" width="168" height="78" rx="12" fill="{esc(item["hex"])}"/>\n'
-            f'  <text x="{x+18}" y="122" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#FFFFFF">{esc(key)}</text>\n'
-            f'  <text x="{x+18}" y="150" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#FFFFFF">{esc(item["label"])}</text>'
+            f'  <rect x="{x}" y="92" width="168" height="88" rx="12" fill="{esc(item["hex"])}"/>\n'
+            f'  <text x="{x+18}" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">{esc(key)}</text>\n'
+            f'{label_block}'
         )
         x += 184
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="230" viewBox="0 0 1000 230" role="img" aria-labelledby="title desc">
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="245" viewBox="0 0 1000 245" role="img" aria-labelledby="title desc">
   <title id="title">ECL dossier state-context palette</title>
   <desc id="desc">Canonical R, S, U, N and unknown colors. Letters and labels accompany every swatch; colors are never entity culpability scores.</desc>
-  <rect width="1000" height="230" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
+  <defs>
+{chr(10).join(clip_defs)}
+  </defs>
+  <rect width="1000" height="245" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
   <text x="40" y="47" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#101828">ECL STATE-CONTEXT PALETTE</text>
   <text x="40" y="73" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#667085">Rendering vocabulary only · not a severity scale · no governance inheritance</text>
 {chr(10).join(blocks)}
-  <text x="40" y="208" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Always render letter + text label together with color.</text>
+  <text x="40" y="222" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Always render letter + text label together with color.</text>
 </svg>
 '''
 
@@ -138,13 +349,16 @@ def main() -> int:
     parser.add_argument("--palette", type=Path, default=DEFAULT_PALETTE)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
+
     rows = load_entities(args.manifest_dir)
     palette = load_json(args.palette)
     args.out.mkdir(parents=True, exist_ok=True)
+
     (args.out / "state-outcome-legend.svg").write_text(legend_svg(palette), encoding="utf-8")
     for entity in rows:
         (args.out / f'{entity["id"]}-status.svg').write_text(status_svg(entity, palette), encoding="utf-8")
         (args.out / f'{entity["id"]}-evidence.svg').write_text(evidence_svg(entity), encoding="utf-8")
+
     return 0
 
 
