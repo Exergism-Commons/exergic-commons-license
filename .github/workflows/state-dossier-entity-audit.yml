@@ -6,6 +6,7 @@ on:
       - 'dossiers/states/**'
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
@@ -19,6 +20,7 @@ on:
       - 'dossiers/states/**'
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
@@ -55,7 +57,7 @@ jobs:
           python tools/audit_state_dossier_entities.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
 
-      - name: Generate full-corpus audits
+      - name: Generate full-corpus audits and reject unknown curated references
         run: |
           mkdir -p build
           python tools/audit_state_dossier_entities.py \
@@ -64,7 +66,8 @@ jobs:
             --fail-if-empty
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
-            --markdown build/schedule-reference-coverage.md
+            --markdown build/schedule-reference-coverage.md \
+            --fail-on-unresolved-curated
 
       - name: Prove deterministic output
         run: |
@@ -78,7 +81,8 @@ jobs:
             --fail-if-empty
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
-            --markdown build/schedule-reference-coverage.md
+            --markdown build/schedule-reference-coverage.md \
+            --fail-on-unresolved-curated
           cmp build/state-dossier-entity-audit.first.json build/state-dossier-entity-audit.json
           cmp build/state-dossier-entity-audit.first.md build/state-dossier-entity-audit.md
           cmp build/schedule-reference-coverage.first.json build/schedule-reference-coverage.json
