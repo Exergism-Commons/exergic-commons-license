@@ -130,6 +130,7 @@ jobs:
           cmp build/private-org-mention-audit.first.md build/private-org-mention-audit.md
 
       - name: Upload audit artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: state-dossier-entity-audit
