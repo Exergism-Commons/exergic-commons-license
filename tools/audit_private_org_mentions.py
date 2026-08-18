@@ -167,7 +167,7 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 4,
+        "schema_version": 5,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
@@ -224,6 +224,7 @@ def main() -> int:
     parser.add_argument("--json", type=Path)
     parser.add_argument("--markdown", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--fail-on-unresolved-private", action="store_true")
     args = parser.parse_args()
     if args.self_test:
         self_test()
@@ -236,6 +237,8 @@ def main() -> int:
         args.markdown.parent.mkdir(parents=True, exist_ok=True)
         write_markdown(report, args.markdown)
     print(json.dumps(report["counts"], sort_keys=True))
+    if args.fail_on_unresolved_private and report["counts"]["unresolved_review_candidates"]:
+        return 2
     return 0
 
 
