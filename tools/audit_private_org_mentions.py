@@ -21,13 +21,10 @@ FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 STATE_ID_RE = re.compile(r"^ECL-STATE-([A-Z]{3})$")
 PROPER = r"[A-Z][A-Za-z0-9&.'’/-]{2,}(?:\s+[A-Z][A-Za-z0-9&.'’/-]{2,}){0,3}"
 
-# Explicit company-form names are always candidates in dossier prose.
 CORPORATE_FORM_RE = re.compile(
     r"\b([A-Z][A-Za-z0-9&.'’/-]*(?:\s+(?:[A-Z][A-Za-z0-9&.'’/-]*|of|the|and)){0,5}\s+"
     r"(?:Ltd\.?|Limited|Inc\.?|Corp\.?|Corporation|Company|Technologies|Technology|Systems|Group|S\.A\.|AD|ZRT|Pte\.?\s+Ltd\.?))\b"
 )
-# Case-insensitivity applies only to the connective/action words. The captured name
-# stays case-sensitive, preventing "private contractor support" -> "support" noise.
 DIRECT_SUPPLIER_ACTION_RE = re.compile(
     rf"\b({PROPER})\s+"
     r"(?i:(?:itself\s+)?(?:halted|stopped|suspended|withdrew|supplied|provided|developed|sold|licensed|disabled|blocked)\s+"
@@ -94,7 +91,9 @@ def clean(name: str) -> str:
 def plausible(name: str) -> bool:
     if not name or name in STOP or len(name) < 3:
         return False
-    if name.startswith(("State ", "Current ", "Historical ", "Ordinary ")):
+    if name.startswith(("State ", "Current ", "Historical ", "Ordinary ", "UN ")):
+        return False
+    if "Working Group" in name:
         return False
     return True
 
@@ -168,7 +167,7 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
@@ -213,6 +212,7 @@ def write_markdown(report: dict, path: Path) -> None:
 def self_test() -> None:
     assert extract_names("Cellebrite halted product use in Serbia") == [("Cellebrite", "direct-supplier-action")]
     assert extract_names("private contractor support was reported") == []
+    assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
     assert any(name == "Example Technologies" for name, _ in names)
     assert norm("Cellebrite") == "cellebrite"
