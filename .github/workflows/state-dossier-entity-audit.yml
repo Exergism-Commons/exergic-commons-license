@@ -6,10 +6,12 @@ on:
       - 'dossiers/states/**'
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
+      - 'tools/review_state_dossier_candidates.py'
       - 'tools/audit_schedule_reference_coverage.py'
       - 'tools/audit_private_org_mentions.py'
       - 'tools/check_state_dossier_identity_sets.py'
@@ -21,10 +23,12 @@ on:
       - 'dossiers/states/**'
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
+      - 'tools/review_state_dossier_candidates.py'
       - 'tools/audit_schedule_reference_coverage.py'
       - 'tools/audit_private_org_mentions.py'
       - 'tools/check_state_dossier_identity_sets.py'
@@ -54,9 +58,10 @@ jobs:
       - name: Validate reviewed identity-only promotions
         run: python tools/test_entity_scaleout.py
 
-      - name: Self-test discovery semantics
+      - name: Self-test discovery and review semantics
         run: |
           python tools/audit_state_dossier_entities.py --self-test
+          python tools/review_state_dossier_candidates.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
           python tools/audit_private_org_mentions.py --self-test
 
@@ -67,6 +72,12 @@ jobs:
             --json build/state-dossier-entity-audit.json \
             --markdown build/state-dossier-entity-audit.md \
             --fail-if-empty
+          python tools/review_state_dossier_candidates.py \
+            --audit build/state-dossier-entity-audit.json \
+            --json build/state-dossier-candidate-review.json \
+            --markdown build/state-dossier-candidate-review.md \
+            --fail-on-stale-disposition \
+            --fail-on-unreviewed-priority 42
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
@@ -80,6 +91,8 @@ jobs:
         run: |
           cp build/state-dossier-entity-audit.json build/state-dossier-entity-audit.first.json
           cp build/state-dossier-entity-audit.md build/state-dossier-entity-audit.first.md
+          cp build/state-dossier-candidate-review.json build/state-dossier-candidate-review.first.json
+          cp build/state-dossier-candidate-review.md build/state-dossier-candidate-review.first.md
           cp build/schedule-reference-coverage.json build/schedule-reference-coverage.first.json
           cp build/schedule-reference-coverage.md build/schedule-reference-coverage.first.md
           cp build/private-org-mention-audit.json build/private-org-mention-audit.first.json
@@ -88,6 +101,12 @@ jobs:
             --json build/state-dossier-entity-audit.json \
             --markdown build/state-dossier-entity-audit.md \
             --fail-if-empty
+          python tools/review_state_dossier_candidates.py \
+            --audit build/state-dossier-entity-audit.json \
+            --json build/state-dossier-candidate-review.json \
+            --markdown build/state-dossier-candidate-review.md \
+            --fail-on-stale-disposition \
+            --fail-on-unreviewed-priority 42
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
@@ -98,6 +117,8 @@ jobs:
             --fail-on-unresolved-private
           cmp build/state-dossier-entity-audit.first.json build/state-dossier-entity-audit.json
           cmp build/state-dossier-entity-audit.first.md build/state-dossier-entity-audit.md
+          cmp build/state-dossier-candidate-review.first.json build/state-dossier-candidate-review.json
+          cmp build/state-dossier-candidate-review.first.md build/state-dossier-candidate-review.md
           cmp build/schedule-reference-coverage.first.json build/schedule-reference-coverage.json
           cmp build/schedule-reference-coverage.first.md build/schedule-reference-coverage.md
           cmp build/private-org-mention-audit.first.json build/private-org-mention-audit.json
@@ -110,6 +131,8 @@ jobs:
           path: |
             build/state-dossier-entity-audit.json
             build/state-dossier-entity-audit.md
+            build/state-dossier-candidate-review.json
+            build/state-dossier-candidate-review.md
             build/schedule-reference-coverage.json
             build/schedule-reference-coverage.md
             build/private-org-mention-audit.json
