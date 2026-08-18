@@ -37,6 +37,11 @@ def main() -> int:
         if not match or data.get("iso3") != match.group(1):
             continue
         iso = match.group(1)
+        # A canonical State dossier has three independent agreement points:
+        # filename, iso3, and ECL-STATE-<ISO3>. This intentionally excludes
+        # `_TEMPLATE.md` even though its example frontmatter uses XXX.
+        if path.stem != iso:
+            continue
         if iso in dossier_by_iso:
             print(f"duplicate canonical dossier for {iso}: {dossier_by_iso[iso]} and {path}")
             return 2
@@ -52,9 +57,12 @@ def main() -> int:
             print(f"malformed State identity id in {path.relative_to(ROOT)}: {data.get('id')!r}")
             return 3
         iso = match.group(1)
+        if path.stem != data.get("id"):
+            print(f"State identity filename/id mismatch: {path.relative_to(ROOT)} -> {data.get('id')!r}")
+            return 4
         if iso in identity_by_iso:
             print(f"duplicate State identity for {iso}: {identity_by_iso[iso]} and {path}")
-            return 4
+            return 5
         identity_by_iso[iso] = str(path.relative_to(ROOT))
 
     dossier_set = set(dossier_by_iso)
