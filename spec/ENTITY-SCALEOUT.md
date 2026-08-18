@@ -16,10 +16,21 @@ The target property is **representational completeness**, not accusation density
 6. Candidate extraction is discovery only. False positives are expected and must not enter `knowledge/entities/` without a stable, disambiguated referent.
 7. A Project/Deployment boundary must be objectively knowable enough to distinguish the object from a policy family, entire technology class, State apparatus, vendor product line, or speculative future deployment.
 8. Proposition-specific edges require proposition-specific evidence. Identity evidence is insufficient for conduct attribution.
+9. Counter-institutions, remediation projects and excluded actors are eligible for neutral identity materialization on the same terms as potentially restrictive actors/projects.
+
+## Canonical State universe
+
+A State dossier is canonical only when three independent values agree:
+
+- filename `<ISO3>.md`;
+- frontmatter `iso3: <ISO3>`;
+- frontmatter `id: ECL-STATE-<ISO3>`.
+
+`tools/check_state_dossier_identity_sets.py` requires exact set equality between these dossiers and `STATE-<ISO3>` ABox identities. This excludes `_TEMPLATE.md` even though its example frontmatter uses `XXX`.
 
 ## Coverage classes
 
-The audit distinguishes:
+The dossier discovery audit distinguishes:
 
 - **materialized** — a dossier mention resolves by canonical name/alias to an existing ABox identity;
 - **review-candidate** — a deterministic extractor found a plausible named actor/institution/project/deployment that does not resolve to an existing identity;
@@ -27,19 +38,38 @@ The audit distinguishes:
 - **deferred** — plausible referent, but the current record does not support an exact enough identity or Project/Deployment boundary;
 - **rejected** — extraction noise, generic class, legal/policy phrase, geographic label, or other non-identity.
 
-Only the first three correspond to a represented identity. `review-candidate`, `deferred`, and `rejected` have no ontology or governance effect.
+Only `materialized`/`curated-identity` correspond to represented identities. `review-candidate`, `deferred`, and `rejected` have no ontology or governance effect.
 
-## Audit contract
+## State dossier audit contract
 
 `tools/audit_state_dossier_entities.py` scans all canonical `dossiers/states/*.md`, compares detected names against `knowledge/entities/*.json`, and emits:
 
-- deterministic candidate groups;
+- deterministic State-scoped candidate groups;
 - every dossier/line/section occurrence;
 - whether a name already resolves to a canonical identity;
 - a review-priority value used only to order curation work;
 - State/outcome context so R/S dossiers can be reviewed first without treating the outcome as an actor/project attribution.
 
+Unresolved names remain State-scoped. The same text in two States is not evidence that it denotes the same individual.
+
 The audit must remain reproducible from repository contents and must not call an LLM, external NER service, search engine, or mutable external API.
+
+## Curated Schedule-reference gate
+
+State dossiers contain noisy prose, while `registry/schedule-state-s-freezes/` already contains a narrower set of reviewed actor/project references used in Schedule preparation. `tools/audit_schedule_reference_coverage.py` therefore provides a stronger second layer.
+
+For every curated `candidate_parties`/`identified_party`/`identified_operators` and `candidate_projects`/`identified_projects` reference, exactly one of the following representation states must be explainable:
+
+- **resolved** — canonical name/alias or a reviewed binding resolves the reference to one or more exact ABox identities;
+- **partial-deferred** — an exact component is resolved but the source also contains unspecified/composite components that must not be invented;
+- **deferred** — the source deliberately describes a plural, functional, conditional or otherwise non-enumerated class rather than one sufficiently exact identity;
+- **ambiguous / unresolved** — forbidden by the CI gate.
+
+Reviewed exceptions live in `knowledge/generated/schedule-reference-dispositions-v*.json`. A disposition is identity-resolution metadata only. A multi-identity binding does not assert `partOf`, control, participation, operation or any other relation. A deferral is not evidence against the entity and is not a governance judgment.
+
+CI runs the Schedule audit with `--fail-on-unresolved-curated`, so adding or changing a curated actor/project reference cannot silently create new identity debt.
+
+`scope` fields such as `schedule_identity`, `project_boundary`, identified incidents/locations and remediation text are retained as context and are not automatically coerced into ontology individuals.
 
 ## Promotion rule
 
@@ -53,20 +83,22 @@ A candidate may be promoted only when the repository contains enough information
 
 Promotion does **not** require a governance outcome.
 
-For `Project`/`Deployment`, the reviewer must additionally record why the object boundary is exact enough to be tracked independently.
+For `Project`/`Deployment`, the reviewer must additionally record why the object boundary is exact enough to be tracked independently. A historical/remediated project may remain first-class even when it is excluded from current governance scope; this preserves positive and negative evidence symmetrically.
 
 ## Relation rule
 
-After identity promotion, relation curation is a separate pass. A relation is created only as an auditable Claim with supporting EvidenceItem(s). The existence of two identities in the same dossier is never enough.
+After identity promotion, relation curation is a separate pass. A relation is created only as an auditable Claim with supporting EvidenceItem(s). The existence of two identities in the same dossier, freeze or project record is never enough.
 
 ## Intended workflow
 
-1. Run the deterministic full-corpus audit.
-2. Review unresolved candidates in descending discovery priority.
-3. Mark each candidate `curated-identity`, `deferred`, or `rejected` in a generated/reviewed manifest.
-4. Materialize reviewed identity-only records in bounded tranches.
-5. Add relation Claims only where proposition-specific evidence exists.
-6. Re-run the audit until unexplained high-priority unresolved candidates are eliminated.
-7. Re-run Formal Exergism coverage after the actor/object universe stabilizes.
+1. Prove exact State dossier/identity parity.
+2. Run the deterministic full-corpus State-dossier discovery audit.
+3. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved references.
+4. Review unresolved prose candidates using dossier context and existing internal registry/review records.
+5. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
+6. Materialize reviewed identity-only records in bounded tranches.
+7. Add relation Claims only where proposition-specific evidence exists.
+8. Re-run both audits until unexplained high-confidence State-dossier debt is eliminated.
+9. Re-run Formal Exergism coverage after the actor/object universe stabilizes.
 
 This ordering prevents Formal Exergism completeness from being measured against an artificially sparse ABox.
