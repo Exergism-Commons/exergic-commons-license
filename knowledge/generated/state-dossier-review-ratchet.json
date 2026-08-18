@@ -1,11 +1,1 @@
-{
-  "version": 3,
-  "date": "2026-08-18",
-  "min_review_priority": 34,
-  "reason": "All broad State-dossier discovery candidates with review priority 34 or greater have a reviewed disposition or resolve directly to a canonical identity. Lower this value only after the newly included cohort is fully curated and CI passes.",
-  "semantics": [
-    "review priority orders curation work only and has no governance meaning",
-    "lowering the threshold is a monotonic review-completeness ratchet",
-    "the threshold does not redefine Actor, Project, evidence, attribution or R/S/U/N"
-  ]
-}
+{"version":4,"date":"2026-08-18","min_review_priority":33,"reason":"All broad State-dossier discovery candidates with review priority 33 or greater have a reviewed disposition or resolve directly to a canonical identity. Lower this value only after the newly included cohort is fully curated and CI passes.","semantics":["review priority orders curation work only and has no governance meaning","lowering the threshold is a monotonic review-completeness ratchet","the threshold does not redefine Actor, Project, evidence, attribution or R/S/U/N"]}
