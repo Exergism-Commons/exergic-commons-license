@@ -21,6 +21,8 @@ from typing import Callable, Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge" / "entities"
+GENERATED_DIR = ROOT / "knowledge" / "generated"
+SUPERSESSION_GLOB = "entity-id-supersessions-v*.json"
 
 DOMESTIC_ID_RE = re.compile(
     r"^(?:AGENCY|INSTITUTION|ORG|PROJECT|DEPLOYMENT|PERSON)-([A-Z]{3})(?:-|$)"
@@ -33,6 +35,32 @@ def infer_domestic_state(entity_id: str, state_codes: set[str]) -> str | None:
         return None
     state = match.group(1)
     return state if state in state_codes else None
+
+
+def load_id_supersessions() -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for path in sorted(GENERATED_DIR.glob(SUPERSESSION_GLOB)):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert isinstance(data.get("version"), int) and data["version"] >= 1, path
+        for row in data.get("supersessions", []):
+            source = row.get("from")
+            target = row.get("to")
+            reason = row.get("reason")
+            assert isinstance(source, str) and source, (path, row)
+            assert isinstance(target, str) and target and target != source, (path, row)
+            assert isinstance(reason, str) and reason.strip(), (path, row)
+            assert source not in mapping, f"duplicate identity supersession source: {source}"
+            mapping[source] = target
+
+    # Supersession chains are deliberately forbidden. One historical ID must point
+    # directly at the current canonical ID so provenance never depends on transitive drift.
+    chained = sorted(source for source, target in mapping.items() if target in mapping)
+    assert not chained, f"identity supersession chains are forbidden: {chained}"
+    return mapping
+
+
+def canonicalize_id(entity_id: str, supersessions: dict[str, str]) -> str:
+    return supersessions.get(entity_id, entity_id)
 
 
 @dataclass
@@ -49,9 +77,10 @@ def build_name_index(
     entities: Iterable[dict], *, state_codes: set[str], normalizer: Callable[[str], str]
 ) -> NameIndex:
     index = NameIndex(state_codes=set(state_codes))
+    supersessions = load_id_supersessions()
     for entity in entities:
         entity_id = entity.get("id")
-        if not isinstance(entity_id, str):
+        if not isinstance(entity_id, str) or entity_id in supersessions:
             continue
         index.by_id[entity_id] = entity
         scope = infer_domestic_state(entity_id, state_codes)
@@ -93,18 +122,16 @@ def default_normalizer(value: str) -> str:
 
 
 def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
-    """Reject duplicate first-class identities with the same primary name in one scope.
-
-    Aliases may intentionally overlap while a review is resolving terminology. Primary
-    names may not: two domestic IDs with the same normalized primary name create an
-    identity ambiguity that cannot be repaired by an overlay disposition.
-    """
+    """Reject duplicate first-class identities with the same primary name in one scope."""
     entities: list[dict] = []
     state_codes: set[str] = set()
+    supersessions = load_id_supersessions()
     for path in sorted(ENTITY_DIR.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
-        entities.append(data)
         entity_id = data.get("id")
+        if isinstance(entity_id, str) and entity_id in supersessions:
+            continue
+        entities.append(data)
         if data.get("type") == "State" and isinstance(entity_id, str) and entity_id.startswith("STATE-"):
             state_codes.add(entity_id.removeprefix("STATE-"))
 
@@ -120,18 +147,24 @@ def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
         scope = infer_domestic_state(entity_id, state_codes) or "GLOBAL"
         groups[(scope, normalized)].add(entity_id)
 
-    duplicates = [
+    return [
         {"scope": scope, "normalized_name": normalized, "ids": sorted(ids)}
         for (scope, normalized), ids in sorted(groups.items())
         if len(ids) > 1
     ]
-    return duplicates
+
+
+def audit_supersession_targets() -> list[str]:
+    entity_ids: set[str] = set()
+    for path in sorted(ENTITY_DIR.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data.get("id"), str):
+            entity_ids.add(data["id"])
+    supersessions = load_id_supersessions()
+    return sorted(target for target in supersessions.values() if target not in entity_ids)
 
 
 def self_test() -> None:
-    def n(value: str) -> str:
-        return default_normalizer(value)
-
     states = {"KAZ", "SVK", "AUS", "NRU"}
     entities = [
         {
@@ -151,26 +184,28 @@ def self_test() -> None:
         },
         {"id": "ORG-OHCHR", "name": "OHCHR", "aliases": ["UN Human Rights Office"]},
     ]
-    index = build_name_index(entities, state_codes=states, normalizer=n)
-    assert resolve_normalized(index, state="SVK", normalized=n("Constitutional Court")) == [
+    index = build_name_index(entities, state_codes=states, normalizer=default_normalizer)
+    assert resolve_normalized(index, state="SVK", normalized=default_normalizer("Constitutional Court")) == [
         "INSTITUTION-SVK-CONSTITUTIONAL-COURT"
     ]
-    assert resolve_normalized(index, state="KAZ", normalized=n("Constitutional Court")) == [
+    assert resolve_normalized(index, state="KAZ", normalized=default_normalizer("Constitutional Court")) == [
         "INSTITUTION-KAZ-CONSTITUTIONAL-COURT"
     ]
-    assert resolve_normalized(index, state="NRU", normalized=n("Constitutional Court")) == []
-    # Cross-State domestic references require an explicit reviewed binding.
-    assert resolve_normalized(index, state="NRU", normalized=n("Australian Human Rights Commission")) == []
-    # Truly global/transnational identity names may resolve across State dossiers.
-    assert resolve_normalized(index, state="NRU", normalized=n("OHCHR")) == ["ORG-OHCHR"]
+    assert resolve_normalized(index, state="NRU", normalized=default_normalizer("Constitutional Court")) == []
+    assert resolve_normalized(index, state="NRU", normalized=default_normalizer("Australian Human Rights Commission")) == []
+    assert resolve_normalized(index, state="NRU", normalized=default_normalizer("OHCHR")) == ["ORG-OHCHR"]
     assert eligible_in_state(index, "INSTITUTION-SVK-CONSTITUTIONAL-COURT", "KAZ") is False
     assert eligible_in_state(index, "ORG-OHCHR", "KAZ") is True
 
 
 if __name__ == "__main__":
     self_test()
+    missing_targets = audit_supersession_targets()
+    if missing_targets:
+        print("MISSING_SUPERSESSION_TARGETS=" + json.dumps(missing_targets))
+        raise SystemExit(1)
     duplicates = audit_repository_primary_name_uniqueness()
     if duplicates:
         print("DUPLICATE_PRIMARY_IDENTITIES=" + json.dumps(duplicates, sort_keys=True))
         raise SystemExit(1)
-    print("entity identity resolution self-test: OK; repository primary names unique")
+    print("entity identity resolution self-test: OK; supersessions valid; repository primary names unique")
