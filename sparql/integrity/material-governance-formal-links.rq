@@ -3,7 +3,7 @@ PREFIX ecl: <urn:ecl:>
 SELECT ?record ?problem WHERE {
   {
     ?record a ecl:GovernanceDecision ; ecl:outcome ?outcome .
-    FILTER (?outcome IN (ecl:R, ecl:S))
+    FILTER (?outcome IN (ecl:OutcomeR, ecl:OutcomeS))
     FILTER NOT EXISTS { ?record ecl:basedOnAssessment ?assessment }
     BIND("material GovernanceDecision lacks basedOnAssessment" AS ?problem)
   }
