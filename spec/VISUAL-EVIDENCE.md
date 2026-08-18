@@ -74,6 +74,21 @@ Committed SVG evidence visuals must include:
 
 Visual interpretation must remain possible in monochrome or for readers who cannot distinguish the palette colors.
 
+## Layout bounds and text overflow
+
+Dynamic SVG text MUST remain inside the visual region that owns it. It must never rely on an assumed browser font metric or be allowed to paint into a later column, arrow, badge or annotation.
+
+The canonical renderer therefore uses two independent protections:
+
+1. **deterministic wrapping** with conservative font-width estimates and bounded line counts; and
+2. **hard SVG `clipPath` guards** around every dynamic name, source, proposition, identity, boundary and palette-label region.
+
+The clip is the fail-closed guarantee: even if a browser substitutes a font whose glyph metrics are wider than the renderer's estimate, text cannot render beyond the owning box. Wrapping is the readability layer above that hard bound.
+
+If bounded content cannot fit within the permitted line count, the rendered line may be ellipsized. The full text MUST remain available in the dossier or versioned manifest and, for entity names, in SVG metadata.
+
+`tools/check_dossier_visual_layout.py` validates the committed and regenerated SVGs in CI, including clip geometry, clip assignment and maximum wrapped-line counts. A generated asset that loses its hard overflow guard fails CI.
+
 ## AI-generated and decorative imagery
 
 AI-generated, reconstructed or decorative imagery is not evidence and MUST NOT be placed in an evidence section or stored under a path that implies evidentiary status.
