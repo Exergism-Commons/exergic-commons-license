@@ -15,7 +15,8 @@
   </text>
   <rect x="54" y="150" width="300" height="66" rx="12" fill="#D4A017"/>
   <text font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" clip-path="url(#status-badge-clip)">
-    <tspan x="76" y="177">U · Under review / unresolved</tspan>
+    <tspan x="76" y="177">U · Under review /</tspan>
+    <tspan x="76" dy="21">unresolved</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#344054" clip-path="url(#status-context-clip)">
     <tspan x="382" y="177">HND State dossier</tspan>
