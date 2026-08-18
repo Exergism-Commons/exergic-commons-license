@@ -18,7 +18,7 @@ ecl:MaterialGovernanceFormalLinkShape a sh:NodeShape ;
             PREFIX ecl: <urn:ecl:>
             SELECT $this WHERE {
               $this ecl:outcome ?outcome .
-              FILTER (?outcome IN (ecl:R, ecl:S))
+              FILTER (?outcome IN (ecl:OutcomeR, ecl:OutcomeS))
               FILTER NOT EXISTS { $this ecl:basedOnAssessment ?assessment }
             }
         """
