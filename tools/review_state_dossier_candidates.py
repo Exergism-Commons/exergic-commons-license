@@ -63,6 +63,15 @@ def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
     return by_key, manifests
 
 
+def load_ratchet(path: Path) -> tuple[int, dict]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    threshold = data.get("min_review_priority")
+    assert isinstance(threshold, int) and threshold >= 0, (path, threshold)
+    assert isinstance(data.get("version"), int) and data["version"] >= 1, path
+    assert isinstance(data.get("reason"), str) and data["reason"].strip(), path
+    return threshold, data
+
+
 def review(audit: dict, dispositions: dict[tuple[str, str], dict], priority_threshold: int | None = None) -> dict:
     raw = [item for item in audit["candidates"] if item["resolution"] == "review-candidate"]
     occurrence_keys: set[tuple[str, str]] = set()
@@ -218,6 +227,7 @@ def main() -> int:
     parser.add_argument("--json", type=Path)
     parser.add_argument("--markdown", type=Path)
     parser.add_argument("--fail-on-unreviewed-priority", type=int)
+    parser.add_argument("--ratchet-config", type=Path)
     parser.add_argument("--fail-on-stale-disposition", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -226,10 +236,25 @@ def main() -> int:
         return 0
     if args.audit is None:
         parser.error("--audit is required unless --self-test is used")
+    if args.fail_on_unreviewed_priority is not None and args.ratchet_config is not None:
+        parser.error("use either --fail-on-unreviewed-priority or --ratchet-config, not both")
+
+    threshold = args.fail_on_unreviewed_priority
+    ratchet = None
+    if args.ratchet_config is not None:
+        threshold, ratchet = load_ratchet(args.ratchet_config)
+
     audit = json.loads(args.audit.read_text(encoding="utf-8"))
     dispositions, manifests = load_dispositions()
-    report = review(audit, dispositions, args.fail_on_unreviewed_priority)
+    report = review(audit, dispositions, threshold)
     report["disposition_manifests"] = manifests
+    if ratchet is not None:
+        report["ratchet"] = {
+            "config": str(args.ratchet_config),
+            "version": ratchet["version"],
+            "min_review_priority": threshold,
+            "reason": ratchet["reason"],
+        }
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -239,10 +264,7 @@ def main() -> int:
     print(json.dumps(report["counts"], sort_keys=True))
     if args.fail_on_stale_disposition and report["counts"]["stale_dispositions"]:
         return 4
-    if (
-        args.fail_on_unreviewed_priority is not None
-        and report["counts"]["unreviewed_at_or_above_threshold"]
-    ):
+    if threshold is not None and report["counts"]["unreviewed_at_or_above_threshold"]:
         return 5
     return 0
 
