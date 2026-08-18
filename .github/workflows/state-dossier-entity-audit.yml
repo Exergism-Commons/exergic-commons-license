@@ -11,6 +11,7 @@ on:
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
+      - 'tools/entity_identity_resolution.py'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/review_state_dossier_candidates.py'
       - 'tools/audit_schedule_reference_coverage.py'
@@ -29,6 +30,7 @@ on:
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
+      - 'tools/entity_identity_resolution.py'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/review_state_dossier_candidates.py'
       - 'tools/audit_schedule_reference_coverage.py'
@@ -62,6 +64,7 @@ jobs:
 
       - name: Self-test discovery and review semantics
         run: |
+          python tools/entity_identity_resolution.py
           python tools/audit_state_dossier_entities.py --self-test
           python tools/review_state_dossier_candidates.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
