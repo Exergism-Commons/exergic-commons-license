@@ -1,0 +1,66 @@
+name: Canonical entity dossiers
+
+on:
+  push:
+    paths:
+      - 'dossiers/**'
+      - 'knowledge/entities/**'
+      - 'knowledge/generated/canonical-entity-dossier-migration-*.json'
+      - 'knowledge/generated/dossier-visual-palette-*.json'
+      - 'spec/VISUAL-EVIDENCE.md'
+      - 'schemas/evidence-image-metadata.schema.json'
+      - 'tools/check_canonical_entity_dossiers.py'
+      - 'tools/render_dossier_visuals.py'
+      - '.github/workflows/canonical-entity-dossiers.yml'
+  pull_request:
+    paths:
+      - 'dossiers/**'
+      - 'knowledge/entities/**'
+      - 'knowledge/generated/canonical-entity-dossier-migration-*.json'
+      - 'knowledge/generated/dossier-visual-palette-*.json'
+      - 'spec/VISUAL-EVIDENCE.md'
+      - 'schemas/evidence-image-metadata.schema.json'
+      - 'tools/check_canonical_entity_dossiers.py'
+      - 'tools/render_dossier_visuals.py'
+      - '.github/workflows/canonical-entity-dossiers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-dossiers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate canonical per-entity dossier ratchet
+        run: |
+          mkdir -p build
+          python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json
+
+      - name: Regenerate derived visuals
+        run: |
+          rm -rf build/generated-visuals
+          python tools/render_dossier_visuals.py --out build/generated-visuals
+          diff -ru dossiers/assets/generated build/generated-visuals
+
+      - name: Prove deterministic visual generation
+        run: |
+          cp -R build/generated-visuals build/generated-visuals.first
+          rm -rf build/generated-visuals
+          python tools/render_dossier_visuals.py --out build/generated-visuals
+          diff -ru build/generated-visuals.first build/generated-visuals
+
+      - name: Upload dossier coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-entity-dossier-coverage
+          path: |
+            build/canonical-entity-dossier-coverage.json
+            build/generated-visuals/
+          if-no-files-found: error
