@@ -1,5 +1,6 @@
 {
   "assessment_id": "ECL-EX-NLD-001",
+  "actor_id": "STATE-NLD",
   "model": "formal-exergism-v2-pilot",
   "entity": "Netherlands",
   "dossier": "dossiers/states/NLD.md",
