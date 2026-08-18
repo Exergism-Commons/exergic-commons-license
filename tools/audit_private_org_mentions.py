@@ -19,26 +19,22 @@ STATE_DIR = ROOT / "dossiers" / "states"
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 STATE_ID_RE = re.compile(r"^ECL-STATE-([A-Z]{3})$")
+PROPER = r"[A-Z][A-Za-z0-9&.'’/-]{2,}(?:\s+[A-Z][A-Za-z0-9&.'’/-]{2,}){0,3}"
 
 # Explicit company-form names are always candidates in dossier prose.
 CORPORATE_FORM_RE = re.compile(
     r"\b([A-Z][A-Za-z0-9&.'’/-]*(?:\s+(?:[A-Z][A-Za-z0-9&.'’/-]*|of|the|and)){0,5}\s+"
     r"(?:Ltd\.?|Limited|Inc\.?|Corp\.?|Corporation|Company|Technologies|Technology|Systems|Group|S\.A\.|AD|ZRT|Pte\.?\s+Ltd\.?))\b"
 )
-# Brand/group names without a legal suffix are accepted only when the sentence directly
-# assigns a vendor-like action involving a product/technology/software/tool/platform.
+# Case-insensitivity applies only to the connective/action words. The captured name
+# stays case-sensitive, preventing "private contractor support" -> "support" noise.
 DIRECT_SUPPLIER_ACTION_RE = re.compile(
-    r"\b([A-Z][A-Za-z0-9&.'’/-]{2,}(?:\s+[A-Z][A-Za-z0-9&.'’/-]{2,}){0,3})\s+"
-    r"(?:itself\s+)?(?:halted|stopped|suspended|withdrew|supplied|provided|developed|sold|licensed|disabled|blocked)\s+"
-    r"(?:its\s+|the\s+|a\s+|an\s+)?(?:product|products|technology|technologies|software|spyware|platform|tools?|service|services)\b",
-    re.I,
+    rf"\b({PROPER})\s+"
+    r"(?i:(?:itself\s+)?(?:halted|stopped|suspended|withdrew|supplied|provided|developed|sold|licensed|disabled|blocked)\s+"
+    r"(?:its\s+|the\s+|a\s+|an\s+)?(?:product|products|technology|technologies|software|spyware|platform|tools?|service|services))\b"
 )
-# Also recognize explicit syntactic labels such as "supplier Cellebrite" or
-# "contractor Foo Technologies". The candidate must still look like a proper name.
 LABELED_PRIVATE_RE = re.compile(
-    r"\b(?:supplier|vendor|contractor|private\s+company|technology\s+provider)\s+"
-    r"([A-Z][A-Za-z0-9&.'’/-]{2,}(?:\s+[A-Z][A-Za-z0-9&.'’/-]{2,}){0,4})\b",
-    re.I,
+    rf"\b(?i:(?:supplier|vendor|contractor|private\s+company|technology\s+provider)\s+)(?P<name>{PROPER})\b"
 )
 STOP = {
     "Restricted Party", "Restricted Project", "Material Participation", "Covered Associate",
@@ -105,16 +101,19 @@ def plausible(name: str) -> bool:
 
 def extract_names(line: str) -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = []
-    for regex, method in (
-        (CORPORATE_FORM_RE, "corporate-form"),
-        (DIRECT_SUPPLIER_ACTION_RE, "direct-supplier-action"),
-        (LABELED_PRIVATE_RE, "explicit-private-label"),
-    ):
-        for match in regex.finditer(line):
-            value = clean(match.group(1))
-            if plausible(value):
-                found.append((value, method))
-    # Deduplicate same normalized name on one line while preserving strongest reason.
+    for match in CORPORATE_FORM_RE.finditer(line):
+        value = clean(match.group(1))
+        if plausible(value):
+            found.append((value, "corporate-form"))
+    for match in DIRECT_SUPPLIER_ACTION_RE.finditer(line):
+        value = clean(match.group(1))
+        if plausible(value):
+            found.append((value, "direct-supplier-action"))
+    for match in LABELED_PRIVATE_RE.finditer(line):
+        value = clean(match.group("name"))
+        if plausible(value):
+            found.append((value, "explicit-private-label"))
+
     result: dict[str, tuple[str, str]] = {}
     priority = {"corporate-form": 3, "direct-supplier-action": 2, "explicit-private-label": 1}
     for value, method in found:
@@ -169,7 +168,7 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
@@ -214,7 +213,8 @@ def write_markdown(report: dict, path: Path) -> None:
 def self_test() -> None:
     assert extract_names("Cellebrite halted product use in Serbia") == [("Cellebrite", "direct-supplier-action")]
     assert extract_names("private contractor support was reported") == []
-    assert any(name == "Example Technologies" for name, _ in extract_names("Example Technologies supplied software"))
+    names = extract_names("Example Technologies supplied software")
+    assert any(name == "Example Technologies" for name, _ in names)
     assert norm("Cellebrite") == "cellebrite"
     print("private organization audit self-test: OK")
 
