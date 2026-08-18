@@ -5,17 +5,23 @@ on:
     paths:
       - 'dossiers/states/**'
       - 'knowledge/entities/**'
+      - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/check_state_dossier_identity_sets.py'
+      - 'tools/test_entity_scaleout.py'
       - '.github/workflows/state-dossier-entity-audit.yml'
   pull_request:
     paths:
       - 'dossiers/states/**'
       - 'knowledge/entities/**'
+      - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/check_state_dossier_identity_sets.py'
+      - 'tools/test_entity_scaleout.py'
       - '.github/workflows/state-dossier-entity-audit.yml'
   workflow_dispatch:
 
@@ -33,6 +39,9 @@ jobs:
 
       - name: Require exact State dossier/identity parity
         run: python tools/check_state_dossier_identity_sets.py
+
+      - name: Validate reviewed identity-only promotions
+        run: python tools/test_entity_scaleout.py
 
       - name: Self-test discovery semantics
         run: python tools/audit_state_dossier_entities.py --self-test
