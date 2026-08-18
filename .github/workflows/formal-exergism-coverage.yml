@@ -92,6 +92,42 @@ jobs:
           pyshacl -s ontology/exergism-governance-coverage.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build/graph/ecl-abox.ttl
           python tools/run_sparql_checks.py build/graph/ecl-knowledge.nt sparql/integrity
 
+      - name: Prove R/S graph gate rejects missing formal assessment links
+        run: |
+          cat > build/coverage-negative.ttl <<'TTL'
+          @prefix ecl: <urn:ecl:> .
+          ecl:TEST-GD a ecl:GovernanceDecision ;
+              ecl:subject ecl:STATE-USA ;
+              ecl:outcome ecl:OutcomeR .
+          TTL
+          if pyshacl -s ontology/exergism-governance-coverage.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build/coverage-negative.ttl; then
+            echo "ERROR: OutcomeR GovernanceDecision without basedOnAssessment escaped SHACL"
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          from rdflib import Graph
+          g=Graph().parse('build/coverage-negative.ttl', format='turtle')
+          q=Path('sparql/integrity/material-governance-formal-links.rq').read_text(encoding='utf-8')
+          rows=list(g.query(q))
+          assert rows, 'OutcomeR GovernanceDecision escaped SPARQL integrity query'
+          print('negative R/S governance-link fixture rejected by SHACL and SPARQL')
+          PY
+
+      - name: Prove linked governance and Schedule fixture conforms
+        run: |
+          cat > build/coverage-positive.ttl <<'TTL'
+          @prefix ecl: <urn:ecl:> .
+          ecl:TEST-ASSESSMENT a ecl:ExergicAssessment .
+          ecl:TEST-GD a ecl:GovernanceDecision ;
+              ecl:subject ecl:STATE-USA ;
+              ecl:outcome ecl:OutcomeS ;
+              ecl:basedOnAssessment ecl:TEST-ASSESSMENT .
+          ecl:TEST-SE a ecl:ScheduleEntry ;
+              ecl:basedOnDecision ecl:TEST-GD .
+          TTL
+          pyshacl -s ontology/exergism-governance-coverage.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build/coverage-positive.ttl
+
       - uses: actions/upload-artifact@v4
         with:
           name: formal-exergism-coverage
