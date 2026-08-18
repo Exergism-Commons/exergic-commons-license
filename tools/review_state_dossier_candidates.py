@@ -151,6 +151,7 @@ def review(audit: dict, dispositions: dict[tuple[str, str], dict], priority_thre
             "unreviewed_at_or_above_threshold": len(high_unreviewed),
         },
         "stale_dispositions": stale,
+        "unreviewed_at_or_above_threshold": high_unreviewed,
         "candidates": rows,
     }
 
@@ -176,11 +177,8 @@ def write_markdown(report: dict, path: Path) -> None:
             f"**{counts['unreviewed_at_or_above_threshold']}**"
         )
     lines += [
-        "",
-        "## Highest-priority unreviewed candidates",
-        "",
-        "| State | Candidate | Kind | Priority |",
-        "|---|---|---|---:|",
+        "", "## Highest-priority unreviewed candidates", "",
+        "| State | Candidate | Kind | Priority |", "|---|---|---|---:|",
     ]
     for row in report["candidates"]:
         if row["review_status"] != "unreviewed":
@@ -192,32 +190,16 @@ def write_markdown(report: dict, path: Path) -> None:
 
 
 def self_test() -> None:
-    fake = {
-        "candidates": [
-            {
-                "candidate": "The Court", "normalized": "the court",
-                "resolution": "review-candidate", "states": ["AAA"], "review_priority": 50,
-                "kinds": ["actor-or-institution"],
-                "occurrences": [{"state": "AAA", "normalized": "the court"}],
-            },
-            {
-                "candidate": "Noise", "normalized": "noise",
-                "resolution": "review-candidate", "states": ["BBB"], "review_priority": 10,
-                "kinds": ["acronym-review"],
-                "occurrences": [{"state": "BBB", "normalized": "noise"}],
-            },
-        ]
-    }
-    dispositions = {
-        ("AAA", "the court"): {
-            "state": "AAA", "normalized": "the court", "status": "deferred",
-            "reason": "not exact", "source": "x",
-        }
-    }
+    fake = {"candidates": [
+        {"candidate":"The Court","normalized":"the court","resolution":"review-candidate","states":["AAA"],"review_priority":50,"kinds":["actor-or-institution"],"occurrences":[{"state":"AAA","normalized":"the court"}]},
+        {"candidate":"Noise","normalized":"noise","resolution":"review-candidate","states":["BBB"],"review_priority":10,"kinds":["acronym-review"],"occurrences":[{"state":"BBB","normalized":"noise"}]},
+    ]}
+    dispositions = {("AAA", "the court"): {"state":"AAA","normalized":"the court","status":"deferred","reason":"not exact","source":"x"}}
     report = review(fake, dispositions, 42)
     assert report["counts"]["deferred"] == 1
     assert report["counts"]["unreviewed"] == 1
     assert report["counts"]["unreviewed_at_or_above_threshold"] == 0
+    assert report["unreviewed_at_or_above_threshold"] == []
     print("State dossier candidate review self-test: OK")
 
 
@@ -250,10 +232,8 @@ def main() -> int:
     report["disposition_manifests"] = manifests
     if ratchet is not None:
         report["ratchet"] = {
-            "config": str(args.ratchet_config),
-            "version": ratchet["version"],
-            "min_review_priority": threshold,
-            "reason": ratchet["reason"],
+            "config": str(args.ratchet_config), "version": ratchet["version"],
+            "min_review_priority": threshold, "reason": ratchet["reason"],
         }
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
@@ -263,8 +243,10 @@ def main() -> int:
         write_markdown(report, args.markdown)
     print(json.dumps(report["counts"], sort_keys=True))
     if args.fail_on_stale_disposition and report["counts"]["stale_dispositions"]:
+        print("STALE_DISPOSITIONS=" + json.dumps(report["stale_dispositions"], ensure_ascii=False, sort_keys=True))
         return 4
     if threshold is not None and report["counts"]["unreviewed_at_or_above_threshold"]:
+        print("UNREVIEWED_RATCHET_DRIFT=" + json.dumps(report["unreviewed_at_or_above_threshold"], ensure_ascii=False, sort_keys=True))
         return 5
     return 0
 
