@@ -1,0 +1,61 @@
+name: State dossier entity audit
+
+on:
+  push:
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'spec/ENTITY-SCALEOUT.md'
+      - 'tools/audit_state_dossier_entities.py'
+      - '.github/workflows/state-dossier-entity-audit.yml'
+  pull_request:
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'spec/ENTITY-SCALEOUT.md'
+      - 'tools/audit_state_dossier_entities.py'
+      - '.github/workflows/state-dossier-entity-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Self-test discovery semantics
+        run: python tools/audit_state_dossier_entities.py --self-test
+
+      - name: Generate full-corpus audit
+        run: |
+          mkdir -p build
+          python tools/audit_state_dossier_entities.py \
+            --json build/state-dossier-entity-audit.json \
+            --markdown build/state-dossier-entity-audit.md \
+            --fail-if-empty
+
+      - name: Prove deterministic output
+        run: |
+          cp build/state-dossier-entity-audit.json build/state-dossier-entity-audit.first.json
+          cp build/state-dossier-entity-audit.md build/state-dossier-entity-audit.first.md
+          python tools/audit_state_dossier_entities.py \
+            --json build/state-dossier-entity-audit.json \
+            --markdown build/state-dossier-entity-audit.md \
+            --fail-if-empty
+          cmp build/state-dossier-entity-audit.first.json build/state-dossier-entity-audit.json
+          cmp build/state-dossier-entity-audit.first.md build/state-dossier-entity-audit.md
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: state-dossier-entity-audit
+          path: |
+            build/state-dossier-entity-audit.json
+            build/state-dossier-entity-audit.md
+          if-no-files-found: error
