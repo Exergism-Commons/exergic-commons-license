@@ -11,6 +11,7 @@ on:
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/audit_schedule_reference_coverage.py'
+      - 'tools/audit_private_org_mentions.py'
       - 'tools/check_state_dossier_identity_sets.py'
       - 'tools/test_entity_scaleout.py'
       - 'tools/schedule-requirements.txt'
@@ -25,6 +26,7 @@ on:
       - 'spec/ENTITY-SCALEOUT.md'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/audit_schedule_reference_coverage.py'
+      - 'tools/audit_private_org_mentions.py'
       - 'tools/check_state_dossier_identity_sets.py'
       - 'tools/test_entity_scaleout.py'
       - 'tools/schedule-requirements.txt'
@@ -56,6 +58,7 @@ jobs:
         run: |
           python tools/audit_state_dossier_entities.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
+          python tools/audit_private_org_mentions.py --self-test
 
       - name: Generate full-corpus audits and reject unknown curated references
         run: |
@@ -68,6 +71,9 @@ jobs:
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
             --fail-on-unresolved-curated
+          python tools/audit_private_org_mentions.py \
+            --json build/private-org-mention-audit.json \
+            --markdown build/private-org-mention-audit.md
 
       - name: Prove deterministic output
         run: |
@@ -75,6 +81,8 @@ jobs:
           cp build/state-dossier-entity-audit.md build/state-dossier-entity-audit.first.md
           cp build/schedule-reference-coverage.json build/schedule-reference-coverage.first.json
           cp build/schedule-reference-coverage.md build/schedule-reference-coverage.first.md
+          cp build/private-org-mention-audit.json build/private-org-mention-audit.first.json
+          cp build/private-org-mention-audit.md build/private-org-mention-audit.first.md
           python tools/audit_state_dossier_entities.py \
             --json build/state-dossier-entity-audit.json \
             --markdown build/state-dossier-entity-audit.md \
@@ -83,10 +91,15 @@ jobs:
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
             --fail-on-unresolved-curated
+          python tools/audit_private_org_mentions.py \
+            --json build/private-org-mention-audit.json \
+            --markdown build/private-org-mention-audit.md
           cmp build/state-dossier-entity-audit.first.json build/state-dossier-entity-audit.json
           cmp build/state-dossier-entity-audit.first.md build/state-dossier-entity-audit.md
           cmp build/schedule-reference-coverage.first.json build/schedule-reference-coverage.json
           cmp build/schedule-reference-coverage.first.md build/schedule-reference-coverage.md
+          cmp build/private-org-mention-audit.first.json build/private-org-mention-audit.json
+          cmp build/private-org-mention-audit.first.md build/private-org-mention-audit.md
 
       - name: Upload audit artifact
         uses: actions/upload-artifact@v4
@@ -97,4 +110,6 @@ jobs:
             build/state-dossier-entity-audit.md
             build/schedule-reference-coverage.json
             build/schedule-reference-coverage.md
+            build/private-org-mention-audit.json
+            build/private-org-mention-audit.md
           if-no-files-found: error
