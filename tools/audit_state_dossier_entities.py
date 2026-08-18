@@ -2,9 +2,10 @@
 """Audit named non-State entities/projects mentioned by canonical State dossiers.
 
 Discovery only: this tool never creates ABox identities, Claims, assessments, or
-GovernanceDecision records. Unresolved names are intentionally scoped to the State
-dossier that mentioned them so generic labels such as "Constitutional Court" do not
-silently merge unrelated institutions across jurisdictions.
+GovernanceDecision records. Domestic identity names/aliases auto-resolve only inside the
+State encoded by their stable ID; cross-State domestic references require an explicit
+reviewed binding in the prose-disposition overlay. Truly transnational identities may
+resolve globally.
 """
 from __future__ import annotations
 
@@ -15,6 +16,8 @@ from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
+
+from entity_identity_resolution import build_name_index, resolve_normalized, self_test as resolution_self_test
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_DIR = ROOT / "dossiers" / "states"
@@ -94,11 +97,7 @@ def canonical_state_dossiers() -> list[tuple[Path, dict[str, str], int]]:
         front, body_offset = parse_frontmatter(text)
         match = CANONICAL_STATE_ID_RE.fullmatch(front.get("id", ""))
         iso = front.get("iso3", "")
-        if not match or iso != match.group(1):
-            continue
-        # Canonicality requires agreement among filename, iso3 and dossier id.
-        # This excludes `_TEMPLATE.md` even though its example frontmatter uses XXX.
-        if path.stem != iso:
+        if not match or iso != match.group(1) or path.stem != iso:
             continue
         if iso in seen_iso:
             raise ValueError(f"duplicate canonical State dossier for {iso}")
@@ -107,8 +106,8 @@ def canonical_state_dossiers() -> list[tuple[Path, dict[str, str], int]]:
     return dossiers
 
 
-def load_identity_index() -> tuple[dict[str, str], set[str], Counter]:
-    names: dict[str, str] = {}
+def load_identity_index(state_codes: set[str]):
+    records: list[dict] = []
     ids: set[str] = set()
     types: Counter = Counter()
     for path in sorted(ENTITY_DIR.glob("*.json")):
@@ -124,10 +123,13 @@ def load_identity_index() -> tuple[dict[str, str], set[str], Counter]:
         if entity_type == "State":
             continue
         ids.add(entity_id)
-        for value in [data.get("name"), *(data.get("aliases") or [])]:
-            if isinstance(value, str) and norm(value):
-                names[norm(value)] = entity_id
-    return names, ids, types
+        records.append(data)
+    return build_name_index(records, state_codes=state_codes, normalizer=norm), ids, types
+
+
+def resolve_name(index, state: str, value: str) -> str | None:
+    matches = resolve_normalized(index, state=state, normalized=norm(value))
+    return matches[0] if len(matches) == 1 else None
 
 
 def classify(text: str) -> str | None:
@@ -194,7 +196,7 @@ def iter_occurrences(
     path: Path,
     front: dict[str, str],
     body_offset: int,
-    identity_names: dict[str, str],
+    identity_index,
     identity_ids: set[str],
 ) -> Iterable[Occurrence]:
     text = path.read_text(encoding="utf-8")
@@ -221,20 +223,20 @@ def iter_occurrences(
             if ENTITY_ID_RE.fullmatch(value):
                 extracted.append((value, "id-reference", value if value in identity_ids else None))
             elif looks_named_opaque(value):
-                extracted.append((value, "opaque-name", identity_names.get(norm(value))))
+                extracted.append((value, "opaque-name", resolve_name(identity_index, state, value)))
         for match in QUOTED_RE.finditer(line):
             value = clean_candidate(match.group(1))
             if looks_named_opaque(value):
-                extracted.append((value, "quoted-name", identity_names.get(norm(value))))
+                extracted.append((value, "quoted-name", resolve_name(identity_index, state, value)))
         for match in TITLE_RE.finditer(line):
             value = clean_candidate(match.group(0))
             kind = classify(value)
             if kind and plausible(value):
-                extracted.append((value, kind, identity_names.get(norm(value))))
+                extracted.append((value, kind, resolve_name(identity_index, state, value)))
         for match in ACRONYM_RE.finditer(line):
             value = match.group(0)
             if plausible(value) and value not in ACRONYM_STOP and not value.endswith("-"):
-                extracted.append((value, "acronym-review", identity_names.get(norm(value))))
+                extracted.append((value, "acronym-review", resolve_name(identity_index, state, value)))
 
         seen_line: set[tuple[str, str]] = set()
         for value, kind, resolved in extracted:
@@ -257,11 +259,12 @@ def iter_occurrences(
 
 
 def audit() -> dict:
-    identity_names, identity_ids, entity_types = load_identity_index()
     dossiers = canonical_state_dossiers()
+    state_codes = {front["iso3"] for _, front, _ in dossiers}
+    identity_index, identity_ids, entity_types = load_identity_index(state_codes)
     occurrences: list[Occurrence] = []
     for path, front, body_offset in dossiers:
-        occurrences.extend(iter_occurrences(path, front, body_offset, identity_names, identity_ids))
+        occurrences.extend(iter_occurrences(path, front, body_offset, identity_index, identity_ids))
 
     same_text_states: dict[str, set[str]] = defaultdict(set)
     for occurrence in occurrences:
@@ -319,16 +322,18 @@ def audit() -> dict:
     resolved = [item for item in candidates if item["resolution"] == "materialized"]
     non_state_count = sum(value for key, value in entity_types.items() if key != "State")
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "semantics": {
             "purpose": "candidate discovery only",
             "canonical_state_rule": "filename ISO3 == frontmatter iso3 == ECL-STATE-ISO3 suffix",
+            "identity_resolution": "domestic stable IDs auto-resolve only within their ISO3 State; transnational IDs may resolve globally; cross-State domestic references require reviewed bindings",
             "unresolved_identity_scope": "State-scoped until reviewed/disambiguated",
             "non_inference": [
                 "mention is not identity proof",
                 "identity is not attribution",
                 "association is not participation/control/operation",
                 "same text in multiple States is not proof of the same identity",
+                "cross-State domestic name similarity is not identity resolution",
                 "no candidate or priority value has governance effect",
             ],
         },
@@ -376,9 +381,9 @@ def write_markdown(report: dict, path: Path, limit: int = 300) -> None:
         "",
         "## Review rule",
         "",
-        "Unresolved names remain jurisdiction-scoped until a reviewer proves that they denote a stable, disambiguated referent. "
-        "Materialize identity-only records independently of governance. Create `operates`, `controls`, `participatesIn`, supply, "
-        "or other material relations only as Claims backed by proposition-specific EvidenceItems. Never derive R/S/U/N from this audit.",
+        "Domestic identity aliases resolve automatically only inside their canonical State. "
+        "Cross-State domestic references require an explicit reviewed binding. Materialize identity-only records independently "
+        "of governance, and create material relations only as proposition-specific Claims backed by EvidenceItems.",
         "",
     ]
     path.write_text("\n".join(rows), encoding="utf-8")
@@ -395,6 +400,7 @@ def self_test() -> None:
     assert plausible("OHCHR")
     front, offset = parse_frontmatter("---\nid: ECL-STATE-DNK\niso3: DNK\n---\n# Denmark\n")
     assert front["iso3"] == "DNK" and offset > 0
+    resolution_self_test()
     print("entity audit self-test: OK")
 
 
