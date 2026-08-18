@@ -57,6 +57,22 @@ Unresolved names remain State-scoped. The same text in two States is not evidenc
 
 The audit must remain reproducible from repository contents and must not call an LLM, external NER service, search engine, or mutable external API.
 
+## Reviewed prose-candidate overlay
+
+The broad discovery audit intentionally stays noisy. Human-reviewed curation is therefore stored separately in `knowledge/generated/state-dossier-prose-dispositions-v*.json` and applied by `tools/review_state_dossier_candidates.py`.
+
+Each disposition is keyed by the exact State-scoped pair `(state, normalized)` and may be only:
+
+- **curated-identity** — the mention is bound to one or more already materialized ABox identities;
+- **deferred** — the text does not yet establish a sufficiently exact legal/organizational/project boundary;
+- **rejected** — the extractor produced a generic class, legislation/acronym, malformed fragment, geographic/population label or other non-individual at the current ontology granularity.
+
+A disposition must carry a repository provenance path and a reason. `curated-identity` must resolve to existing stable IDs. The overlay never edits the raw audit, so discovery behavior remains inspectable independently from human review decisions.
+
+The CI threshold is a **ratchet, not ontology doctrine**. The current tranche requires zero unreviewed candidates with discovery priority `>= 42`. Later tranches should lower that threshold as curation advances. Priority only orders review work; it never changes the substantive meaning of a candidate or creates governance.
+
+Stale dispositions are rejected by CI unless a `curated-identity` became directly resolvable by the raw audit after the corresponding identity was materialized. This prevents review metadata from silently drifting away from the corpus.
+
 ## Curated Schedule-reference gate
 
 State dossiers contain noisy prose, while `registry/schedule-state-s-freezes/` already contains a narrower set of reviewed actor/project references used in Schedule preparation. `tools/audit_schedule_reference_coverage.py` therefore provides a stronger second layer.
@@ -109,13 +125,14 @@ After identity promotion, relation curation is a separate pass. A relation is cr
 
 1. Prove exact State dossier/identity parity.
 2. Run the deterministic full-corpus State-dossier discovery audit.
-3. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved references.
-4. Run the high-precision private-organization audit and require zero unresolved high-confidence company/vendor names.
-5. Review unresolved prose candidates using dossier context and existing internal registry/review records.
-6. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
-7. Materialize reviewed identity-only records in bounded tranches.
-8. Add relation Claims only where proposition-specific evidence exists.
-9. Re-run all audits until unexplained high-confidence State-dossier debt is eliminated.
-10. Re-run Formal Exergism coverage after the actor/object universe stabilizes.
+3. Apply the reviewed prose-candidate overlay and ratchet the unreviewed-priority threshold downward in bounded tranches.
+4. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved references.
+5. Run the high-precision private-organization audit and require zero unresolved high-confidence company/vendor names.
+6. Review unresolved prose candidates using dossier context and existing internal registry/review records.
+7. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
+8. Materialize reviewed identity-only records in bounded tranches.
+9. Add relation Claims only where proposition-specific evidence exists.
+10. Re-run all audits until unexplained high-confidence State-dossier debt is eliminated.
+11. Re-run Formal Exergism coverage after the actor/object universe stabilizes.
 
 This ordering prevents Formal Exergism completeness from being measured against an artificially sparse ABox.
