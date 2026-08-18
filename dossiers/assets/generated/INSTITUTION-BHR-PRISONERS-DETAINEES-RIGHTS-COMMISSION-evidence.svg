@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360" role="img" aria-labelledby="title desc">
-  <title id="title">Prisoners' and Detainees' Rights Commission — derived evidence diagram</title>
+  <title id="title">Prisoners&#x27; and Detainees&#x27; Rights Commission — derived evidence diagram</title>
   <desc id="desc">Derived evidence diagram linking the curated source surface to the dossier proposition and then to the entity identity, while preserving a no-governance-inheritance boundary.</desc>
   <rect width="1100" height="360" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
   <text x="40" y="48" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#101828">DERIVED EVIDENCE DIAGRAM</text>
@@ -23,7 +23,7 @@
 
   <rect x="770" y="118" width="290" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <text x="792" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">IDENTITY BOUNDARY</text>
-  <text x="792" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">Prisoners' and Detainees' Rights Commission</text>
+  <text x="792" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">Prisoners&#x27; and Detainees&#x27; Rights Commission</text>
   <text x="792" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Identity ≠ participation / culpability</text>
 
   <rect x="40" y="284" width="1020" height="46" rx="10" fill="#F2F4F7"/>
