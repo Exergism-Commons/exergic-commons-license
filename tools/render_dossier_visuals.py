@@ -79,22 +79,28 @@ def evidence_svg(entity: dict) -> str:
   <rect width="1100" height="360" rx="18" fill="#FFFFFF" stroke="#D0D5DD"/>
   <text x="40" y="48" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#101828">DERIVED EVIDENCE DIAGRAM</text>
   <text x="40" y="76" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#667085">Not a source facsimile · textual equivalent is preserved in the dossier</text>
+
   <rect x="40" y="118" width="285" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <text x="62" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
   <text x="62" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">{esc(source)}</text>
   <text x="62" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">{esc(granularity_label)}</text>
+
   <line x1="325" y1="183" x2="395" y2="183" stroke="#667085" stroke-width="2"/>
   <polygon points="395,183 383,176 383,190" fill="#667085"/>
+
   <rect x="405" y="118" width="285" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <text x="427" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
   <text x="427" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">{esc(proposition)}</text>
   <text x="427" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Prose evidence; no Claim/EvidenceItem invented</text>
+
   <line x1="690" y1="183" x2="760" y2="183" stroke="#667085" stroke-width="2"/>
   <polygon points="760,183 748,176 748,190" fill="#667085"/>
+
   <rect x="770" y="118" width="290" height="130" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <text x="792" y="149" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">IDENTITY BOUNDARY</text>
   <text x="792" y="184" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828">{esc(name)}</text>
   <text x="792" y="219" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#667085">Identity ≠ participation / culpability</text>
+
   <rect x="40" y="284" width="1020" height="46" rx="10" fill="#F2F4F7"/>
   <text x="60" y="313" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#344054">BOUNDARY:</text>
   <text x="160" y="313" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475467">{esc(boundary)} · no partOf/control/operation/participation/supplier inference</text>
