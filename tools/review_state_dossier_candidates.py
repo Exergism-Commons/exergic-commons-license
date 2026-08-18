@@ -15,6 +15,8 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from entity_identity_resolution import canonicalize_id, load_id_supersessions
+
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 GENERATED_DIR = ROOT / "knowledge" / "generated"
@@ -35,6 +37,7 @@ def load_entity_ids() -> set[str]:
 
 def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
     entity_ids = load_entity_ids()
+    supersessions = load_id_supersessions()
     by_key: dict[tuple[str, str], dict] = {}
     manifests: list[str] = []
     for path in sorted(GENERATED_DIR.glob(DISPOSITION_GLOB)):
@@ -54,12 +57,17 @@ def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
             key = (state, normalized)
             assert key not in by_key, f"duplicate prose disposition key: {key}"
             resolved_ids = row.get("resolved_ids", [])
+            reviewed = dict(row)
             if status == "curated-identity":
                 assert isinstance(resolved_ids, list) and resolved_ids, (path, row)
-                assert all(isinstance(item, str) and item in entity_ids for item in resolved_ids), (path, row)
+                canonical_ids = [canonicalize_id(item, supersessions) for item in resolved_ids]
+                assert all(isinstance(item, str) and item in entity_ids for item in canonical_ids), (path, row, canonical_ids)
+                reviewed["resolved_ids"] = canonical_ids
+                if canonical_ids != resolved_ids:
+                    reviewed["historical_resolved_ids"] = list(resolved_ids)
             else:
                 assert resolved_ids in ([], None), (path, row)
-            by_key[key] = dict(row)
+            by_key[key] = reviewed
     return by_key, manifests
 
 
@@ -200,6 +208,7 @@ def self_test() -> None:
     assert report["counts"]["unreviewed"] == 1
     assert report["counts"]["unreviewed_at_or_above_threshold"] == 0
     assert report["unreviewed_at_or_above_threshold"] == []
+    assert canonicalize_id("AGENCY-PHL-PNP", {"AGENCY-PHL-PNP": "AGENCY-PHL-PHILIPPINE-NATIONAL-POLICE"}) == "AGENCY-PHL-PHILIPPINE-NATIONAL-POLICE"
     print("State dossier candidate review self-test: OK")
 
 
