@@ -17,6 +17,7 @@ The target property is **representational completeness**, not accusation density
 7. A Project/Deployment boundary must be objectively knowable enough to distinguish the object from a policy family, entire technology class, State apparatus, vendor product line, or speculative future deployment.
 8. Proposition-specific edges require proposition-specific evidence. Identity evidence is insufficient for conduct attribution.
 9. Counter-institutions, remediation projects and excluded actors are eligible for neutral identity materialization on the same terms as potentially restrictive actors/projects.
+10. A named victim, defendant, journalist, activist, lawyer or other case subject may be a `Person` identity without being a culpable actor or Restricted Party.
 
 ## Canonical State universe
 
@@ -39,6 +40,8 @@ The dossier discovery audit distinguishes:
 - **rejected** — extraction noise, generic class, legal/policy phrase, geographic label, or other non-identity.
 
 Only `materialized`/`curated-identity` correspond to represented identities. `review-candidate`, `deferred`, and `rejected` have no ontology or governance effect.
+
+A raw `review-candidate` count is **not a count of missing entities**. It intentionally contains extraction noise, ambiguous labels, international bodies, legislation/acronyms, plural/functional classes and true domestic identity candidates. Only curation may move a candidate to `curated-identity`, `deferred` or `rejected`.
 
 ## State dossier audit contract
 
@@ -71,6 +74,19 @@ CI runs the Schedule audit with `--fail-on-unresolved-curated`, so adding or cha
 
 `scope` fields such as `schedule_identity`, `project_boundary`, identified incidents/locations and remediation text are retained as context and are not automatically coerced into ontology individuals.
 
+## High-precision private-organization gate
+
+The general prose audit is deliberately broad and therefore unsuitable as a company completeness gate. `tools/audit_private_org_mentions.py` is a separate high-precision pass over all 195 canonical State dossiers. It recognizes only:
+
+- explicit corporate-form names; or
+- a proper name directly tied to a supplier/vendor/private-company action involving a product, technology, software, spyware, platform, tool or service.
+
+Unnamed phrases such as `private contractors` are not converted into invented companies. Product brands are not converted into organizations merely because they are products. International `Working Group` names are filtered rather than misclassified as companies.
+
+CI runs this pass with `--fail-on-unresolved-private`. Therefore a newly named high-confidence private organization/vendor must either resolve to an ABox identity or make the audit fail until reviewed. The gate has no supply, participation, control or governance semantics.
+
+A supplier can also be counter/remediation evidence. For example, an identity may be materialized precisely so that product withdrawal or remediation remains queryable without treating the supplier as a Restricted Party.
+
 ## Promotion rule
 
 A candidate may be promoted only when the repository contains enough information to establish:
@@ -94,11 +110,12 @@ After identity promotion, relation curation is a separate pass. A relation is cr
 1. Prove exact State dossier/identity parity.
 2. Run the deterministic full-corpus State-dossier discovery audit.
 3. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved references.
-4. Review unresolved prose candidates using dossier context and existing internal registry/review records.
-5. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
-6. Materialize reviewed identity-only records in bounded tranches.
-7. Add relation Claims only where proposition-specific evidence exists.
-8. Re-run both audits until unexplained high-confidence State-dossier debt is eliminated.
-9. Re-run Formal Exergism coverage after the actor/object universe stabilizes.
+4. Run the high-precision private-organization audit and require zero unresolved high-confidence company/vendor names.
+5. Review unresolved prose candidates using dossier context and existing internal registry/review records.
+6. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
+7. Materialize reviewed identity-only records in bounded tranches.
+8. Add relation Claims only where proposition-specific evidence exists.
+9. Re-run all audits until unexplained high-confidence State-dossier debt is eliminated.
+10. Re-run Formal Exergism coverage after the actor/object universe stabilizes.
 
 This ordering prevents Formal Exergism completeness from being measured against an artificially sparse ABox.
