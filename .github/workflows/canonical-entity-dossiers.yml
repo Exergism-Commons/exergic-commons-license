@@ -10,6 +10,7 @@ on:
       - 'spec/VISUAL-EVIDENCE.md'
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
+      - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - '.github/workflows/canonical-entity-dossiers.yml'
   pull_request:
@@ -21,6 +22,7 @@ on:
       - 'spec/VISUAL-EVIDENCE.md'
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
+      - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - '.github/workflows/canonical-entity-dossiers.yml'
   workflow_dispatch:
@@ -42,11 +44,17 @@ jobs:
           mkdir -p build
           python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json
 
+      - name: Validate committed visual layout bounds
+        run: python tools/check_dossier_visual_layout.py dossiers/assets/generated
+
       - name: Regenerate derived visuals
         run: |
           rm -rf build/generated-visuals
           python tools/render_dossier_visuals.py --out build/generated-visuals
           diff -ru dossiers/assets/generated build/generated-visuals
+
+      - name: Validate regenerated visual layout bounds
+        run: python tools/check_dossier_visual_layout.py build/generated-visuals
 
       - name: Prove deterministic visual generation
         run: |
