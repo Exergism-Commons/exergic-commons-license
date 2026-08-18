@@ -5,9 +5,9 @@
   "type": "Agency",
   "name": "Zambia Police Service",
   "aliases": [],
-  "dossier": "../../dossiers/states/ZMB.md",
-  "lastSubstantiveReview": "2026-08-13",
-  "reviewDue": "2026-09-13",
+  "dossier": "../../dossiers/agencies/ZMB-POLICE-SERVICE.md",
+  "lastSubstantiveReview": "2026-08-18",
+  "reviewDue": "2026-09-18",
   "reviewClass": "active",
   "reviewReason": "Identity-only promotion from the Zambia statutory-agency freeze. Case-specific Cyber Crimes Act or State-security enforcement is not generalized to the service."
 }
