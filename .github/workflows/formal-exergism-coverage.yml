@@ -14,6 +14,7 @@ on:
       - "spec/EXERGIC-ANALYSIS.md"
       - "tools/exergic_analysis.py"
       - "tools/report_exergism_coverage.py"
+      - "tools/check_graph_formal_coverage.py"
       - "tools/test_exergism_coverage.py"
       - ".github/workflows/formal-exergism-coverage.yml"
   pull_request:
@@ -29,6 +30,7 @@ on:
       - "spec/EXERGIC-ANALYSIS.md"
       - "tools/exergic_analysis.py"
       - "tools/report_exergism_coverage.py"
+      - "tools/check_graph_formal_coverage.py"
       - "tools/test_exergism_coverage.py"
       - ".github/workflows/formal-exergism-coverage.yml"
   workflow_dispatch:
@@ -91,6 +93,7 @@ jobs:
           python tools/build_knowledge_graph.py --output-dir build/graph
           pyshacl -s ontology/exergism-governance-coverage.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build/graph/ecl-abox.ttl
           python tools/run_sparql_checks.py build/graph/ecl-knowledge.nt sparql/integrity
+          python tools/check_graph_formal_coverage.py
 
       - name: Prove R/S graph gate rejects missing formal assessment links
         run: |
@@ -114,7 +117,26 @@ jobs:
           print('negative R/S governance-link fixture rejected by SHACL and SPARQL')
           PY
 
-      - name: Prove linked governance and Schedule fixture conforms
+      - name: Prove incomplete linked assessment cannot launder governance readiness
+        run: |
+          mkdir -p knowledge/decisions
+          cat > knowledge/decisions/TEST-INCOMPLETE-FORMAL-COVERAGE.json <<'JSON'
+          {
+            "id": "TEST-INCOMPLETE-FORMAL-COVERAGE",
+            "type": "GovernanceDecision",
+            "subject": "ecl:STATE-USA",
+            "outcome": "ecl:OutcomeR",
+            "basedOnAssessment": "ecl:ECL-EX-USA-001"
+          }
+          JSON
+          if python tools/check_graph_formal_coverage.py; then
+            echo "ERROR: linked but incomplete USA pilot laundered GovernanceDecision readiness"
+            exit 1
+          fi
+          rm knowledge/decisions/TEST-INCOMPLETE-FORMAL-COVERAGE.json
+          rmdir knowledge/decisions
+
+      - name: Prove linked governance and Schedule fixture conforms structurally
         run: |
           cat > build/coverage-positive.ttl <<'TTL'
           @prefix ecl: <urn:ecl:> .
