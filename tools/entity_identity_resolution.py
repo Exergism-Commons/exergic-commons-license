@@ -12,10 +12,15 @@ control, participation, operation, attribution or governance in the ontology.
 """
 from __future__ import annotations
 
+import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Callable, Iterable
+
+ROOT = Path(__file__).resolve().parents[1]
+ENTITY_DIR = ROOT / "knowledge" / "entities"
 
 DOMESTIC_ID_RE = re.compile(
     r"^(?:AGENCY|INSTITUTION|ORG|PROJECT|DEPLOYMENT|PERSON)-([A-Z]{3})(?:-|$)"
@@ -83,9 +88,49 @@ def eligible_in_state(index: NameIndex, entity_id: str, state: str | None) -> bo
     return scope is None or (state is not None and scope == state)
 
 
+def default_normalizer(value: str) -> str:
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
+
+
+def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
+    """Reject duplicate first-class identities with the same primary name in one scope.
+
+    Aliases may intentionally overlap while a review is resolving terminology. Primary
+    names may not: two domestic IDs with the same normalized primary name create an
+    identity ambiguity that cannot be repaired by an overlay disposition.
+    """
+    entities: list[dict] = []
+    state_codes: set[str] = set()
+    for path in sorted(ENTITY_DIR.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        entities.append(data)
+        entity_id = data.get("id")
+        if data.get("type") == "State" and isinstance(entity_id, str) and entity_id.startswith("STATE-"):
+            state_codes.add(entity_id.removeprefix("STATE-"))
+
+    groups: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for entity in entities:
+        entity_id = entity.get("id")
+        name = entity.get("name")
+        if not isinstance(entity_id, str) or not isinstance(name, str):
+            continue
+        normalized = default_normalizer(name)
+        if not normalized:
+            continue
+        scope = infer_domestic_state(entity_id, state_codes) or "GLOBAL"
+        groups[(scope, normalized)].add(entity_id)
+
+    duplicates = [
+        {"scope": scope, "normalized_name": normalized, "ids": sorted(ids)}
+        for (scope, normalized), ids in sorted(groups.items())
+        if len(ids) > 1
+    ]
+    return duplicates
+
+
 def self_test() -> None:
     def n(value: str) -> str:
-        return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
+        return default_normalizer(value)
 
     states = {"KAZ", "SVK", "AUS", "NRU"}
     entities = [
@@ -124,4 +169,8 @@ def self_test() -> None:
 
 if __name__ == "__main__":
     self_test()
-    print("entity identity resolution self-test: OK")
+    duplicates = audit_repository_primary_name_uniqueness()
+    if duplicates:
+        print("DUPLICATE_PRIMARY_IDENTITIES=" + json.dumps(duplicates, sort_keys=True))
+        raise SystemExit(1)
+    print("entity identity resolution self-test: OK; repository primary names unique")
