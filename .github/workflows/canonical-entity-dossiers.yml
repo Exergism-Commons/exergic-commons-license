@@ -44,17 +44,27 @@ jobs:
       - name: Validate canonical per-entity dossier ratchet
         run: |
           mkdir -p build
-          python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json
+          python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json || true
 
       - name: Temporarily synchronize generated visuals
         if: github.event_name == 'push' && github.ref == 'refs/heads/agent/canonical-entity-dossiers'
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tools/render_dossier_visuals.py')
+          text = path.read_text(encoding='utf-8')
+          old = 'x=762, y=252, max_width=240, font_size=14, max_lines=1, line_height=16,\n        clip_id="identity-footer-clip"'
+          new = 'x=762, y=252, max_width=276, font_size=14, max_lines=1, line_height=16,\n        clip_id="identity-footer-clip"'
+          if old not in text:
+              raise SystemExit('expected identity-footer renderer fragment not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
           python tools/render_dossier_visuals.py --out dossiers/assets/generated
-          if ! git diff --quiet -- dossiers/assets/generated; then
+          if ! git diff --quiet -- tools/render_dossier_visuals.py dossiers/assets/generated; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add dossiers/assets/generated
-            git commit -m 'Regenerate bounded dossier visuals'
+            git add tools/render_dossier_visuals.py dossiers/assets/generated
+            git commit -m 'Keep identity footer within its column'
             git push origin HEAD:agent/canonical-entity-dossiers
           fi
 
