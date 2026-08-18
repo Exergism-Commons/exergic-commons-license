@@ -1,0 +1,101 @@
+name: Formal Exergism coverage integrity
+
+on:
+  push:
+    paths:
+      - "exergism/**"
+      - "knowledge/**"
+      - "dossiers/**"
+      - "registry/**"
+      - "ontology/**"
+      - "sparql/integrity/**"
+      - "schemas/exergic-assessment.schema.json"
+      - "spec/EXERGIC-COVERAGE.md"
+      - "spec/EXERGIC-ANALYSIS.md"
+      - "tools/exergic_analysis.py"
+      - "tools/report_exergism_coverage.py"
+      - "tools/test_exergism_coverage.py"
+      - ".github/workflows/formal-exergism-coverage.yml"
+  pull_request:
+    paths:
+      - "exergism/**"
+      - "knowledge/**"
+      - "dossiers/**"
+      - "registry/**"
+      - "ontology/**"
+      - "sparql/integrity/**"
+      - "schemas/exergic-assessment.schema.json"
+      - "spec/EXERGIC-COVERAGE.md"
+      - "spec/EXERGIC-ANALYSIS.md"
+      - "tools/exergic_analysis.py"
+      - "tools/report_exergism_coverage.py"
+      - "tools/test_exergism_coverage.py"
+      - ".github/workflows/formal-exergism-coverage.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements-ontology.txt
+            tools/schedule-requirements.txt
+
+      - name: Install coverage dependencies
+        run: python -m pip install -r requirements-ontology.txt -r tools/schedule-requirements.txt
+
+      - name: Run coverage adversarial regressions
+        run: python tools/test_exergism_coverage.py
+
+      - name: Validate assessment schema
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator, FormatChecker
+          schema=json.loads(Path('schemas/exergic-assessment.schema.json').read_text(encoding='utf-8'))
+          validator=Draft202012Validator(schema, format_checker=FormatChecker())
+          paths=sorted(Path('exergism/assessments').glob('*.json'))
+          assert paths, 'no Formal Exergism assessments found'
+          for path in paths:
+              data=json.loads(path.read_text(encoding='utf-8'))
+              errors=list(validator.iter_errors(data))
+              assert not errors, f"{path}: {[e.message for e in errors]}"
+          print(f'validated {len(paths)} assessment records against schema')
+          PY
+
+      - name: Build deterministic coverage report and enforce no UNKNOWN material dependencies
+        run: |
+          mkdir -p build
+          python tools/report_exergism_coverage.py \
+            --json build/exergism-coverage.json \
+            --matrix build/exergism-actor-matrix.json \
+            --fail-on-unknown-material
+
+      - name: Assert deterministic coverage output
+        run: |
+          python tools/report_exergism_coverage.py --json build/exergism-coverage-2.json --matrix build/exergism-actor-matrix-2.json --fail-on-unknown-material
+          cmp build/exergism-coverage.json build/exergism-coverage-2.json
+          cmp build/exergism-actor-matrix.json build/exergism-actor-matrix-2.json
+
+      - name: Validate graph-native governance formal links
+        run: |
+          python tools/build_knowledge_graph.py --output-dir build/graph
+          pyshacl -s ontology/exergism-governance-coverage.shacl.ttl -e ontology/ecl.owl.ttl -i owlrl build/graph/ecl-abox.ttl
+          python tools/run_sparql_checks.py build/graph/ecl-knowledge.nt sparql/integrity
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: formal-exergism-coverage
+          path: |
+            build/exergism-coverage.json
+            build/exergism-actor-matrix.json
+          if-no-files-found: error
