@@ -7,6 +7,7 @@ on:
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
       - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
+      - 'knowledge/generated/state-dossier-review-ratchet.json'
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
@@ -24,6 +25,7 @@ on:
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
       - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
+      - 'knowledge/generated/state-dossier-review-ratchet.json'
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'spec/ENTITY-SCALEOUT.md'
@@ -77,7 +79,7 @@ jobs:
             --json build/state-dossier-candidate-review.json \
             --markdown build/state-dossier-candidate-review.md \
             --fail-on-stale-disposition \
-            --fail-on-unreviewed-priority 38
+            --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
@@ -106,7 +108,7 @@ jobs:
             --json build/state-dossier-candidate-review.json \
             --markdown build/state-dossier-candidate-review.md \
             --fail-on-stale-disposition \
-            --fail-on-unreviewed-priority 38
+            --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
