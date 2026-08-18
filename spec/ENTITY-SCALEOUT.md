@@ -69,7 +69,7 @@ Each disposition is keyed by the exact State-scoped pair `(state, normalized)` a
 
 A disposition must carry a repository provenance path and a reason. `curated-identity` must resolve to existing stable IDs. The overlay never edits the raw audit, so discovery behavior remains inspectable independently from human review decisions.
 
-The CI threshold is a **ratchet, not ontology doctrine**. The current tranche requires zero unreviewed candidates with discovery priority `>= 42`. Later tranches should lower that threshold as curation advances. Priority only orders review work; it never changes the substantive meaning of a candidate or creates governance.
+The CI threshold is a **ratchet, not ontology doctrine**. Its current value is stored in `knowledge/generated/state-dossier-review-ratchet.json`; CI reads that versioned file rather than hardcoding the threshold in workflow YAML. Lowering `min_review_priority` is a monotonic curation step and is allowed only after every candidate newly brought into scope has a reviewed disposition or resolves directly to a canonical identity. Priority only orders review work; it never changes the substantive meaning of a candidate or creates governance.
 
 Stale dispositions are rejected by CI unless a `curated-identity` became directly resolvable by the raw audit after the corresponding identity was materialized. This prevents review metadata from silently drifting away from the corpus.
 
@@ -125,7 +125,7 @@ After identity promotion, relation curation is a separate pass. A relation is cr
 
 1. Prove exact State dossier/identity parity.
 2. Run the deterministic full-corpus State-dossier discovery audit.
-3. Apply the reviewed prose-candidate overlay and ratchet the unreviewed-priority threshold downward in bounded tranches.
+3. Apply the reviewed prose-candidate overlay and lower the versioned review ratchet in bounded tranches.
 4. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved references.
 5. Run the high-precision private-organization audit and require zero unresolved high-confidence company/vendor names.
 6. Review unresolved prose candidates using dossier context and existing internal registry/review records.
