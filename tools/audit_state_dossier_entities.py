@@ -74,16 +74,16 @@ def clean_candidate(text: str) -> str:
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], int]:
-    m = FRONT_RE.match(text)
-    if not m:
+    match = FRONT_RE.match(text)
+    if not match:
         return {}, 0
     out: dict[str, str] = {}
-    for line in m.group(1).splitlines():
+    for line in match.group(1).splitlines():
         if ":" not in line:
             continue
         key, value = line.split(":", 1)
         out[key.strip()] = value.strip().strip("\"'")
-    return out, m.end()
+    return out, match.end()
 
 
 def canonical_state_dossiers() -> list[tuple[Path, dict[str, str], int]]:
@@ -95,6 +95,10 @@ def canonical_state_dossiers() -> list[tuple[Path, dict[str, str], int]]:
         match = CANONICAL_STATE_ID_RE.fullmatch(front.get("id", ""))
         iso = front.get("iso3", "")
         if not match or iso != match.group(1):
+            continue
+        # Canonicality requires agreement among filename, iso3 and dossier id.
+        # This excludes `_TEMPLATE.md` even though its example frontmatter uses XXX.
+        if path.stem != iso:
             continue
         if iso in seen_iso:
             raise ValueError(f"duplicate canonical State dossier for {iso}")
@@ -146,8 +150,8 @@ def plausible(text: str) -> bool:
         return False
     if "→" in text or "=>" in text or " != " in text or " == " in text:
         return False
-    n = norm(text)
-    if not n or n in {norm(x) for x in STOP_PHRASES}:
+    normalized = norm(text)
+    if not normalized or normalized in {norm(x) for x in STOP_PHRASES}:
         return False
     if text in ACRONYM_STOP or (text.isupper() and text in ACRONYM_STOP):
         return False
@@ -157,20 +161,16 @@ def plausible(text: str) -> bool:
 
 
 def looks_named_opaque(text: str) -> bool:
-    if not plausible(text):
+    if not plausible(text) or len(text.split()) > 8:
         return False
-    if len(text.split()) > 8:
-        return False
-    # Quoted/backticked product and program names can lack a generic cue, but should
-    # still look like a proper name rather than a prose/status fragment.
     return bool(re.search(r"[A-Z]", text)) and not text.lower().startswith((
         "last_", "asof", "review_", "provisional_", "evidence_", "state-",
     ))
 
 
 def material_section(section: str) -> bool:
-    s = section.lower()
-    return any(token in s for token in (
+    section = section.lower()
+    return any(token in section for token in (
         "participant", "attribution", "scope", "current determination", "criteria engaged",
         "evidence supporting", "material", "project", "deployment",
     ))
@@ -206,33 +206,33 @@ def iter_occurrences(
 
     for relative_lineno, raw in enumerate(body.splitlines(), 1):
         lineno = line_offset + relative_lineno
-        hm = HEADING_RE.match(raw)
-        if hm:
-            section = hm.group(1).strip()
+        heading = HEADING_RE.match(raw)
+        if heading:
+            section = heading.group(1).strip()
             continue
         line = URL_RE.sub("", raw)
-        line = MD_LINK_RE.sub(lambda m: m.group(1), line)
+        line = MD_LINK_RE.sub(lambda match: match.group(1), line)
         if not line.strip() or line.lstrip().startswith("#"):
             continue
 
         extracted: list[tuple[str, str, str | None]] = []
-        for m in INLINE_CODE_RE.finditer(line):
-            value = clean_candidate(m.group(1))
+        for match in INLINE_CODE_RE.finditer(line):
+            value = clean_candidate(match.group(1))
             if ENTITY_ID_RE.fullmatch(value):
                 extracted.append((value, "id-reference", value if value in identity_ids else None))
             elif looks_named_opaque(value):
                 extracted.append((value, "opaque-name", identity_names.get(norm(value))))
-        for m in QUOTED_RE.finditer(line):
-            value = clean_candidate(m.group(1))
+        for match in QUOTED_RE.finditer(line):
+            value = clean_candidate(match.group(1))
             if looks_named_opaque(value):
                 extracted.append((value, "quoted-name", identity_names.get(norm(value))))
-        for m in TITLE_RE.finditer(line):
-            value = clean_candidate(m.group(0))
+        for match in TITLE_RE.finditer(line):
+            value = clean_candidate(match.group(0))
             kind = classify(value)
             if kind and plausible(value):
                 extracted.append((value, kind, identity_names.get(norm(value))))
-        for m in ACRONYM_RE.finditer(line):
-            value = m.group(0)
+        for match in ACRONYM_RE.finditer(line):
+            value = match.group(0)
             if plausible(value) and value not in ACRONYM_STOP and not value.endswith("-"):
                 extracted.append((value, "acronym-review", identity_names.get(norm(value))))
 
@@ -263,30 +263,28 @@ def audit() -> dict:
     for path, front, body_offset in dossiers:
         occurrences.extend(iter_occurrences(path, front, body_offset, identity_names, identity_ids))
 
-    # Global same-text statistics are informative, but unresolved candidates remain
-    # State-scoped. This prevents accidental same-name identity merges.
     same_text_states: dict[str, set[str]] = defaultdict(set)
-    for occ in occurrences:
-        same_text_states[occ.normalized].add(occ.state)
+    for occurrence in occurrences:
+        same_text_states[occurrence.normalized].add(occurrence.state)
 
     groups: dict[str, list[Occurrence]] = defaultdict(list)
-    for occ in occurrences:
-        if occ.resolved_id:
-            key = f"resolved::{occ.resolved_id}"
+    for occurrence in occurrences:
+        if occurrence.resolved_id:
+            key = f"resolved::{occurrence.resolved_id}"
         else:
-            key = f"unresolved::{occ.state}::{occ.normalized}"
-        groups[key].append(occ)
+            key = f"unresolved::{occurrence.state}::{occurrence.normalized}"
+        groups[key].append(occurrence)
 
     candidates = []
-    for key, occs in sorted(groups.items()):
-        display = Counter(o.candidate for o in occs).most_common(1)[0][0]
-        resolved = next((o.resolved_id for o in occs if o.resolved_id), None)
-        states = sorted({o.state for o in occs})
-        outcomes = sorted({o.outcome for o in occs if o.outcome})
-        kinds = sorted({o.kind for o in occs})
-        material_occurrences = sum(1 for o in occs if material_section(o.section))
-        restricted_occurrences = sum(1 for o in occs if o.outcome in {"R", "S"})
-        global_state_count = len(same_text_states[occs[0].normalized])
+    for key, group in sorted(groups.items()):
+        display = Counter(item.candidate for item in group).most_common(1)[0][0]
+        resolved = next((item.resolved_id for item in group if item.resolved_id), None)
+        states = sorted({item.state for item in group})
+        outcomes = sorted({item.outcome for item in group if item.outcome})
+        kinds = sorted({item.kind for item in group})
+        material_occurrences = sum(1 for item in group if material_section(item.section))
+        restricted_occurrences = sum(1 for item in group if item.outcome in {"R", "S"})
+        global_state_count = len(same_text_states[group[0].normalized])
         review_priority = (
             (30 if restricted_occurrences else 0)
             + min(material_occurrences, 10) * 3
@@ -296,34 +294,35 @@ def audit() -> dict:
         )
         candidates.append({
             "candidate": display,
-            "normalized": occs[0].normalized,
+            "normalized": group[0].normalized,
             "candidate_key": key,
             "kinds": kinds,
             "resolution": "materialized" if resolved else "review-candidate",
             "resolved_id": resolved,
             "states": states,
             "outcomes": outcomes,
-            "occurrence_count": len(occs),
+            "occurrence_count": len(group),
             "material_section_occurrences": material_occurrences,
             "restricted_state_occurrences": restricted_occurrences,
             "same_text_global_state_count": global_state_count,
             "review_priority": review_priority,
-            "occurrences": [asdict(o) for o in occs],
+            "occurrences": [asdict(item) for item in group],
         })
 
-    candidates.sort(key=lambda x: (
-        x["resolution"] != "review-candidate",
-        -x["review_priority"],
-        x["states"][0] if x["states"] else "",
-        x["candidate"].lower(),
+    candidates.sort(key=lambda item: (
+        item["resolution"] != "review-candidate",
+        -item["review_priority"],
+        item["states"][0] if item["states"] else "",
+        item["candidate"].lower(),
     ))
-    unresolved = [c for c in candidates if c["resolution"] == "review-candidate"]
-    resolved = [c for c in candidates if c["resolution"] == "materialized"]
-    non_state_count = sum(v for k, v in entity_types.items() if k != "State")
+    unresolved = [item for item in candidates if item["resolution"] == "review-candidate"]
+    resolved = [item for item in candidates if item["resolution"] == "materialized"]
+    non_state_count = sum(value for key, value in entity_types.items() if key != "State")
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "semantics": {
             "purpose": "candidate discovery only",
+            "canonical_state_rule": "filename ISO3 == frontmatter iso3 == ECL-STATE-ISO3 suffix",
             "unresolved_identity_scope": "State-scoped until reviewed/disambiguated",
             "non_inference": [
                 "mention is not identity proof",
@@ -365,13 +364,13 @@ def write_markdown(report: dict, path: Path, limit: int = 300) -> None:
         "| State | Candidate | Kind | Occurrences | Material-section | Same text in States | Priority |",
         "|---|---|---|---:|---:|---:|---:|",
     ]
-    unresolved = [c for c in report["candidates"] if c["resolution"] == "review-candidate"][:limit]
-    for c in unresolved:
-        name = c["candidate"].replace("|", "\\|")
-        kinds = ", ".join(c["kinds"]).replace("|", "\\|")
+    unresolved = [item for item in report["candidates"] if item["resolution"] == "review-candidate"][:limit]
+    for item in unresolved:
+        name = item["candidate"].replace("|", "\\|")
+        kinds = ", ".join(item["kinds"]).replace("|", "\\|")
         rows.append(
-            f"| {','.join(c['states'])} | {name} | {kinds} | {c['occurrence_count']} | "
-            f"{c['material_section_occurrences']} | {c['same_text_global_state_count']} | {c['review_priority']} |"
+            f"| {','.join(item['states'])} | {name} | {kinds} | {item['occurrence_count']} | "
+            f"{item['material_section_occurrences']} | {item['same_text_global_state_count']} | {item['review_priority']} |"
         )
     rows += [
         "",
