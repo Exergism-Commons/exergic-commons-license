@@ -2,9 +2,9 @@
 """Discover high-confidence private-company/vendor names in canonical State dossiers.
 
 Precision is preferred over recall. Generic phrases such as "private contractors" are
-representation debt only when a dossier actually names a contractor. This tool never
-turns an unnamed class into a fabricated company and never creates attribution or
-governance semantics.
+representation debt only when a dossier actually names a contractor. Domestic company
+identities auto-resolve only inside their State; transnational identities may resolve
+globally. This tool never creates attribution or governance semantics.
 """
 from __future__ import annotations
 
@@ -13,6 +13,8 @@ import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+
+from entity_identity_resolution import build_name_index, resolve_normalized
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_DIR = ROOT / "dossiers" / "states"
@@ -72,16 +74,13 @@ def canonical_dossiers() -> list[tuple[Path, str, int]]:
     return rows
 
 
-def identity_names() -> dict[str, str]:
-    names: dict[str, str] = {}
+def identity_index(state_codes: set[str]):
+    records: list[dict] = []
     for path in ENTITY_DIR.glob("*.json"):
         data = json.loads(path.read_text(encoding="utf-8"))
-        if data.get("type") == "State":
-            continue
-        for value in [data.get("name"), *(data.get("aliases") or [])]:
-            if isinstance(value, str) and norm(value):
-                names[norm(value)] = data["id"]
-    return names
+        if data.get("type") != "State":
+            records.append(data)
+    return build_name_index(records, state_codes=state_codes, normalizer=norm)
 
 
 def clean(name: str) -> str:
@@ -124,9 +123,10 @@ def extract_names(line: str) -> list[tuple[str, str]]:
 
 
 def audit() -> dict:
-    known = identity_names()
-    occurrences: list[dict] = []
     dossiers = canonical_dossiers()
+    states = {iso for _, iso, _ in dossiers}
+    known = identity_index(states)
+    occurrences: list[dict] = []
     for path, iso, offset in dossiers:
         text = path.read_text(encoding="utf-8")
         line_offset = text[:offset].count("\n")
@@ -134,12 +134,14 @@ def audit() -> dict:
             line = re.sub(r"https?://\S+", "", raw)
             line = re.sub(r"`[^`]+`", "", line)
             for name, method in extract_names(line):
+                matches = resolve_normalized(known, state=iso, normalized=norm(name))
+                resolved = matches[0] if len(matches) == 1 else None
                 occurrences.append({
                     "state": iso,
                     "candidate": name,
                     "normalized": norm(name),
                     "extraction": method,
-                    "resolved_id": known.get(norm(name)),
+                    "resolved_id": resolved,
                     "dossier": str(path.relative_to(ROOT)),
                     "line": line_offset + rel_line,
                     "snippet": raw.strip()[:420],
@@ -167,10 +169,11 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 5,
+        "schema_version": 6,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
+            "identity_resolution": "domestic identities resolve automatically only inside their State; transnational identities may resolve globally",
             "non_inference": [
                 "private-organization mention does not prove legal-entity precision",
                 "identity does not prove supply, participation, control or culpability",
@@ -216,6 +219,16 @@ def self_test() -> None:
     names = extract_names("Example Technologies supplied software")
     assert any(name == "Example Technologies" for name, _ in names)
     assert norm("Cellebrite") == "cellebrite"
+    local = build_name_index(
+        [
+            {"id": "ORG-AAA-EXAMPLE", "name": "Example Technologies", "aliases": []},
+            {"id": "ORG-GLOBAL-VENDOR", "name": "Global Vendor", "aliases": []},
+        ],
+        state_codes={"AAA", "BBB"}, normalizer=norm,
+    )
+    assert resolve_normalized(local, state="AAA", normalized=norm("Example Technologies")) == ["ORG-AAA-EXAMPLE"]
+    assert resolve_normalized(local, state="BBB", normalized=norm("Example Technologies")) == []
+    assert resolve_normalized(local, state="BBB", normalized=norm("Global Vendor")) == ["ORG-GLOBAL-VENDOR"]
     print("private organization audit self-test: OK")
 
 
