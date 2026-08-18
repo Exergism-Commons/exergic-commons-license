@@ -68,13 +68,15 @@ class CoverageTests(unittest.TestCase):
         variables = {v:self.interval() for v in MODULE.CORE_VARS + MODULE.ADVANCED_VARS}
         return {
             'assessment_id':'ECL-EX-AAA-001','actor_id':'STATE-AAA','model':'test','entity':'Alpha','object':'Exact alpha project',
-            'scoring_status':'scorable','normalization':{'method':'bounded rubric','rubric':'fixture','anchors':anchors,'provenance':['fixture']},
+            'scoring_status':'scorable','normalization':{'method':'bounded rubric','rubric':'fixture','anchors':anchors,'provenance':['ecl:EVIDENCE-A']},
             'profiles':['exergism/profiles/test.json'],'sensitivity_review':{'performed':True,'notes':'interval/profile sensitivity checked'},
             'variables':variables,
+            'advanced_evidence_independence':{v:{'independent_from_harm_inference':True,'rationale':'independent fixture basis','evidence_refs':['ecl:EVIDENCE-A']} for v in ('D_a','I','Lz','G')},
             'adversarial_review':{'status':'reviewed','determination':'uphold exact scope','reviewed_at':'2026-08-17','reviewer_independence':'independent-second-pass','provenance':['fixture-review']},
             'criterion_relevance':['ECL5_1'],'attribution':['direct project evidence'],'counter_institutions':['none material to fixture'],
+            'governance_scope_binding':{'scope':'Exact alpha project','provenance':['ecl:EVIDENCE-A']},
             'exclusions':['outside project'],'disagreement_notes':['none'],
-            'temporal_applicability':{'status':'not-applicable','reason':'single bounded event; no temporal conclusion used','provenance':['fixture']}
+            'temporal_applicability':{'status':'not-applicable','reason':'single bounded event; no temporal conclusion used','provenance':['ecl:EVIDENCE-A']}
         }
 
     def test_complete_is_derived_not_declared(self):
@@ -129,6 +131,16 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(material['unknown'], 0)
         dep = next(d for d in material['dependencies'] if d['target']=='PROJECT-MITIGA-DETENTION')
         self.assertEqual(dep['status'], 'blocked')
+
+    def test_scope_mismatch_blocks_governance_ready(self):
+        self.state(); self.claim(); item=self.complete_assessment()
+        item['governance_scope_binding']['scope']='Different scope'
+        self.write_json('exergism/assessments/AAA.json', item)
+        data = MODULE.report(self.root, today=MODULE.dt.date(2026,8,18))
+        row=data['actors'][0]
+        self.assertEqual(row['coverage']['formal_core']['status'], 'complete')
+        self.assertEqual(row['coverage']['governance_ready']['status'], 'blocked')
+        self.assertTrue(any('governance_scope_binding' in x for x in row['coverage']['governance_ready']['missing']))
 
     def test_score_to_tier_laundering_is_integrity_error(self):
         self.state(); self.claim(); item=self.complete_assessment(); item['tier']='R'
