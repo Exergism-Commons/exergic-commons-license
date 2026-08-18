@@ -4,10 +4,12 @@
   "id": "PROJECT-ARG-DECREE-383-2025-PFA-DIGITAL-PREVENTION",
   "type": "Project",
   "name": "Decreto 383/2025 PFA digital-prevention deployment",
-  "aliases": ["Decreto 383/2025 PFA prevention activity in open digital spaces"],
-  "dossier": "../../dossiers/states/ARG.md",
-  "lastSubstantiveReview": "2026-08-13",
-  "reviewDue": "2026-09-13",
+  "aliases": [
+    "Decreto 383/2025 PFA prevention activity in open digital spaces"
+  ],
+  "dossier": "../../dossiers/projects/ARG-DECREE-383-2025-PFA-DIGITAL-PREVENTION.md",
+  "lastSubstantiveReview": "2026-08-19",
+  "reviewDue": "2026-09-19",
   "reviewClass": "active",
   "reviewReason": "Identity-only statutory/deployment boundary from the ARG freeze. Ordinary OSINT, investigation and identity verification are explicitly outside any inferred project effect."
 }
