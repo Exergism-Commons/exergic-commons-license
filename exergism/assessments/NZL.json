@@ -1,5 +1,6 @@
 {
   "assessment_id": "ECL-EX-NZL-001",
+  "actor_id": "STATE-NZL",
   "model": "formal-exergism-v2-pilot",
   "entity": "New Zealand",
   "dossier": "dossiers/states/NZL.md",

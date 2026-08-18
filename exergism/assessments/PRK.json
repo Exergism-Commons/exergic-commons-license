@@ -1,5 +1,6 @@
 {
   "assessment_id": "ECL-EX-PRK-001",
+  "actor_id": "STATE-PRK",
   "model": "formal-exergism-v2-pilot",
   "entity": "North Korea (DPRK)",
   "dossier": "dossiers/states/PRK.md",

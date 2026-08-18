@@ -1,0 +1,34 @@
+@prefix ecl: <urn:ecl:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+# Graph-native boundary only. Formal completeness is proved by
+# tools/report_exergism_coverage.py, not inferred by SHACL/OWL.
+ecl:MaterialGovernanceFormalLinkShape a sh:NodeShape ;
+    sh:targetClass ecl:GovernanceDecision ;
+    sh:property [
+        sh:path ecl:subject ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "R/S GovernanceDecision requires an explicit basedOnAssessment link; the coverage reporter must separately prove that assessment complete." ;
+        sh:select """
+            PREFIX ecl: <urn:ecl:>
+            SELECT $this WHERE {
+              $this ecl:outcome ?outcome .
+              FILTER (?outcome IN (ecl:OutcomeR, ecl:OutcomeS))
+              FILTER NOT EXISTS { $this ecl:basedOnAssessment ?assessment }
+            }
+        """
+    ] .
+
+ecl:ScheduleDecisionLinkShape a sh:NodeShape ;
+    sh:targetClass ecl:ScheduleEntry ;
+    sh:property [
+        sh:path ecl:basedOnDecision ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI
+    ] .
