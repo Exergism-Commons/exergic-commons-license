@@ -53,6 +53,25 @@
       }
     },
     "variables": {"type": "object"},
+    "advanced_evidence_independence": {
+      "type": "object",
+      "description": "Human-auditable proof that intention/imputability variables were not inferred from harm/capture scores alone.",
+      "properties": {
+        "D_a": {"$ref": "#/$defs/independentEvidence"},
+        "I": {"$ref": "#/$defs/independentEvidence"},
+        "Lz": {"$ref": "#/$defs/independentEvidence"},
+        "G": {"$ref": "#/$defs/independentEvidence"}
+      }
+    },
+    "governance_scope_binding": {
+      "type": "object",
+      "description": "Explicit binding from this assessment object to the exact dossier governance scope. Presence alone does not make governance-ready true.",
+      "required": ["scope", "provenance"],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "provenance": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
     "temporal": {"type": "object"},
     "temporal_applicability": {
       "type": "object",
@@ -79,6 +98,17 @@
     "counter_institutions": {},
     "exclusions": {},
     "disagreement_notes": {}
+  },
+  "$defs": {
+    "independentEvidence": {
+      "type": "object",
+      "required": ["independent_from_harm_inference", "rationale", "evidence_refs"],
+      "properties": {
+        "independent_from_harm_inference": {"const": true},
+        "rationale": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    }
   },
   "allOf": [
     {
