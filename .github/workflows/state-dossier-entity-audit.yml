@@ -77,7 +77,7 @@ jobs:
             --json build/state-dossier-candidate-review.json \
             --markdown build/state-dossier-candidate-review.md \
             --fail-on-stale-disposition \
-            --fail-on-unreviewed-priority 42
+            --fail-on-unreviewed-priority 41
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
@@ -106,7 +106,7 @@ jobs:
             --json build/state-dossier-candidate-review.json \
             --markdown build/state-dossier-candidate-review.md \
             --fail-on-stale-disposition \
-            --fail-on-unreviewed-priority 42
+            --fail-on-unreviewed-priority 41
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
