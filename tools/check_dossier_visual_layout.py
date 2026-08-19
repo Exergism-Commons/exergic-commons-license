@@ -28,6 +28,14 @@ EXPECTED = {
     },
 }
 
+# A clip is the final paint boundary. These smaller budgets are the readability
+# boundary: body text must wrap well before the clip edge / next arrow or box.
+TEXT_BUDGETS = {
+    "source-box-clip": 220.0,
+    "proposition-box-clip": 220.0,
+    "identity-box-clip": 240.0,
+}
+
 COLUMN_GUARDS = {
     "source-column-clip": (40.0, 118.0, 300.0, 156.0),
     "proposition-column-clip": (390.0, 118.0, 300.0, 156.0),
@@ -79,7 +87,7 @@ def clipped_groups(root: ET.Element, clip_id: str) -> list[ET.Element]:
     return [node for node in root.findall(f".//{NS}g") if node.get("clip-path") == token]
 
 
-def validate_wrapped_text(path: Path, clip_id: str, texts: list[ET.Element], clip_width: float, max_lines: int) -> list[str]:
+def validate_wrapped_text(path: Path, clip_id: str, texts: list[ET.Element], text_budget: float, max_lines: int) -> list[str]:
     errors: list[str] = []
     for text in texts:
         lines = text.findall(f"{NS}tspan")
@@ -92,9 +100,9 @@ def validate_wrapped_text(path: Path, clip_id: str, texts: list[ET.Element], cli
         for line in lines:
             line_text = "".join(line.itertext())
             estimate = measured_width(line_text, font_size)
-            if estimate > clip_width:
+            if estimate > text_budget:
                 errors.append(
-                    f"{path}: {clip_id} estimated line width {estimate:.1f} > clip width {clip_width:.1f}: {line_text!r}"
+                    f"{path}: {clip_id} estimated line width {estimate:.1f} > safe text budget {text_budget:.1f}: {line_text!r}"
                 )
     return errors
 
@@ -142,7 +150,11 @@ def validate_file(path: Path) -> list[str]:
                 f"{path}: {clip_id} must bound {expected_text_nodes} text block(s), found {len(texts)}"
             )
             continue
-        errors.extend(validate_wrapped_text(path, clip_id, texts, width, max_lines))
+        budget = TEXT_BUDGETS.get(clip_id, width)
+        if budget > width:
+            errors.append(f"{path}: {clip_id} safe text budget {budget} exceeds clip width {width}")
+            continue
+        errors.extend(validate_wrapped_text(path, clip_id, texts, budget, max_lines))
 
     if kind == "evidence":
         for clip_id, expected in COLUMN_GUARDS.items():
@@ -179,7 +191,7 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
-    print(f"dossier visual layout: OK ({len(files)} SVGs; wrapped text + hard column clipping)")
+    print(f"dossier visual layout: OK ({len(files)} SVGs; conservative wrap budgets + hard column clipping)")
     return 0
 
 
