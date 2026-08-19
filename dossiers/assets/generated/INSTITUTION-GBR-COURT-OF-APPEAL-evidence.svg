@@ -21,8 +21,8 @@
   <g clip-path="url(#source-column-clip)">
   <text x="62" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#source-box-clip)">
-    <tspan x="62" y="180">Court of Appeal 15 June 2026</tspan>
-    <tspan x="62" dy="20">judgment</tspan>
+    <tspan x="62" y="180">Court of Appeal 15 June</tspan>
+    <tspan x="62" dy="20">2026 judgment</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#667085" clip-path="url(#source-footer-clip)">
     <tspan x="62" y="252">direct locator</tspan>
@@ -36,8 +36,8 @@
   <g clip-path="url(#proposition-column-clip)">
   <text x="412" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#proposition-box-clip)">
-    <tspan x="412" y="180">Palestine Action proscription</tspan>
-    <tspan x="412" dy="20">held lawful</tspan>
+    <tspan x="412" y="180">Palestine Action</tspan>
+    <tspan x="412" dy="20">proscription held lawful</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#667085" clip-path="url(#proposition-footer-clip)">
     <tspan x="412" y="244">Prose evidence; no</tspan>

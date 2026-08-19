@@ -21,8 +21,8 @@
   <g clip-path="url(#source-column-clip)">
   <text x="62" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#source-box-clip)">
-    <tspan x="62" y="180">Inspectorate Feb 2026 / NLD</tspan>
-    <tspan x="62" dy="20">freeze</tspan>
+    <tspan x="62" y="180">Inspectorate Feb 2026 /</tspan>
+    <tspan x="62" dy="20">NLD freeze</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#667085" clip-path="url(#source-footer-clip)">
     <tspan x="62" y="252">direct locator</tspan>
@@ -37,7 +37,8 @@
   <text x="412" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#proposition-box-clip)">
     <tspan x="412" y="180">Named workflow;</tspan>
-    <tspan x="412" dy="20">unremediated-use condition</tspan>
+    <tspan x="412" dy="20">unremediated-use</tspan>
+    <tspan x="412" dy="20">condition</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#667085" clip-path="url(#proposition-footer-clip)">
     <tspan x="412" y="244">Prose evidence; no</tspan>

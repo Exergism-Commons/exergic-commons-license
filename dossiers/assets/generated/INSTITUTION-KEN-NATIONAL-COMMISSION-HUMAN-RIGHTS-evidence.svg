@@ -21,8 +21,8 @@
   <g clip-path="url(#source-column-clip)">
   <text x="62" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#source-box-clip)">
-    <tspan x="62" y="180">KNCHR 25 June 2026 protest</tspan>
-    <tspan x="62" dy="20">record</tspan>
+    <tspan x="62" y="180">KNCHR 25 June 2026</tspan>
+    <tspan x="62" dy="20">protest record</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#667085" clip-path="url(#source-footer-clip)">
     <tspan x="62" y="252">direct locator</tspan>
@@ -36,9 +36,9 @@
   <g clip-path="url(#proposition-column-clip)">
   <text x="412" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#proposition-box-clip)">
-    <tspan x="412" y="180">Documented disappearances,</tspan>
-    <tspan x="412" dy="20">torture and accountability</tspan>
-    <tspan x="412" dy="20">demand</tspan>
+    <tspan x="412" y="180">Documented</tspan>
+    <tspan x="412" dy="20">disappearances, torture</tspan>
+    <tspan x="412" dy="20">and accountability demand</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#667085" clip-path="url(#proposition-footer-clip)">
     <tspan x="412" y="244">Prose evidence; no</tspan>

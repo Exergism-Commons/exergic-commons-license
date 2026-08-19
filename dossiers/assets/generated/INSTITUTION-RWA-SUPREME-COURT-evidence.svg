@@ -35,8 +35,8 @@
   <g clip-path="url(#proposition-column-clip)">
   <text x="412" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#proposition-box-clip)">
-    <tspan x="412" y="180">Ombudsman referral/review</tspan>
-    <tspan x="412" dy="20">power</tspan>
+    <tspan x="412" y="180">Ombudsman</tspan>
+    <tspan x="412" dy="20">referral/review power</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#667085" clip-path="url(#proposition-footer-clip)">
     <tspan x="412" y="244">Prose evidence; no</tspan>
