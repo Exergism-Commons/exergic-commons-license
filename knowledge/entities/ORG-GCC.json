@@ -1,1 +1,3 @@
-{"@context":"../../ontology/ecl-context.jsonld","iri":"ecl:ORG-GCC","id":"ORG-GCC","type":"Organization","name":"Gulf Cooperation Council","aliases":["GCC"],"dossier":"../../dossiers/states/QAT.md","lastSubstantiveReview":"2026-08-18","reviewDue":"2026-09-18","reviewClass":"active","reviewReason":"Identity-only regional organization appearing in comparative source context; member-state conduct does not propagate through membership."}
+{
+  "id":"ORG-GCC","name":"Gulf Cooperation Council (GCC)","type":"Organization","aliases":["GCC"],"dossier":"dossiers/organizations/GCC.md","reviewReason":"Regional intergovernmental body with documented engagement or decisions relevant to governance conditions in ARE."
+}
