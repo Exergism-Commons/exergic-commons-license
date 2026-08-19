@@ -44,12 +44,26 @@ jobs:
       - name: Synchronize conservative visual wrapping
         if: github.event_name == 'push' && github.ref == 'refs/heads/agent/canonical-entity-dossiers'
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tools/render_dossier_visuals.py')
+          text = path.read_text(encoding='utf-8')
+          replacements = {
+              'max_width=EVIDENCE_TEXT_BUDGETS["source"], font_size=15,\n        max_lines=3, line_height=20': 'max_width=EVIDENCE_TEXT_BUDGETS["source"], font_size=14,\n        max_lines=3, line_height=19',
+              'max_width=EVIDENCE_TEXT_BUDGETS["proposition"], font_size=15,\n        max_lines=3, line_height=20': 'max_width=EVIDENCE_TEXT_BUDGETS["proposition"], font_size=14,\n        max_lines=3, line_height=19',
+              'max_width=EVIDENCE_TEXT_BUDGETS["identity"], font_size=15,\n        max_lines=3, line_height=20': 'max_width=EVIDENCE_TEXT_BUDGETS["identity"], font_size=14,\n        max_lines=3, line_height=19',
+          }
+          for old, new in replacements.items():
+              if old in text:
+                  text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
           python tools/render_dossier_visuals.py --out dossiers/assets/generated
-          if ! git diff --quiet -- dossiers/assets/generated; then
+          if ! git diff --quiet -- tools/render_dossier_visuals.py dossiers/assets/generated; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add dossiers/assets/generated
-            git commit -m 'Regenerate conservatively wrapped dossier visuals'
+            git add tools/render_dossier_visuals.py dossiers/assets/generated
+            git commit -m 'Fit full evidence text within safe gutters'
             git push origin HEAD:agent/canonical-entity-dossiers
           fi
 
