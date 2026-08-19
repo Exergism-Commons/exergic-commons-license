@@ -13,6 +13,15 @@ DEFAULT_MANIFEST_DIR = ROOT / "knowledge/generated"
 DEFAULT_PALETTE = ROOT / "knowledge/generated/dossier-visual-palette-v1.json"
 DEFAULT_OUT = ROOT / "dossiers/assets/generated"
 
+# Deliberately smaller than the physical clip rectangles. These are layout
+# budgets, not clip widths: wrapped text must leave a substantial gutter before
+# arrows / neighbouring columns even when browser font metrics differ.
+EVIDENCE_TEXT_BUDGETS = {
+    "source": 220,
+    "proposition": 220,
+    "identity": 240,
+}
+
 
 def esc(value: str) -> str:
     return html.escape(str(value), quote=True)
@@ -180,11 +189,14 @@ def evidence_svg(entity: dict) -> str:
     granularity_label = ("direct locator" if entity["sourceGranularity"] == "direct"
                          else "partial locator / explicit gap")
 
-    source_block = text_block(source, x=62, y=180, max_width=240, font_size=15,
+    source_block = text_block(source, x=62, y=180,
+        max_width=EVIDENCE_TEXT_BUDGETS["source"], font_size=15,
         max_lines=3, line_height=20, clip_id="source-box-clip")
-    proposition_block = text_block(proposition, x=412, y=180, max_width=240,
-        font_size=15, max_lines=3, line_height=20, clip_id="proposition-box-clip")
-    identity_block = text_block(name, x=762, y=180, max_width=240, font_size=15,
+    proposition_block = text_block(proposition, x=412, y=180,
+        max_width=EVIDENCE_TEXT_BUDGETS["proposition"], font_size=15,
+        max_lines=3, line_height=20, clip_id="proposition-box-clip")
+    identity_block = text_block(name, x=762, y=180,
+        max_width=EVIDENCE_TEXT_BUDGETS["identity"], font_size=15,
         max_lines=3, line_height=20, clip_id="identity-box-clip")
     source_footer = text_block(granularity_label, x=62, y=252, max_width=240,
         font_size=14, max_lines=1, line_height=16, clip_id="source-footer-clip",
