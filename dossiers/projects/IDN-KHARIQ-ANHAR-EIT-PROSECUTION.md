@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION
+entity: Khariq Anhar EIT-law prosecution project
+entity_type: project
+---
 # Khariq Anhar EIT-law prosecution project
 
-- Entity ID: `PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the exact prosecution project.
-## Linked governance context
-Source: `dossiers/states/IDN.md`.
+Canonical identity `PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION`; ABox metadata remains authoritative.
+## State governance context
+`IDN` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-No prosecution authority participation or governance is inferred.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Institutional relations remain separately evidenced.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION-status.svg)
-![Evidence](../assets/generated/PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION-evidence.svg)
+![State context](../assets/generated/PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-IDN-KHARIQ-ANHAR-EIT-PROSECUTION.json`
 - `dossiers/states/IDN.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

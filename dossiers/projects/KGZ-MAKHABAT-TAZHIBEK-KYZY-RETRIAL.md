@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL
+entity: Makhabat Tazhibek-kyzy retrial and travel-restriction project
+entity_type: project
+---
 # Makhabat Tazhibek-kyzy retrial and travel-restriction project
 
-- Entity ID: `PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the exact proceeding project.
-## Linked governance context
-Source: `dossiers/states/KGZ.md`.
+Canonical identity `PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL`; ABox metadata remains authoritative.
+## State governance context
+`KGZ` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-No court/prosecutor actor relation or governance is inferred.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Actor relations remain separate evidence propositions.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL-status.svg)
-![Evidence](../assets/generated/PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL-evidence.svg)
+![State context](../assets/generated/PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-KGZ-MAKHABAT-TAZHIBEK-KYZY-RETRIAL.json`
 - `dossiers/states/KGZ.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

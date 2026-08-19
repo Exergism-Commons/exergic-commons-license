@@ -1,31 +1,32 @@
-# Caribbean Community (CARICOM)
-
-- Entity ID: `ORG-CARICOM`
-- Entity type: `Organization`
-- Canonical dossier: `dossiers/organizations/CARICOM.md`
+---
+id: ECL-ORG-CARICOM
+entity: Caribbean Community
+entity_type: organization
+---
+# Caribbean Community
 
 ## Identity scope
-Dedicated canonical record for `ORG-CARICOM`; identity and aliases remain authoritative in `knowledge/entities/ORG-CARICOM.json`.
+Canonical identity `ORG-CARICOM`; ABox metadata remains authoritative.
 
-## Linked governance context
-Migration source: `dossiers/states/DMA.md`. The link supplies context only and does not transfer a State governance classification.
+## State governance context
+`DMA` context is `N` only; no entity-level governance inheritance.
 
 ## Evidence record
-This migration materializes the existing entity boundary; it asserts no new event, relationship, or outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 
 ## Attribution and exclusions
-Only directly attributable Organization evidence belongs here; State and other entity records remain separate.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![Status context](../assets/generated/ORG-CARICOM-status.svg)
-![Evidence coverage](../assets/generated/ORG-CARICOM-evidence.svg)
+![State context](../assets/generated/ORG-CARICOM-status.svg)
+![Evidence boundary](../assets/generated/ORG-CARICOM-evidence.svg)
 
 ## Evidence gaps
-Direct entity-level evidence beyond the linked source remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 
 ## Sources
 - `knowledge/entities/ORG-CARICOM.json`
 - `dossiers/states/DMA.md`
 
 ## Governance boundary
-This Organization dossier does not classify a State or inherit linked-State governance status.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

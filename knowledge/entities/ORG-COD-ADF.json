@@ -1,8 +1,15 @@
 {
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-COD-ADF",
   "id": "ORG-COD-ADF",
-  "name": "Allied Democratic Forces (ADF)",
   "type": "Organization",
-  "aliases": ["ADF"],
-  "dossier": "dossiers/organizations/COD-ADF.md",
-  "reviewReason": "Armed non-state actor whose conduct is cited in documentation relevant to the COD record."
+  "name": "ADF (DRC armed group)",
+  "aliases": [
+    "ADF"
+  ],
+  "dossier": "../../dossiers/organizations/COD-ADF.md",
+  "lastSubstantiveReview": "2026-08-18",
+  "reviewDue": "2026-09-18",
+  "reviewClass": "active",
+  "reviewReason": "Identity-only non-State armed group used to preserve actor separation from FARDC/M23; no sponsor/control relation is inferred."
 }

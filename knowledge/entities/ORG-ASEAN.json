@@ -1,8 +1,15 @@
 {
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-ASEAN",
   "id": "ORG-ASEAN",
-  "name": "Association of Southeast Asian Nations (ASEAN)",
   "type": "Organization",
-  "aliases": ["ASEAN"],
-  "dossier": "dossiers/organizations/ASEAN.md",
-  "reviewReason": "Regional intergovernmental body with recorded engagement or decisions relevant to governance conditions in MMR."
+  "name": "Association of Southeast Asian Nations",
+  "aliases": [
+    "ASEAN"
+  ],
+  "dossier": "../../dossiers/organizations/ASEAN.md",
+  "lastSubstantiveReview": "2026-08-18",
+  "reviewDue": "2026-09-18",
+  "reviewClass": "active",
+  "reviewReason": "Identity-only regional organization used as current-context provenance. Member-State or Myanmar conduct never propagates through membership."
 }

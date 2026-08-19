@@ -1,8 +1,13 @@
 {
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:ORG-BINUH",
   "id": "ORG-BINUH",
-  "name": "United Nations Integrated Office in Haiti (BINUH)",
   "type": "Organization",
-  "aliases": ["BINUH"],
-  "dossier": "dossiers/organizations/BINUH.md",
-  "reviewReason": "United Nations mission with reporting or monitoring relevant to the HTI record."
+  "name": "BINUH",
+  "aliases": [],
+  "dossier": "../../dossiers/organizations/BINUH.md",
+  "lastSubstantiveReview": "2026-08-18",
+  "reviewDue": "2026-09-18",
+  "reviewClass": "active",
+  "reviewReason": "Identity-only UN mission/office referenced as attribution provenance; exact report locator gaps remain proposition-specific."
 }

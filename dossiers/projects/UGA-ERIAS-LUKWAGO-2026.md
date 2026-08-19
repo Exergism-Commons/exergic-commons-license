@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-UGA-ERIAS-LUKWAGO-2026
+entity: Erias Lukwago June 2026 detention and prosecution project
+entity_type: project
+---
 # Erias Lukwago June 2026 detention and prosecution project
 
-- Entity ID: `PROJECT-UGA-ERIAS-LUKWAGO-2026`
-- Entity type: `Project`
 ## Identity scope
-Dedicated canonical record for the exact June 2026 case project.
-## Linked governance context
-Source: `dossiers/states/UGA.md`.
+Canonical identity `PROJECT-UGA-ERIAS-LUKWAGO-2026`; ABox metadata remains authoritative.
+## State governance context
+`UGA` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Military, police, and prosecutor participation remains separately evidenced.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-No actor participation follows from project identity alone.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-UGA-ERIAS-LUKWAGO-2026-status.svg)
-![Evidence](../assets/generated/PROJECT-UGA-ERIAS-LUKWAGO-2026-evidence.svg)
+![State context](../assets/generated/PROJECT-UGA-ERIAS-LUKWAGO-2026-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-UGA-ERIAS-LUKWAGO-2026-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-UGA-ERIAS-LUKWAGO-2026.json`
 - `dossiers/states/UGA.md`
 ## Governance boundary
-No linked-State governance outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

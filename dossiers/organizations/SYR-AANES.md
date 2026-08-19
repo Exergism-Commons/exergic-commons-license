@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-SYR-AANES
+entity: AANES
+entity_type: organization
+---
 # AANES
 
-- Entity ID: `ORG-SYR-AANES`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-SYR-AANES`.
-## Linked governance context
-Source: `dossiers/states/SYR.md`; geography does not import this actor's conduct into Syrian-government scope.
+Canonical identity `ORG-SYR-AANES`; ABox metadata remains authoritative.
+
+## State governance context
+`SYR` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-No new conduct or relationship is asserted by this migration.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Fragmented attribution remains actor-specific.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-SYR-AANES-status.svg)
-![Evidence](../assets/generated/ORG-SYR-AANES-evidence.svg)
+![State context](../assets/generated/ORG-SYR-AANES-status.svg)
+![Evidence boundary](../assets/generated/ORG-SYR-AANES-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-SYR-AANES.json`
 - `dossiers/states/SYR.md`
+
 ## Governance boundary
-No linked-State status is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

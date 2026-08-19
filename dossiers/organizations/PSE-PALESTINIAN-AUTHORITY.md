@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-PSE-PALESTINIAN-AUTHORITY
+entity: Palestinian Authority
+entity_type: organization
+---
 # Palestinian Authority
 
-- Entity ID: `ORG-PSE-PALESTINIAN-AUTHORITY`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-PSE-PALESTINIAN-AUTHORITY`.
-## Linked governance context
-Migration source: `dossiers/states/PSE.md`; the Palestine dossier's attribution split is preserved.
+Canonical identity `ORG-PSE-PALESTINIAN-AUTHORITY`; ABox metadata remains authoritative.
+
+## State governance context
+`PSE` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-This migration asserts no new conduct, project attribution, or governance result.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-PA attribution does not propagate from the State or to unrelated Palestinian actors.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-status.svg)
-![Evidence](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-evidence.svg)
+![State context](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-status.svg)
+![Evidence boundary](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence beyond the linked source remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-PSE-PALESTINIAN-AUTHORITY.json`
 - `dossiers/states/PSE.md`
+
 ## Governance boundary
-This Organization dossier does not classify a State or inherit linked-State governance status.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

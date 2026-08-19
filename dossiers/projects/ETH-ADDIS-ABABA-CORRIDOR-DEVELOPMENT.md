@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT
+entity: Addis Ababa Corridor Development Project
+entity_type: project
+---
 # Addis Ababa Corridor Development Project
 
-- Entity ID: `PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the named corridor project.
-## Linked governance context
-Source: `dossiers/states/ETH.md`.
+Canonical identity `PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT`; ABox metadata remains authoritative.
+## State governance context
+`ETH` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Ordinary construction and rights-compliant relocation are not qualifying conduct by identity alone.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Conduct and governance propositions remain independently evidenced.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT-status.svg)
-![Evidence](../assets/generated/PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT-evidence.svg)
+![State context](../assets/generated/PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT.json`
 - `dossiers/states/ETH.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

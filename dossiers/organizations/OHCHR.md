@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-OHCHR
+entity: Office of the United Nations High Commissioner for Human Rights
+entity_type: organization
+---
 # Office of the United Nations High Commissioner for Human Rights
 
-- Entity ID: `ORG-OHCHR`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-OHCHR`.
-## Linked governance context
-Migration source: `dossiers/states/CHN.md`; monitoring, evidence, and cooperation provenance are contextual only.
+Canonical identity `ORG-OHCHR`; ABox metadata remains authoritative.
+
+## State governance context
+`CHN` context is `R` only; no entity-level governance inheritance.
+
 ## Evidence record
-This migration asserts no new event, relationship, or governance outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-OHCHR reporting does not mechanically create ECL governance or transfer attribution.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-OHCHR-status.svg)
-![Evidence](../assets/generated/ORG-OHCHR-evidence.svg)
+![State context](../assets/generated/ORG-OHCHR-status.svg)
+![Evidence boundary](../assets/generated/ORG-OHCHR-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence beyond the linked source remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-OHCHR.json`
 - `dossiers/states/CHN.md`
+
 ## Governance boundary
-This Organization dossier does not classify a State or inherit linked-State governance status.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

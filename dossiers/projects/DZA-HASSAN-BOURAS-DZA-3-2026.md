@@ -1,23 +1,25 @@
+---
+id: ECL-PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026
+entity: Hassan Bouras detention project — DZA 3/2026
+entity_type: project
+---
 # Hassan Bouras detention project — DZA 3/2026
 
-- Entity ID: `PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026`
-- Entity type: `Project`
-
 ## Identity scope
-Dedicated record for the exact case project.
-## Linked governance context
-Source: `dossiers/states/DZA.md`.
+Canonical identity `PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026`; ABox metadata remains authoritative.
+## State governance context
+`DZA` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Actor participation and governance remain separate propositions.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-No institutional relation is inferred from case identity.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026-status.svg)
-![Evidence](../assets/generated/PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026-evidence.svg)
+![State context](../assets/generated/PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-DZA-HASSAN-BOURAS-DZA-3-2026.json`
 - `dossiers/states/DZA.md`
 ## Governance boundary
-No linked-State governance outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

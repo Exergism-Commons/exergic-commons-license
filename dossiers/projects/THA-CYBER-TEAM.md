@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-THA-CYBER-TEAM
+entity: Cyber Team (Thailand)
+entity_type: project
+---
 # Cyber Team (Thailand)
 
-- Entity ID: `PROJECT-THA-CYBER-TEAM`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the exact named coordinated information-control project.
-## Linked governance context
-Source: `dossiers/states/THA.md`.
+Canonical identity `PROJECT-THA-CYBER-TEAM`; ABox metadata remains authoritative.
+## State governance context
+`THA` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Operator relations remain separate Claims.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Police/military participation is not inferred from identity alone.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-THA-CYBER-TEAM-status.svg)
-![Evidence](../assets/generated/PROJECT-THA-CYBER-TEAM-evidence.svg)
+![State context](../assets/generated/PROJECT-THA-CYBER-TEAM-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-THA-CYBER-TEAM-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-THA-CYBER-TEAM.json`
 - `dossiers/states/THA.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

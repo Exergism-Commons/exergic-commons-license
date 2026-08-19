@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26
+entity: Gabon 26 February 2026 digital-platform suspension project
+entity_type: project
+---
 # Gabon 26 February 2026 digital-platform suspension project
 
-- Entity ID: `PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the exact platform-suspension project.
-## Linked governance context
-Source: `dossiers/states/GAB.md`.
+Canonical identity `PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26`; ABox metadata remains authoritative.
+## State governance context
+`GAB` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Later governance dialogue and unrelated administration remain distinct.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-No implementing actor is inferred from identity alone.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26-status.svg)
-![Evidence](../assets/generated/PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26-evidence.svg)
+![State context](../assets/generated/PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26.json`
 - `dossiers/states/GAB.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

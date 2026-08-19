@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-MINUSCA
+entity: MINUSCA
+entity_type: organization
+---
 # MINUSCA
 
-- Entity ID: `ORG-MINUSCA`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-MINUSCA`.
-## Linked governance context
-Migration source: `dossiers/states/CAF.md`; mission reporting/remediation provenance is contextual only.
+Canonical identity `ORG-MINUSCA`; ABox metadata remains authoritative.
+
+## State governance context
+`CAF` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-This migration asserts no new event, relationship, or outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Reporting by the mission does not propagate attribution to other entities.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-MINUSCA-status.svg)
-![Evidence](../assets/generated/ORG-MINUSCA-evidence.svg)
+![State context](../assets/generated/ORG-MINUSCA-status.svg)
+![Evidence boundary](../assets/generated/ORG-MINUSCA-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence beyond the linked source remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-MINUSCA.json`
 - `dossiers/states/CAF.md`
+
 ## Governance boundary
-This Organization dossier does not classify a State or inherit linked-State governance status.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

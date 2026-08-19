@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-UNHCR
+entity: United Nations High Commissioner for Refugees
+entity_type: organization
+---
 # United Nations High Commissioner for Refugees
 
-- Entity ID: `ORG-UNHCR`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-UNHCR`.
-## Linked governance context
-Source: `dossiers/states/TTO.md`; protection/access-remedy context remains proposition-specific.
+Canonical identity `ORG-UNHCR`; ABox metadata remains authoritative.
+
+## State governance context
+`TTO` context is `U` only; no entity-level governance inheritance.
+
 ## Evidence record
-No new event, relationship, or outcome is asserted.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Obstruction or cooperation requires separate evidence.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-UNHCR-status.svg)
-![Evidence](../assets/generated/ORG-UNHCR-evidence.svg)
+![State context](../assets/generated/ORG-UNHCR-status.svg)
+![Evidence boundary](../assets/generated/ORG-UNHCR-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-UNHCR.json`
 - `dossiers/states/TTO.md`
+
 ## Governance boundary
-No linked-State status is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

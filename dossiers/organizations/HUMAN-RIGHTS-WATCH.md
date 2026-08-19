@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-HUMAN-RIGHTS-WATCH
+entity: Human Rights Watch
+entity_type: organization
+---
 # Human Rights Watch
 
-- Entity ID: `ORG-HUMAN-RIGHTS-WATCH`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-HUMAN-RIGHTS-WATCH`; the entity JSON remains authoritative for identity and aliases.
-## Linked governance context
-Migration source: `dossiers/states/TUR.md`; this is contextual linkage only.
+Canonical identity `ORG-HUMAN-RIGHTS-WATCH`; ABox metadata remains authoritative.
+
+## State governance context
+`BRA` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-This migration materializes the existing documentary-source boundary and asserts no new outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Only directly attributable Organization evidence belongs here; cited reporting does not transfer attribution.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-status.svg)
-![Evidence](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-evidence.svg)
+![State context](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-status.svg)
+![Evidence boundary](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-evidence.svg)
+
 ## Evidence gaps
-Further direct entity-level evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-HUMAN-RIGHTS-WATCH.json`
-- `dossiers/states/TUR.md`
+- `dossiers/states/BRA.md`
+
 ## Governance boundary
-This Organization dossier does not classify or inherit the governance status of a linked State.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

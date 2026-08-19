@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-SYR-SDF
+entity: SDF (Syria)
+entity_type: organization
+---
 # SDF (Syria)
 
-- Entity ID: `ORG-SYR-SDF`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-SYR-SDF`.
-## Linked governance context
-Source: `dossiers/states/SYR.md`; fragmented context does not transfer attribution.
+Canonical identity `ORG-SYR-SDF`; ABox metadata remains authoritative.
+
+## State governance context
+`SYR` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-No new conduct or relationship is asserted by this migration.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-The SDF remains separate from transitional-government attribution.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-SYR-SDF-status.svg)
-![Evidence](../assets/generated/ORG-SYR-SDF-evidence.svg)
+![State context](../assets/generated/ORG-SYR-SDF-status.svg)
+![Evidence boundary](../assets/generated/ORG-SYR-SDF-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-SYR-SDF.json`
 - `dossiers/states/SYR.md`
+
 ## Governance boundary
-No linked-State status is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

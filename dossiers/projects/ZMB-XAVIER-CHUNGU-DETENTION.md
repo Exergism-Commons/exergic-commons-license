@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-ZMB-XAVIER-CHUNGU-DETENTION
+entity: Xavier Chungu State-security/sedition detention case
+entity_type: project
+---
 # Xavier Chungu State-security/sedition detention case
 
-- Entity ID: `PROJECT-ZMB-XAVIER-CHUNGU-DETENTION`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the bounded Xavier Chungu matter.
-## Linked governance context
-Source: `dossiers/states/ZMB.md`.
+Canonical identity `PROJECT-ZMB-XAVIER-CHUNGU-DETENTION`; ABox metadata remains authoritative.
+## State governance context
+`ZMB` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Identity is not a finding of guilt or whole-agency status.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Individual and institutional propositions remain separately evidenced.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-ZMB-XAVIER-CHUNGU-DETENTION-status.svg)
-![Evidence](../assets/generated/PROJECT-ZMB-XAVIER-CHUNGU-DETENTION-evidence.svg)
+![State context](../assets/generated/PROJECT-ZMB-XAVIER-CHUNGU-DETENTION-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-ZMB-XAVIER-CHUNGU-DETENTION-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-ZMB-XAVIER-CHUNGU-DETENTION.json`
 - `dossiers/states/ZMB.md`
 ## Governance boundary
-No linked-State governance outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

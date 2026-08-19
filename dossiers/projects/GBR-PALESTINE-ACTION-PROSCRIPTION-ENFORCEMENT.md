@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT
+entity: Palestine Action proscription enforcement project
+entity_type: project
+---
 # Palestine Action proscription enforcement project
 
-- Entity ID: `PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the bounded post-5-July-2025 statutory enforcement project.
-## Linked governance context
-Source: `dossiers/states/GBR.md`.
+Canonical identity `PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT`; ABox metadata remains authoritative.
+## State governance context
+`GBR` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Ordinary counterterrorism enforcement is not included by this identity.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Specific enforcement acts remain separately evidenced.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT-status.svg)
-![Evidence](../assets/generated/PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT-evidence.svg)
+![State context](../assets/generated/PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT.json`
 - `dossiers/states/GBR.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

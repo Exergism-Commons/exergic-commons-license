@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-NLD-PROBATION-RISK-TOOLS
+entity: Netherlands probation risk tools
+entity_type: project
+---
 # Netherlands probation risk tools
 
-- Entity ID: `PROJECT-NLD-PROBATION-RISK-TOOLS`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the scoped probation-risk-tools project.
-## Linked governance context
-Source: `dossiers/states/NLD.md`.
+Canonical identity `PROJECT-NLD-PROBATION-RISK-TOOLS`; ABox metadata remains authoritative.
+## State governance context
+`NLD` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-The project identity follows the canonical State dossier pending dedicated evidence curation.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Identity alone does not create a governance outcome.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-NLD-PROBATION-RISK-TOOLS-status.svg)
-![Evidence](../assets/generated/PROJECT-NLD-PROBATION-RISK-TOOLS-evidence.svg)
+![State context](../assets/generated/PROJECT-NLD-PROBATION-RISK-TOOLS-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-NLD-PROBATION-RISK-TOOLS-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-NLD-PROBATION-RISK-TOOLS.json`
 - `dossiers/states/NLD.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

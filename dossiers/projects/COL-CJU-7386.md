@@ -1,23 +1,25 @@
+---
+id: ECL-PROJECT-COL-CJU-7386
+entity: CJU-7386 jurisdictional proceeding
+entity_type: project
+---
 # CJU-7386 jurisdictional proceeding
 
-- Entity ID: `PROJECT-COL-CJU-7386`
-- Entity type: `Project`
-
 ## Identity scope
-Dedicated record for the bounded `CJU-7386` proceeding.
-## Linked governance context
-Source: `dossiers/states/COL.md`.
+Canonical identity `PROJECT-COL-CJU-7386`; ABox metadata remains authoritative.
+## State governance context
+`COL` context is `U` only; no entity-level governance inheritance.
 ## Evidence record
-The proceeding remains a tracked case object, not a governance outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-No institutional participation beyond sourced propositions is inferred.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-COL-CJU-7386-status.svg)
-![Evidence](../assets/generated/PROJECT-COL-CJU-7386-evidence.svg)
+![State context](../assets/generated/PROJECT-COL-CJU-7386-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-COL-CJU-7386-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-COL-CJU-7386.json`
 - `dossiers/states/COL.md`
 ## Governance boundary
-No linked-State governance outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

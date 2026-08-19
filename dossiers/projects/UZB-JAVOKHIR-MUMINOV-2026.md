@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-UZB-JAVOKHIR-MUMINOV-2026
+entity: Javokhir Muminov June 2026 detention/prosecution project
+entity_type: project
+---
 # Javokhir Muminov June 2026 detention/prosecution project
 
-- Entity ID: `PROJECT-UZB-JAVOKHIR-MUMINOV-2026`
-- Entity type: `Project`
 ## Identity scope
-Dedicated canonical record for the exact June 2026 case project.
-## Linked governance context
-Source: `dossiers/states/UZB.md`.
+Canonical identity `PROJECT-UZB-JAVOKHIR-MUMINOV-2026`; ABox metadata remains authoritative.
+## State governance context
+`UZB` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Custody and prosecution actor participation remains separate evidence.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-No actor relation follows from project identity alone.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-UZB-JAVOKHIR-MUMINOV-2026-status.svg)
-![Evidence](../assets/generated/PROJECT-UZB-JAVOKHIR-MUMINOV-2026-evidence.svg)
+![State context](../assets/generated/PROJECT-UZB-JAVOKHIR-MUMINOV-2026-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-UZB-JAVOKHIR-MUMINOV-2026-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-UZB-JAVOKHIR-MUMINOV-2026.json`
 - `dossiers/states/UZB.md`
 ## Governance boundary
-No linked-State governance outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

@@ -1,23 +1,25 @@
-# Shahriar Kabir case (BGD.1/2026)
-
-- Entity ID: `PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026`
-- Entity type: `Project`
+---
+id: ECL-PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026
+entity: BGD 1/2026 — Shahriar Kabir continued detention/prosecution project
+entity_type: project
+---
+# BGD 1/2026 — Shahriar Kabir continued detention/prosecution project
 
 ## Identity scope
-Dedicated canonical record for this bounded case/project.
-## Linked governance context
-Source: `dossiers/states/BGD.md`; the State record supplies context only.
+Canonical identity `PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026`; ABox metadata remains authoritative.
+## State governance context
+`BGD` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-The migration asserts no new actor participation, guilt, or governance result.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Case-specific propositions remain separate from State and institutional identities.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026-status.svg)
-![Evidence](../assets/generated/PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026-evidence.svg)
+![State context](../assets/generated/PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026-evidence.svg)
 ## Evidence gaps
-Additional project-level evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-BGD-SHAHRIAR-KABIR-BGD-1-2026.json`
 - `dossiers/states/BGD.md`
 ## Governance boundary
-This Project dossier does not inherit a linked State's governance status.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

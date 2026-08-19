@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-ILO
+entity: International Labour Organization
+entity_type: organization
+---
 # International Labour Organization
 
-- Entity ID: `ORG-ILO`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-ILO`; identity and aliases remain authoritative in its entity JSON.
-## Linked governance context
-Migration source: `dossiers/states/QAT.md`; technical cooperation is context, not an inherited ECL outcome.
+Canonical identity `ORG-ILO`; ABox metadata remains authoritative.
+
+## State governance context
+`QAT` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-This migration asserts no new event, relationship, or outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Labour-reform and counter-evidence provenance remains proposition-specific.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-ILO-status.svg)
-![Evidence](../assets/generated/ORG-ILO-evidence.svg)
+![State context](../assets/generated/ORG-ILO-status.svg)
+![Evidence boundary](../assets/generated/ORG-ILO-evidence.svg)
+
 ## Evidence gaps
-Further direct entity-level evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-ILO.json`
 - `dossiers/states/QAT.md`
+
 ## Governance boundary
-This Organization dossier does not classify or inherit a linked State's governance status.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

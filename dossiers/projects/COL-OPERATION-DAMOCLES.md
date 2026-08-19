@@ -1,23 +1,25 @@
+---
+id: ECL-PROJECT-COL-OPERATION-DAMOCLES
+entity: Operation order 039 Damocles
+entity_type: project
+---
 # Operation order 039 Damocles
 
-- Entity ID: `PROJECT-COL-OPERATION-DAMOCLES`
-- Entity type: `Project`
-
 ## Identity scope
-Dedicated record for the exact named operation-order object.
-## Linked governance context
-Source: `dossiers/states/COL.md`.
+Canonical identity `PROJECT-COL-OPERATION-DAMOCLES`; ABox metadata remains authoritative.
+## State governance context
+`COL` context is `U` only; no entity-level governance inheritance.
 ## Evidence record
-Identity alone establishes no operator relation or ECL outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Operator relations require separate Claims.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-COL-OPERATION-DAMOCLES-status.svg)
-![Evidence](../assets/generated/PROJECT-COL-OPERATION-DAMOCLES-evidence.svg)
+![State context](../assets/generated/PROJECT-COL-OPERATION-DAMOCLES-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-COL-OPERATION-DAMOCLES-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-COL-OPERATION-DAMOCLES.json`
 - `dossiers/states/COL.md`
 ## Governance boundary
-No linked-State governance outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

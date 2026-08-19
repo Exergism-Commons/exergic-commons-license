@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-UNMISS
+entity: United Nations Mission in South Sudan
+entity_type: organization
+---
 # United Nations Mission in South Sudan
 
-- Entity ID: `ORG-UNMISS`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-UNMISS`.
-## Linked governance context
-Source: `dossiers/states/SSD.md`; mission reporting and assistance are provenance only.
+Canonical identity `ORG-UNMISS`; ABox metadata remains authoritative.
+
+## State governance context
+`SSD` context is `S` only; no entity-level governance inheritance.
+
 ## Evidence record
-No new event, relationship, or outcome is asserted.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Reporting or assistance does not create governance.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-UNMISS-status.svg)
-![Evidence](../assets/generated/ORG-UNMISS-evidence.svg)
+![State context](../assets/generated/ORG-UNMISS-status.svg)
+![Evidence boundary](../assets/generated/ORG-UNMISS-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-UNMISS.json`
 - `dossiers/states/SSD.md`
+
 ## Governance boundary
-No linked-State status is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

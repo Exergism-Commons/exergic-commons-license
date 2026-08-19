@@ -1,22 +1,25 @@
+---
+id: ECL-PROJECT-ECU-EXTERMINIO-TOTAL
+entity: Exterminio Total
+entity_type: project
+---
 # Exterminio Total
 
-- Entity ID: `PROJECT-ECU-EXTERMINIO-TOTAL`
-- Entity type: `Project`
 ## Identity scope
-Dedicated record for the exact named project.
-## Linked governance context
-Source: `dossiers/states/ECU.md`.
+Canonical identity `PROJECT-ECU-EXTERMINIO-TOTAL`; ABox metadata remains authoritative.
+## State governance context
+`ECU` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-Identity alone establishes no operator, attribution, or governance outcome.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Operator relations require separate evidence.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-ECU-EXTERMINIO-TOTAL-status.svg)
-![Evidence](../assets/generated/PROJECT-ECU-EXTERMINIO-TOTAL-evidence.svg)
+![State context](../assets/generated/PROJECT-ECU-EXTERMINIO-TOTAL-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-ECU-EXTERMINIO-TOTAL-evidence.svg)
 ## Evidence gaps
-Direct project evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-ECU-EXTERMINIO-TOTAL.json`
 - `dossiers/states/ECU.md`
 ## Governance boundary
-No linked-State outcome is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

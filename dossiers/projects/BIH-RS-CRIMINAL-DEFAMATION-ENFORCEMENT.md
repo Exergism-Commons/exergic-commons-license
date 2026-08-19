@@ -1,23 +1,25 @@
+---
+id: ECL-PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT
+entity: Republika Srpska criminal-defamation enforcement project
+entity_type: project
+---
 # Republika Srpska criminal-defamation enforcement project
 
-- Entity ID: `PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT`
-- Entity type: `Project`
-
 ## Identity scope
-Dedicated record bounded to Articles 208a-208đ enforcement.
-## Linked governance context
-Source: `dossiers/states/BIH.md`; context does not expand the project boundary.
+Canonical identity `PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT`; ABox metadata remains authoritative.
+## State governance context
+`BIH` context is `S` only; no entity-level governance inheritance.
 ## Evidence record
-No individual prosecution or prosecutor-office participation is inferred.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
 ## Attribution and exclusions
-Individual proceedings remain separate Claims.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 ## Visual evidence
-![Status](../assets/generated/PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT-status.svg)
-![Evidence](../assets/generated/PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT-evidence.svg)
+![State context](../assets/generated/PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT-status.svg)
+![Evidence boundary](../assets/generated/PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT-evidence.svg)
 ## Evidence gaps
-Project-specific evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
 ## Sources
 - `knowledge/entities/PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT.json`
 - `dossiers/states/BIH.md`
 ## Governance boundary
-This Project dossier does not inherit a State outcome.
+This dossier records identity and context only; it does not independently establish an ECL restriction.

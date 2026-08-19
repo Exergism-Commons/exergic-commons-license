@@ -1,23 +1,32 @@
+---
+id: ECL-ORG-UNAMA
+entity: United Nations Assistance Mission in Afghanistan
+entity_type: organization
+---
 # United Nations Assistance Mission in Afghanistan
 
-- Entity ID: `ORG-UNAMA`
-- Entity type: `Organization`
-
 ## Identity scope
-Dedicated canonical record for `ORG-UNAMA`.
-## Linked governance context
-Source: `dossiers/states/AFG.md`; mission reporting is evidence provenance only.
+Canonical identity `ORG-UNAMA`; ABox metadata remains authoritative.
+
+## State governance context
+`AFG` context is `R` only; no entity-level governance inheritance.
+
 ## Evidence record
-No new event, relationship, or outcome is asserted.
+Dedicated dossier migration only; no Claim, EvidenceItem, relation, participation or licensing effect is created.
+
 ## Attribution and exclusions
-Reporting does not itself create an ECL outcome.
+Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
+
 ## Visual evidence
-![Status](../assets/generated/ORG-UNAMA-status.svg)
-![Evidence](../assets/generated/ORG-UNAMA-evidence.svg)
+![State context](../assets/generated/ORG-UNAMA-status.svg)
+![Evidence boundary](../assets/generated/ORG-UNAMA-evidence.svg)
+
 ## Evidence gaps
-Direct entity evidence remains to be curated where absent.
+Source granularity: `partial`; proposition-specific gaps remain open.
+
 ## Sources
 - `knowledge/entities/ORG-UNAMA.json`
 - `dossiers/states/AFG.md`
+
 ## Governance boundary
-No linked-State status is inherited.
+This dossier records identity and context only; it does not independently establish an ECL restriction.
