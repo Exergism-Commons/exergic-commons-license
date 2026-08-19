@@ -36,13 +36,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'push' && github.ref_name || github.event.pull_request.head.sha }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Synchronize generated visuals for v12
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/canonical-entity-dossiers'
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/agent/canonical-entity-dossiers')
         run: |
           python tools/render_dossier_visuals.py --out dossiers/assets/generated
           if ! git diff --quiet -- dossiers/assets/generated; then
