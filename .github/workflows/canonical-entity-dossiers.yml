@@ -28,16 +28,30 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   canonical-dossiers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Synchronize generated visuals for v13
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/agent/canonical-entity-dossiers')
+        run: |
+          python tools/render_dossier_visuals.py --out dossiers/assets/generated
+          if [ -n "$(git status --porcelain -- dossiers/assets/generated)" ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add dossiers/assets/generated
+            git commit -m 'Regenerate v13 person dossier visuals'
+            git push origin HEAD:agent/canonical-entity-dossiers
+          fi
 
       - name: Validate canonical per-entity dossier ratchet
         run: |
