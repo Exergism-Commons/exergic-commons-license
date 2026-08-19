@@ -1,3 +1,3 @@
 {
-  "id":"ORG-HUMAN-RIGHTS-WATCH","name":"Human Rights Watch","type":"Organization","aliases":[],"dossier":"dossiers/organizations/HUMAN-RIGHTS-WATCH.md","reviewReason":"Non-governmental organization that appears as an attributed documentary source in the TUR record."
+  "@context":"../../ontology/ecl-context.jsonld","iri":"ecl:ORG-HUMAN-RIGHTS-WATCH","id":"ORG-HUMAN-RIGHTS-WATCH","type":"Organization","name":"Human Rights Watch","aliases":["HRW"],"dossier":"../../dossiers/organizations/HUMAN-RIGHTS-WATCH.md","lastSubstantiveReview":"2026-08-18","reviewDue":"2026-09-18","reviewClass":"active","reviewReason":"Identity-only civil-society evidence source used across State dossiers. Citation or advocacy by HRW does not create an ECL governance determination or attribution edge."
 }
