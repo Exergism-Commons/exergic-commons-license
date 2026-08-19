@@ -20,9 +20,9 @@
   <rect x="40" y="118" width="300" height="156" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <g clip-path="url(#source-column-clip)">
   <text x="62" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">SOURCE SURFACE</text>
-  <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#source-box-clip)">
+  <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#101828" clip-path="url(#source-box-clip)">
     <tspan x="62" y="180">Inspectorate Feb 2026 /</tspan>
-    <tspan x="62" dy="20">NLD freeze</tspan>
+    <tspan x="62" dy="19">NLD freeze</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#667085" clip-path="url(#source-footer-clip)">
     <tspan x="62" y="252">direct locator</tspan>
@@ -35,10 +35,10 @@
   <rect x="390" y="118" width="300" height="156" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <g clip-path="url(#proposition-column-clip)">
   <text x="412" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">CURATED PROPOSITION</text>
-  <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#proposition-box-clip)">
+  <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#101828" clip-path="url(#proposition-box-clip)">
     <tspan x="412" y="180">Named probation</tspan>
-    <tspan x="412" dy="20">organization; tool relation</tspan>
-    <tspan x="412" dy="20">unresolved</tspan>
+    <tspan x="412" dy="19">organization; tool relation</tspan>
+    <tspan x="412" dy="19">unresolved</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#667085" clip-path="url(#proposition-footer-clip)">
     <tspan x="412" y="244">Prose evidence; no</tspan>
@@ -52,9 +52,9 @@
   <rect x="740" y="118" width="320" height="156" rx="14" fill="#F9FAFB" stroke="#98A2B3"/>
   <g clip-path="url(#identity-column-clip)">
   <text x="762" y="148" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#344054">IDENTITY BOUNDARY</text>
-  <text font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#101828" clip-path="url(#identity-box-clip)">
+  <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#101828" clip-path="url(#identity-box-clip)">
     <tspan x="762" y="180">Stichting</tspan>
-    <tspan x="762" dy="20">Verslavingsreclassering GGZ</tspan>
+    <tspan x="762" dy="19">Verslavingsreclassering GGZ</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#667085" clip-path="url(#identity-footer-clip)">
     <tspan x="762" y="252">Identity ≠ participation / culpability</tspan>
