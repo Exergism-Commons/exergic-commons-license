@@ -1,0 +1,13 @@
+{
+  "version": 40,
+  "reviewDate": "2026-08-19",
+  "migrationScope": ["Organization"],
+  "maxMissingDedicatedDossiers": 44,
+  "entities": [
+    {"id":"ORG-ASEAN","name":"Association of Southeast Asian Nations (ASEAN)","type":"Organization","dossier":"dossiers/organizations/ASEAN.md","sourceDossier":"dossiers/states/MMR.md","sourceGranularity":"partial","state":"MMR","visuals":{"status":"dossiers/assets/generated/ORG-ASEAN-status.svg","evidence":"dossiers/assets/generated/ORG-ASEAN-evidence.svg"}},
+    {"id":"ORG-BINUH","name":"United Nations Integrated Office in Haiti (BINUH)","type":"Organization","dossier":"dossiers/organizations/BINUH.md","sourceDossier":"dossiers/states/HTI.md","sourceGranularity":"partial","state":"HTI","visuals":{"status":"dossiers/assets/generated/ORG-BINUH-status.svg","evidence":"dossiers/assets/generated/ORG-BINUH-evidence.svg"}},
+    {"id":"ORG-CARICOM","name":"Caribbean Community (CARICOM)","type":"Organization","dossier":"dossiers/organizations/CARICOM.md","sourceDossier":"dossiers/states/DMA.md","sourceGranularity":"partial","state":"DMA","visuals":{"status":"dossiers/assets/generated/ORG-CARICOM-status.svg","evidence":"dossiers/assets/generated/ORG-CARICOM-evidence.svg"}},
+    {"id":"ORG-COD-ADF","name":"Allied Democratic Forces (ADF)","type":"Organization","dossier":"dossiers/organizations/COD-ADF.md","sourceDossier":"dossiers/states/COD.md","sourceGranularity":"partial","state":"COD","visuals":{"status":"dossiers/assets/generated/ORG-COD-ADF-status.svg","evidence":"dossiers/assets/generated/ORG-COD-ADF-evidence.svg"}},
+    {"id":"ORG-COUNCIL-OF-EUROPE","name":"Council of Europe","type":"Organization","dossier":"dossiers/organizations/COUNCIL-OF-EUROPE.md","sourceDossier":"dossiers/states/MDA.md","sourceGranularity":"partial","state":"MDA","visuals":{"status":"dossiers/assets/generated/ORG-COUNCIL-OF-EUROPE-status.svg","evidence":"dossiers/assets/generated/ORG-COUNCIL-OF-EUROPE-evidence.svg"}}
+  ]
+}
