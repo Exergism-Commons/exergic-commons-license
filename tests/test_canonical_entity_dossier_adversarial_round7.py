@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import check_canonical_entity_contract_round6 as hardened  # noqa: E402
+import check_canonical_entity_dossiers_extended as coverage  # noqa: E402
 
 
 def copy_schema_and_context(root: Path) -> None:
@@ -78,6 +79,46 @@ class CanonicalRoundSevenTests(unittest.TestCase):
                 any("non-local CommonMark image resource" in error for error in errors),
                 errors,
             )
+
+    def test_commonmark_escaped_alt_cannot_hide_local_allowlist_violations(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dossier = root / "dossiers/organizations/ORG-X.md"
+            dossier.parent.mkdir(parents=True, exist_ok=True)
+            evidence_dir = root / "dossiers/evidence-images"
+            evidence_dir.mkdir(parents=True, exist_ok=True)
+
+            rogue = r"![x\]y](rogue.png)"
+            self.assertIn("rogue.png", coverage.image_targets(rogue))
+            errors = coverage.checker.validate_dossier_images(
+                rogue,
+                dossier,
+                set(),
+                root=root,
+                evidence_image_dir=evidence_dir,
+            )
+            self.assertTrue(any("uncontrolled asset" in error for error in errors), errors)
+
+            traversal = r"![x\]y](../../../rogue.png)"
+            errors = coverage.checker.validate_dossier_images(
+                traversal,
+                dossier,
+                set(),
+                root=root,
+                evidence_image_dir=evidence_dir,
+            )
+            self.assertTrue(any("uncontrolled asset" in error for error in errors), errors)
+
+            allowed = "dossiers/assets/generated/ORG-X-status.svg"
+            permitted = r"![x\]y](../assets/generated/ORG-X-status.svg)"
+            errors = coverage.checker.validate_dossier_images(
+                permitted,
+                dossier,
+                {allowed},
+                root=root,
+                evidence_image_dir=evidence_dir,
+            )
+            self.assertEqual(errors, [])
 
     def test_canonical_context_semantics_are_pinned(self) -> None:
         mutations = {
