@@ -11,7 +11,9 @@ on:
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
       - 'tools/check_canonical_entity_provenance.py'
+      - 'tools/check_canonical_entity_manifest_history.py'
       - 'tools/check_canonical_entity_migration_preservation.py'
+      - 'tools/check_evidence_image_metadata.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - 'tools/render_dossier_visuals_legacy.py'
@@ -26,7 +28,9 @@ on:
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
       - 'tools/check_canonical_entity_provenance.py'
+      - 'tools/check_canonical_entity_manifest_history.py'
       - 'tools/check_canonical_entity_migration_preservation.py'
+      - 'tools/check_evidence_image_metadata.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - 'tools/render_dossier_visuals_legacy.py'
@@ -47,13 +51,22 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install metadata-schema validator
+        run: python -m pip install "jsonschema>=4.26.0,<5"
+
+      - name: Validate canonical State provenance
+        run: python tools/check_canonical_entity_provenance.py
+
+      - name: Validate canonical migration history
+        run: python tools/check_canonical_entity_manifest_history.py
+
+      - name: Validate source-facsimile metadata schema
+        run: python tools/check_evidence_image_metadata.py
+
       - name: Validate canonical per-entity dossier ratchet
         run: |
           mkdir -p build
           python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json
-
-      - name: Validate canonical State provenance
-        run: python tools/check_canonical_entity_provenance.py
 
       - name: Validate ABox migration preservation
         if: github.event_name == 'pull_request'
