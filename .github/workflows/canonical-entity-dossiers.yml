@@ -13,6 +13,7 @@ on:
       - 'tools/check_canonical_entity_provenance.py'
       - 'tools/check_canonical_entity_manifest_history.py'
       - 'tools/check_canonical_entity_migration_preservation.py'
+      - 'tools/check_canonical_dossier_accessibility.py'
       - 'tools/check_evidence_image_metadata.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
@@ -30,6 +31,7 @@ on:
       - 'tools/check_canonical_entity_provenance.py'
       - 'tools/check_canonical_entity_manifest_history.py'
       - 'tools/check_canonical_entity_migration_preservation.py'
+      - 'tools/check_canonical_dossier_accessibility.py'
       - 'tools/check_evidence_image_metadata.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
@@ -62,6 +64,9 @@ jobs:
 
       - name: Validate source-facsimile metadata schema
         run: python tools/check_evidence_image_metadata.py
+
+      - name: Validate canonical dossier accessibility
+        run: python tools/check_canonical_dossier_accessibility.py
 
       - name: Validate canonical per-entity dossier ratchet
         run: |

@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-COD-ADF
-entity: ADF (DRC armed group)
+entity: "ADF (DRC armed group)"
 entity_type: organization
 ---
 # ADF (DRC armed group)
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-COD-ADF-status.svg)
-![Evidence boundary](../assets/generated/ORG-COD-ADF-evidence.svg)
+![State dossier context for ADF (DRC armed group)](../assets/generated/ORG-COD-ADF-status.svg)
+![Derived evidence diagram for ADF (DRC armed group)](../assets/generated/ORG-COD-ADF-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

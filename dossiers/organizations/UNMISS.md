@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-UNMISS
-entity: United Nations Mission in South Sudan
+entity: "United Nations Mission in South Sudan"
 entity_type: organization
 ---
 # United Nations Mission in South Sudan
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-UNMISS-status.svg)
-![Evidence boundary](../assets/generated/ORG-UNMISS-evidence.svg)
+![State dossier context for United Nations Mission in South Sudan](../assets/generated/ORG-UNMISS-status.svg)
+![Derived evidence diagram for United Nations Mission in South Sudan](../assets/generated/ORG-UNMISS-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-SYR-SDF
-entity: SDF (Syria)
+entity: "SDF (Syria)"
 entity_type: organization
 ---
 # SDF (Syria)
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-SYR-SDF-status.svg)
-![Evidence boundary](../assets/generated/ORG-SYR-SDF-evidence.svg)
+![State dossier context for SDF (Syria)](../assets/generated/ORG-SYR-SDF-status.svg)
+![Derived evidence diagram for SDF (Syria)](../assets/generated/ORG-SYR-SDF-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

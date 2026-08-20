@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-SYR-AANES
-entity: AANES
+entity: "AANES"
 entity_type: organization
 ---
 # AANES
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-SYR-AANES-status.svg)
-![Evidence boundary](../assets/generated/ORG-SYR-AANES-evidence.svg)
+![State dossier context for AANES](../assets/generated/ORG-SYR-AANES-status.svg)
+![Derived evidence diagram for AANES](../assets/generated/ORG-SYR-AANES-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

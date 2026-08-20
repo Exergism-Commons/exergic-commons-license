@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-ASEAN
-entity: Association of Southeast Asian Nations
+entity: "Association of Southeast Asian Nations"
 entity_type: organization
 ---
 # Association of Southeast Asian Nations
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-ASEAN-status.svg)
-![Evidence boundary](../assets/generated/ORG-ASEAN-evidence.svg)
+![State dossier context for Association of Southeast Asian Nations](../assets/generated/ORG-ASEAN-status.svg)
+![Derived evidence diagram for Association of Southeast Asian Nations](../assets/generated/ORG-ASEAN-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

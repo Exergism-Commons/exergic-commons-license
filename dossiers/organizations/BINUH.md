@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-BINUH
-entity: BINUH
+entity: "BINUH"
 entity_type: organization
 ---
 # BINUH
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-BINUH-status.svg)
-![Evidence boundary](../assets/generated/ORG-BINUH-evidence.svg)
+![State dossier context for BINUH](../assets/generated/ORG-BINUH-status.svg)
+![Derived evidence diagram for BINUH](../assets/generated/ORG-BINUH-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

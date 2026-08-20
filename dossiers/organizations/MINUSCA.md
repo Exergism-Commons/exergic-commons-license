@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-MINUSCA
-entity: MINUSCA
+entity: "MINUSCA"
 entity_type: organization
 ---
 # MINUSCA
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-MINUSCA-status.svg)
-![Evidence boundary](../assets/generated/ORG-MINUSCA-evidence.svg)
+![State dossier context for MINUSCA](../assets/generated/ORG-MINUSCA-status.svg)
+![Derived evidence diagram for MINUSCA](../assets/generated/ORG-MINUSCA-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-UNSMIL
-entity: UNSMIL
+entity: "UNSMIL"
 entity_type: organization
 ---
 # UNSMIL
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-UNSMIL-status.svg)
-![Evidence boundary](../assets/generated/ORG-UNSMIL-evidence.svg)
+![State dossier context for UNSMIL](../assets/generated/ORG-UNSMIL-status.svg)
+![Derived evidence diagram for UNSMIL](../assets/generated/ORG-UNSMIL-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-PSE-PALESTINIAN-AUTHORITY
-entity: Palestinian Authority
+entity: "Palestinian Authority"
 entity_type: organization
 ---
 # Palestinian Authority
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-status.svg)
-![Evidence boundary](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-evidence.svg)
+![State dossier context for Palestinian Authority](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-status.svg)
+![Derived evidence diagram for Palestinian Authority](../assets/generated/ORG-PSE-PALESTINIAN-AUTHORITY-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

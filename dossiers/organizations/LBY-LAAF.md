@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-LBY-LAAF
-entity: LAAF (Libya)
+entity: "LAAF (Libya)"
 entity_type: organization
 ---
 # LAAF (Libya)
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-LBY-LAAF-status.svg)
-![Evidence boundary](../assets/generated/ORG-LBY-LAAF-evidence.svg)
+![State dossier context for LAAF (Libya)](../assets/generated/ORG-LBY-LAAF-status.svg)
+![Derived evidence diagram for LAAF (Libya)](../assets/generated/ORG-LBY-LAAF-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

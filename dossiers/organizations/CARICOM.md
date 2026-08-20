@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-CARICOM
-entity: Caribbean Community
+entity: "Caribbean Community"
 entity_type: organization
 ---
 # Caribbean Community
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-CARICOM-status.svg)
-![Evidence boundary](../assets/generated/ORG-CARICOM-evidence.svg)
+![State dossier context for Caribbean Community](../assets/generated/ORG-CARICOM-status.svg)
+![Derived evidence diagram for Caribbean Community](../assets/generated/ORG-CARICOM-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

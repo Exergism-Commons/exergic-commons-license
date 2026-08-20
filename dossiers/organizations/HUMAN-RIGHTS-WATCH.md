@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-HUMAN-RIGHTS-WATCH
-entity: Human Rights Watch
+entity: "Human Rights Watch"
 entity_type: organization
 ---
 # Human Rights Watch
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-status.svg)
-![Evidence boundary](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-evidence.svg)
+![State dossier context for Human Rights Watch](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-status.svg)
+![Derived evidence diagram for Human Rights Watch](../assets/generated/ORG-HUMAN-RIGHTS-WATCH-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

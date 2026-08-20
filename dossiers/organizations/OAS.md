@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-OAS
-entity: Organization of American States
+entity: "Organization of American States"
 entity_type: organization
 ---
 # Organization of American States
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-OAS-status.svg)
-![Evidence boundary](../assets/generated/ORG-OAS-evidence.svg)
+![State dossier context for Organization of American States](../assets/generated/ORG-OAS-status.svg)
+![Derived evidence diagram for Organization of American States](../assets/generated/ORG-OAS-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.

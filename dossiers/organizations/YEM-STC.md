@@ -1,6 +1,6 @@
 ---
 id: ECL-ORG-YEM-STC
-entity: STC (Yemen)
+entity: "STC (Yemen)"
 entity_type: organization
 ---
 # STC (Yemen)
@@ -18,8 +18,8 @@ Dedicated dossier migration only; no Claim, EvidenceItem, relation, participatio
 Identity or adjacency does not infer partOf, sameAs, control, operation, participation, supply, command, membership or culpability.
 
 ## Visual evidence
-![State context](../assets/generated/ORG-YEM-STC-status.svg)
-![Evidence boundary](../assets/generated/ORG-YEM-STC-evidence.svg)
+![State dossier context for STC (Yemen)](../assets/generated/ORG-YEM-STC-status.svg)
+![Derived evidence diagram for STC (Yemen)](../assets/generated/ORG-YEM-STC-evidence.svg)
 
 ## Evidence gaps
 Source granularity: `partial`; proposition-specific gaps remain open.
