@@ -4,9 +4,7 @@ on:
   push:
     paths:
       - 'dossiers/**'
-      - 'knowledge/entities/**'
-      - 'knowledge/generated/canonical-entity-dossier-migration-*.json'
-      - 'knowledge/generated/dossier-visual-palette-*.json'
+      - 'knowledge/**'
       - 'spec/VISUAL-EVIDENCE.md'
       - 'spec/CANONICAL-DOSSIER-MIGRATION.md'
       - 'schemas/entity.schema.json'
@@ -34,9 +32,7 @@ on:
   pull_request:
     paths:
       - 'dossiers/**'
-      - 'knowledge/entities/**'
-      - 'knowledge/generated/canonical-entity-dossier-migration-*.json'
-      - 'knowledge/generated/dossier-visual-palette-*.json'
+      - 'knowledge/**'
       - 'spec/VISUAL-EVIDENCE.md'
       - 'spec/CANONICAL-DOSSIER-MIGRATION.md'
       - 'schemas/entity.schema.json'

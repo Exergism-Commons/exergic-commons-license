@@ -22,6 +22,8 @@ on:
       - "examples/**"
       - "requirements-ontology.txt"
       - "tools/build_knowledge_graph.py"
+      - "tools/check_canonical_entity_contract.py"
+      - "tools/canonical_dossier_contract.py"
       - "tools/run_sparql_checks.py"
       - "tools/ecl_resolve.py"
       - "tools/update_ticket_sweep.py"
@@ -31,6 +33,7 @@ on:
       - "tests/test_cross_entity_claim_evidence_scaleout_v3.py"
       - "tests/test_state_project_track_claim_completeness.py"
       - "tests/test_agency_hierarchy_scaleout_v5.py"
+      - "tests/test_canonical_entity_dossier_*.py"
       - ".github/workflows/living-update-integrity.yml"
       - ".github/workflows/living-review-sweep.yml"
   pull_request:
@@ -54,6 +57,8 @@ on:
       - "examples/**"
       - "requirements-ontology.txt"
       - "tools/build_knowledge_graph.py"
+      - "tools/check_canonical_entity_contract.py"
+      - "tools/canonical_dossier_contract.py"
       - "tools/run_sparql_checks.py"
       - "tools/ecl_resolve.py"
       - "tools/update_ticket_sweep.py"
@@ -63,6 +68,7 @@ on:
       - "tests/test_cross_entity_claim_evidence_scaleout_v3.py"
       - "tests/test_state_project_track_claim_completeness.py"
       - "tests/test_agency_hierarchy_scaleout_v5.py"
+      - "tests/test_canonical_entity_dossier_*.py"
       - ".github/workflows/living-update-integrity.yml"
       - ".github/workflows/living-review-sweep.yml"
 
@@ -103,6 +109,9 @@ jobs:
                       json.load(handle)
                   print(f'validated JSON parse: {path}')
           PY
+
+      - name: Validate canonical ABox entity placement and recursive schema surface
+        run: python tools/check_canonical_entity_contract.py --abox-only
 
       - name: Validate entity records against JSON Schema
         run: |

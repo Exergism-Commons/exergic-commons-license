@@ -24,6 +24,31 @@ def load_json(path: Path) -> dict:
     return value
 
 
+def valid_raster_bytes(path: Path) -> bool:
+    """Fail closed when an allowed raster extension does not match the binary container."""
+    data = path.read_bytes()
+    suffix = path.suffix.lower()
+    if suffix == ".png":
+        return (
+            len(data) >= 24
+            and data.startswith(b"\x89PNG\r\n\x1a\n")
+            and data[12:16] == b"IHDR"
+        )
+    if suffix in {".jpg", ".jpeg"}:
+        return (
+            len(data) >= 4
+            and data[:3] == b"\xff\xd8\xff"
+            and b"\xff\xd9" in data[-32:]
+        )
+    if suffix == ".webp":
+        return (
+            len(data) >= 16
+            and data[:4] == b"RIFF"
+            and data[8:12] == b"WEBP"
+        )
+    return False
+
+
 def main() -> int:
     errors: list[str] = []
     schema = load_json(SCHEMA_PATH)
@@ -84,6 +109,10 @@ def main() -> int:
             errors.append(
                 f"{rel}: referenced asset is not an allowed raster source-facsimile type: {asset_name}"
             )
+        elif not valid_raster_bytes(asset):
+            errors.append(
+                f"{rel}: asset extension declares PNG/JPEG/WebP but binary bytes do not match: {asset_name}"
+            )
 
         expected_hash = hashlib.sha256(asset.read_bytes()).hexdigest()
         if meta.get("contentSha256") != expected_hash:
@@ -110,6 +139,8 @@ def main() -> int:
             if path.is_symlink():
                 errors.append(f"{rel}: source-facsimile asset must not be a symlink")
                 continue
+            if not valid_raster_bytes(path):
+                errors.append(f"{rel}: raster extension does not match PNG/JPEG/WebP binary bytes")
             sidecar = path.with_suffix(".json")
             if not sidecar.is_file():
                 errors.append(f"{rel}: missing source-image metadata sidecar {sidecar.name}")
