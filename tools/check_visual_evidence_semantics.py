@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Validate normative visible semantics of canonical dossier SVG evidence."""
+"""Validate normative *visibly rendered* semantics of canonical dossier SVG evidence."""
 from __future__ import annotations
 
 import json
+import math
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -26,14 +27,127 @@ def normalized(value: str) -> str:
     return " ".join(value.split())
 
 
+def _number(value: str | None) -> float | None:
+    if value is None:
+        return None
+    match = re.match(r"^[ \t]*([-+]?(?:\d+(?:\.\d*)?|\.\d+))", value)
+    return float(match.group(1)) if match else None
+
+
+def _style_map(value: str | None) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for declaration in (value or "").split(";"):
+        if ":" not in declaration:
+            continue
+        key, val = declaration.split(":", 1)
+        result[key.strip().lower()] = val.strip().lower()
+    return result
+
+
+def _zero(value: str | None) -> bool:
+    if value is None:
+        return False
+    value = value.strip().lower()
+    if value.endswith("%"):
+        try:
+            return float(value[:-1]) <= 0
+        except ValueError:
+            return False
+    try:
+        return float(value) <= 0
+    except ValueError:
+        return False
+
+
+def _element_hidden(element: ET.Element) -> bool:
+    style = _style_map(element.get("style"))
+    display = (element.get("display") or style.get("display") or "").strip().lower()
+    visibility = (element.get("visibility") or style.get("visibility") or "").strip().lower()
+    opacity = element.get("opacity") or style.get("opacity")
+    font_size = element.get("font-size") or style.get("font-size")
+    fill = (element.get("fill") or style.get("fill") or "").strip().lower()
+    fill_opacity = element.get("fill-opacity") or style.get("fill-opacity")
+    stroke = (element.get("stroke") or style.get("stroke") or "").strip().lower()
+    return (
+        display == "none"
+        or visibility in {"hidden", "collapse"}
+        or _zero(opacity)
+        or _zero(font_size)
+        or ((fill == "none" or _zero(fill_opacity)) and stroke in {"", "none"})
+    )
+
+
+def _viewbox(root: ET.Element) -> tuple[float, float, float, float] | None:
+    raw = root.get("viewBox")
+    if not raw:
+        return None
+    parts = re.split(r"[ ,]+", raw.strip())
+    if len(parts) != 4:
+        return None
+    try:
+        x, y, width, height = map(float, parts)
+    except ValueError:
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    return x, y, x + width, y + height
+
+
+def _inside(bounds: tuple[float, float, float, float] | None, x: float | None, y: float | None) -> bool:
+    if bounds is None or x is None or y is None:
+        return True
+    x0, y0, x1, y1 = bounds
+    return x0 <= x <= x1 and y0 <= y <= y1 and math.isfinite(x) and math.isfinite(y)
+
+
 def visible_svg_text(path: Path) -> str | None:
+    """Return text that is statically demonstrable as visible.
+
+    Generated canonical SVGs intentionally avoid CSS classes and transforms.
+    Rather than trusting hidden/off-canvas text, this checker fails closed on
+    stylesheet/class/transform indirection and filters nodes hidden by common
+    SVG presentation properties or positioned outside the viewBox.
+    """
     try:
         root = ET.parse(path).getroot()
     except Exception:
         return None
+    if root.tag != f"{SVG_NS}svg":
+        return None
+    if root.find(f".//{SVG_NS}style") is not None:
+        return None
+    if any("class" in element.attrib or "transform" in element.attrib for element in root.iter()):
+        return None
+
+    bounds = _viewbox(root)
     chunks: list[str] = []
-    for element in root.iter(f"{SVG_NS}text"):
-        chunks.extend(element.itertext())
+
+    def walk(
+        element: ET.Element,
+        hidden: bool,
+        inherited_x: float | None,
+        inherited_y: float | None,
+    ) -> None:
+        tag = element.tag.rsplit("}", 1)[-1]
+        if tag in {"defs", "title", "desc", "metadata"}:
+            return
+        hidden = hidden or _element_hidden(element)
+        x = _number(element.get("x"))
+        y = _number(element.get("y"))
+        if x is None:
+            x = inherited_x
+        if y is None:
+            y = inherited_y
+        semantic_text_node = tag in {"text", "tspan"}
+        in_bounds = _inside(bounds, x, y)
+        if semantic_text_node and not hidden and in_bounds and element.text:
+            chunks.append(element.text)
+        for child in element:
+            walk(child, hidden, x, y)
+            if semantic_text_node and not hidden and in_bounds and child.tail:
+                chunks.append(child.tail)
+
+    walk(root, False, None, None)
     return normalized(" ".join(chunks))
 
 
@@ -100,7 +214,7 @@ def main() -> int:
                 status_path = ROOT / status_rel
                 status_text = visible_svg_text(status_path) if status_path.is_file() else None
                 if status_text is None:
-                    errors.append(f"{entity_id}: invalid or missing status SVG {status_rel}")
+                    errors.append(f"{entity_id}: invalid/unverifiably-visible status SVG {status_rel}")
                 elif state_context not in palette.get("states", {}):
                     errors.append(f"{entity_id}: unknown stateContext {state_context!r} for status semantics")
                 else:
@@ -123,7 +237,7 @@ def main() -> int:
                 evidence_text = visible_svg_text(evidence_path) if evidence_path.is_file() else None
                 granularity_label = GRANULARITY_LABELS.get(source_granularity)
                 if evidence_text is None:
-                    errors.append(f"{entity_id}: invalid or missing evidence SVG {evidence_rel}")
+                    errors.append(f"{entity_id}: invalid/unverifiably-visible evidence SVG {evidence_rel}")
                 elif granularity_label is None:
                     errors.append(
                         f"{entity_id}: unsupported sourceGranularity {source_granularity!r} for evidence semantics"
