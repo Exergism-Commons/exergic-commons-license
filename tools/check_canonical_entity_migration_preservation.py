@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "knowledge/generated"
 ENTITY_DIR = ROOT / "knowledge/entities"
 ALLOWED_CHANGED_FIELDS = {"dossier"}
+_MISSING = object()
 
 
 def load_json(path: Path) -> dict:
@@ -37,10 +38,18 @@ def git_json(ref: str, path: Path) -> dict | None:
     return json.loads(proc.stdout)
 
 
+def field_value(record: dict, key: str) -> object:
+    return record[key] if key in record else _MISSING
+
+
+def display_value(record: dict, key: str) -> str:
+    return repr(record[key]) if key in record else "<absent>"
+
+
 def changed_fields(before: dict, after: dict) -> list[str]:
     return sorted(
         key for key in set(before) | set(after)
-        if before.get(key) != after.get(key)
+        if field_value(before, key) != field_value(after, key)
     )
 
 
@@ -83,7 +92,7 @@ def main() -> int:
             illegal = [field for field in changed if field not in ALLOWED_CHANGED_FIELDS]
             if illegal:
                 details = ", ".join(
-                    f"{field}: {before.get(field)!r} -> {after.get(field)!r}"
+                    f"{field}: {display_value(before, field)} -> {display_value(after, field)}"
                     for field in illegal
                 )
                 errors.append(f"{entity_id}: non-dossier ABox mutation: {details}")
