@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
-  <title id="title">Canonical non-State identity — State dossier context S</title>
-  <desc id="desc">Derived status card. The Referenced State dossier is S — Scoped restriction. This status is context only and is not inherited by Canonical non-State identity.</desc>
+  <title id="title">Netherlands probation risk tools — State dossier context S</title>
+  <desc id="desc">Derived status card. The NLD State dossier is S — Scoped restriction. This status is context only and is not inherited by Netherlands probation risk tools.</desc>
   <defs>
     <clipPath id="status-name-clip"><rect x="54" y="64" width="800" height="66"/></clipPath>
     <clipPath id="status-badge-clip"><rect x="54" y="150" width="300" height="66" rx="12"/></clipPath>
@@ -18,7 +18,7 @@
     <tspan x="76" y="177">S · Scoped restriction</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#344054" clip-path="url(#status-context-clip)">
-    <tspan x="382" y="177">Referenced State dossier</tspan>
+    <tspan x="382" y="177">NLD State dossier</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" fill="#475467" clip-path="url(#status-context-clip)">
     <tspan x="382" y="205">Context only — no entity-level governance inheritance</tspan>
