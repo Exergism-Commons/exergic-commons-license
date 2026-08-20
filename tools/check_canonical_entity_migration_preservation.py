@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """Verify that newly introduced dossier migrations only change the ABox dossier pointer.
 
-The check is intentionally PR-relative. Migration rows already present in the
-pull-request base are historical and are not re-policed here: their manifests
-are protected by the append-only history guard, while their ABox review metadata
-must remain free to evolve in later work. Rows newly introduced by this PR must
-refer to an identity that already exists in the base and may change only the
-``dossier`` field.
+The check is intentionally base-relative. Migration rows already present in the
+comparison base are historical and are not re-policed here: their manifests are
+protected by the append-only history guard, while their ABox review metadata must
+remain free to evolve in later work. Rows newly introduced after the base must
+refer to an identity that already exists there and must perform a real
+non-dedicated -> dedicated dossier transition without changing any other ABox
+field.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import posixpath
 import re
 import subprocess
 from pathlib import Path
@@ -21,6 +23,13 @@ MANIFEST_DIR = ROOT / "knowledge/generated"
 ENTITY_DIR = ROOT / "knowledge/entities"
 ALLOWED_CHANGED_FIELDS = {"dossier"}
 MANIFEST_RE = re.compile(r"^knowledge/generated/canonical-entity-dossier-migration-v\d+\.json$")
+TYPE_DIR = {
+    "Agency": "agencies",
+    "Institution": "institutions",
+    "Organization": "organizations",
+    "Person": "persons",
+    "Project": "projects",
+}
 _MISSING = object()
 
 
@@ -89,6 +98,16 @@ def changed_fields(before: dict, after: dict) -> list[str]:
     )
 
 
+def dedicated_pointer(record: dict) -> bool:
+    entity_type = record.get("type")
+    dossier_ref = record.get("dossier")
+    expected_dir = TYPE_DIR.get(entity_type)
+    if expected_dir is None or not isinstance(dossier_ref, str) or not dossier_ref:
+        return False
+    rel = posixpath.normpath(posixpath.join("knowledge/entities", dossier_ref.replace("\\", "/")))
+    return rel.startswith(f"dossiers/{expected_dir}/") and rel.endswith(".md")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-ref", required=True)
@@ -135,11 +154,22 @@ def main() -> int:
             before = git_json(args.base_ref, entity_path)
             if before is None:
                 errors.append(
-                    f"{entity_id}: entity did not exist at PR base {args.base_ref}; "
+                    f"{entity_id}: entity did not exist at comparison base {args.base_ref}; "
                     "canonical dossier migration must not create ABox identities"
                 )
                 continue
             after = load_json(entity_path)
+
+            if dedicated_pointer(before):
+                errors.append(
+                    f"{entity_id}: comparison base already pointed to a type-appropriate dedicated dossier; "
+                    "this is not a new dossier migration"
+                )
+            if not dedicated_pointer(after):
+                errors.append(
+                    f"{entity_id}: newly introduced migration does not end at a type-appropriate dedicated dossier"
+                )
+
             changed = changed_fields(before, after)
             illegal = [field for field in changed if field not in ALLOWED_CHANGED_FIELDS]
             if illegal:
@@ -161,7 +191,7 @@ def main() -> int:
         "canonical migration preservation: OK "
         f"({len(newly_migrated)} newly migrated entities checked against {args.base_ref}; "
         f"{len(historical_ids & seen)} historical migrated entities skipped; "
-        "new migrations change only dossier pointers)"
+        "new rows are non-dedicated -> dedicated and change only dossier pointers)"
     )
     return 0
 

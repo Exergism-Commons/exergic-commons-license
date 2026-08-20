@@ -61,13 +61,17 @@ jobs:
       - name: Validate canonical State provenance
         run: python tools/check_canonical_entity_provenance.py
 
-      - name: Validate canonical migration history
-        if: github.event_name != 'pull_request'
-        run: python tools/check_canonical_entity_manifest_history.py
-
       - name: Validate canonical migration history against PR base
         if: github.event_name == 'pull_request'
         run: python tools/check_canonical_entity_manifest_history.py --base-ref "${{ github.event.pull_request.base.sha }}"
+
+      - name: Validate canonical migration history against push parent
+        if: ${{ github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
+        run: python tools/check_canonical_entity_manifest_history.py --base-ref "${{ github.event.before }}"
+
+      - name: Validate canonical migration history structurally
+        if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.before == '0000000000000000000000000000000000000000') }}
+        run: python tools/check_canonical_entity_manifest_history.py
 
       - name: Validate source-facsimile metadata schema
         run: python tools/check_evidence_image_metadata.py
@@ -83,9 +87,13 @@ jobs:
       - name: Validate normative visual evidence semantics
         run: python tools/check_visual_evidence_semantics.py
 
-      - name: Validate ABox migration preservation
+      - name: Validate ABox migration preservation against PR base
         if: github.event_name == 'pull_request'
         run: python tools/check_canonical_entity_migration_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
+
+      - name: Validate ABox migration preservation against push parent
+        if: ${{ github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
+        run: python tools/check_canonical_entity_migration_preservation.py --base-ref "${{ github.event.before }}"
 
       - name: Validate committed visual layout bounds
         run: python tools/check_dossier_visual_layout.py dossiers/assets/generated
