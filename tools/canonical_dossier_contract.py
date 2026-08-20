@@ -25,12 +25,13 @@ SVG_NS = "{http://www.w3.org/2000/svg}"
 
 INLINE_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(\s*(?:<([^>\n]+)>|([^\s)\n]+))", flags=re.I)
 REFERENCE_DEF_RE = re.compile(
-    r"(?m)^[ \t]{0,3}\[([^\]]+)\]:[ \t]*(?:<([^>\n]+)>|([^\s\n]+))"
+    r"(?m)^[ \t]{0,3}\[([^\]]+)\]:[ \t]*(?:\n[ \t]{0,3})?(?:<([^>\n]+)>|([^\s\n]+))"
 )
 REFERENCE_IMAGE_RE = re.compile(r"!\[([^\]]*)\]\[([^\]]*)\]")
 SHORTCUT_IMAGE_RE = re.compile(r"!\[([^\]]+)\](?!\s*[\[(])")
 HTML_RESOURCE_RE = re.compile(
-    r"<(?:img|source|image|embed)\b[^>]*\b(?:src|srcset|href|xlink:href)\s*=\s*"
+    r"<(?:img|source|image|embed|video|audio|iframe|track|input)\b[^>]*\b"
+    r"(?:src|srcset|href|xlink:href|poster)\s*=\s*"
     r"(?:\"([^\"]*)\"|'([^']*)'|([^\s>]+))",
     flags=re.I | re.S,
 )
@@ -74,8 +75,7 @@ def frontmatter(text: str) -> dict[str, str]:
 def entity_paths(root: Path) -> list[Path]:
     entity_dir = root / "knowledge/entities"
     return sorted(
-        path
-        for path in entity_dir.rglob("*")
+        path for path in entity_dir.rglob("*")
         if path.is_file() and path.suffix.lower() in ENTITY_SUFFIXES
     )
 
@@ -90,9 +90,7 @@ def strict_manifest_paths(root: Path) -> tuple[list[Path], list[str]]:
         if not path.is_file() or not path.name.startswith(MANIFEST_PREFIX):
             continue
         if not path.name.endswith(".json"):
-            errors.append(
-                f"{path.relative_to(root)}: canonical migration manifest must end in .json"
-            )
+            errors.append(f"{path.relative_to(root)}: canonical migration manifest must end in .json")
             continue
         match = MANIFEST_NAME_RE.fullmatch(path.name)
         if match is None:
@@ -118,10 +116,7 @@ def resolve_repo_ref(root: Path, owner_file: Path, ref: object) -> Path | None:
 
 def canonical_visuals(entity_id: str) -> tuple[str, str]:
     base = "dossiers/assets/generated"
-    return (
-        f"{base}/{entity_id}-status.svg",
-        f"{base}/{entity_id}-evidence.svg",
-    )
+    return (f"{base}/{entity_id}-status.svg", f"{base}/{entity_id}-evidence.svg")
 
 
 def _schema_non_state_types(root: Path) -> set[str] | None:
@@ -137,18 +132,15 @@ def _schema_non_state_types(root: Path) -> set[str] | None:
 
 
 def validate_schema_type_alignment(root: Path) -> list[str]:
-    """Fail when the entity schema and canonical coverage universe drift apart."""
     schema_types = _schema_non_state_types(root)
     if schema_types is None:
         return ["schemas/entity.schema.json: cannot resolve the canonical entity type enum"]
     contract_types = set(TYPE_DIR)
     if schema_types == contract_types:
         return []
-    missing = sorted(schema_types - contract_types)
-    stale = sorted(contract_types - schema_types)
     return [
         "canonical non-State type universe is out of sync with entity.schema.json: "
-        f"schema-only={missing}, contract-only={stale}"
+        f"schema-only={sorted(schema_types - contract_types)}, contract-only={sorted(contract_types - schema_types)}"
     ]
 
 
@@ -163,11 +155,9 @@ def _definition_targets(text: str) -> dict[str, str]:
 
 
 def embedded_resource_targets(text: str) -> list[str]:
-    """Extract Markdown/HTML/CSS resource destinations without treating normal links as embeds."""
     targets: list[str] = []
     for match in INLINE_IMAGE_RE.finditer(text):
         targets.append(match.group(1) or match.group(2) or "")
-
     definitions = _definition_targets(text)
     for match in REFERENCE_IMAGE_RE.finditer(text):
         alt, label = match.groups()
@@ -178,7 +168,6 @@ def embedded_resource_targets(text: str) -> list[str]:
         key = " ".join(match.group(1).split()).casefold()
         if key in definitions:
             targets.append(definitions[key])
-
     for regex in (HTML_RESOURCE_RE, HTML_OBJECT_RE, CSS_URL_RE, CSS_IMPORT_RE):
         for match in regex.finditer(text):
             raw = next((group for group in match.groups() if group is not None), "")
@@ -217,7 +206,6 @@ def validate_dossier_embedded_resources(text: str, dossier_rel: Path) -> list[st
 
 
 def validate_universe(root: Path) -> list[str]:
-    """Validate identity-to-dossier binding for every supported non-State entity."""
     errors: list[str] = []
     seen: dict[str, Path] = {}
     for path in entity_paths(root):
@@ -238,51 +226,33 @@ def validate_universe(root: Path) -> list[str]:
             )
             continue
         seen[entity_id] = path
+        if record.get("iri") != f"ecl:{entity_id}":
+            errors.append(
+                f"{path.relative_to(root)}: canonical entity iri {record.get('iri')!r} must equal 'ecl:{entity_id}'"
+            )
         if entity_type not in TYPE_DIR:
             continue
-
         rel = resolve_repo_ref(root, path, record.get("dossier"))
         expected_dir = TYPE_DIR[entity_type]
-        if (
-            rel is None
-            or len(rel.parts) < 3
-            or rel.parts[:2] != ("dossiers", expected_dir)
-            or rel.suffix != ".md"
-        ):
-            errors.append(
-                f"{entity_id}: dossier must resolve under dossiers/{expected_dir}/ as Markdown"
-            )
+        if rel is None or len(rel.parts) < 3 or rel.parts[:2] != ("dossiers", expected_dir) or rel.suffix != ".md":
+            errors.append(f"{entity_id}: dossier must resolve under dossiers/{expected_dir}/ as Markdown")
             continue
-
         dossier = root / rel
         if not dossier.is_file():
             errors.append(f"{entity_id}: dedicated dossier does not exist: {rel.as_posix()}")
             continue
-
         text = dossier.read_text(encoding="utf-8")
         fm = frontmatter(text)
         if fm.get("id") != f"ECL-{entity_id}":
-            errors.append(
-                f"{entity_id}: dossier {rel.as_posix()} frontmatter id {fm.get('id')!r} "
-                f"!= {f'ECL-{entity_id}'!r}"
-            )
-
+            errors.append(f"{entity_id}: dossier {rel.as_posix()} frontmatter id {fm.get('id')!r} != {f'ECL-{entity_id}'!r}")
         name = record.get("name")
         if not isinstance(name, str) or not name:
             errors.append(f"{entity_id}: ABox name is required")
         elif fm.get("entity") != name:
-            errors.append(
-                f"{entity_id}: dossier {rel.as_posix()} frontmatter entity {fm.get('entity')!r} "
-                f"!= ABox name {name!r}"
-            )
-
+            errors.append(f"{entity_id}: dossier {rel.as_posix()} frontmatter entity {fm.get('entity')!r} != ABox name {name!r}")
         expected_type = str(entity_type).lower()
         if fm.get("entity_type") != expected_type:
-            errors.append(
-                f"{entity_id}: dossier {rel.as_posix()} frontmatter entity_type "
-                f"{fm.get('entity_type')!r} != {expected_type!r}"
-            )
-
+            errors.append(f"{entity_id}: dossier {rel.as_posix()} frontmatter entity_type {fm.get('entity_type')!r} != {expected_type!r}")
         errors.extend(validate_dossier_embedded_resources(text, rel))
     return errors
 
@@ -306,15 +276,11 @@ def validate_manifest_visual_paths(root: Path) -> list[str]:
                 continue
             expected = list(canonical_visuals(entity_id))
             if visuals != expected:
-                errors.append(
-                    f"{manifest_path.relative_to(root)}: {entity_id}: visuals must be exactly "
-                    f"{expected!r}, got {visuals!r}"
-                )
+                errors.append(f"{manifest_path.relative_to(root)}: {entity_id}: visuals must be exactly {expected!r}, got {visuals!r}")
     return errors
 
 
 def validate_evidence_image_surface(root: Path) -> list[str]:
-    """Evidence facsimiles are provenance-controlled raster files only."""
     errors: list[str] = []
     directory = root / "dossiers/evidence-images"
     if not directory.exists():
@@ -326,9 +292,7 @@ def validate_evidence_image_surface(root: Path) -> list[str]:
         if path.name == "README.md" or path.suffix.lower() == ".json":
             continue
         if path.suffix.lower() not in RASTER_FACSIMILE_EXTENSIONS:
-            errors.append(
-                f"{rel}: unsupported source-facsimile file type; only PNG/JPEG/WebP raster assets are allowed"
-            )
+            errors.append(f"{rel}: unsupported source-facsimile file type; only PNG/JPEG/WebP raster assets are allowed")
             continue
         sidecar = path.with_suffix(".json")
         if not sidecar.is_file():
@@ -370,19 +334,13 @@ def _inside(rect: tuple[float, float, float, float], x: float, y: float) -> bool
     return rect[0] <= x <= rect[2] and rect[1] <= y <= rect[3]
 
 
-def _apply_svg_position(
-    element: ET.Element,
-    current_x: float | None,
-    current_y: float | None,
-) -> tuple[float | None, float | None, bool]:
+def _apply_svg_position(element: ET.Element, current_x: float | None, current_y: float | None) -> tuple[float | None, float | None, bool]:
     x = _float(element.get("x")) if element.get("x") is not None else current_x
     y = _float(element.get("y")) if element.get("y") is not None else current_y
-
     if element.get("x") is not None and x is None:
         return None, None, False
     if element.get("y") is not None and y is None:
         return None, None, False
-
     if element.get("dx") is not None:
         dx = _float(element.get("dx"))
         if dx is None or x is None:
@@ -403,7 +361,6 @@ def _text_anchor_positions(text: ET.Element) -> tuple[list[tuple[float, float]],
         return [], False
     if x is not None and y is not None:
         positions.append((x, y))
-
     def walk(parent: ET.Element, cursor_x: float | None, cursor_y: float | None) -> tuple[float | None, float | None, bool]:
         for child in parent:
             if child.tag != f"{SVG_NS}tspan":
@@ -416,7 +373,6 @@ def _text_anchor_positions(text: ET.Element) -> tuple[list[tuple[float, float]],
             if not child_ok:
                 return cursor_x, cursor_y, False
         return cursor_x, cursor_y, True
-
     _, _, ok = walk(text, x, y)
     return positions, ok
 
@@ -437,37 +393,37 @@ def validate_generated_svg_clipping(root: Path) -> list[str]:
             if tag in {"foreignObject", "textPath", "use"}:
                 errors.append(f"{path.relative_to(root)}: unsupported SVG indirection element <{tag}>")
             if any(name in element.attrib for name in ("mask", "filter")):
-                errors.append(
-                    f"{path.relative_to(root)}: unsupported SVG visibility indirection on <{tag}>"
-                )
-
+                errors.append(f"{path.relative_to(root)}: unsupported SVG visibility indirection on <{tag}>")
         clips = _clip_rects(svg)
         parent_map = {child: parent for parent in svg.iter() for child in parent}
         for text in svg.findall(f".//{SVG_NS}text"):
-            clip = _clip_id(text.get("clip-path"))
-            if clip is None:
-                parent = parent_map.get(text)
-                while parent is not None and clip is None:
-                    clip = _clip_id(parent.get("clip-path"))
-                    parent = parent_map.get(parent)
-            if clip is None:
-                continue
-            rect = clips.get(clip)
-            if rect is None:
-                errors.append(f"{path.relative_to(root)}: text references unknown clipPath {clip!r}")
+            active_clips: list[str] = []
+            node: ET.Element | None = text
+            malformed = False
+            while node is not None:
+                raw_clip = node.get("clip-path")
+                if raw_clip is not None:
+                    clip = _clip_id(raw_clip)
+                    if clip is None:
+                        errors.append(f"{path.relative_to(root)}: unsupported clip-path syntax {raw_clip!r}")
+                        malformed = True
+                        break
+                    active_clips.append(clip)
+                node = parent_map.get(node)
+            if malformed or not active_clips:
                 continue
             positions, verifiable = _text_anchor_positions(text)
             if not verifiable or not positions:
-                errors.append(
-                    f"{path.relative_to(root)}: clipped text has no statically verifiable x/y/dx/dy anchor sequence"
-                )
+                errors.append(f"{path.relative_to(root)}: clipped text has no statically verifiable x/y/dx/dy anchor sequence")
                 continue
-            for px, py in positions:
-                if not _inside(rect, px, py):
-                    errors.append(
-                        f"{path.relative_to(root)}: clipped text anchor ({px:g}, {py:g}) "
-                        f"is outside clipPath {clip}"
-                    )
+            for clip in active_clips:
+                rect = clips.get(clip)
+                if rect is None:
+                    errors.append(f"{path.relative_to(root)}: text references unknown/non-rectangular clipPath {clip!r}")
+                    continue
+                for px, py in positions:
+                    if not _inside(rect, px, py):
+                        errors.append(f"{path.relative_to(root)}: clipped text anchor ({px:g}, {py:g}) is outside active clipPath {clip}")
     return errors
 
 

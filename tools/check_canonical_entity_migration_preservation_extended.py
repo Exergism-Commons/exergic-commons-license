@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run base-relative migration preservation plus no-denominator-shrink identity preservation."""
+"""Run base-relative migration preservation plus immutable identity-core guards."""
 from __future__ import annotations
 
 import argparse
@@ -14,10 +14,15 @@ checker.ENTITY_SUFFIXES = set(contract.ENTITY_SUFFIXES)
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_REL_DIR = Path("knowledge/entities")
+IMMUTABLE_IDENTITY_FIELDS = ("id", "iri", "type")
+ATOMIC_IDENTITY_ALLOWED_FIELDS = {
+    "@context", "iri", "id", "type", "name", "aliases", "dossier", "provenance",
+    "lastSubstantiveReview", "reviewDue", "reviewClass", "reviewReason", "identityLifecycle",
+}
 
 
-def _supported_base_ids(base_ref: str, root: Path) -> set[str]:
-    result: set[str] = set()
+def _supported_base_records(base_ref: str, root: Path) -> dict[str, dict]:
+    result: dict[str, dict] = {}
     for rel in checker.git_paths(base_ref, ENTITY_REL_DIR.as_posix(), root):
         if Path(rel).suffix not in contract.ENTITY_SUFFIXES:
             continue
@@ -27,34 +32,62 @@ def _supported_base_ids(base_ref: str, root: Path) -> set[str]:
         record = json.loads(content)
         entity_id = record.get("id") if isinstance(record, dict) else None
         if record.get("type") in contract.TYPE_DIR and isinstance(entity_id, str) and entity_id:
-            result.add(entity_id)
+            result[entity_id] = record
     return result
 
 
 def validate_baseline_identity_preservation(base_ref: str, root: Path = ROOT) -> list[str]:
-    """A supported identity may be superseded semantically, but not physically disappear."""
+    """Stable ID/IRI/type survive review-metadata and lifecycle evolution."""
     try:
-        base_ids = _supported_base_ids(base_ref, root)
+        base_records = _supported_base_records(base_ref, root)
         current = checker.current_entity_index(root)
     except (RuntimeError, json.JSONDecodeError) as exc:
         return [str(exc)]
 
     errors: list[str] = []
-    for entity_id in sorted(base_ids):
+    for entity_id, before in sorted(base_records.items()):
         current_entry = current.get(entity_id)
         if current_entry is None:
             errors.append(
                 f"{entity_id}: supported non-State identity existed at comparison base {base_ref} "
-                "but was deleted; preserve canonical identity records instead of shrinking the "
-                "dossier-coverage denominator"
+                "but was deleted; use identityLifecycle/supersededBy rather than shrinking the coverage denominator"
             )
             continue
-        record, _rel = current_entry
-        if record.get("type") not in contract.TYPE_DIR:
+        after, _rel = current_entry
+        for field in IMMUTABLE_IDENTITY_FIELDS:
+            if before.get(field) != after.get(field):
+                errors.append(
+                    f"{entity_id}: immutable identity core field {field!r} changed "
+                    f"{before.get(field)!r} -> {after.get(field)!r}; supersede/retire the identity instead"
+                )
+    return errors
+
+
+def validate_atomic_identity_only_additions(base_ref: str, root: Path = ROOT) -> list[str]:
+    """A v50+ atomic identity may not smuggle curated graph relationships."""
+    try:
+        base = checker.base_entity_index(base_ref, root)
+        current = checker.current_entity_index(root)
+    except (RuntimeError, json.JSONDecodeError) as exc:
+        return [str(exc)]
+
+    errors: list[str] = []
+    for entity_id, (record, _rel) in sorted(current.items()):
+        if entity_id in base or record.get("type") not in contract.TYPE_DIR:
+            continue
+        extra = sorted(set(record) - ATOMIC_IDENTITY_ALLOWED_FIELDS)
+        if extra:
             errors.append(
-                f"{entity_id}: supported non-State identity changed to unsupported type "
-                f"{record.get('type')!r}; type changes must not shrink the canonical coverage denominator"
+                f"{entity_id}: post-v49 atomic identity-only addition contains non-identity fields {extra}; "
+                "curate graph relationships in a separate reviewed change after identity registration"
             )
+        lifecycle = record.get("identityLifecycle", "active")
+        if lifecycle != "active":
+            errors.append(
+                f"{entity_id}: new atomic identity must begin active (or omit identityLifecycle), got {lifecycle!r}"
+            )
+        if "supersededBy" in record:
+            errors.append(f"{entity_id}: a newly registered atomic identity cannot arrive already superseded")
     return errors
 
 
@@ -64,8 +97,9 @@ def main() -> int:
     args = parser.parse_args()
 
     migration_errors, stats = checker.validate(args.base_ref, ROOT)
-    baseline_errors = validate_baseline_identity_preservation(args.base_ref, ROOT)
-    errors = migration_errors + baseline_errors
+    identity_errors = validate_baseline_identity_preservation(args.base_ref, ROOT)
+    atomic_errors = validate_atomic_identity_only_additions(args.base_ref, ROOT)
+    errors = migration_errors + identity_errors + atomic_errors
     if errors:
         for error in errors:
             print(f"ERROR: {error}")
@@ -75,8 +109,8 @@ def main() -> int:
     print(
         "canonical migration preservation: OK "
         f"({stats['newlyMigrated']} new ledger row(s); {stats['atomicNew']} atomic post-v49 identity addition(s); "
-        "existing identities are non-dedicated -> dedicated, preserve base sourceDossier, and change only dossier; "
-        "all new non-State identities are ledgered; base supported identity set cannot shrink)"
+        "existing migrations preserve source/dossier-only changes; immutable id/iri/type core is preserved; "
+        "atomic new identities are relationship-free; all new non-State identities are ledgered)"
     )
     return 0
 

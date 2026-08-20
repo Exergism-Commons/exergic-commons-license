@@ -23,6 +23,7 @@ on:
       - "requirements-ontology.txt"
       - "tools/build_knowledge_graph.py"
       - "tools/check_canonical_entity_contract.py"
+      - "tools/check_canonical_entity_contract_round6.py"
       - "tools/canonical_dossier_contract.py"
       - "tools/run_sparql_checks.py"
       - "tools/ecl_resolve.py"
@@ -58,6 +59,7 @@ on:
       - "requirements-ontology.txt"
       - "tools/build_knowledge_graph.py"
       - "tools/check_canonical_entity_contract.py"
+      - "tools/check_canonical_entity_contract_round6.py"
       - "tools/canonical_dossier_contract.py"
       - "tools/run_sparql_checks.py"
       - "tools/ecl_resolve.py"
@@ -110,8 +112,8 @@ jobs:
                   print(f'validated JSON parse: {path}')
           PY
 
-      - name: Validate canonical ABox entity placement and recursive schema surface
-        run: python tools/check_canonical_entity_contract.py --abox-only
+      - name: Validate canonical JSON-LD ABox dialect, placement and recursive schema surface
+        run: python tools/check_canonical_entity_contract_round6.py --abox-only
 
       - name: Validate entity records against JSON Schema
         run: |
@@ -122,7 +124,7 @@ jobs:
 
           schema = json.loads(Path('schemas/entity.schema.json').read_text(encoding='utf-8'))
           validator = Draft202012Validator(schema, format_checker=FormatChecker())
-          paths = sorted(Path('knowledge/entities').glob('*.json')) + sorted(Path('knowledge/entities').glob('*.jsonld'))
+          paths = sorted(Path('knowledge/entities').rglob('*.json')) + sorted(Path('knowledge/entities').rglob('*.jsonld'))
           for path in paths:
               record = json.loads(path.read_text(encoding='utf-8'))
               errors = sorted(validator.iter_errors(record), key=lambda error: list(error.absolute_path))

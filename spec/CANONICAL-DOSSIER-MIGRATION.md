@@ -4,43 +4,53 @@ Status: normative repository curation specification.
 
 ## Supported non-State universe
 
-Canonical per-entity dossier coverage applies to `Agency`, `Institution`, `Organization`, `Person`, `Project`, and `Deployment` ABox records stored as lowercase `.json` or `.jsonld` under `knowledge/entities/`. `Deployment` uses the `dossiers/projects/` surface, which is the repository home for project/program/deployment dossiers.
+Canonical per-entity dossier coverage applies to `Agency`, `Institution`, `Organization`, `Person`, `Project`, and `Deployment` ABox records stored as lowercase `.json` or `.jsonld` under `knowledge/entities/`. `Deployment` uses the `dossiers/projects/` surface.
 
-`knowledge/**` remains the broader Git-native ABox surface for claims, evidence, assessments and other reviewed semantic records. Any record that the RDF builder would load and whose `type` is one of the entity types defined by `schemas/entity.schema.json` MUST live under `knowledge/entities/`; placing an Entity-typed ABox object elsewhere is an integrity error. Entity records are schema-validated recursively, and case-variant extensions such as `.JSON`/`.JSONLD` are rejected so discovery is identical to the RDF builder's case-sensitive `.json`/`.jsonld` contract.
+`knowledge/**` remains the broader Git-native ABox surface. Builder-loadable ABox records use one canonical compact JSON-LD dialect: `@context` MUST be a local relative reference resolving to `ontology/ecl-context.jsonld`; the compact `iri` and `type` aliases MUST be used instead of direct `@id`/`@type` or alternate context aliases. Remote, inline or alternate JSON-LD contexts are forbidden. This makes raw repository classification and RDF meaning the same fail-closed surface.
 
-`schemas/entity.schema.json` and the canonical dossier contract MUST expose the same non-State type universe. A type added to the ABox schema without a canonical dossier mapping is a CI error rather than an implicitly uncovered type.
+Any ABox record whose canonical `type` is an entity type from `schemas/entity.schema.json` MUST live under `knowledge/entities/`. Entity records are schema-validated recursively. Case-variant extensions such as `.JSON`/`.JSONLD` are rejected so discovery is identical to the RDF builder.
 
-Every supported non-State identity must point to an existing type-appropriate dossier whose frontmatter contains all three canonical identity fields:
+For every entity, `iri` MUST equal `ecl:<id>`. `id`, `iri`, and `type` form the immutable identity core after adoption. A name, alias, review clock or review reason may evolve without changing that stable core.
+
+`schemas/entity.schema.json` and the canonical dossier contract MUST expose the same non-State type universe. A type added to the ABox schema without a dossier mapping is a CI error.
+
+Every supported non-State identity must point to an existing type-appropriate dossier whose frontmatter contains:
 
 - `id: ECL-<entity-id>`
 - `entity: <exact ABox name>`
 - `entity_type: <lowercase ABox type>`
 
-This binding applies to the complete non-State universe, including identities that already had dedicated dossiers before the versioned migration ledger began.
+## Identity lifecycle
 
-A supported identity that existed at the comparison base MUST NOT be physically deleted or changed to an unsupported type merely to reduce the coverage denominator. Identity retirement/supersession must preserve the canonical identity record and be represented explicitly in the semantic model rather than by disappearance.
+A supported identity MUST NOT disappear or change its stable `id`/`iri`/`type` merely to reduce the dossier denominator or rewrite history. Lifecycle changes use the entity fields `identityLifecycle` (`active`, `retired`, `superseded`) and, for `superseded`, mandatory `supersededBy`.
+
+Omission of `identityLifecycle` means active for existing records. `supersededBy` is legal only when `identityLifecycle` is `superseded`. Retirement/supersession preserves the original canonical record and its immutable identity core.
 
 ## Identity-only frontmatter and rendered Markdown
 
-Dossiers introduced by the canonical migration ledger are identity/evidence-boundary records, not standalone governance determinations. Their frontmatter uses a deliberately restricted flat `key: value` syntax with unquoted canonical keys. Duplicate keys, merge keys, nested/indented YAML, multiline YAML values and other structures that could alter the interpreted key set are rejected fail-closed.
+Dossiers introduced by the canonical migration ledger are identity/evidence-boundary records, not standalone governance determinations. Their frontmatter uses restricted flat `key: value` syntax with unquoted canonical keys. Duplicate keys, merge keys, nested/indented YAML and multiline YAML values fail closed.
 
-Identity-only migrated dossiers MUST NOT carry governance shortcut keys such as `provisional_outcome`, `outcome`, `status`, `tier`, `governanceStatus`, `restrictionStatus` or `currentGovernance`. A non-State dossier that independently predates the identity-only migration may have its own separately reviewed governance record; that is distinct from inheriting a State outcome through this migration surface.
+Identity-only migrated dossiers MUST NOT carry governance shortcut keys such as `provisional_outcome`, `outcome`, `status`, `tier`, `governanceStatus`, `restrictionStatus` or `currentGovernance`.
 
-Positive completeness requirements are evaluated against renderable Markdown, not raw source text. HTML comments, fenced/indented code and inline-code examples cannot satisfy required headings, textual-equivalent sections or required image/alt-text references. Raw source is still scanned for forbidden embedded resources.
+Positive completeness requirements are evaluated against a deterministic CommonMark-compatible surface. HTML comments, fenced/indented code and single- or multi-line code spans cannot satisfy headings, textual-equivalent sections or required image references. Raw HTML is forbidden on identity-only canonical dossiers; this removes browser-specific raw-HTML parsing from the positive contract. Raw source remains scanned for forbidden embedded resources, including multiline reference definitions.
 
 ## Append-only ledger
 
 Migration manifests are named exactly `canonical-entity-dossier-migration-v<N>.json`, where `N` is a positive decimal integer with no sign, decimal point, leading-zero alias or alternate spelling. Payloads conform to `schemas/canonical-entity-dossier-migration.schema.json`.
 
-The historical v1-v49 prefix is immutable. Later manifests append contiguously. A new supported non-State identity added after closure must arrive atomically with its dedicated dossier and a new manifest row. Existing identities may be migrated only from a non-dedicated pointer to a type-appropriate dedicated dossier, preserving the comparison-base source dossier and changing no ABox field except `dossier`.
+The historical v1-v49 prefix is immutable. Later manifests append contiguously. A new supported non-State identity added after closure must arrive atomically with its dedicated dossier and a new manifest row.
+
+A post-v49 atomic registration is strictly **identity-only**. It may contain canonical identity, aliases/provenance, dossier mapping and review-clock metadata, but MUST NOT introduce graph relationships (`partOf`, `controls`, `participatesIn`, `operates`, `deploys`, `materiallyBenefits`, `targetsOrAffects`, `remediates`, `reviews`, tracked-object relations, or any future non-identity field). Relationship curation is a separate reviewed change after the identity exists. A new atomic identity starts active and cannot arrive already retired/superseded.
+
+Existing identities may be migrated only from a non-dedicated pointer to a type-appropriate dedicated dossier, preserving the comparison-base source dossier and changing no ABox field except `dossier`. After adoption, base-relative preservation separately freezes the identity core `id`/`iri`/`type` while allowing ordinary review metadata to evolve.
 
 ## State-context snapshot semantics
 
-`stateContext` is an **immutable migration-time snapshot** of the referenced State dossier's `provisional_outcome` when a manifest row is appended. It is provenance metadata, not a live alias for the State dossier.
+`stateContext` is an immutable migration-time snapshot of the referenced State dossier's `provisional_outcome` when a manifest row is appended. It is provenance metadata, not a live alias for the State dossier.
 
-A newly appended manifest row MUST match the referenced State dossier outcome at append time. Once that manifest becomes historical, later living-governance changes to the State dossier MUST NOT require rewriting the historical `stateContext` snapshot. Current governance is always read from the current State dossier; historical canonical visuals remain evidence of the migration snapshot and never propagate governance to the non-State identity.
+A newly appended row MUST match the referenced State dossier outcome at append time. Later living-governance changes MUST NOT rewrite the historical manifest snapshot.
 
-This separation prevents a living State outcome change from deadlocking an immutable migration ledger.
+Status SVGs do **not** render the immutable manifest snapshot as current truth. At render time they read the current referenced State dossier and display that live `provisional_outcome` as **STATE DOSSIER CONTEXT**. A later State governance change therefore causes deterministic status-card regeneration without rewriting the historical manifest. Evidence visuals and manifest provenance remain tied to the migration snapshot.
 
 ## Canonical generated visuals
 
@@ -49,48 +59,43 @@ For every migration row `<ID>`, `visuals` is exactly:
 - `dossiers/assets/generated/<ID>-status.svg`
 - `dossiers/assets/generated/<ID>-evidence.svg`
 
-No alternate path can satisfy the canonical visual contract. This ensures the assets referenced by dossiers are the same bytes regenerated and compared deterministically in CI.
+No alternate path can satisfy the contract. Generated SVG semantics must be statically demonstrable. Text hidden by clipping, masks, filters, off-canvas positioning, unsupported indirection, or cumulative `dx`/`dy` movement cannot satisfy required tokens.
 
-Generated SVG semantics must be statically demonstrable. Text hidden by clipping, masks, filters, off-canvas positioning, unsupported indirection, or cumulative `dx`/`dy` movement outside its owning region cannot satisfy required visual tokens.
+SVG clips compose by intersection. CI therefore evaluates every clip inherited from a text element and all of its ancestors; a token must lie inside **all** active clips. The static-safety guard scans every generated SVG, including `state-outcome-legend.svg`, not only files listed in manifests.
 
-Canonical generated SVGs are static documents. Active/dynamic or externally resolved constructs are forbidden, including scripts, event-handler attributes, animation/SMIL elements, hyperlinks/hrefs, external `url(...)` references, XML stylesheet/entity/DOCTYPE indirection and non-`userSpaceOnUse` clip-path coordinate systems. Deterministic bytes are not sufficient if browser execution could later alter the rendered pixels.
+Active/dynamic or externally resolved SVG constructs are forbidden, including scripts, event handlers, animation/SMIL, hyperlinks/hrefs, external `url(...)`, XML stylesheet/entity/DOCTYPE indirection and non-`userSpaceOnUse` clip coordinates.
 
-For v40+ rows, `visualModel` is constrained to one of two canonical identity-only templates: the historical migration template (referenced State dossier plus existing ABox identity/review record, preservation of the named entity as an identity-only non-State record, and the fixed no-participation/control/culpability/governance boundary) or the post-closure atomic-addition template (`<STATE> State dossier + ABox identity`, `Atomic identity-only <TYPE> dossier`, `No governance inheritance`). This prevents versioned manifest metadata from carrying a stronger proposition than the normalized renderer displays.
+For v40+ rows, `visualModel` is constrained to canonical identity-only templates and cannot carry a stronger proposition than the renderer displays.
 
 ## Embedded resource boundary
 
-Canonical dossier Markdown MUST NOT hot-link remote or embedded image/media resources. This includes Markdown image syntax, HTML `<img>`, `<source>`, `<image>`, `<embed>`, `<object>`, CSS `url(...)` / `@import`, protocol-relative URLs, `data:` or other URI schemes, and equivalent HTML-entity/CSS escape indirection.
+Canonical dossier Markdown MUST NOT hot-link remote or embedded image/media resources. This includes Markdown images and reference definitions, HTML image/media/embed/object surfaces, inline SVG, CSS `url(...)`/`@import`, protocol-relative URLs, `data:` or other URI schemes, and equivalent HTML-entity/CSS/backslash indirection.
 
-Inline `<svg>` is not an allowed evidence surface. Derived SVGs must be deterministic files under `dossiers/assets/generated/`; external source imagery must use the provenance-controlled raster facsimile surface below.
+Identity-only dossiers additionally forbid raw HTML altogether.
 
 ## Source facsimiles
 
-`dossiers/evidence-images/` is reserved for provenance-controlled **raster** source facsimiles. Allowed asset formats are PNG, JPEG and WebP. Each asset requires its sibling JSON metadata sidecar and must satisfy `schemas/evidence-image-metadata.schema.json` plus byte-hash checks.
+`dossiers/evidence-images/` is reserved for provenance-controlled raster source facsimiles: PNG, JPEG and WebP. Each asset requires its sibling JSON metadata sidecar and must satisfy the metadata schema, confinement/symlink rules, content SHA-256 and HTTPS-source rules.
 
-The extension is not trusted by itself: CI also verifies the binary signature/container structure expected for PNG, JPEG or WebP so arbitrary bytes renamed to a raster extension cannot satisfy the facsimile contract.
+The extension and magic bytes are not sufficient. CI opens the asset with Pillow, verifies the declared decoder format, validates dimensions/structure and forces a pixel decode. Truncated or forged containers fail closed.
 
-SVG is intentionally excluded from the source-facsimile surface because SVG can reference active or remote resources whose rendered pixels are not fixed by hashing the wrapper bytes. Derived repository SVGs belong only under `dossiers/assets/generated/`.
-
-Unknown image/media extensions in `dossiers/evidence-images/` fail closed rather than bypassing metadata validation.
+SVG remains excluded because wrapper-byte hashing does not fix externally referenced rendered pixels.
 
 ## Adversarial testing
 
-Canonical CI must exercise both the valid corpus and negative mutation fixtures. Tests cover at least:
+Canonical CI exercises the valid corpus and negative mutations covering at least:
 
-- wrong or incomplete baseline identity-to-dossier frontmatter binding;
-- deletion/type-removal of comparison-base supported identities;
-- Entity-typed ABox records outside `knowledge/entities/`, recursive entity-schema bypasses and case-variant JSON extensions;
-- schema-to-canonical-type-universe drift;
-- `Deployment` inclusion;
-- quoted/merged/nested frontmatter attempts to hide governance keys;
-- comments/code fences attempting to satisfy headings, textual-equivalent sections or visual alt text;
-- malformed manifest filenames and non-integer numeric fields;
-- non-canonical visual paths;
-- new-row State snapshot mismatch while allowing historical snapshot drift;
-- remote/embedded resource syntax, including HTML-entity/CSS escape indirection, inline SVG and CSS URLs;
-- unsupported/sidecarless source facsimiles and fake raster bytes;
-- SVG facsimile rejection;
-- generated SVG active content, remote indirection and noncanonical clip coordinate systems;
-- clipped, off-canvas or `dx`/`dy`-shifted semantic text;
-- unsafe v40+ `visualModel` metadata; and
-- a complete post-v49 atomic-addition fixture that executes the same schema, history, provenance, contract, coverage, accessibility, visual semantics, preservation, layout and deterministic-render checks as the canonical workflow.
+- canonical local JSON-LD context, compact `iri`/`type` dialect and `id == iri` identity binding;
+- entity placement, recursive schema and case-sensitive suffixes;
+- immutable identity core and explicit retirement/supersession lifecycle;
+- relationship-free post-v49 atomic identity registration;
+- strict frontmatter and governance-key smuggling;
+- comments, fences, indented code, multiline code spans, raw HTML and multiline reference definitions;
+- malformed manifests and noncanonical visual paths;
+- State snapshot mismatch plus live status-card derivation from the current State dossier;
+- remote/embedded resource indirection;
+- fully decoded raster facsimiles;
+- static SVG safety for all generated SVGs;
+- nested/intersecting clips and off-canvas/`dx`/`dy` semantic text;
+- safe v40+ `visualModel`; and
+- a complete post-v49 atomic-addition fixture covering the same workflow surface as CI.
