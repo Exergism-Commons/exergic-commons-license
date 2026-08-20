@@ -79,6 +79,30 @@ class CanonicalRoundSevenTests(unittest.TestCase):
                 errors,
             )
 
+    def test_canonical_context_semantics_are_pinned(self) -> None:
+        mutations = {
+            "class-remap": ("Organization", "ecl:Person"),
+            "relation-remap": (
+                "partOf",
+                {"@id": "ecl:controls", "@type": "@id", "@container": "@set"},
+            ),
+            "reverse-loss": ("supersededBy", {"@id": "ecl:supersedes", "@type": "@id"}),
+        }
+        for label, (term, replacement) in mutations.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                copy_schema_and_context(root)
+                self.assertEqual(hardened.validate_canonical_context_semantics(root), [])
+                path = root / "ontology/ecl-context.jsonld"
+                document = json.loads(path.read_text(encoding="utf-8"))
+                document["@context"][term] = replacement
+                path.write_text(json.dumps(document), encoding="utf-8")
+                errors = hardened.validate_canonical_context_semantics(root)
+                self.assertTrue(
+                    any("semantic fingerprint" in error for error in errors),
+                    errors,
+                )
+
     def test_supersession_rejects_self_dangling_and_cycles(self) -> None:
         with self.subTest("self-supersession"), tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
