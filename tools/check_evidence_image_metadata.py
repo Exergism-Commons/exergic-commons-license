@@ -29,6 +29,15 @@ def main() -> int:
     sidecars = sorted(EVIDENCE_IMAGE_DIR.rglob("*.json")) if EVIDENCE_IMAGE_DIR.exists() else []
     for sidecar in sidecars:
         rel = sidecar.relative_to(ROOT)
+        if sidecar.is_symlink():
+            errors.append(f"{rel}: source-facsimile metadata sidecar must not be a symlink")
+            continue
+        try:
+            sidecar.resolve(strict=True).relative_to(evidence_root)
+        except ValueError:
+            errors.append(f"{rel}: metadata sidecar escapes dossiers/evidence-images")
+            continue
+
         meta = load_json(sidecar)
         for violation in sorted(validator.iter_errors(meta), key=lambda err: list(err.path)):
             location = ".".join(str(part) for part in violation.path) or "<root>"
