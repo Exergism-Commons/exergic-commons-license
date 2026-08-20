@@ -11,6 +11,7 @@ on:
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
       - 'tools/check_canonical_entity_provenance.py'
+      - 'tools/check_canonical_entity_migration_preservation.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - 'tools/render_dossier_visuals_legacy.py'
@@ -25,6 +26,7 @@ on:
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
       - 'tools/check_canonical_entity_provenance.py'
+      - 'tools/check_canonical_entity_migration_preservation.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - 'tools/render_dossier_visuals_legacy.py'
@@ -39,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -50,6 +54,10 @@ jobs:
 
       - name: Validate canonical State provenance
         run: python tools/check_canonical_entity_provenance.py
+
+      - name: Validate ABox migration preservation
+        if: github.event_name == 'pull_request'
+        run: python tools/check_canonical_entity_migration_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
       - name: Validate committed visual layout bounds
         run: python tools/check_dossier_visual_layout.py dossiers/assets/generated
