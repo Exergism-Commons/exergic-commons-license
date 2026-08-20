@@ -24,6 +24,7 @@ def main() -> int:
     schema = load_json(SCHEMA_PATH)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    evidence_root = EVIDENCE_IMAGE_DIR.resolve()
 
     sidecars = sorted(EVIDENCE_IMAGE_DIR.rglob("*.json")) if EVIDENCE_IMAGE_DIR.exists() else []
     for sidecar in sidecars:
@@ -36,10 +37,30 @@ def main() -> int:
         asset_name = meta.get("asset")
         if not isinstance(asset_name, str) or not asset_name:
             continue
+        asset_ref = Path(asset_name)
+        if asset_ref.is_absolute() or asset_ref.name != asset_name or "/" in asset_name or "\\" in asset_name:
+            errors.append(f"{rel}: asset must be a basename in the sidecar directory, got {asset_name!r}")
+            continue
+
         asset = sidecar.parent / asset_name
         if not asset.is_file():
             errors.append(f"{rel}: referenced asset does not exist: {asset_name}")
             continue
+        if asset.is_symlink():
+            errors.append(f"{rel}: source-facsimile asset must not be a symlink: {asset_name}")
+            continue
+        try:
+            asset.resolve(strict=True).relative_to(evidence_root)
+        except ValueError:
+            errors.append(f"{rel}: referenced asset escapes dossiers/evidence-images: {asset_name}")
+            continue
+
+        expected_sidecar = asset.with_suffix(".json")
+        if expected_sidecar != sidecar:
+            errors.append(
+                f"{rel}: sidecar/asset basename mismatch; expected metadata file {expected_sidecar.name!r}"
+            )
+
         if asset.suffix.lower() not in IMAGE_EXTENSIONS:
             errors.append(f"{rel}: referenced asset is not an allowed image type: {asset_name}")
 
@@ -58,6 +79,9 @@ def main() -> int:
             path for path in EVIDENCE_IMAGE_DIR.rglob("*")
             if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
         ):
+            if asset.is_symlink():
+                errors.append(f"{asset.relative_to(ROOT)}: source-facsimile asset must not be a symlink")
+                continue
             sidecar = asset.with_suffix(".json")
             if not sidecar.is_file():
                 errors.append(

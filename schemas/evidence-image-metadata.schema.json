@@ -16,7 +16,7 @@
   ],
   "properties": {
     "version": {"const": 1},
-    "asset": {"type": "string", "minLength": 1},
+    "asset": {"type": "string", "minLength": 1, "pattern": "^[^/\\\\]+$"},
     "sourceUrl": {"type": "string", "format": "uri", "pattern": "^https://"},
     "capturedAt": {"type": "string", "format": "date-time"},
     "contentSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},

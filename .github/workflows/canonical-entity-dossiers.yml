@@ -15,6 +15,7 @@ on:
       - 'tools/check_canonical_entity_migration_preservation.py'
       - 'tools/check_canonical_dossier_accessibility.py'
       - 'tools/check_evidence_image_metadata.py'
+      - 'tools/check_visual_evidence_semantics.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - 'tools/render_dossier_visuals_legacy.py'
@@ -33,6 +34,7 @@ on:
       - 'tools/check_canonical_entity_migration_preservation.py'
       - 'tools/check_canonical_dossier_accessibility.py'
       - 'tools/check_evidence_image_metadata.py'
+      - 'tools/check_visual_evidence_semantics.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
       - 'tools/render_dossier_visuals_legacy.py'
@@ -46,10 +48,10 @@ jobs:
   canonical-dossiers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -60,7 +62,12 @@ jobs:
         run: python tools/check_canonical_entity_provenance.py
 
       - name: Validate canonical migration history
+        if: github.event_name != 'pull_request'
         run: python tools/check_canonical_entity_manifest_history.py
+
+      - name: Validate canonical migration history against PR base
+        if: github.event_name == 'pull_request'
+        run: python tools/check_canonical_entity_manifest_history.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
       - name: Validate source-facsimile metadata schema
         run: python tools/check_evidence_image_metadata.py
@@ -72,6 +79,9 @@ jobs:
 
       - name: Validate canonical dossier accessibility
         run: python tools/check_canonical_dossier_accessibility.py
+
+      - name: Validate normative visual evidence semantics
+        run: python tools/check_visual_evidence_semantics.py
 
       - name: Validate ABox migration preservation
         if: github.event_name == 'pull_request'
@@ -97,8 +107,8 @@ jobs:
           diff -ru build/generated-visuals.first build/generated-visuals
 
       - name: Upload dossier coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
+        if: ${{ always() && hashFiles('build/canonical-entity-dossier-coverage.json') != '' }}
+        uses: actions/upload-artifact@v7
         with:
           name: canonical-entity-dossier-coverage
           path: |
