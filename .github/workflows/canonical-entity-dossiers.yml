@@ -103,7 +103,7 @@ jobs:
         run: python tools/check_canonical_entity_manifest_history.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
       - name: Validate canonical migration history against push parent
-        if: ${{ github.event_name === 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
+        if: ${{ github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
         run: python tools/check_canonical_entity_manifest_history.py --base-ref "${{ github.event.before }}"
 
       - name: Validate canonical migration history structurally
