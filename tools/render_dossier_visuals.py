@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Render dossier visuals while preserving legacy bytes through v39.
 
-v40+ uses a normalized identity-boundary visual template. Entity-specific
-identity and evidence metadata remain in manifests/dossiers; the SVG template
-only renders State-context class and the non-inheritance boundary.
+v40+ uses a normalized identity-boundary visual body. Entity identity, State
+provenance and source granularity remain authoritative metadata; the body
+normalizes only proposition/evidence wording so visual adjacency cannot imply
+entity-level governance or culpability.
 """
 from __future__ import annotations
 
@@ -42,19 +43,41 @@ def normalized(entity: dict) -> dict:
     if not entity.get("_normalized_visual_v40"):
         return entity
     rendered = dict(entity)
+    # Keep state and sourceGranularity unchanged: both are provenance data.
+    # The visible identity label stays generic, while the real entity name is
+    # restored into SVG metadata below as required by VISUAL-EVIDENCE.md.
     rendered["name"] = _GENERIC_NAME
-    rendered["state"] = "Referenced"
-    rendered["sourceGranularity"] = "partial"
     rendered["visualModel"] = dict(_GENERIC_MODEL)
     return rendered
 
 
+def _restore_metadata_name(svg: str, entity: dict) -> str:
+    generic = legacy.esc(_GENERIC_NAME)
+    actual = legacy.esc(entity["name"])
+    svg = svg.replace(
+        f'<title id="title">{generic} —',
+        f'<title id="title">{actual} —',
+        1,
+    )
+    # status_svg also mentions the normalized name in its accessibility desc.
+    svg = svg.replace(
+        f'not inherited by {generic}.</desc>',
+        f'not inherited by {actual}.</desc>',
+        1,
+    )
+    return svg
+
+
 def status_svg(entity: dict, palette: dict) -> str:
-    return _original_status_svg(normalized(entity), palette)
+    if not entity.get("_normalized_visual_v40"):
+        return _original_status_svg(entity, palette)
+    return _restore_metadata_name(_original_status_svg(normalized(entity), palette), entity)
 
 
 def evidence_svg(entity: dict) -> str:
-    return _original_evidence_svg(normalized(entity))
+    if not entity.get("_normalized_visual_v40"):
+        return _original_evidence_svg(entity)
+    return _restore_metadata_name(_original_evidence_svg(normalized(entity)), entity)
 
 
 legacy.load_entities = load_entities

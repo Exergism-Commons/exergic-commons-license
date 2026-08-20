@@ -10,8 +10,10 @@ on:
       - 'spec/VISUAL-EVIDENCE.md'
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
+      - 'tools/check_canonical_entity_provenance.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
+      - 'tools/render_dossier_visuals_legacy.py'
       - '.github/workflows/canonical-entity-dossiers.yml'
   pull_request:
     paths:
@@ -22,8 +24,10 @@ on:
       - 'spec/VISUAL-EVIDENCE.md'
       - 'schemas/evidence-image-metadata.schema.json'
       - 'tools/check_canonical_entity_dossiers.py'
+      - 'tools/check_canonical_entity_provenance.py'
       - 'tools/check_dossier_visual_layout.py'
       - 'tools/render_dossier_visuals.py'
+      - 'tools/render_dossier_visuals_legacy.py'
       - '.github/workflows/canonical-entity-dossiers.yml'
   workflow_dispatch:
 
@@ -43,6 +47,9 @@ jobs:
         run: |
           mkdir -p build
           python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json
+
+      - name: Validate canonical State provenance
+        run: python tools/check_canonical_entity_provenance.py
 
       - name: Validate committed visual layout bounds
         run: python tools/check_dossier_visual_layout.py dossiers/assets/generated
