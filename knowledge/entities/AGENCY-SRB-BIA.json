@@ -4,12 +4,10 @@
   "id": "AGENCY-SRB-BIA",
   "type": "Agency",
   "name": "Security Information Agency (Serbia)",
-  "aliases": [
-    "BIA"
-  ],
+  "aliases": ["BIA"],
   "dossier": "../../dossiers/agencies/SRB-BIA.md",
-  "lastSubstantiveReview": "2026-08-19",
-  "reviewDue": "2026-09-19",
+  "lastSubstantiveReview": "2026-08-18",
+  "reviewDue": "2026-09-18",
   "reviewClass": "active",
   "reviewReason": "Identity-only Serbian intelligence agency. The Schedule translation limits applicability to materially evidenced repressive spyware/mobile-forensic deployments; generic intelligence activity remains excluded."
 }

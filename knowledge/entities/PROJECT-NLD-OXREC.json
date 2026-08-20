@@ -6,8 +6,8 @@
   "name": "OXREC recidivism-risk algorithm",
   "aliases": ["OXREC"],
   "dossier": "../../dossiers/projects/NLD-OXREC.md",
-  "lastSubstantiveReview": "2026-08-18",
-  "reviewDue": "2026-09-18",
+  "lastSubstantiveReview": "2026-08-14",
+  "reviewDue": "2026-09-14",
   "reviewClass": "active",
   "reviewReason": "Identity-only tracked object. The canonical NLD dossier explicitly excludes OXREC from active S scope while its suspension remains effective; materialization preserves remediation history without reactivating governance."
 }
