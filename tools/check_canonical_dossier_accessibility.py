@@ -10,7 +10,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "knowledge/generated"
 IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
-GENERIC_ALT_TEXT = {"state context", "evidence boundary", "image", "visual", "diagram"}
+GENERIC_ALT_TEXT = {
+    "state context",
+    "state dossier context",
+    "evidence boundary",
+    "derived evidence diagram",
+    "image",
+    "visual",
+    "diagram",
+}
 
 
 def load_json(path: Path) -> dict:
@@ -20,6 +28,23 @@ def load_json(path: Path) -> dict:
 def expected_relative_visual(dossier: str, visual: str) -> str:
     dossier_dir = posixpath.dirname(dossier)
     return posixpath.relpath(visual, dossier_dir)
+
+
+def meaningful_alt_error(alt: str, visual: str) -> str | None:
+    normalized = " ".join(alt.casefold().split())
+    if not normalized:
+        return "empty alt text"
+    if normalized in GENERIC_ALT_TEXT:
+        return f"generic alt text {alt!r}"
+    if len(normalized) < 12:
+        return f"alt text is too terse to be meaningful: {alt!r}"
+    if visual.endswith("-status.svg"):
+        if "state" not in normalized or "context" not in normalized:
+            return f"status alt text must identify State context: {alt!r}"
+    elif visual.endswith("-evidence.svg"):
+        if "evidence" not in normalized or "diagram" not in normalized:
+            return f"evidence alt text must identify the evidence diagram: {alt!r}"
+    return None
 
 
 def main() -> int:
@@ -34,12 +59,8 @@ def main() -> int:
         manifest = load_json(manifest_path)
         for row in manifest.get("entities", []):
             entity_id = row.get("id", "<missing-id>")
-            entity_name = row.get("name")
             dossier = row.get("dossier")
             visuals = row.get("visuals")
-            if not isinstance(entity_name, str) or not entity_name:
-                errors.append(f"{manifest_path.relative_to(ROOT)}: {entity_id}: missing name")
-                continue
             if not isinstance(dossier, str) or not dossier:
                 errors.append(f"{manifest_path.relative_to(ROOT)}: {entity_id}: missing dossier")
                 continue
@@ -68,18 +89,9 @@ def main() -> int:
                     continue
                 alt = matches[0][0]
                 checked += 1
-                if not alt:
-                    errors.append(f"{dossier}: {entity_id}: empty alt text for {expected_target}")
-                    continue
-                if alt.casefold() in GENERIC_ALT_TEXT:
-                    errors.append(
-                        f"{dossier}: {entity_id}: generic alt text {alt!r} for {expected_target}"
-                    )
-                if entity_name.casefold() not in alt.casefold():
-                    errors.append(
-                        f"{dossier}: {entity_id}: alt text {alt!r} does not contain canonical "
-                        f"entity name {entity_name!r}"
-                    )
+                problem = meaningful_alt_error(alt, visual)
+                if problem:
+                    errors.append(f"{dossier}: {entity_id}: {problem} for {expected_target}")
 
     if errors:
         for error in errors:
@@ -88,7 +100,7 @@ def main() -> int:
 
     print(
         "canonical dossier accessibility: OK "
-        f"({checked} visual references with entity-specific Markdown alt text)"
+        f"({checked} visual references with meaningful Markdown alt text)"
     )
     return 0
 

@@ -65,13 +65,13 @@ jobs:
       - name: Validate source-facsimile metadata schema
         run: python tools/check_evidence_image_metadata.py
 
-      - name: Validate canonical dossier accessibility
-        run: python tools/check_canonical_dossier_accessibility.py
-
       - name: Validate canonical per-entity dossier ratchet
         run: |
           mkdir -p build
           python tools/check_canonical_entity_dossiers.py --json build/canonical-entity-dossier-coverage.json
+
+      - name: Validate canonical dossier accessibility
+        run: python tools/check_canonical_dossier_accessibility.py
 
       - name: Validate ABox migration preservation
         if: github.event_name == 'pull_request'
