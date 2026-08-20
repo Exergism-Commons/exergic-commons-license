@@ -17,6 +17,7 @@ DEFAULT_PALETTE = ROOT / "knowledge/generated/dossier-visual-palette-v1.json"
 EVIDENCE_IMAGE_DIR = ROOT / "dossiers/evidence-images"
 TYPE_DIR = {"Agency":"agencies","Institution":"institutions","Organization":"organizations","Person":"persons","Project":"projects"}
 EXPECTED_PALETTE = {"R":"#B42318","S":"#E67E22","U":"#D4A017","N":"#2E7D32","UNKNOWN":"#667085"}
+VALID_ENTITY_STATE_CONTEXTS = {"R", "S", "U", "N"}
 REQUIRED_SECTIONS = ("## Identity scope","## State governance context","## Evidence record","## Attribution and exclusions","## Visual evidence","## Evidence gaps","## Sources","## Governance boundary")
 
 
@@ -207,7 +208,11 @@ def main() -> int:
                 errors.append(f"{expected_rel}: remote Markdown image is forbidden; curate a provenance-safe asset")
             if len(row.get("visuals", [])) < 2:
                 errors.append(f"{entity_id}: requires at least status + evidence visuals")
-            state, color = row["stateContext"], EXPECTED_PALETTE[row["stateContext"]]
+            state = row.get("stateContext")
+            if state not in VALID_ENTITY_STATE_CONTEXTS:
+                errors.append(f"{entity_id}: invalid stateContext {state!r}")
+                continue
+            color = EXPECTED_PALETTE[state]
             for rel_visual in row.get("visuals", []):
                 visual_path = ROOT / rel_visual
                 if not visual_path.is_file():
