@@ -87,7 +87,7 @@ jobs:
       - name: Validate rendered compatibility state
         run: python -I tools/check_schedule_compatibility_output.py build/ECL-RP-0.5-GENERATED-DRAFT.md
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ecl-schedule-generated-draft
           path: build/ECL-RP-0.5-GENERATED-DRAFT.md
