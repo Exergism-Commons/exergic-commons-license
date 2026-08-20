@@ -7,6 +7,7 @@ import math
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from urllib.parse import urlsplit
 
 TYPE_DIR = {
     "Agency": "agencies",
@@ -21,6 +22,31 @@ MANIFEST_NAME_RE = re.compile(r"^canonical-entity-dossier-migration-v([1-9][0-9]
 MANIFEST_PREFIX = "canonical-entity-dossier-migration-v"
 RASTER_FACSIMILE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 SVG_NS = "{http://www.w3.org/2000/svg}"
+
+INLINE_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(\s*(?:<([^>\n]+)>|([^\s)\n]+))", flags=re.I)
+REFERENCE_DEF_RE = re.compile(
+    r"(?m)^[ \t]{0,3}\[([^\]]+)\]:[ \t]*(?:<([^>\n]+)>|([^\s\n]+))"
+)
+REFERENCE_IMAGE_RE = re.compile(r"!\[([^\]]*)\]\[([^\]]*)\]")
+SHORTCUT_IMAGE_RE = re.compile(r"!\[([^\]]+)\](?!\s*[\[(])")
+HTML_RESOURCE_RE = re.compile(
+    r"<(?:img|source|image|embed)\b[^>]*\b(?:src|srcset|href|xlink:href)\s*=\s*"
+    r"(?:\"([^\"]*)\"|'([^']*)'|([^\s>]+))",
+    flags=re.I | re.S,
+)
+HTML_OBJECT_RE = re.compile(
+    r"<object\b[^>]*\bdata\s*=\s*(?:\"([^\"]*)\"|'([^']*)'|([^\s>]+))",
+    flags=re.I | re.S,
+)
+CSS_URL_RE = re.compile(
+    r"url\(\s*(?:\"([^\"]+)\"|'([^']+)'|([^)\s]+))\s*\)",
+    flags=re.I,
+)
+CSS_IMPORT_RE = re.compile(
+    r"@import\s+(?:url\(\s*)?(?:\"([^\"]+)\"|'([^']+)'|([^\s;)]+))",
+    flags=re.I,
+)
+INLINE_SVG_RE = re.compile(r"<\s*svg\b", flags=re.I)
 
 
 def load_json(path: Path) -> dict:
@@ -48,7 +74,8 @@ def frontmatter(text: str) -> dict[str, str]:
 def entity_paths(root: Path) -> list[Path]:
     entity_dir = root / "knowledge/entities"
     return sorted(
-        path for path in entity_dir.rglob("*")
+        path
+        for path in entity_dir.rglob("*")
         if path.is_file() and path.suffix.lower() in ENTITY_SUFFIXES
     )
 
@@ -63,7 +90,9 @@ def strict_manifest_paths(root: Path) -> tuple[list[Path], list[str]]:
         if not path.is_file() or not path.name.startswith(MANIFEST_PREFIX):
             continue
         if not path.name.endswith(".json"):
-            errors.append(f"{path.relative_to(root)}: canonical migration manifest must end in .json")
+            errors.append(
+                f"{path.relative_to(root)}: canonical migration manifest must end in .json"
+            )
             continue
         match = MANIFEST_NAME_RE.fullmatch(path.name)
         if match is None:
@@ -95,6 +124,98 @@ def canonical_visuals(entity_id: str) -> tuple[str, str]:
     )
 
 
+def _schema_non_state_types(root: Path) -> set[str] | None:
+    path = root / "schemas/entity.schema.json"
+    try:
+        schema = load_json(path)
+        enum = schema["properties"]["type"]["enum"]
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+    if not isinstance(enum, list) or not all(isinstance(item, str) for item in enum):
+        return None
+    return set(enum) - {"State"}
+
+
+def validate_schema_type_alignment(root: Path) -> list[str]:
+    """Fail when the entity schema and canonical coverage universe drift apart."""
+    schema_types = _schema_non_state_types(root)
+    if schema_types is None:
+        return ["schemas/entity.schema.json: cannot resolve the canonical entity type enum"]
+    contract_types = set(TYPE_DIR)
+    if schema_types == contract_types:
+        return []
+    missing = sorted(schema_types - contract_types)
+    stale = sorted(contract_types - schema_types)
+    return [
+        "canonical non-State type universe is out of sync with entity.schema.json: "
+        f"schema-only={missing}, contract-only={stale}"
+    ]
+
+
+def _definition_targets(text: str) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for match in REFERENCE_DEF_RE.finditer(text):
+        label = " ".join(match.group(1).split()).casefold()
+        target = match.group(2) or match.group(3) or ""
+        if label:
+            result[label] = target
+    return result
+
+
+def embedded_resource_targets(text: str) -> list[str]:
+    """Extract Markdown/HTML/CSS resource destinations without treating normal links as embeds."""
+    targets: list[str] = []
+    for match in INLINE_IMAGE_RE.finditer(text):
+        targets.append(match.group(1) or match.group(2) or "")
+
+    definitions = _definition_targets(text)
+    for match in REFERENCE_IMAGE_RE.finditer(text):
+        alt, label = match.groups()
+        key = " ".join((label or alt).split()).casefold()
+        if key in definitions:
+            targets.append(definitions[key])
+    for match in SHORTCUT_IMAGE_RE.finditer(text):
+        key = " ".join(match.group(1).split()).casefold()
+        if key in definitions:
+            targets.append(definitions[key])
+
+    for regex in (HTML_RESOURCE_RE, HTML_OBJECT_RE, CSS_URL_RE, CSS_IMPORT_RE):
+        for match in regex.finditer(text):
+            raw = next((group for group in match.groups() if group is not None), "")
+            if regex is HTML_RESOURCE_RE and "," in raw:
+                for candidate in raw.split(","):
+                    candidate = candidate.strip()
+                    if candidate:
+                        targets.append(candidate.split()[0])
+            else:
+                targets.append(raw.strip())
+    return targets
+
+
+def nonlocal_resource_target(target: str) -> bool:
+    target = target.strip()
+    if target.startswith("//"):
+        return True
+    parsed = urlsplit(target)
+    return bool(parsed.scheme or parsed.netloc)
+
+
+def validate_dossier_embedded_resources(text: str, dossier_rel: Path) -> list[str]:
+    errors: list[str] = []
+    if INLINE_SVG_RE.search(text):
+        errors.append(
+            f"{dossier_rel}: inline <svg> is forbidden in canonical dossier Markdown; "
+            "reference a deterministic generated SVG or provenance-controlled raster facsimile"
+        )
+    for target in embedded_resource_targets(text):
+        if nonlocal_resource_target(target):
+            errors.append(
+                f"{dossier_rel}: non-local embedded resource {target!r} is forbidden; "
+                "curate a provenance-safe local asset instead"
+            )
+    return errors
+
+
 def validate_universe(root: Path) -> list[str]:
     """Validate identity-to-dossier binding for every supported non-State entity."""
     errors: list[str] = []
@@ -119,33 +240,50 @@ def validate_universe(root: Path) -> list[str]:
         seen[entity_id] = path
         if entity_type not in TYPE_DIR:
             continue
+
         rel = resolve_repo_ref(root, path, record.get("dossier"))
         expected_dir = TYPE_DIR[entity_type]
-        if rel is None or len(rel.parts) < 3 or rel.parts[:2] != ("dossiers", expected_dir) or rel.suffix != ".md":
+        if (
+            rel is None
+            or len(rel.parts) < 3
+            or rel.parts[:2] != ("dossiers", expected_dir)
+            or rel.suffix != ".md"
+        ):
             errors.append(
                 f"{entity_id}: dossier must resolve under dossiers/{expected_dir}/ as Markdown"
             )
             continue
+
         dossier = root / rel
         if not dossier.is_file():
             errors.append(f"{entity_id}: dedicated dossier does not exist: {rel.as_posix()}")
             continue
-        fm = frontmatter(dossier.read_text(encoding="utf-8"))
+
+        text = dossier.read_text(encoding="utf-8")
+        fm = frontmatter(text)
         if fm.get("id") != f"ECL-{entity_id}":
             errors.append(
                 f"{entity_id}: dossier {rel.as_posix()} frontmatter id {fm.get('id')!r} "
                 f"!= {f'ECL-{entity_id}'!r}"
             )
+
         name = record.get("name")
-        if "entity" in fm and isinstance(name, str) and fm.get("entity") != name:
+        if not isinstance(name, str) or not name:
+            errors.append(f"{entity_id}: ABox name is required")
+        elif fm.get("entity") != name:
             errors.append(
-                f"{entity_id}: dossier {rel.as_posix()} frontmatter entity {fm.get('entity')!r} != ABox name {name!r}"
+                f"{entity_id}: dossier {rel.as_posix()} frontmatter entity {fm.get('entity')!r} "
+                f"!= ABox name {name!r}"
             )
-        if "entity_type" in fm and fm.get("entity_type") != str(entity_type).lower():
+
+        expected_type = str(entity_type).lower()
+        if fm.get("entity_type") != expected_type:
             errors.append(
-                f"{entity_id}: dossier {rel.as_posix()} frontmatter entity_type {fm.get('entity_type')!r} "
-                f"!= {str(entity_type).lower()!r}"
+                f"{entity_id}: dossier {rel.as_posix()} frontmatter entity_type "
+                f"{fm.get('entity_type')!r} != {expected_type!r}"
             )
+
+        errors.extend(validate_dossier_embedded_resources(text, rel))
     return errors
 
 
@@ -169,7 +307,8 @@ def validate_manifest_visual_paths(root: Path) -> list[str]:
             expected = list(canonical_visuals(entity_id))
             if visuals != expected:
                 errors.append(
-                    f"{manifest_path.relative_to(root)}: {entity_id}: visuals must be exactly {expected!r}, got {visuals!r}"
+                    f"{manifest_path.relative_to(root)}: {entity_id}: visuals must be exactly "
+                    f"{expected!r}, got {visuals!r}"
                 )
     return errors
 
@@ -231,6 +370,57 @@ def _inside(rect: tuple[float, float, float, float], x: float, y: float) -> bool
     return rect[0] <= x <= rect[2] and rect[1] <= y <= rect[3]
 
 
+def _apply_svg_position(
+    element: ET.Element,
+    current_x: float | None,
+    current_y: float | None,
+) -> tuple[float | None, float | None, bool]:
+    x = _float(element.get("x")) if element.get("x") is not None else current_x
+    y = _float(element.get("y")) if element.get("y") is not None else current_y
+
+    if element.get("x") is not None and x is None:
+        return None, None, False
+    if element.get("y") is not None and y is None:
+        return None, None, False
+
+    if element.get("dx") is not None:
+        dx = _float(element.get("dx"))
+        if dx is None or x is None:
+            return None, None, False
+        x += dx
+    if element.get("dy") is not None:
+        dy = _float(element.get("dy"))
+        if dy is None or y is None:
+            return None, None, False
+        y += dy
+    return x, y, True
+
+
+def _text_anchor_positions(text: ET.Element) -> tuple[list[tuple[float, float]], bool]:
+    positions: list[tuple[float, float]] = []
+    x, y, ok = _apply_svg_position(text, None, None)
+    if not ok:
+        return [], False
+    if x is not None and y is not None:
+        positions.append((x, y))
+
+    def walk(parent: ET.Element, cursor_x: float | None, cursor_y: float | None) -> tuple[float | None, float | None, bool]:
+        for child in parent:
+            if child.tag != f"{SVG_NS}tspan":
+                continue
+            cursor_x, cursor_y, child_ok = _apply_svg_position(child, cursor_x, cursor_y)
+            if not child_ok or cursor_x is None or cursor_y is None:
+                return cursor_x, cursor_y, False
+            positions.append((cursor_x, cursor_y))
+            cursor_x, cursor_y, child_ok = walk(child, cursor_x, cursor_y)
+            if not child_ok:
+                return cursor_x, cursor_y, False
+        return cursor_x, cursor_y, True
+
+    _, _, ok = walk(text, x, y)
+    return positions, ok
+
+
 def validate_generated_svg_clipping(root: Path) -> list[str]:
     errors: list[str] = []
     directory = root / "dossiers/assets/generated"
@@ -247,7 +437,10 @@ def validate_generated_svg_clipping(root: Path) -> list[str]:
             if tag in {"foreignObject", "textPath", "use"}:
                 errors.append(f"{path.relative_to(root)}: unsupported SVG indirection element <{tag}>")
             if any(name in element.attrib for name in ("mask", "filter")):
-                errors.append(f"{path.relative_to(root)}: unsupported SVG visibility indirection on <{tag}>")
+                errors.append(
+                    f"{path.relative_to(root)}: unsupported SVG visibility indirection on <{tag}>"
+                )
+
         clips = _clip_rects(svg)
         parent_map = {child: parent for parent in svg.iter() for child in parent}
         for text in svg.findall(f".//{SVG_NS}text"):
@@ -263,27 +456,24 @@ def validate_generated_svg_clipping(root: Path) -> list[str]:
             if rect is None:
                 errors.append(f"{path.relative_to(root)}: text references unknown clipPath {clip!r}")
                 continue
-            positions: list[tuple[float, float]] = []
-            x, y = _float(text.get("x")), _float(text.get("y"))
-            if x is not None and y is not None:
-                positions.append((x, y))
-            for tspan in text.findall(f".//{SVG_NS}tspan"):
-                tx, ty = _float(tspan.get("x")), _float(tspan.get("y"))
-                if tx is not None and ty is not None:
-                    positions.append((tx, ty))
-            if not positions:
-                errors.append(f"{path.relative_to(root)}: clipped text has no statically verifiable anchor")
+            positions, verifiable = _text_anchor_positions(text)
+            if not verifiable or not positions:
+                errors.append(
+                    f"{path.relative_to(root)}: clipped text has no statically verifiable x/y/dx/dy anchor sequence"
+                )
                 continue
             for px, py in positions:
                 if not _inside(rect, px, py):
                     errors.append(
-                        f"{path.relative_to(root)}: clipped text anchor ({px:g}, {py:g}) is outside clipPath {clip}"
+                        f"{path.relative_to(root)}: clipped text anchor ({px:g}, {py:g}) "
+                        f"is outside clipPath {clip}"
                     )
     return errors
 
 
 def validate(root: Path) -> list[str]:
     errors: list[str] = []
+    errors.extend(validate_schema_type_alignment(root))
     errors.extend(validate_universe(root))
     errors.extend(validate_manifest_visual_paths(root))
     errors.extend(validate_evidence_image_surface(root))

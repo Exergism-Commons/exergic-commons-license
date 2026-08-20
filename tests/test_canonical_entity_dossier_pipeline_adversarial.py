@@ -18,7 +18,9 @@ import check_canonical_entity_manifest_schema as manifest_schema  # noqa: E402
 import check_canonical_entity_migration_preservation as preservation  # noqa: E402
 import check_canonical_entity_provenance_snapshot as provenance  # noqa: E402
 
-preservation.TYPE_DIR["Deployment"] = "projects"
+preservation.TYPE_DIR.clear()
+preservation.TYPE_DIR.update(contract.TYPE_DIR)
+preservation.ENTITY_SUFFIXES = set(contract.ENTITY_SUFFIXES)
 
 
 class CanonicalPipelineAdversarialTests(unittest.TestCase):
@@ -36,9 +38,16 @@ class CanonicalPipelineAdversarialTests(unittest.TestCase):
         return self.git(root, "rev-parse", "HEAD")
 
     def write_schema(self, root: Path) -> None:
-        target = root / "schemas/canonical-entity-dossier-migration.schema.json"
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(REPO_ROOT / "schemas/canonical-entity-dossier-migration.schema.json", target)
+        schema_dir = root / "schemas"
+        schema_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(
+            REPO_ROOT / "schemas/canonical-entity-dossier-migration.schema.json",
+            schema_dir / "canonical-entity-dossier-migration.schema.json",
+        )
+        shutil.copyfile(
+            REPO_ROOT / "schemas/entity.schema.json",
+            schema_dir / "entity.schema.json",
+        )
 
     @staticmethod
     def write_state(root: Path, outcome: str) -> None:
@@ -221,7 +230,10 @@ class CanonicalPipelineAdversarialTests(unittest.TestCase):
             directory = root / "dossiers/evidence-images"
             directory.mkdir(parents=True)
             (directory / "photo.gif").write_bytes(b"gif")
-            (directory / "wrapper.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"><image href="https://example.invalid/x.png"/></svg>', encoding="utf-8")
+            (directory / "wrapper.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg"><image href="https://example.invalid/x.png"/></svg>',
+                encoding="utf-8",
+            )
             errors = contract.validate_evidence_image_surface(root)
             self.assertEqual(sum("unsupported source-facsimile file type" in e for e in errors), 2)
 

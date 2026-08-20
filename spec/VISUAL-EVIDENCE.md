@@ -23,7 +23,9 @@ A source facsimile may be committed only when repository storage/reuse is permit
 
 Cropping or redaction must never change the evidentiary meaning. A remote image must not be hot-linked from dossier Markdown as a substitute for provenance control.
 
-If storage/reuse is not justified, keep the external citation and describe the visual evidence in text; do not copy the image into the repository.
+Canonical dossier Markdown must not embed remote resources through Markdown images, HTML image/media elements, inline SVG, CSS `url(...)`/`@import`, protocol-relative URLs, `data:` URIs, or equivalent indirection. If storage/reuse is not justified, keep the external citation and describe the visual evidence in text; do not copy or embed the image.
+
+Source facsimiles under `dossiers/evidence-images/` are raster-only: PNG, JPEG or WebP. SVG is excluded because wrapper-byte hashing does not fix externally referenced rendered pixels.
 
 ### 2. Derived evidence diagram
 
@@ -87,7 +89,9 @@ The clip is the fail-closed guarantee: even if a browser substitutes a font whos
 
 If bounded content cannot fit within the permitted line count, the rendered line may be ellipsized. The full text MUST remain available in the dossier or versioned manifest and, for entity names, in SVG metadata.
 
-`tools/check_dossier_visual_layout.py` validates the committed and regenerated SVGs in CI, including clip geometry, clip assignment and maximum wrapped-line counts. A generated asset that loses its hard overflow guard fails CI.
+Static validation resolves sequential `x`/`y` plus `dx`/`dy` positioning for text and `tspan` elements. A token shifted outside its viewBox or active clip by cumulative offsets is not visible evidence and cannot satisfy a normative semantic check.
+
+`tools/check_dossier_visual_layout.py` validates the committed and regenerated SVGs in CI, including clip geometry, clip assignment and maximum wrapped-line counts. `tools/canonical_dossier_contract.py` and `tools/check_visual_evidence_semantics.py` independently reject unverifiable or clipped-out semantic text.
 
 ## AI-generated and decorative imagery
 
@@ -103,6 +107,6 @@ CI regenerates those assets and compares them byte-for-byte with the committed v
 
 ## Canonical dossier boundary
 
-A State dossier may be provenance for an Agency, Institution, Organization, Person or Project, but it is not that entity's canonical per-entity dossier.
+A State dossier may be provenance for an Agency, Institution, Organization, Person, Project or Deployment, but it is not that entity's canonical per-entity dossier. `Deployment` uses the project dossier surface.
 
-The migration ratchet in `knowledge/generated/canonical-entity-dossier-migration-v*.json` measures dedicated dossier coverage. `tools/check_canonical_entity_dossiers.py` validates migrated entities, dossier paths, visual requirements, frontmatter and the no-inheritance boundary.
+Canonical coverage applies to both `.json` and `.jsonld` ABox records under `knowledge/entities/`. The migration ratchet in `knowledge/generated/canonical-entity-dossier-migration-v*.json` measures dedicated dossier coverage. The canonical workflow validates migrated entities, the complete non-State identity universe, dossier paths, visual requirements, frontmatter and the no-inheritance boundary.

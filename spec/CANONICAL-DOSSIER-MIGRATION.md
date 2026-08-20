@@ -6,7 +6,15 @@ Status: normative repository curation specification.
 
 Canonical per-entity dossier coverage applies to `Agency`, `Institution`, `Organization`, `Person`, `Project`, and `Deployment` ABox records stored as `.json` or `.jsonld` under `knowledge/entities/`. `Deployment` uses the `dossiers/projects/` surface, which is the repository home for project/program/deployment dossiers.
 
-Every supported non-State identity must point to an existing type-appropriate dossier whose frontmatter `id` is exactly `ECL-<entity-id>`. When `entity` and `entity_type` frontmatter fields are present they must match the ABox name and type. This binding applies to the complete non-State universe, including identities that already had dedicated dossiers before the versioned migration ledger began.
+`schemas/entity.schema.json` and the canonical dossier contract MUST expose the same non-State type universe. A type added to the ABox schema without a canonical dossier mapping is a CI error rather than an implicitly uncovered type.
+
+Every supported non-State identity must point to an existing type-appropriate dossier whose frontmatter contains all three canonical identity fields:
+
+- `id: ECL-<entity-id>`
+- `entity: <exact ABox name>`
+- `entity_type: <lowercase ABox type>`
+
+This binding applies to the complete non-State universe, including identities that already had dedicated dossiers before the versioned migration ledger began.
 
 ## Append-only ledger
 
@@ -31,7 +39,13 @@ For every migration row `<ID>`, `visuals` is exactly:
 
 No alternate path can satisfy the canonical visual contract. This ensures the assets referenced by dossiers are the same bytes regenerated and compared deterministically in CI.
 
-Generated SVG semantics must be statically demonstrable. Text hidden by clipping, masks, filters, off-canvas positioning or unsupported indirection cannot satisfy required visual tokens.
+Generated SVG semantics must be statically demonstrable. Text hidden by clipping, masks, filters, off-canvas positioning, unsupported indirection, or cumulative `dx`/`dy` movement outside its owning region cannot satisfy required visual tokens.
+
+## Embedded resource boundary
+
+Canonical dossier Markdown MUST NOT hot-link remote or embedded image/media resources. This includes Markdown image syntax, HTML `<img>`, `<source>`, `<image>`, `<embed>`, `<object>`, CSS `url(...)` / `@import`, protocol-relative URLs, and `data:` or other URI schemes.
+
+Inline `<svg>` is not an allowed evidence surface. Derived SVGs must be deterministic files under `dossiers/assets/generated/`; external source imagery must use the provenance-controlled raster facsimile surface below.
 
 ## Source facsimiles
 
@@ -45,12 +59,14 @@ Unknown image/media extensions in `dossiers/evidence-images/` fail closed rather
 
 Canonical CI must exercise both the valid corpus and negative mutation fixtures. Tests cover at least:
 
-- wrong baseline identity-to-dossier binding;
+- wrong or incomplete baseline identity-to-dossier frontmatter binding;
+- schema-to-canonical-type-universe drift;
 - `Deployment` inclusion;
 - malformed manifest filenames and non-integer numeric fields;
 - non-canonical visual paths;
 - new-row State snapshot mismatch while allowing historical snapshot drift;
+- remote/embedded resource syntax, including inline SVG and CSS URLs;
 - unsupported/sidecarless source facsimiles;
 - SVG facsimile rejection;
-- clipped or otherwise non-verifiably-visible semantic text; and
-- a complete post-v49 atomic-addition fixture crossing the base-relative ledger and provenance guards.
+- clipped, off-canvas or `dx`/`dy`-shifted semantic text; and
+- a complete post-v49 atomic-addition fixture that executes the same schema, history, provenance, contract, coverage, accessibility, visual semantics, preservation, layout and deterministic-render checks as the canonical workflow.

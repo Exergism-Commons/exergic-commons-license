@@ -9,14 +9,19 @@ from urllib.parse import urlparse
 
 from jsonschema import Draft202012Validator, FormatChecker
 
+import canonical_dossier_contract as contract
+
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas/evidence-image-metadata.schema.json"
 EVIDENCE_IMAGE_DIR = ROOT / "dossiers/evidence-images"
-IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
+IMAGE_EXTENSIONS = set(contract.RASTER_FACSIMILE_EXTENSIONS)
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path}: expected JSON object")
+    return value
 
 
 def main() -> int:
@@ -38,7 +43,12 @@ def main() -> int:
             errors.append(f"{rel}: metadata sidecar escapes dossiers/evidence-images")
             continue
 
-        meta = load_json(sidecar)
+        try:
+            meta = load_json(sidecar)
+        except (ValueError, json.JSONDecodeError) as exc:
+            errors.append(str(exc))
+            continue
+
         for violation in sorted(validator.iter_errors(meta), key=lambda err: list(err.path)):
             location = ".".join(str(part) for part in violation.path) or "<root>"
             errors.append(f"{rel}: schema violation at {location}: {violation.message}")
@@ -71,7 +81,9 @@ def main() -> int:
             )
 
         if asset.suffix.lower() not in IMAGE_EXTENSIONS:
-            errors.append(f"{rel}: referenced asset is not an allowed image type: {asset_name}")
+            errors.append(
+                f"{rel}: referenced asset is not an allowed raster source-facsimile type: {asset_name}"
+            )
 
         expected_hash = hashlib.sha256(asset.read_bytes()).hexdigest()
         if meta.get("contentSha256") != expected_hash:
@@ -84,18 +96,23 @@ def main() -> int:
                 errors.append(f"{rel}: sourceUrl must be an absolute HTTPS URL")
 
     if EVIDENCE_IMAGE_DIR.exists():
-        for asset in sorted(
-            path for path in EVIDENCE_IMAGE_DIR.rglob("*")
-            if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
-        ):
-            if asset.is_symlink():
-                errors.append(f"{asset.relative_to(ROOT)}: source-facsimile asset must not be a symlink")
+        for path in sorted(EVIDENCE_IMAGE_DIR.rglob("*")):
+            if not path.is_file():
                 continue
-            sidecar = asset.with_suffix(".json")
-            if not sidecar.is_file():
+            if path.name == "README.md" or path.suffix.lower() == ".json":
+                continue
+            rel = path.relative_to(ROOT)
+            if path.suffix.lower() not in IMAGE_EXTENSIONS:
                 errors.append(
-                    f"{asset.relative_to(ROOT)}: missing source-image metadata sidecar {sidecar.name}"
+                    f"{rel}: unsupported source-facsimile file type; only PNG/JPEG/WebP raster assets are allowed"
                 )
+                continue
+            if path.is_symlink():
+                errors.append(f"{rel}: source-facsimile asset must not be a symlink")
+                continue
+            sidecar = path.with_suffix(".json")
+            if not sidecar.is_file():
+                errors.append(f"{rel}: missing source-image metadata sidecar {sidecar.name}")
 
     if errors:
         for error in errors:

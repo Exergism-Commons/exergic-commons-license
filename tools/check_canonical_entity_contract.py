@@ -15,7 +15,11 @@ def main() -> int:
             print(f"ERROR: {error}")
         print(f"canonical dossier contract: FAILED ({len(errors)} error(s))")
         return 1
-    print("canonical dossier contract: OK (universe binding, canonical visual paths, raster facsimiles, SVG clipping)")
+    print(
+        "canonical dossier contract: OK "
+        "(schema/type alignment, universe/frontmatter binding, embedded-resource boundary, "
+        "canonical visual paths, raster facsimiles, cumulative SVG clipping)"
+    )
     return 0
 
 

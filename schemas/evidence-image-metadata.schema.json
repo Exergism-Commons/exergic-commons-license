@@ -15,14 +15,45 @@
     "transformation"
   ],
   "properties": {
-    "version": {"const": 1},
-    "asset": {"type": "string", "minLength": 1, "pattern": "^[^/\\\\]+$"},
-    "sourceUrl": {"type": "string", "format": "uri", "pattern": "^https://"},
-    "capturedAt": {"type": "string", "format": "date-time"},
-    "contentSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "licenseBasis": {"type": "string", "minLength": 1},
-    "propositions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-    "transformation": {"type": "string", "minLength": 1},
-    "notes": {"type": "string"}
+    "version": {
+      "const": 1
+    },
+    "asset": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/\\\\]+\\.(?:[Pp][Nn][Gg]|[Jj][Pp][Ee]?[Gg]|[Ww][Ee][Bb][Pp])$"
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "contentSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "licenseBasis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "propositions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "transformation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": "string"
+    }
   }
 }

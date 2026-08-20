@@ -30,8 +30,11 @@ def normalized(value: str) -> str:
 def _number(value: str | None) -> float | None:
     if value is None:
         return None
-    match = re.match(r"^[ \t]*([-+]?(?:\d+(?:\.\d*)?|\.\d+))", value)
-    return float(match.group(1)) if match else None
+    match = re.fullmatch(r"[ \t]*([-+]?(?:\d+(?:\.\d*)?|\.\d+))[ \t]*", value)
+    if not match:
+        return None
+    result = float(match.group(1))
+    return result if math.isfinite(result) else None
 
 
 def _style_map(value: str | None) -> dict[str, str]:
@@ -94,19 +97,74 @@ def _viewbox(root: ET.Element) -> tuple[float, float, float, float] | None:
 
 
 def _inside(bounds: tuple[float, float, float, float] | None, x: float | None, y: float | None) -> bool:
-    if bounds is None or x is None or y is None:
+    if bounds is None:
         return True
+    if x is None or y is None or not (math.isfinite(x) and math.isfinite(y)):
+        return False
     x0, y0, x1, y1 = bounds
-    return x0 <= x <= x1 and y0 <= y <= y1 and math.isfinite(x) and math.isfinite(y)
+    return x0 <= x <= x1 and y0 <= y <= y1
+
+
+def _clip_rects(root: ET.Element) -> dict[str, tuple[float, float, float, float]]:
+    result: dict[str, tuple[float, float, float, float]] = {}
+    for clip in root.findall(f".//{SVG_NS}clipPath"):
+        clip_id = clip.get("id")
+        rect = clip.find(f"{SVG_NS}rect")
+        if not clip_id or rect is None:
+            continue
+        vals = [_number(rect.get(attr)) for attr in ("x", "y", "width", "height")]
+        if any(value is None for value in vals):
+            continue
+        x, y, width, height = vals
+        assert x is not None and y is not None and width is not None and height is not None
+        if width < 0 or height < 0:
+            continue
+        result[clip_id] = (x, y, x + width, y + height)
+    return result
+
+
+def _clip_id(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    match = re.fullmatch(r"url\(#([A-Za-z0-9_.:-]+)\)", raw.strip())
+    return match.group(1) if match else None
+
+
+def _apply_position(
+    element: ET.Element,
+    current_x: float | None,
+    current_y: float | None,
+) -> tuple[float | None, float | None] | None:
+    x = current_x
+    y = current_y
+    if element.get("x") is not None:
+        x = _number(element.get("x"))
+        if x is None:
+            return None
+    if element.get("y") is not None:
+        y = _number(element.get("y"))
+        if y is None:
+            return None
+    if element.get("dx") is not None:
+        dx = _number(element.get("dx"))
+        if dx is None or x is None:
+            return None
+        x += dx
+    if element.get("dy") is not None:
+        dy = _number(element.get("dy"))
+        if dy is None or y is None:
+            return None
+        y += dy
+    return x, y
 
 
 def visible_svg_text(path: Path) -> str | None:
     """Return text that is statically demonstrable as visible.
 
-    Generated canonical SVGs intentionally avoid CSS classes and transforms.
-    Rather than trusting hidden/off-canvas text, this checker fails closed on
-    stylesheet/class/transform indirection and filters nodes hidden by common
-    SVG presentation properties or positioned outside the viewBox.
+    Generated canonical SVGs intentionally avoid CSS classes/transforms and
+    unsupported visibility indirection. Text coordinates, including sequential
+    tspan dx/dy offsets, are resolved statically against both the viewBox and
+    the active clipPath rectangle.
     """
     try:
         root = ET.parse(path).getroot()
@@ -118,36 +176,69 @@ def visible_svg_text(path: Path) -> str | None:
         return None
     if any("class" in element.attrib or "transform" in element.attrib for element in root.iter()):
         return None
+    if any(
+        element.tag.rsplit("}", 1)[-1] in {"foreignObject", "textPath", "use"}
+        or "mask" in element.attrib
+        or "filter" in element.attrib
+        for element in root.iter()
+    ):
+        return None
 
     bounds = _viewbox(root)
+    clips = _clip_rects(root)
     chunks: list[str] = []
+    invalid = False
 
     def walk(
         element: ET.Element,
         hidden: bool,
         inherited_x: float | None,
         inherited_y: float | None,
-    ) -> None:
+        inherited_clip: str | None,
+    ) -> tuple[float | None, float | None]:
+        nonlocal invalid
         tag = element.tag.rsplit("}", 1)[-1]
         if tag in {"defs", "title", "desc", "metadata"}:
-            return
+            return inherited_x, inherited_y
+
         hidden = hidden or _element_hidden(element)
-        x = _number(element.get("x"))
-        y = _number(element.get("y"))
-        if x is None:
-            x = inherited_x
-        if y is None:
-            y = inherited_y
+        position = _apply_position(element, inherited_x, inherited_y)
+        if position is None:
+            invalid = True
+            return inherited_x, inherited_y
+        x, y = position
+
+        own_clip_raw = element.get("clip-path")
+        if own_clip_raw is not None:
+            own_clip = _clip_id(own_clip_raw)
+            if own_clip is None or own_clip not in clips:
+                invalid = True
+                return x, y
+            clip = own_clip
+        else:
+            clip = inherited_clip
+
         semantic_text_node = tag in {"text", "tspan"}
-        in_bounds = _inside(bounds, x, y)
-        if semantic_text_node and not hidden and in_bounds and element.text:
+        visible = not hidden and _inside(bounds, x, y)
+        if clip is not None:
+            visible = visible and _inside(clips.get(clip), x, y)
+
+        if semantic_text_node and visible and element.text:
             chunks.append(element.text)
+
+        cursor_x, cursor_y = x, y
         for child in element:
-            walk(child, hidden, x, y)
-            if semantic_text_node and not hidden and in_bounds and child.tail:
+            child_x, child_y = walk(child, hidden, cursor_x, cursor_y, clip)
+            if semantic_text_node:
+                cursor_x, cursor_y = child_x, child_y
+            if semantic_text_node and visible and child.tail:
                 chunks.append(child.tail)
 
-    walk(root, False, None, None)
+        return cursor_x, cursor_y
+
+    walk(root, False, None, None, None)
+    if invalid:
+        return None
     return normalized(" ".join(chunks))
 
 
