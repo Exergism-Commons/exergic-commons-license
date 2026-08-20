@@ -2,6 +2,7 @@
 """Public round-six hardening wrapper with compatibility and adversarial guards."""
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 from pathlib import Path
@@ -14,6 +15,9 @@ import check_canonical_entity_contract_round6_impl as _impl
 _original_commonmark_validation = _impl.validate_commonmark_identity_dossiers
 _original_abox_validation = _impl.validate_abox_dialect
 _original_encoded_resource_validation = _impl.validate_encoded_resources
+
+
+_CANONICAL_JSONLD_CONTEXT_SHA256 = "ad85086227a65f2da2cfe1e26261fbbc74cef4a3607b96063172fafbe00ffe9c"
 
 
 def _sources_has_rendered_content(path: Path) -> bool:
@@ -124,8 +128,34 @@ def validate_identity_supersession(root: Path) -> list[str]:
     return errors
 
 
+def validate_canonical_context_semantics(root: Path) -> list[str]:
+    """Freeze the canonical JSON-LD context as a semantic contract, not only a path."""
+    path = root / "ontology/ecl-context.jsonld"
+    rel = Path("ontology/ecl-context.jsonld")
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"{rel}: cannot load canonical JSON-LD context: {exc}"]
+    if not isinstance(document, dict) or set(document) != {"@context"}:
+        return [f"{rel}: canonical JSON-LD document must contain exactly one top-level @context object"]
+    if not isinstance(document.get("@context"), dict):
+        return [f"{rel}: canonical @context must be an object"]
+
+    canonical = json.dumps(
+        document, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    digest = hashlib.sha256(canonical).hexdigest()
+    if digest == _CANONICAL_JSONLD_CONTEXT_SHA256:
+        return []
+    return [
+        f"{rel}: canonical JSON-LD semantic fingerprint {digest} does not match pinned "
+        f"{_CANONICAL_JSONLD_CONTEXT_SHA256}; any dialect change must update the guard and RDF equivalence tests"
+    ]
+
+
 def validate_abox_dialect(root: Path) -> list[str]:
-    errors = _original_abox_validation(root)
+    errors = validate_canonical_context_semantics(root)
+    errors.extend(_original_abox_validation(root))
     errors.extend(validate_identity_supersession(root))
     return errors
 
@@ -191,6 +221,7 @@ for _name, _value in vars(_impl).items():
 
 # Ensure patched public functions/helpers are not overwritten by the export loop.
 globals()["validate_commonmark_identity_dossiers"] = validate_commonmark_identity_dossiers
+globals()["validate_canonical_context_semantics"] = validate_canonical_context_semantics
 globals()["validate_identity_supersession"] = validate_identity_supersession
 globals()["validate_abox_dialect"] = validate_abox_dialect
 globals()["_commonmark_image_targets"] = _commonmark_image_targets
