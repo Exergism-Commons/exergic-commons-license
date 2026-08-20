@@ -16,7 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 class CanonicalV50FullPipelineTests(unittest.TestCase):
     maxDiff = None
 
-    def run(self, root: Path, *args: str) -> str:
+    def run_python(self, root: Path, *args: str) -> str:
         proc = subprocess.run(
             [sys.executable, *args],
             cwd=root,
@@ -232,7 +232,7 @@ The fixture is identity-only. State context is provenance and must not be inheri
             )
 
             staged = root / "build/e2e-staged"
-            self.run(root, "tools/render_dossier_visuals.py", "--out", str(staged))
+            self.run_python(root, "tools/render_dossier_visuals.py", "--out", str(staged))
             generated = root / "dossiers/assets/generated"
             for suffix in ("status", "evidence"):
                 shutil.copy2(
@@ -272,11 +272,11 @@ The fixture is identity-only. State context is provenance and must not be inheri
                 ),
             ]
             for command in commands:
-                self.run(root, *command)
+                self.run_python(root, *command)
 
             regenerated_one = root / "build/e2e-regenerated-one"
             regenerated_two = root / "build/e2e-regenerated-two"
-            self.run(
+            self.run_python(
                 root,
                 "tools/render_dossier_visuals.py",
                 "--out",
@@ -284,12 +284,12 @@ The fixture is identity-only. State context is provenance and must not be inheri
             )
             self.assert_dir_bytes_equal(self, generated, regenerated_one)
 
-            self.run(
+            self.run_python(
                 root,
                 "tools/check_dossier_visual_layout.py",
                 str(regenerated_one),
             )
-            self.run(
+            self.run_python(
                 root,
                 "tools/render_dossier_visuals.py",
                 "--out",
