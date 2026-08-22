@@ -18,12 +18,12 @@ PYTHON_TOOL_RE = re.compile(r"\bpython(?:3)?\s+(tools/[A-Za-z0-9_./-]+\.py)\b")
 
 
 def _workflow_python_entrypoints(workflow_text: str) -> tuple[str, ...]:
-    """Discover every repository tool executed directly by a workflow."""
+    """Discover repository tools executed in the simple direct-python form."""
     return tuple(sorted(set(PYTHON_TOOL_RE.findall(workflow_text))))
 
 
 def _local_tool_dependencies(entrypoints: tuple[str, ...]) -> set[str]:
-    """Return the recursive tools/*.py import closure for normative entrypoints."""
+    """Return the recursive tools/*.py import closure for discovered entrypoints."""
     pending = [ROOT / path for path in entrypoints]
     seen: set[Path] = set()
 
@@ -89,12 +89,38 @@ def _covered(path: str, patterns: set[str]) -> bool:
 
 
 class CanonicalWorkflowGateTests(unittest.TestCase):
-    def test_all_executed_python_tools_and_imports_are_ci_path_covered(self) -> None:
+    def test_every_tools_change_unconditionally_triggers_normative_workflows(self) -> None:
+        """Do not depend on reconstructing Python command/import syntax to trigger CI."""
+        probes = (
+            "tools/__future_helper__.py",
+            "tools/nested/__future_helper__.py",
+            "tools/check_visual_evidence_semantics_hardened.py",
+        )
+        for workflow_rel in WORKFLOWS:
+            workflow_text = (ROOT / workflow_rel).read_text(encoding="utf-8")
+            for event in ("push", "pull_request"):
+                patterns = _event_paths(workflow_text, event)
+                self.assertIn(
+                    "tools/**",
+                    patterns,
+                    f"{workflow_rel} {event}.paths must contain the unconditional tools/** guard",
+                )
+                for probe in probes:
+                    self.assertTrue(
+                        _covered(probe, patterns),
+                        f"{workflow_rel} {event}.paths does not cover arbitrary tool {probe}",
+                    )
+
+    def test_discovered_executed_python_tools_and_imports_remain_ci_path_covered(self) -> None:
+        """Retain recursive discovery as defense in depth, not as the sole trigger guard."""
         for workflow_rel in WORKFLOWS:
             with self.subTest(workflow=workflow_rel):
                 workflow_text = (ROOT / workflow_rel).read_text(encoding="utf-8")
                 entrypoints = _workflow_python_entrypoints(workflow_text)
-                self.assertTrue(entrypoints, f"{workflow_rel}: no directly executed tools/*.py entrypoints discovered")
+                self.assertTrue(
+                    entrypoints,
+                    f"{workflow_rel}: no directly executed tools/*.py entrypoints discovered",
+                )
 
                 dependencies = _local_tool_dependencies(entrypoints)
                 self.assertTrue(dependencies, workflow_rel)
@@ -102,7 +128,9 @@ class CanonicalWorkflowGateTests(unittest.TestCase):
 
                 for event in ("push", "pull_request"):
                     patterns = _event_paths(workflow_text, event)
-                    missing = sorted(path for path in dependencies if not _covered(path, patterns))
+                    missing = sorted(
+                        path for path in dependencies if not _covered(path, patterns)
+                    )
                     self.assertEqual(
                         [],
                         missing,

@@ -52,7 +52,7 @@ A newly appended row MUST match the referenced State dossier outcome at append t
 
 Status SVGs do **not** render the immutable manifest snapshot as current truth. At render time they read the current referenced State dossier and display that live `provisional_outcome` as **STATE DOSSIER CONTEXT**. A later State governance change therefore causes deterministic status-card regeneration without rewriting the historical manifest. Evidence visuals and manifest provenance remain tied to the migration snapshot.
 
-The Markdown `## State governance context` section may use outcome-neutral prose. If it states an explicit present-tense `R/S/U/N — label` outcome, that value is part of the live semantic surface and MUST match the current referenced State dossier. CI rejects stale prose even when the regenerated status SVG is current, preventing Markdown/SVG disagreement after a living-governance change.
+The Markdown `## State governance context` section may use outcome-neutral prose. If its **rendered CommonMark text** states an explicit present-tense `R/S/U/N — label` outcome, that value is part of the live semantic surface and MUST match the current referenced State dossier. Emphasis changes, split emphasis and inline-code formatting do not change this rule. Fenced/indented code and fake headings inside code cannot redirect section discovery. The live checker also applies this coherence rule to dedicated pre-ledger canonical dossiers when an explicit State outcome is present and the State provenance code can be resolved.
 
 ## Canonical generated visuals
 
@@ -61,13 +61,13 @@ For every migration row `<ID>`, `visuals` is exactly:
 - `dossiers/assets/generated/<ID>-status.svg`
 - `dossiers/assets/generated/<ID>-evidence.svg`
 
-No alternate path can satisfy the contract. Generated SVG semantics must be statically demonstrable. Text hidden by clipping, masks, filters, off-canvas positioning, unsupported indirection, or cumulative `dx`/`dy` movement cannot satisfy required tokens.
+No alternate path can satisfy the contract. Generated SVG semantics must be statically demonstrable. Text hidden by clipping, masks, filters, off-canvas positioning, unsupported indirection, cumulative `dx`/`dy` movement, zero-area clips, transparent paint, near-zero opacity or sub-readable font size cannot satisfy required tokens.
 
-SVG clips compose by intersection. CI therefore evaluates every clip inherited from a text element and all of its ancestors; a token must lie inside **all** active clips. The static-safety guard scans every generated SVG, including `state-outcome-legend.svg`, not only files listed in manifests.
+SVG clips compose by intersection. CI therefore evaluates every clip inherited from a text element and all of its ancestors; a token must lie inside **all** active clips. Canonical semantic extraction additionally requires a positive `viewBox`, strictly positive clip rectangles, font size of at least 8 user units where explicitly set, effective opacity/fill-opacity of at least `0.05`, and non-transparent inherited paint. The static-safety guard scans every generated SVG, including `state-outcome-legend.svg`, not only files listed in manifests.
 
 Active/dynamic or externally resolved SVG constructs are forbidden, including scripts, event handlers, animation/SMIL, hyperlinks/hrefs, external `url(...)`, XML stylesheet/entity/DOCTYPE indirection and non-`userSpaceOnUse` clip coordinates.
 
-For v40+ rows, `visualModel` is constrained to canonical identity-only templates and cannot carry a stronger proposition than the renderer displays.
+For v40+ rows, `visualModel` is constrained to canonical identity-only templates and cannot carry a stronger proposition than the renderer displays. Historical v1-v39 free-form `visualModel` fields remain supported, but each `source`, `proposition` and `boundary` field MUST be textually anchored to the rendered dossier sections that support it. CI token-normalizes those fields and requires at least half of their significant terms to occur on the corresponding rendered support surface. This is an audit linkage, not a replacement for substantive human review.
 
 ## Embedded resource boundary
 
@@ -83,6 +83,12 @@ The extension and magic bytes are not sufficient. CI opens the asset with Pillow
 
 SVG remains excluded because wrapper-byte hashing does not fix externally referenced rendered pixels.
 
+## CI trigger surface
+
+Changes under `tools/**` MUST trigger both **Canonical entity dossiers** and **Living update integrity** on `push` and `pull_request`. This unconditional wildcard is the primary fail-closed trigger guard, so alternate invocation forms such as `python -u`, `python -m`, executable scripts or future package layouts cannot evade CI merely because a regex did not reconstruct the command.
+
+The recursive Python entrypoint/import regression remains as defense in depth for the currently discovered execution graph, but it is not the sole mechanism protecting the workflow trigger surface.
+
 ## Adversarial testing
 
 Canonical CI exercises the valid corpus and negative mutations covering at least:
@@ -94,10 +100,11 @@ Canonical CI exercises the valid corpus and negative mutations covering at least
 - strict frontmatter and governance-key smuggling;
 - comments, fences, indented code, multiline code spans, raw HTML and multiline reference definitions;
 - malformed manifests and noncanonical visual paths;
-- State snapshot mismatch, live status-card derivation and stale explicit State-outcome prose after a living-governance change;
+- State snapshot mismatch, live status-card derivation, formatting-independent stale State-outcome prose and fenced-heading bypasses;
 - remote/embedded resource indirection;
 - fully decoded raster facsimiles;
 - static SVG safety for all generated SVGs;
-- nested/intersecting clips and off-canvas/`dx`/`dy` semantic text;
-- safe v40+ `visualModel`; and
+- nested/intersecting clips, zero-area clips, transparent/tiny/near-zero-opacity semantic text and off-canvas/`dx`/`dy` movement;
+- v1-v39 visualModel textual anchoring and safe v40+ `visualModel`;
+- unconditional `tools/**` workflow triggering plus recursive import coverage; and
 - a complete post-v49 atomic-addition fixture covering the same workflow surface as CI.

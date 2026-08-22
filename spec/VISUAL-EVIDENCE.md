@@ -24,7 +24,9 @@ A repository-generated diagram that visualizes already-curated dossier content, 
 
 `source surface -> curated proposition -> entity identity -> attribution boundary`
 
-Derived diagrams MUST say that they are derived, preserve a textual equivalent, identify source granularity, never manufacture a Claim/EvidenceItem, and never imply participation/control/supply/command/membership/culpability by adjacency.
+Derived diagrams MUST say that they are derived, preserve a textual support surface, identify source granularity, never manufacture a Claim/EvidenceItem, and never imply participation/control/supply/command/membership/culpability by adjacency.
+
+Historical v1-v39 free-form `visualModel` summaries are required to be lexically anchored to the rendered dossier sections that support their `source`, `proposition` and `boundary` fields. v40+ models use canonical identity-only templates. The automated anchor is an audit invariant, not a substitute for substantive review.
 
 ### 3. Derived chart
 
@@ -38,9 +40,11 @@ For a non-State migration, manifest `stateContext` is historical provenance. The
 
 A State outcome is never copied into a non-State dossier's `provisional_outcome`.
 
+If `## State governance context` contains an explicit visible `R/S/U/N — label`, CI interprets the section through CommonMark and requires the code to match the live State dossier regardless of emphasis or inline-code formatting. Fake headings or stale values inside fenced/indented code do not redirect the rendered-section parser.
+
 ## Accessibility
 
-Committed SVG evidence visuals include `<title>`, `<desc>`, meaningful Markdown alt text and a textual equivalent. Interpretation remains possible without color.
+Committed SVG evidence visuals include `<title>`, `<desc>`, meaningful Markdown alt text and a textual support surface. Interpretation remains possible without color.
 
 ## Layout bounds and text overflow
 
@@ -48,7 +52,9 @@ Dynamic SVG text MUST remain inside every visual region that owns it. The render
 
 SVG clipping is cumulative: a child clip does not replace an ancestor clip. Static validation therefore resolves sequential `x`/`y` plus `dx`/`dy` positioning and requires every text anchor to remain inside the viewBox and **every active ancestor/self clip**. A token hidden by any active clip cannot satisfy normative semantics.
 
-`tools/check_dossier_visual_layout.py`, `tools/canonical_dossier_contract.py` and `tools/check_visual_evidence_semantics.py` independently validate layout/visibility. Static-safety validation covers every file under `dossiers/assets/generated/*.svg`, including the palette legend.
+Normative semantic visibility additionally fails closed for a missing/non-positive `viewBox`, zero-area clips, transparent inherited paint, explicitly tiny text (`< 8` user units), or effective opacity/fill-opacity below `0.05`. `tools/check_visual_evidence_semantics_hardened.py` applies these paint/geometry guards before delegating to the structural semantic extractor; `tools/check_visual_evidence_semantics_live.py` is the workflow entrypoint.
+
+`tools/check_dossier_visual_layout.py`, the canonical dossier contract, and the hardened/live semantic checker independently constrain layout/visibility. Static-safety validation covers every file under `dossiers/assets/generated/*.svg`, including the palette legend.
 
 ## Static SVG contract
 
@@ -61,6 +67,10 @@ AI-generated, reconstructed or decorative imagery is not evidence and MUST NOT b
 ## Deterministic generation
 
 `tools/render_dossier_visuals.py` renders the canonical SVGs from versioned manifests and the palette. CI regenerates and compares byte-for-byte, validates layout again, and performs a second independent regeneration.
+
+## CI trigger integrity
+
+Both canonical workflows use an unconditional `tools/**` path trigger on `push` and `pull_request`. Recursive entrypoint/import analysis remains a secondary defense; correctness does not depend on recognizing every possible Python command-line form.
 
 ## Canonical dossier boundary
 
