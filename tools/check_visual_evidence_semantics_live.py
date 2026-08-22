@@ -24,7 +24,7 @@ MODEL_STOPWORDS = {
     "or", "the", "to", "with", "canonical", "dossier", "entity", "identity", "record",
     "source", "surface", "abox", "existing", "dedicated", "non", "only", "no", "state",
     "set", "batch", "freeze", "frozen", "locator", "context", "exact", "official",
-    "candidate", "material", "without", "ready", "base", "party", "surface", "promoted",
+    "candidate", "material", "without", "ready", "base", "party", "promoted",
 }
 TOKEN_ALIASES = {
     "inherited": "inherit",
@@ -41,6 +41,8 @@ TOKEN_ALIASES = {
     "referral": "refer",
     "remedial": "remedy",
     "remediation": "remedy",
+    "pathway": "path",
+    "srb": "serbia",
 }
 
 
