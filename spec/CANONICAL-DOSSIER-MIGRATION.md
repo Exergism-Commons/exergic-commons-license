@@ -52,6 +52,8 @@ A newly appended row MUST match the referenced State dossier outcome at append t
 
 Status SVGs do **not** render the immutable manifest snapshot as current truth. At render time they read the current referenced State dossier and display that live `provisional_outcome` as **STATE DOSSIER CONTEXT**. A later State governance change therefore causes deterministic status-card regeneration without rewriting the historical manifest. Evidence visuals and manifest provenance remain tied to the migration snapshot.
 
+The Markdown `## State governance context` section may use outcome-neutral prose. If it states an explicit present-tense `R/S/U/N — label` outcome, that value is part of the live semantic surface and MUST match the current referenced State dossier. CI rejects stale prose even when the regenerated status SVG is current, preventing Markdown/SVG disagreement after a living-governance change.
+
 ## Canonical generated visuals
 
 For every migration row `<ID>`, `visuals` is exactly:
@@ -92,7 +94,7 @@ Canonical CI exercises the valid corpus and negative mutations covering at least
 - strict frontmatter and governance-key smuggling;
 - comments, fences, indented code, multiline code spans, raw HTML and multiline reference definitions;
 - malformed manifests and noncanonical visual paths;
-- State snapshot mismatch plus live status-card derivation from the current State dossier;
+- State snapshot mismatch, live status-card derivation and stale explicit State-outcome prose after a living-governance change;
 - remote/embedded resource indirection;
 - fully decoded raster facsimiles;
 - static SVG safety for all generated SVGs;
