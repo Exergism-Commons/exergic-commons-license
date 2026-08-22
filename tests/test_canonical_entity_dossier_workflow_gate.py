@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import fnmatch
+import re
 import unittest
 from pathlib import Path
 
@@ -9,15 +10,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 
-WORKFLOW_ENTRYPOINTS = {
-    ".github/workflows/canonical-entity-dossiers.yml": (
-        "tools/canonical_dossier_contract.py",
-        "tools/check_canonical_entity_contract_round6.py",
-    ),
-    ".github/workflows/living-update-integrity.yml": (
-        "tools/check_canonical_entity_contract_round6.py",
-    ),
-}
+WORKFLOWS = (
+    ".github/workflows/canonical-entity-dossiers.yml",
+    ".github/workflows/living-update-integrity.yml",
+)
+PYTHON_TOOL_RE = re.compile(r"\bpython(?:3)?\s+(tools/[A-Za-z0-9_./-]+\.py)\b")
+
+
+def _workflow_python_entrypoints(workflow_text: str) -> tuple[str, ...]:
+    """Discover every repository tool executed directly by a workflow."""
+    return tuple(sorted(set(PYTHON_TOOL_RE.findall(workflow_text))))
 
 
 def _local_tool_dependencies(entrypoints: tuple[str, ...]) -> set[str]:
@@ -87,12 +89,16 @@ def _covered(path: str, patterns: set[str]) -> bool:
 
 
 class CanonicalWorkflowGateTests(unittest.TestCase):
-    def test_normative_local_python_imports_are_ci_path_covered(self) -> None:
-        for workflow_rel, entrypoints in WORKFLOW_ENTRYPOINTS.items():
+    def test_all_executed_python_tools_and_imports_are_ci_path_covered(self) -> None:
+        for workflow_rel in WORKFLOWS:
             with self.subTest(workflow=workflow_rel):
                 workflow_text = (ROOT / workflow_rel).read_text(encoding="utf-8")
+                entrypoints = _workflow_python_entrypoints(workflow_text)
+                self.assertTrue(entrypoints, f"{workflow_rel}: no directly executed tools/*.py entrypoints discovered")
+
                 dependencies = _local_tool_dependencies(entrypoints)
                 self.assertTrue(dependencies, workflow_rel)
+                self.assertTrue(set(entrypoints) <= dependencies, workflow_rel)
 
                 for event in ("push", "pull_request"):
                     patterns = _event_paths(workflow_text, event)
@@ -100,7 +106,7 @@ class CanonicalWorkflowGateTests(unittest.TestCase):
                     self.assertEqual(
                         [],
                         missing,
-                        f"{workflow_rel} {event}.paths does not cover normative local imports: {missing}",
+                        f"{workflow_rel} {event}.paths does not cover executed Python tools/imports: {missing}",
                     )
 
 
