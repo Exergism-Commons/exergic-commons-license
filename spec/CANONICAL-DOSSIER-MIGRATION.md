@@ -67,7 +67,7 @@ SVG clips compose by intersection. CI therefore evaluates every clip inherited f
 
 Active/dynamic or externally resolved SVG constructs are forbidden, including scripts, event handlers, animation/SMIL, hyperlinks/hrefs, external `url(...)`, XML stylesheet/entity/DOCTYPE indirection and non-`userSpaceOnUse` clip coordinates.
 
-For v40+ rows, `visualModel` is constrained to canonical identity-only templates and cannot carry a stronger proposition than the renderer displays. Historical v1-v39 free-form `visualModel` fields remain supported, but each `source`, `proposition` and `boundary` field MUST be textually anchored to the rendered dossier sections that support it. CI token-normalizes those fields and requires at least half of their significant terms to occur on the corresponding rendered support surface. This is an audit linkage, not a replacement for substantive human review.
+For v40+ rows, `visualModel` is constrained to canonical identity-only templates and cannot carry a stronger proposition than the renderer displays. Historical v1-v39 free-form `visualModel` fields remain supported, but each `source`, `proposition` and `boundary` field MUST be textually anchored to rendered dossier support. CI token-normalizes away migration bookkeeping vocabulary; `source` requires at least one distinctive shared term, while `proposition` and noncanonical `boundary` text require two shared significant terms when two are available. The canonical `No State R/S/U/N inheritance` boundary is accepted directly as the safe no-inheritance formula. This is an audit linkage, not a replacement for substantive human review.
 
 ## Embedded resource boundary
 

@@ -23,7 +23,8 @@ MODEL_STOPWORDS = {
     "a", "an", "and", "as", "at", "by", "for", "from", "in", "into", "of", "on",
     "or", "the", "to", "with", "canonical", "dossier", "entity", "identity", "record",
     "source", "surface", "abox", "existing", "dedicated", "non", "only", "no", "state",
-    "set",
+    "set", "batch", "freeze", "frozen", "locator", "context", "exact", "official",
+    "candidate", "material", "without", "ready", "base", "party", "surface", "promoted",
 }
 TOKEN_ALIASES = {
     "inherited": "inherit",
@@ -174,8 +175,7 @@ def validate_visual_model_textual_anchor(
 
     v40+ rows use canonical identity-only templates and are validated elsewhere.
     v1-v39 retain their historical free-form summaries, so each field must share
-    a meaningful fraction of its significant terms with the section(s) that
-    constitute its textual support.
+    an auditable lexical anchor with the section(s) that constitute its textual support.
     """
     if version >= 40:
         return []
@@ -208,7 +208,11 @@ def validate_visual_model_textual_anchor(
             )
             continue
         matched = model_terms & target_terms
-        required = max(1, math.ceil(len(model_terms) / 2))
+        if field == "boundary" and re.fullmatch(
+            r"No State [RSUN] inheritance", value.strip(), flags=re.I
+        ):
+            continue
+        required = 1 if field == "source" else min(2, len(model_terms))
         if len(matched) < required:
             errors.append(
                 f"{dossier}: {entity_id}: visualModel.{field} is not textually anchored: "

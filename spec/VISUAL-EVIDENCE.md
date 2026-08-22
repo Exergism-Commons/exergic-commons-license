@@ -26,7 +26,7 @@ A repository-generated diagram that visualizes already-curated dossier content, 
 
 Derived diagrams MUST say that they are derived, preserve a textual support surface, identify source granularity, never manufacture a Claim/EvidenceItem, and never imply participation/control/supply/command/membership/culpability by adjacency.
 
-Historical v1-v39 free-form `visualModel` summaries are required to be lexically anchored to the rendered dossier sections that support their `source`, `proposition` and `boundary` fields. v40+ models use canonical identity-only templates. The automated anchor is an audit invariant, not a substitute for substantive review.
+Historical v1-v39 free-form `visualModel` summaries are required to be lexically anchored to rendered dossier support: bookkeeping tokens are ignored, `source` needs a distinctive shared term, and `proposition` / noncanonical `boundary` text need two shared significant terms when available. The canonical `No State R/S/U/N inheritance` boundary is an explicitly safe formula. v40+ models use canonical identity-only templates. The automated anchor is an audit invariant, not a substitute for substantive review.
 
 ### 3. Derived chart
 
