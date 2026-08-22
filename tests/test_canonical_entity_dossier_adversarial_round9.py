@@ -30,12 +30,12 @@ The canonical `USA` State dossier records **S — Scoped restriction**. That Sta
         )
         self.assertTrue(any("text is stale" in error and "S" in error and "N" in error for error in errors), errors)
 
-    def test_matching_explicit_state_outcome_is_accepted(self) -> None:
+    def test_matching_outcome_code_allows_contextual_description(self) -> None:
         dossier = """# Example
 
 ## State governance context
 
-The canonical `USA` State dossier records **S — Scoped restriction**. That State status is context only.
+The canonical `USA` State dossier records **S — Restricted with defined scope**. That State status is context only.
 """
         self.assertEqual(
             [],
