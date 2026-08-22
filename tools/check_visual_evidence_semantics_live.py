@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import canonical_dossier_contract as contract
@@ -10,6 +11,9 @@ import check_visual_evidence_semantics as base
 
 ROOT = Path(__file__).resolve().parents[1]
 VALID = {"R", "S", "U", "N"}
+EXPLICIT_STATE_OUTCOME_RE = re.compile(
+    r"\*\*([RSUN])\s+(?:—|–|-|·)\s+([^*\n]+?)\*\*"
+)
 
 
 def frontmatter(path: Path) -> dict[str, str]:
@@ -33,6 +37,37 @@ def current_state_outcome(state: str) -> str | None:
         return None
     value = frontmatter(path).get("provisional_outcome")
     return value if value in VALID else None
+
+
+def validate_live_state_context_text(
+    dossier_text: str,
+    dossier: str,
+    entity_id: str,
+    state: str,
+    live: str,
+    label: str,
+) -> list[str]:
+    """Reject stale present-tense State outcomes embedded in canonical dossier prose.
+
+    Outcome-neutral prose is allowed. If the State-governance section chooses to
+    state an explicit ``R/S/U/N — label`` value, however, it becomes part of the
+    live surface and must agree with the current State dossier exactly.
+    """
+    body = base.section_body(dossier_text, "## State governance context")
+    if body is None:
+        return []
+
+    expected_label = base.normalized(label)
+    errors: list[str] = []
+    for stated_code, stated_label in EXPLICIT_STATE_OUTCOME_RE.findall(body):
+        if stated_code == live and base.normalized(stated_label) == expected_label:
+            continue
+        errors.append(
+            f"{dossier}: {entity_id}: State governance context text is stale: "
+            f"states {stated_code} · {stated_label.strip()}, but current {state} State dossier "
+            f"is {live} · {label}; update the prose or make it outcome-neutral"
+        )
+    return errors
 
 
 def main() -> int:
@@ -75,15 +110,28 @@ def main() -> int:
                 errors.append(f"{entity_id}: invalid status SVG or current State outcome")
             else:
                 label = palette["states"][live].get("label")
-                for required in (
-                    "STATE DOSSIER CONTEXT",
-                    base.normalized(f"{live} · {label}"),
-                    f"{state} State dossier",
-                    "no entity-level governance inheritance",
-                ):
-                    if required not in status_text:
-                        errors.append(f"{status_rel}: {entity_id}: visible status semantics missing {required!r}")
-                checked += 1
+                if not isinstance(label, str) or not label:
+                    errors.append(f"{entity_id}: live State outcome {live!r} has no canonical palette label")
+                else:
+                    errors.extend(
+                        validate_live_state_context_text(
+                            dossier_text,
+                            dossier,
+                            str(entity_id),
+                            str(state),
+                            live,
+                            label,
+                        )
+                    )
+                    for required in (
+                        "STATE DOSSIER CONTEXT",
+                        base.normalized(f"{live} · {label}"),
+                        f"{state} State dossier",
+                        "no entity-level governance inheritance",
+                    ):
+                        if required not in status_text:
+                            errors.append(f"{status_rel}: {entity_id}: visible status semantics missing {required!r}")
+                    checked += 1
 
             evidence_text = base.visible_svg_text(ROOT / evidence_rel) if (ROOT / evidence_rel).is_file() else None
             granularity_label = base.GRANULARITY_LABELS.get(source_granularity)
@@ -104,7 +152,10 @@ def main() -> int:
             print(f"ERROR: {error}")
         print(f"visual evidence semantics: FAILED ({len(errors)} error(s))")
         return 1
-    print(f"visual evidence semantics: OK ({checked} status/evidence SVGs checked; live State context + cumulative clips)")
+    print(
+        f"visual evidence semantics: OK ({checked} status/evidence SVGs checked; "
+        "live State context + dossier prose coherence + cumulative clips)"
+    )
     return 0
 
 
