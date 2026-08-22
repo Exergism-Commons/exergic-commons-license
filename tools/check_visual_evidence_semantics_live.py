@@ -47,20 +47,20 @@ def validate_live_state_context_text(
     live: str,
     label: str,
 ) -> list[str]:
-    """Reject stale present-tense State outcomes embedded in canonical dossier prose.
+    """Reject stale present-tense State outcome codes embedded in dossier prose.
 
     Outcome-neutral prose is allowed. If the State-governance section chooses to
-    state an explicit ``R/S/U/N — label`` value, however, it becomes part of the
-    live surface and must agree with the current State dossier exactly.
+    state an explicit ``R/S/U/N — description`` value, the outcome code becomes
+    part of the live surface and must agree with the current State dossier. The
+    human-readable description may remain contextual or historically specific.
     """
     body = base.section_body(dossier_text, "## State governance context")
     if body is None:
         return []
 
-    expected_label = base.normalized(label)
     errors: list[str] = []
     for stated_code, stated_label in EXPLICIT_STATE_OUTCOME_RE.findall(body):
-        if stated_code == live and base.normalized(stated_label) == expected_label:
+        if stated_code == live:
             continue
         errors.append(
             f"{dossier}: {entity_id}: State governance context text is stale: "
