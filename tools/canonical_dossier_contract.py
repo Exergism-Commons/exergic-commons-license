@@ -33,6 +33,18 @@ def commonmark_image_targets(text: str) -> list[str]:
     return targets
 
 
+def commonmark_has_raw_html(text: str) -> bool:
+    """Return whether CommonMark exposes any raw HTML block or inline token."""
+    for token in MarkdownIt("commonmark").parse(text):
+        if token.type in {"html_block", "html_inline"}:
+            return True
+        if token.type == "inline" and any(
+            child.type == "html_inline" for child in (token.children or [])
+        ):
+            return True
+    return False
+
+
 def embedded_resource_targets(text: str) -> list[str]:
     """Union legacy raw-syntax discovery with rendered CommonMark image destinations."""
     targets = list(_original_embedded_resource_targets(text))
@@ -110,8 +122,17 @@ def validate_dossier_local_resources(
     return errors
 
 
+def validate_dossier_commonmark_surface(text: str, dossier_rel: Path) -> list[str]:
+    """Keep the canonical dossier prose surface parseable without raw-HTML escape hatches."""
+    if commonmark_has_raw_html(text):
+        return [
+            f"{dossier_rel}: raw HTML is forbidden on canonical dossiers; use CommonMark prose/resources"
+        ]
+    return []
+
+
 def validate_universe(root: Path) -> list[str]:
-    """Validate canonical identity bindings plus local/remote resource provenance for every dossier."""
+    """Validate canonical identity bindings plus CommonMark/resource provenance for every dossier."""
     errors = list(_original_validate_universe(root))
     for path in _impl.entity_paths(root):
         try:
@@ -133,6 +154,7 @@ def validate_universe(root: Path) -> list[str]:
             text = dossier.read_text(encoding="utf-8")
         except OSError:
             continue
+        errors.extend(validate_dossier_commonmark_surface(text, rel))
         errors.extend(validate_dossier_local_resources(text, rel, entity_id, root))
     return errors
 
