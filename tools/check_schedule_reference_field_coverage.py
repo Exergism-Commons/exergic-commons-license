@@ -18,7 +18,9 @@ REFERENCE_FIELD_RE = re.compile(
     r"project|projects|deployment|deployments|participant|participants|implementer|implementers|"
     r"entity|entities|owner|owners|controller|controllers|body|bodies|unit|units|department|"
     r"departments|directorate|directorates|service|services|force|forces|office|offices|bureau|"
-    r"bureaux|command|commands|ministry|ministries)",
+    r"bureaux|command|commands|ministry|ministries|court|courts|tribunal|tribunals|commission|"
+    r"commissions|committee|committees|police|military|army|navy|prosecutor|prosecution|"
+    r"ombudsman|ombud|mission|missions)",
     re.I,
 )
 KNOWN_REFERENCE_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
@@ -64,6 +66,36 @@ def canonical_state_names() -> dict[str, str]:
     return result
 
 
+def non_state_identity_index():
+    entities, _ = identity.load_repository_entities()
+    state_codes, _ = identity.repository_state_names(entities)
+    non_state = [entity for entity in entities if entity.get("type") != "State"]
+    return identity.build_name_index(
+        non_state,
+        state_codes=state_codes,
+        normalizer=identity.default_normalizer,
+    )
+
+
+def exact_identity_values(value: object, state: str | None, name_index) -> list[dict]:
+    values: list[str] = []
+    if isinstance(value, str):
+        values = [value]
+    elif isinstance(value, list):
+        values = [item for item in value if isinstance(item, str)]
+    matches: list[dict] = []
+    if not isinstance(state, str):
+        return matches
+    for raw in values:
+        normalized = identity.default_normalizer(raw)
+        if not normalized:
+            continue
+        ids = identity.resolve_normalized(name_index, state=state, normalized=normalized)
+        if ids:
+            matches.append({"value": raw, "resolved_ids": ids})
+    return matches
+
+
 def metadata_failure(field: str, value: object, record: dict, state_names: dict[str, str]) -> str | None:
     if field == "entity":
         state = record.get("state")
@@ -102,7 +134,15 @@ def append_failure(failures: list[dict], *, path, record_index: int | None, fiel
     failures.append(row)
 
 
-def validate_record_fields(path, record_index: int, record: dict, state_names: dict[str, str], cross_ids: dict[str, set[str]], failures: list[dict]) -> None:
+def validate_record_fields(
+    path,
+    record_index: int,
+    record: dict,
+    state_names: dict[str, str],
+    cross_ids: dict[str, set[str]],
+    name_index,
+    failures: list[dict],
+) -> None:
     state = record.get("state")
     if not isinstance(state, str) or state not in state_names:
         append_failure(
@@ -138,7 +178,14 @@ def validate_record_fields(path, record_index: int, record: dict, state_names: d
         elif REFERENCE_FIELD_RE.search(field):
             reason = "identity-bearing-looking field is not classified by the Schedule coverage schema"
         else:
-            continue
+            exact = exact_identity_values(value, state, name_index)
+            if exact:
+                reason = (
+                    "unclassified field contains exact current ABox identity value(s): "
+                    + json.dumps(exact, ensure_ascii=False, sort_keys=True)
+                )
+            else:
+                continue
         append_failure(failures, path=path, record_index=record_index, field_path=field_path, reason=reason)
 
 
@@ -184,6 +231,7 @@ def unknown_reference_fields() -> list[dict]:
     files = sorted(schedule.FREEZE_DIR.glob("*.yml")) + sorted(schedule.FREEZE_DIR.glob("*.yaml"))
     state_names = canonical_state_names()
     cross_ids = {field: registry_ids(path) for field, path in CROSS_ENTITY_LINK_FIELDS.items()}
+    name_index = non_state_identity_index()
 
     for path in files:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -198,7 +246,7 @@ def unknown_reference_fields() -> list[dict]:
         else:
             records = []
         for record_index, record in enumerate(records):
-            validate_record_fields(path, record_index, record, state_names, cross_ids, failures)
+            validate_record_fields(path, record_index, record, state_names, cross_ids, name_index, failures)
 
     dedup: dict[tuple[str, object, str], dict] = {
         (row["source"], row.get("record_index"), row["field_path"]): row for row in failures
@@ -213,12 +261,21 @@ def self_test() -> None:
     assert REFERENCE_FIELD_RE.search("responsible_unit")
     assert REFERENCE_FIELD_RE.search("controlling_department")
     assert REFERENCE_FIELD_RE.search("security_service")
+    assert REFERENCE_FIELD_RE.search("responsible_court")
+    assert REFERENCE_FIELD_RE.search("police_body")
     assert not REFERENCE_FIELD_RE.search("legal_basis")
     assert "candidate_parties" in KNOWN_REFERENCE_FIELDS
     assert "project_boundary" in KNOWN_REFERENCE_FIELDS
     assert reference_value_failure("candidate_parties", ["Agency"]) is None
     assert reference_value_failure("candidate_parties", ["Agency", 7]) is not None
     assert reference_value_failure("candidate_parties", {"name": "Agency"}) is not None
+    synthetic_index = identity.build_name_index(
+        [{"id": "AGENCY-AAA-EXAMPLE", "name": "Example Agency", "aliases": ["EA"]}],
+        state_codes={"AAA"},
+        normalizer=identity.default_normalizer,
+    )
+    assert exact_identity_values("Example Agency", "AAA", synthetic_index)
+    assert exact_identity_values("Example Agency performed an action", "AAA", synthetic_index) == []
     nested = list(walk_dict_fields({"details": {"candidate_parties": ["Agency"]}}))
     assert any(path == ("details", "candidate_parties") for path, _ in nested)
     assert "MITIGA-DETENTION-APPARATUS" in registry_ids("registry/projects.yml")
