@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -21,8 +22,10 @@ ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 GENERATED_DIR = ROOT / "knowledge" / "generated"
 DISPOSITION_GLOB = "state-dossier-prose-dispositions-v*.json"
+DISPOSITION_RE = re.compile(r"^state-dossier-prose-dispositions-v([1-9][0-9]*)\.json$")
 ALLOWED_STATUSES = {"curated-identity", "deferred", "rejected"}
 STATE_RE = re.compile(r"^[A-Z]{3}$")
+GIT_OBJECT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def load_entity_ids() -> set[str]:
@@ -35,14 +38,42 @@ def load_entity_ids() -> set[str]:
     return ids
 
 
+def disposition_manifests() -> list[tuple[int, Path]]:
+    manifests: list[tuple[int, Path]] = []
+    for path in GENERATED_DIR.glob(DISPOSITION_GLOB):
+        match = DISPOSITION_RE.fullmatch(path.name)
+        assert match, f"malformed prose disposition manifest filename: {path.name}"
+        manifests.append((int(match.group(1)), path))
+    manifests.sort()
+    assert manifests, "no State-dossier prose disposition manifests"
+    versions = [version for version, _ in manifests]
+    assert versions == list(range(1, versions[-1] + 1)), f"non-contiguous prose disposition versions: {versions}"
+    return manifests
+
+
 def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
     entity_ids = load_entity_ids()
     supersessions = load_id_supersessions()
     by_key: dict[tuple[str, str], dict] = {}
-    manifests: list[str] = []
-    for path in sorted(GENERATED_DIR.glob(DISPOSITION_GLOB)):
-        manifests.append(str(path.relative_to(ROOT)))
+    manifest_names: list[str] = []
+    previous: Path | None = None
+    for version, path in disposition_manifests():
+        manifest_names.append(str(path.relative_to(ROOT)))
         data = json.loads(path.read_text(encoding="utf-8"))
+        assert data.get("version") == version, (
+            f"prose disposition version/file mismatch: {path.relative_to(ROOT)} -> {data.get('version')!r}"
+        )
+        if previous is None:
+            assert not data.get("follows"), f"v1 prose dispositions must not follow another manifest: {path.relative_to(ROOT)}"
+        else:
+            expected = str(previous.relative_to(ROOT))
+            assert data.get("follows") == expected, (
+                f"broken prose disposition follows chain at {path.relative_to(ROOT)}: "
+                f"expected {expected!r}, got {data.get('follows')!r}"
+            )
+        assert set(data.get("allowedStatuses") or []) == ALLOWED_STATUSES, (path, data.get("allowedStatuses"))
+        source_audit = data.get("sourceAudit")
+        assert isinstance(source_audit, str) and (ROOT / source_audit).is_file(), (path, source_audit)
         for row in data.get("dispositions", []):
             state = row.get("state")
             normalized = row.get("normalized")
@@ -54,6 +85,11 @@ def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
             assert status in ALLOWED_STATUSES, (path, row)
             assert isinstance(reason, str) and reason.strip(), (path, row)
             assert isinstance(source, str) and (ROOT / source).exists(), (path, row)
+            source_path = Path(source)
+            if source_path.parts[:2] == ("dossiers", "states") and source_path.suffix == ".md":
+                assert source_path.stem == state, (
+                    f"prose disposition State/source mismatch in {path.relative_to(ROOT)}: {state} -> {source}"
+                )
             key = (state, normalized)
             assert key not in by_key, f"duplicate prose disposition key: {key}"
             resolved_ids = row.get("resolved_ids", [])
@@ -62,13 +98,23 @@ def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
                 assert isinstance(resolved_ids, list) and resolved_ids, (path, row)
                 canonical_ids = [canonicalize_id(item, supersessions) for item in resolved_ids]
                 assert all(isinstance(item, str) and item in entity_ids for item in canonical_ids), (path, row, canonical_ids)
+                assert len(canonical_ids) == len(set(canonical_ids)), (path, row, canonical_ids)
                 reviewed["resolved_ids"] = canonical_ids
                 if canonical_ids != resolved_ids:
                     reviewed["historical_resolved_ids"] = list(resolved_ids)
             else:
                 assert resolved_ids in ([], None), (path, row)
             by_key[key] = reviewed
-    return by_key, manifests
+        previous = path
+    return by_key, manifest_names
+
+
+def current_git_tree(path: str) -> str:
+    value = subprocess.check_output(
+        ["git", "rev-parse", f"HEAD:{path}"], cwd=ROOT, text=True, stderr=subprocess.STDOUT
+    ).strip()
+    assert GIT_OBJECT_RE.fullmatch(value), (path, value)
+    return value
 
 
 def load_ratchet(path: Path) -> tuple[int, dict]:
@@ -77,6 +123,8 @@ def load_ratchet(path: Path) -> tuple[int, dict]:
     assert isinstance(threshold, int) and threshold >= 0, (path, threshold)
     assert isinstance(data.get("version"), int) and data["version"] >= 1, path
     assert isinstance(data.get("reason"), str) and data["reason"].strip(), path
+    reviewed_tree = data.get("reviewed_state_dossier_tree")
+    assert isinstance(reviewed_tree, str) and GIT_OBJECT_RE.fullmatch(reviewed_tree), (path, reviewed_tree)
     return threshold, data
 
 
@@ -152,7 +200,7 @@ def review(audit: dict, dispositions: dict[tuple[str, str], dict], priority_thre
     ]
     reviewed_total = sum(status_counts[state] for state in ALLOWED_STATUSES)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "semantics": {
             "purpose": "review overlay for broad State-dossier discovery candidates",
             "raw_audit_remains_authoritative_for_discovery": True,
@@ -199,6 +247,12 @@ def write_markdown(report: dict, path: Path) -> None:
         lines.append(
             f"- Unreviewed with priority >= {counts['priority_threshold']}: "
             f"**{counts['unreviewed_at_or_above_threshold']}**"
+        )
+    ratchet = report.get("ratchet")
+    if ratchet:
+        lines.append(
+            f"- Reviewed State-dossier tree: `{ratchet['reviewed_state_dossier_tree']}` "
+            f"(current `{ratchet['current_state_dossier_tree']}`)"
         )
     lines += [
         "", "## Highest-priority unreviewed candidates", "",
@@ -264,17 +318,25 @@ def main() -> int:
 
     threshold = args.fail_on_unreviewed_priority
     ratchet = None
+    current_tree = None
     if args.ratchet_config is not None:
         threshold, ratchet = load_ratchet(args.ratchet_config)
+        current_tree = current_git_tree("dossiers/states")
 
     audit = json.loads(args.audit.read_text(encoding="utf-8"))
     dispositions, manifests = load_dispositions()
     report = review(audit, dispositions, threshold)
     report["disposition_manifests"] = manifests
+    tree_mismatch = False
     if ratchet is not None:
+        expected_tree = ratchet["reviewed_state_dossier_tree"]
+        tree_mismatch = current_tree != expected_tree
         report["ratchet"] = {
             "config": str(args.ratchet_config), "version": ratchet["version"],
             "min_review_priority": threshold, "reason": ratchet["reason"],
+            "reviewed_state_dossier_tree": expected_tree,
+            "current_state_dossier_tree": current_tree,
+            "state_dossier_tree_matches_review": not tree_mismatch,
         }
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
@@ -283,6 +345,12 @@ def main() -> int:
         args.markdown.parent.mkdir(parents=True, exist_ok=True)
         write_markdown(report, args.markdown)
     print(json.dumps(report["counts"], sort_keys=True))
+    if tree_mismatch:
+        print(
+            "STALE_STATE_DOSSIER_REVIEW_TREE="
+            + json.dumps({"expected": ratchet["reviewed_state_dossier_tree"], "actual": current_tree}, sort_keys=True)
+        )
+        return 6
     if args.fail_on_stale_disposition and report["counts"]["stale_dispositions"]:
         print("STALE_DISPOSITIONS=" + json.dumps(report["stale_dispositions"], ensure_ascii=False, sort_keys=True))
         return 4
