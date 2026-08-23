@@ -45,6 +45,20 @@ def commonmark_has_raw_html(text: str) -> bool:
     return False
 
 
+def commonmark_h2_titles(text: str) -> list[str]:
+    """Return rendered H2 titles in document order."""
+    tokens = MarkdownIt("commonmark").parse(text)
+    result: list[str] = []
+    for index, token in enumerate(tokens[:-1]):
+        if token.type != "heading_open" or token.tag != "h2":
+            continue
+        inline = tokens[index + 1]
+        if inline.type != "inline":
+            continue
+        result.append(" ".join(inline.content.split()))
+    return result
+
+
 def embedded_resource_targets(text: str) -> list[str]:
     """Union legacy raw-syntax discovery with rendered CommonMark image destinations."""
     targets = list(_original_embedded_resource_targets(text))
@@ -123,12 +137,23 @@ def validate_dossier_local_resources(
 
 
 def validate_dossier_commonmark_surface(text: str, dossier_rel: Path) -> list[str]:
-    """Keep the canonical dossier prose surface parseable without raw-HTML escape hatches."""
+    """Keep canonical prose structurally unambiguous and free of raw-HTML escape hatches."""
+    errors: list[str] = []
     if commonmark_has_raw_html(text):
-        return [
+        errors.append(
             f"{dossier_rel}: raw HTML is forbidden on canonical dossiers; use CommonMark prose/resources"
-        ]
-    return []
+        )
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for title in commonmark_h2_titles(text):
+        if title in seen:
+            duplicates.add(title)
+        seen.add(title)
+    for title in sorted(duplicates):
+        errors.append(
+            f"{dossier_rel}: duplicate CommonMark H2 section {title!r} is forbidden on canonical dossiers"
+        )
+    return errors
 
 
 def validate_universe(root: Path) -> list[str]:
