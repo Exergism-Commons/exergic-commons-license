@@ -134,6 +134,30 @@ class FailClosedSvgVisibilityTests(unittest.TestCase):
             )
         )
 
+    def test_style_opacity_overrides_presentation_attribute_fail_closed(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20" font-size="12" opacity="1" '
+                'style="opacity:0.001">REQUIRED</text>'
+            )
+        )
+
+    def test_style_display_none_overrides_presentation_attribute_fail_closed(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20" font-size="12" display="inline" '
+                'style="display:none">REQUIRED</text>'
+            )
+        )
+
+    def test_style_transparent_fill_overrides_presentation_attribute_fail_closed(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20" font-size="12" fill="#000000" '
+                'style="fill:transparent">REQUIRED</text>'
+            )
+        )
+
     def test_nested_opacity_is_multiplied_fail_closed(self) -> None:
         self.assertIsNone(
             self._visible(
