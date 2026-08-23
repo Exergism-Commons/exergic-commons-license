@@ -48,6 +48,10 @@ HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 URL_RE = re.compile(r"https?://\S+")
 INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 MARKDOWN_EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
+FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
+LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
+TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?\s*$")
 
 
 def norm(text: str) -> str:
@@ -105,39 +109,101 @@ def plausible(name: str) -> bool:
     return True
 
 
-def visible_prose(line: str) -> str:
-    """Approximate rendered prose while excluding non-prose destinations/code.
+def visible_prose(text: str) -> str:
+    text = INLINE_LINK_RE.sub(lambda match: match.group(1), text)
+    text = REFERENCE_LINK_RE.sub(lambda match: match.group(1), text)
+    text = BRACKET_LABEL_RE.sub(lambda match: match.group(1), text)
+    text = HTML_TAG_RE.sub("", text)
+    text = URL_RE.sub("", text)
+    text = INLINE_CODE_RE.sub("", text)
+    text = MARKDOWN_EMPHASIS_RE.sub("", text)
+    return html.unescape(text)
 
-    Link/reference labels and HTML element text remain visible to the detector; link
-    destinations, tags and inline code do not. Common emphasis markers are removed after
-    label extraction so formatting cannot split an otherwise high-confidence vendor/action
-    phrase. HTML character references are decoded to their rendered characters.
+
+def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
+    """Return paragraph-like rendered prose segments with 1-based source line numbers.
+
+    CommonMark soft line breaks inside a paragraph are spaces, so vendor/action phrases may
+    span source lines. Structural block boundaries are not joined. Fenced code is excluded
+    consistently with the existing inline-code policy.
     """
-    line = INLINE_LINK_RE.sub(lambda match: match.group(1), line)
-    line = REFERENCE_LINK_RE.sub(lambda match: match.group(1), line)
-    line = BRACKET_LABEL_RE.sub(lambda match: match.group(1), line)
-    line = HTML_TAG_RE.sub("", line)
-    line = URL_RE.sub("", line)
-    line = INLINE_CODE_RE.sub("", line)
-    line = MARKDOWN_EMPHASIS_RE.sub("", line)
-    return html.unescape(line)
+    result: list[tuple[int, str, str]] = []
+    buffer: list[str] = []
+    raw_buffer: list[str] = []
+    start_line: int | None = None
+    fence_marker: str | None = None
+
+    def flush() -> None:
+        nonlocal buffer, raw_buffer, start_line
+        if buffer and start_line is not None:
+            prose = visible_prose(" ".join(part.strip() for part in buffer if part.strip()))
+            if prose.strip():
+                result.append((start_line, " ".join(part.strip() for part in raw_buffer)[:420], prose))
+        buffer = []
+        raw_buffer = []
+        start_line = None
+
+    for line_no, raw in enumerate(body.splitlines(), 1):
+        stripped = raw.strip()
+        fence = FENCE_RE.match(raw)
+        if fence:
+            marker = fence.group(1)[0]
+            if fence_marker is None:
+                flush()
+                fence_marker = marker
+            elif marker == fence_marker:
+                fence_marker = None
+            continue
+        if fence_marker is not None:
+            continue
+        if not stripped:
+            flush()
+            continue
+        if HEADING_RE.match(raw):
+            flush()
+            heading = HEADING_RE.sub("", raw, count=1)
+            prose = visible_prose(heading)
+            if prose.strip():
+                result.append((line_no, raw.strip()[:420], prose))
+            continue
+        if TABLE_SEPARATOR_RE.match(raw) or (stripped.startswith("|") and stripped.endswith("|")):
+            flush()
+            if not TABLE_SEPARATOR_RE.match(raw):
+                prose = visible_prose(raw)
+                if prose.strip():
+                    result.append((line_no, raw.strip()[:420], prose))
+            continue
+        list_match = LIST_RE.match(raw)
+        if list_match:
+            flush()
+            start_line = line_no
+            content = raw[list_match.end():]
+            buffer.append(content)
+            raw_buffer.append(raw)
+            continue
+        quote = re.sub(r"^\s{0,3}(?:>\s*)+", "", raw)
+        if start_line is None:
+            start_line = line_no
+        buffer.append(quote)
+        raw_buffer.append(raw)
+    flush()
+    return result
 
 
-def extract_names(line: str) -> list[tuple[str, str]]:
+def extract_names(text: str) -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = []
-    for match in CORPORATE_FORM_RE.finditer(line):
+    for match in CORPORATE_FORM_RE.finditer(text):
         value = clean(match.group(1))
         if plausible(value):
             found.append((value, "corporate-form"))
-    for match in DIRECT_SUPPLIER_ACTION_RE.finditer(line):
+    for match in DIRECT_SUPPLIER_ACTION_RE.finditer(text):
         value = clean(match.group(1))
         if plausible(value):
             found.append((value, "direct-supplier-action"))
-    for match in LABELED_PRIVATE_RE.finditer(line):
+    for match in LABELED_PRIVATE_RE.finditer(text):
         value = clean(match.group("name"))
         if plausible(value):
             found.append((value, "explicit-private-label"))
-
     result: dict[str, tuple[str, str]] = {}
     priority = {"corporate-form": 3, "direct-supplier-action": 2, "explicit-private-label": 1}
     for value, method in found:
@@ -156,9 +222,8 @@ def audit() -> dict:
     for path, iso, offset in dossiers:
         text = path.read_text(encoding="utf-8")
         line_offset = text[:offset].count("\n")
-        for rel_line, raw in enumerate(text[offset:].splitlines(), 1):
-            line = visible_prose(raw)
-            for name, method in extract_names(line):
+        for rel_line, snippet, prose in rendered_prose_segments(text[offset:]):
+            for name, method in extract_names(prose):
                 matches = resolve_normalized(known, state=iso, normalized=norm(name))
                 resolved = matches[0] if len(matches) == 1 else None
                 occurrences.append({
@@ -169,14 +234,13 @@ def audit() -> dict:
                     "resolved_id": resolved,
                     "dossier": str(path.relative_to(ROOT)),
                     "line": line_offset + rel_line,
-                    "snippet": raw.strip()[:420],
+                    "snippet": snippet,
                 })
 
     groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in occurrences:
         key = ("resolved:" + row["resolved_id"], row["normalized"]) if row["resolved_id"] else (row["state"], row["normalized"])
         groups[key].append(row)
-
     candidates: list[dict] = []
     for rows in groups.values():
         display = Counter(row["candidate"] for row in rows).most_common(1)[0][0]
@@ -194,12 +258,12 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 7,
+        "schema_version": 8,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
             "identity_resolution": "domestic identities resolve automatically only inside their State; transnational identities may resolve globally",
-            "visible_text_policy": "ordinary Markdown links/references/emphasis and HTML tags/entities are normalized to visible prose before high-confidence extraction",
+            "visible_text_policy": "ordinary Markdown links/references/emphasis, HTML tags/entities and CommonMark soft line breaks are normalized to rendered prose; fenced/inline code is excluded",
             "non_inference": [
                 "private-organization mention does not prove legal-entity precision",
                 "identity does not prove supply, participation, control or culpability",
@@ -247,6 +311,12 @@ def self_test() -> None:
     assert extract_names(visible_prose("[Cellebrite][vendor] supplied software")) == expected
     assert extract_names(visible_prose("[Cellebrite] supplied software")) == expected
     assert extract_names(visible_prose('<a href="https://example.test"><strong>Cellebrite</strong></a>&nbsp;supplied software')) == expected
+    soft = rendered_prose_segments("Cellebrite\nsupplied software\n")
+    assert len(soft) == 1 and extract_names(soft[0][2]) == expected
+    separate_items = rendered_prose_segments("- Cellebrite\n- supplied software\n")
+    assert not any(extract_names(segment[2]) for segment in separate_items)
+    fenced = rendered_prose_segments("```text\nCellebrite supplied software\n```\n")
+    assert fenced == []
     assert extract_names("private contractor support was reported") == []
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
@@ -254,10 +324,9 @@ def self_test() -> None:
     assert norm("Cellebrite") == "cellebrite"
     local = build_name_index(
         [
-            {"id": "ORG-AAA-EXAMPLE", "name": "Example Technologies", "aliases": []},
-            {"id": "ORG-GLOBAL-VENDOR", "name": "Global Vendor", "aliases": []},
-        ],
-        state_codes={"AAA", "BBB"}, normalizer=norm,
+            {"id":"ORG-AAA-EXAMPLE","name":"Example Technologies","aliases":[]},
+            {"id":"ORG-GLOBAL-VENDOR","name":"Global Vendor","aliases":[]},
+        ], state_codes={"AAA", "BBB"}, normalizer=norm,
     )
     assert resolve_normalized(local, state="AAA", normalized=norm("Example Technologies")) == ["ORG-AAA-EXAMPLE"]
     assert resolve_normalized(local, state="BBB", normalized=norm("Example Technologies")) == []
