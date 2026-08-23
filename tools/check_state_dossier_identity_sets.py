@@ -20,24 +20,36 @@ def norm(value: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
 
-def frontmatter(path: Path) -> dict[str, str]:
-    text = path.read_text(encoding="utf-8")
+def parse_frontmatter_text(text: str) -> dict[str, str]:
     match = FRONT.match(text)
     if not match:
         return {}
     result: dict[str, str] = {}
-    for line in match.group(1).splitlines():
+    for line_no, line in enumerate(match.group(1).splitlines(), 2):
         if ":" not in line:
             continue
         key, value = line.split(":", 1)
-        result[key.strip()] = value.strip().strip("\"'")
+        key = key.strip()
+        if not key:
+            continue
+        if key in result:
+            raise ValueError(f"duplicate frontmatter key {key!r} at line {line_no}")
+        result[key] = value.strip().strip("\"'")
     return result
+
+
+def frontmatter(path: Path) -> dict[str, str]:
+    return parse_frontmatter_text(path.read_text(encoding="utf-8"))
 
 
 def main() -> int:
     dossier_by_iso: dict[str, str] = {}
     for path in sorted(DOSSIERS.glob("*.md")):
-        data = frontmatter(path)
+        try:
+            data = frontmatter(path)
+        except ValueError as exc:
+            print(f"invalid State dossier frontmatter in {path.relative_to(ROOT)}: {exc}")
+            return 14
         match = DOSSIER_ID.fullmatch(data.get("id", ""))
         if not match or data.get("iso3") != match.group(1):
             continue
