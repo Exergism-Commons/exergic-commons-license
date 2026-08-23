@@ -64,12 +64,19 @@ def global_domestic_shadows() -> list[dict]:
     return failures
 
 
-def state_non_state_shadows() -> list[dict]:
-    """Country names/aliases must not resolve as non-State identities in the prose index."""
+def state_global_non_state_shadows() -> list[dict]:
+    """A globally resolvable non-State name/alias must not collide with any State term.
+
+    Domestic aliases may legitimately equal a different State's ISO3 token (for example
+    Paraguay's SEN agency vs Senegal's SEN ISO3). Those remain jurisdiction-scoped and the
+    dossier review overlay/tree pin protects their concrete occurrences. A GLOBAL identity,
+    by contrast, is eligible in every State and would silently shadow a country term.
+    """
     entities, _ = identity.load_repository_entities()
+    state_codes, _ = identity.repository_state_names(entities)
     supersessions = identity.load_id_supersessions()
     state_rows: dict[str, list[dict]] = defaultdict(list)
-    non_state_rows: dict[str, list[dict]] = defaultdict(list)
+    global_non_state_rows: dict[str, list[dict]] = defaultdict(list)
     for entity in entities:
         entity_id = entity.get("id")
         if not isinstance(entity_id, str) or entity_id in supersessions:
@@ -81,16 +88,21 @@ def state_non_state_shadows() -> list[dict]:
         for alias in entity.get("aliases") or []:
             if isinstance(alias, str) and identity.default_normalizer(alias):
                 values.append(("alias", alias))
-        target = state_rows if entity.get("type") == "State" else non_state_rows
+        if entity.get("type") == "State":
+            target = state_rows
+        else:
+            if identity.infer_domestic_state(entity_id, state_codes) is not None:
+                continue
+            target = global_non_state_rows
         for kind, text in values:
             target[identity.default_normalizer(text)].append({"id": entity_id, "kind": kind, "text": text})
 
     failures: list[dict] = []
-    for normalized in sorted(set(state_rows) & set(non_state_rows)):
+    for normalized in sorted(set(state_rows) & set(global_non_state_rows)):
         failures.append({
             "normalized": normalized,
             "state_matches": state_rows[normalized],
-            "non_state_matches": non_state_rows[normalized],
+            "global_non_state_matches": global_non_state_rows[normalized],
         })
     return failures
 
@@ -119,12 +131,12 @@ def main() -> int:
         return 0
     same_scope = collisions()
     shadows = global_domestic_shadows()
-    state_shadows = state_non_state_shadows()
+    state_shadows = state_global_non_state_shadows()
     if same_scope or shadows or state_shadows:
         print("IDENTITY_NAME_RESOLUTION_COLLISIONS=" + json.dumps({
             "same_scope_primary_alias": same_scope,
             "global_domestic_shadows": shadows,
-            "state_non_state_shadows": state_shadows,
+            "state_global_non_state_shadows": state_shadows,
         }, ensure_ascii=False, sort_keys=True))
         return 2
     print("identity name-resolution collisions: none")
