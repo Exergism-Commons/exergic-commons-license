@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 
 import audit_schedule_reference_coverage as schedule
 
@@ -27,6 +28,17 @@ def pre_scope_including(raw: str) -> bool:
     return not scope_positions or include < min(scope_positions)
 
 
+def exact_same_entity_head(head: str, aliases: set[str]) -> bool:
+    """Accept an exact alias, optionally followed by another alias in parentheses."""
+    if schedule.norm(head) in aliases:
+        return True
+    match = re.fullmatch(r"\s*(.+?)\s*\(([^()]+)\)\s*", head)
+    if not match:
+        return False
+    base, parenthetical = match.groups()
+    return schedule.norm(base) in aliases and schedule.norm(parenthetical) in aliases
+
+
 def unsafe_reason(row: dict, by_id: dict[str, dict]) -> str | None:
     if row.get("resolution_source") != HEURISTIC_SOURCE:
         return None
@@ -36,9 +48,9 @@ def unsafe_reason(row: dict, by_id: dict[str, dict]) -> str | None:
     entity = by_id.get(resolved_ids[0])
     if entity is None:
         return "heuristic resolution target is missing from the current ABox"
-    head_norm = schedule.norm(row.get("identity_head") or "")
     aliases = set(entity.get("aliases") or [])
-    if head_norm not in aliases:
+    head = row.get("identity_head") or ""
+    if not exact_same_entity_head(head, aliases):
         return "heuristic match is not an exact canonical name/alias after capacity stripping"
     if pre_scope_including(row.get("raw") or ""):
         return "reference introduces an including-clause before capacity scope and requires reviewed composite handling"
@@ -66,7 +78,7 @@ def self_test() -> None:
     by_id = {
         "AGENCY-AAA-NATIONAL-POLICE": {
             "id": "AGENCY-AAA-NATIONAL-POLICE",
-            "aliases": ["national police"],
+            "aliases": ["national police", "np"],
         }
     }
     exact = {
@@ -76,6 +88,13 @@ def self_test() -> None:
         "raw": "National Police, only in qualifying cases",
     }
     assert unsafe_reason(exact, by_id) is None
+
+    parenthetical_alias = {
+        **exact,
+        "identity_head": "National Police (NP)",
+        "raw": "National Police (NP), only in qualifying cases",
+    }
+    assert unsafe_reason(parenthetical_alias, by_id) is None
 
     prefix = {
         **exact,
