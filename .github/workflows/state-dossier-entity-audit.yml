@@ -58,6 +58,7 @@ jobs:
           python tools/check_state_dossier_softwrap_coverage.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
           python tools/check_schedule_reference_resolution_safety.py --self-test
+          python tools/check_schedule_reference_field_coverage.py --self-test
           python tools/audit_private_org_mentions.py --self-test
 
       - name: Generate full-corpus audits and reject unknown high-confidence references
@@ -74,6 +75,7 @@ jobs:
             --fail-on-stale-disposition \
             --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
           python tools/check_state_dossier_softwrap_coverage.py
+          python tools/check_schedule_reference_field_coverage.py
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
@@ -105,6 +107,7 @@ jobs:
             --fail-on-stale-disposition \
             --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
           python tools/check_state_dossier_softwrap_coverage.py
+          python tools/check_schedule_reference_field_coverage.py
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
