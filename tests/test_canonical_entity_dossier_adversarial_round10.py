@@ -10,6 +10,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
+import canonical_dossier_contract as contract  # noqa: E402
 import check_visual_evidence_semantics_hardened as hardened  # noqa: E402
 import check_visual_evidence_semantics_live as live  # noqa: E402
 
@@ -67,6 +68,34 @@ The USA State dossier records N — No current ECL-relevant basis.
         self.assertEqual([], self._errors(dossier))
 
 
+class CanonicalMarkdownSurfaceTests(unittest.TestCase):
+    def test_raw_html_escape_hatch_is_forbidden_for_every_canonical_dossier(self) -> None:
+        text = """# Example
+
+## State governance context
+
+<div>The USA State dossier records S — Scoped restriction.</div>
+"""
+        errors = contract.validate_dossier_commonmark_surface(
+            text, Path("dossiers/organizations/EXAMPLE.md")
+        )
+        self.assertTrue(errors)
+
+    def test_plain_commonmark_surface_remains_valid(self) -> None:
+        text = """# Example
+
+## State governance context
+
+The USA State dossier records N — No current ECL-relevant basis.
+"""
+        self.assertEqual(
+            [],
+            contract.validate_dossier_commonmark_surface(
+                text, Path("dossiers/organizations/EXAMPLE.md")
+            ),
+        )
+
+
 class FailClosedSvgVisibilityTests(unittest.TestCase):
     def _visible(self, body: str, viewbox: str = "0 0 100 100") -> str | None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -102,6 +131,30 @@ class FailClosedSvgVisibilityTests(unittest.TestCase):
         self.assertIsNone(
             self._visible(
                 '<text x="10" y="20" font-size="12" opacity="0.001">REQUIRED</text>'
+            )
+        )
+
+    def test_nested_opacity_is_multiplied_fail_closed(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<g opacity="0.1"><g opacity="0.1">'
+                '<text x="10" y="20" font-size="12">REQUIRED</text>'
+                '</g></g>'
+            )
+        )
+
+    def test_transparent_stroke_only_text_fails_closed(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20" font-size="12" fill="none" '
+                'stroke="transparent" stroke-width="1">REQUIRED</text>'
+            )
+        )
+
+    def test_near_transparent_alpha_hex_fill_fails_closed(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20" font-size="12" fill="#00000001">REQUIRED</text>'
             )
         )
 
