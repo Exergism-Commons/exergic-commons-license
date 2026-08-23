@@ -38,6 +38,13 @@ def _style_map(value: str | None) -> dict[str, str]:
     return result
 
 
+def _css_value(node: ET.Element, style: dict[str, str], name: str) -> str | None:
+    """Resolve inline style over the corresponding SVG presentation attribute."""
+    if name in style:
+        return style[name]
+    return node.get(name)
+
+
 def _scalar(value: str | None, *, percent: bool = False) -> float | None:
     if value is None:
         return None
@@ -138,7 +145,7 @@ def _ancestor_paint_is_demonstrably_visible(
     element: ET.Element,
     parent_map: dict[ET.Element, ET.Element],
 ) -> bool:
-    """Resolve inherited paint and multiplicative group opacity for one text node."""
+    """Resolve CSS precedence, inherited paint and multiplicative group opacity."""
     chain: list[ET.Element] = []
     node: ET.Element | None = element
     while node is not None:
@@ -157,39 +164,44 @@ def _ancestor_paint_is_demonstrably_visible(
     for node in chain:
         style = _style_map(node.get("style"))
 
-        opacity_raw = node.get("opacity") or style.get("opacity")
+        display = (_css_value(node, style, "display") or "").strip().lower()
+        visibility = (_css_value(node, style, "visibility") or "").strip().lower()
+        if display == "none" or visibility in {"hidden", "collapse"}:
+            return False
+
+        opacity_raw = _css_value(node, style, "opacity")
         if opacity_raw is not None:
             opacity = _unit_interval(opacity_raw)
             if opacity is None:
                 return False
             effective_opacity *= opacity
 
-        font_raw = node.get("font-size") or style.get("font-size")
+        font_raw = _css_value(node, style, "font-size")
         if font_raw is not None:
             font_size = _scalar(font_raw)
             if font_size is None:
                 return False
 
-        fill_raw = node.get("fill") or style.get("fill")
+        fill_raw = _css_value(node, style, "fill")
         if fill_raw is not None:
             fill = fill_raw.strip().lower()
-        fill_opacity_raw = node.get("fill-opacity") or style.get("fill-opacity")
+        fill_opacity_raw = _css_value(node, style, "fill-opacity")
         if fill_opacity_raw is not None:
             parsed = _unit_interval(fill_opacity_raw)
             if parsed is None:
                 return False
             fill_opacity = parsed
 
-        stroke_raw = node.get("stroke") or style.get("stroke")
+        stroke_raw = _css_value(node, style, "stroke")
         if stroke_raw is not None:
             stroke = stroke_raw.strip().lower()
-        stroke_opacity_raw = node.get("stroke-opacity") or style.get("stroke-opacity")
+        stroke_opacity_raw = _css_value(node, style, "stroke-opacity")
         if stroke_opacity_raw is not None:
             parsed = _unit_interval(stroke_opacity_raw)
             if parsed is None:
                 return False
             stroke_opacity = parsed
-        stroke_width_raw = node.get("stroke-width") or style.get("stroke-width")
+        stroke_width_raw = _css_value(node, style, "stroke-width")
         if stroke_width_raw is not None:
             parsed_width = _scalar(stroke_width_raw)
             if parsed_width is None or parsed_width < 0:
