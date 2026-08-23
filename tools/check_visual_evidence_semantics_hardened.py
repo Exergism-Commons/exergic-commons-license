@@ -16,7 +16,6 @@ for _name, _value in vars(_base).items():
 SVG_NS = "{http://www.w3.org/2000/svg}"
 MIN_VISIBLE_FONT_SIZE = 8.0
 MIN_VISIBLE_OPACITY = 0.05
-MIN_VISIBLE_STROKE_WIDTH = 0.5
 TRANSPARENT_PAINT = {
     "transparent",
     "rgba(0,0,0,0)",
@@ -25,6 +24,14 @@ TRANSPARENT_PAINT = {
     "#00000000",
 }
 UNVERIFIABLE_PAINT = {"currentcolor", "context-fill", "context-stroke"}
+SAFE_TEXT_ATTRIBUTES = {
+    "x", "y", "dx", "dy", "font-family", "font-size", "font-weight",
+    "fill", "fill-opacity", "opacity", "clip-path", "display", "visibility",
+}
+SAFE_TSPAN_ATTRIBUTES = {
+    "x", "y", "dx", "dy", "font-family", "font-size", "font-weight",
+    "fill", "fill-opacity", "opacity", "clip-path", "display", "visibility",
+}
 _original_visible_svg_text = _base.visible_svg_text
 
 
@@ -39,7 +46,6 @@ def _style_map(value: str | None) -> dict[str, str]:
 
 
 def _css_value(node: ET.Element, style: dict[str, str], name: str) -> str | None:
-    """Resolve inline style over the corresponding SVG presentation attribute."""
     if name in style:
         return style[name]
     return node.get(name)
@@ -67,14 +73,12 @@ def _unit_interval(value: str | None) -> float | None:
 
 
 def _functional_alpha(raw: str) -> float | None:
-    """Parse alpha from CSS functional colors when present; fail closed if ambiguous."""
     value = raw.strip().lower()
     if not value.endswith(")"):
         return None
     inner = value[value.find("(") + 1 : -1].strip()
     if "/" in inner:
-        alpha_raw = inner.rsplit("/", 1)[1].strip()
-        return _unit_interval(alpha_raw)
+        return _unit_interval(inner.rsplit("/", 1)[1].strip())
     if value.startswith(("rgba(", "hsla(")):
         parts = [part.strip() for part in inner.split(",")]
         if len(parts) != 4:
@@ -84,7 +88,6 @@ def _functional_alpha(raw: str) -> float | None:
 
 
 def _paint_alpha(value: str | None) -> float | None:
-    """Return demonstrable paint alpha, 0 for no paint, None for indirection/ambiguity."""
     raw = (value or "").strip().lower()
     if not raw:
         return 1.0
@@ -96,17 +99,15 @@ def _paint_alpha(value: str | None) -> float | None:
         digits = raw[1:]
         if not re.fullmatch(r"[0-9a-f]+", digits):
             return None
-        if len(digits) == 4:  # #RGBA
+        if len(digits) == 4:
             return int(digits[3], 16) / 15.0
-        if len(digits) == 8:  # #RRGGBBAA
+        if len(digits) == 8:
             return int(digits[6:8], 16) / 255.0
         if len(digits) in {3, 6}:
             return 1.0
         return None
     if raw.startswith(("rgb(", "rgba(", "hsl(", "hsla(")):
         return _functional_alpha(raw)
-    # CSS named colors other than transparent are opaque. Unknown functional
-    # paint syntaxes fail closed rather than being assumed visible.
     if "(" in raw or ")" in raw:
         return None
     return 1.0
@@ -141,11 +142,17 @@ def _positive_clip_rectangles(root: ET.Element) -> bool:
     return True
 
 
+def _text_attributes_are_supported(element: ET.Element) -> bool:
+    tag = element.tag.rsplit("}", 1)[-1]
+    allowed = SAFE_TEXT_ATTRIBUTES if tag == "text" else SAFE_TSPAN_ATTRIBUTES
+    return set(element.attrib).issubset(allowed)
+
+
 def _ancestor_paint_is_demonstrably_visible(
     element: ET.Element,
     parent_map: dict[ET.Element, ET.Element],
 ) -> bool:
-    """Resolve CSS precedence, inherited paint and multiplicative group opacity."""
+    """Resolve inherited fill and multiplicative opacity without CSS indirection."""
     chain: list[ET.Element] = []
     node: ET.Element | None = element
     while node is not None:
@@ -157,9 +164,6 @@ def _ancestor_paint_is_demonstrably_visible(
     font_size: float | None = None
     fill = "black"
     fill_opacity = 1.0
-    stroke = "none"
-    stroke_opacity = 1.0
-    stroke_width = 1.0
 
     for node in chain:
         style = _style_map(node.get("style"))
@@ -192,44 +196,19 @@ def _ancestor_paint_is_demonstrably_visible(
                 return False
             fill_opacity = parsed
 
-        stroke_raw = _css_value(node, style, "stroke")
-        if stroke_raw is not None:
-            stroke = stroke_raw.strip().lower()
-        stroke_opacity_raw = _css_value(node, style, "stroke-opacity")
-        if stroke_opacity_raw is not None:
-            parsed = _unit_interval(stroke_opacity_raw)
-            if parsed is None:
-                return False
-            stroke_opacity = parsed
-        stroke_width_raw = _css_value(node, style, "stroke-width")
-        if stroke_width_raw is not None:
-            parsed_width = _scalar(stroke_width_raw)
-            if parsed_width is None or parsed_width < 0:
-                return False
-            stroke_width = parsed_width
-
     if font_size is not None and font_size < MIN_VISIBLE_FONT_SIZE:
         return False
     if effective_opacity < MIN_VISIBLE_OPACITY:
         return False
 
     fill_alpha = _paint_alpha(fill)
-    stroke_alpha = _paint_alpha(stroke)
-    if fill_alpha is None or stroke_alpha is None:
+    if fill_alpha is None:
         return False
-
-    fill_visible = (
-        fill_alpha * fill_opacity * effective_opacity >= MIN_VISIBLE_OPACITY
-    )
-    stroke_visible = (
-        stroke_width >= MIN_VISIBLE_STROKE_WIDTH
-        and stroke_alpha * stroke_opacity * effective_opacity >= MIN_VISIBLE_OPACITY
-    )
-    return fill_visible or stroke_visible
+    return fill_alpha * fill_opacity * effective_opacity >= MIN_VISIBLE_OPACITY
 
 
 def visible_svg_text(path: Path) -> str | None:
-    """Return only text whose visibility survives additional paint/geometry guards."""
+    """Return only text whose visibility survives strict paint/geometry guards."""
     try:
         root = ET.parse(path).getroot()
     except Exception:
@@ -238,11 +217,17 @@ def visible_svg_text(path: Path) -> str | None:
         return None
     if not _positive_viewbox(root) or not _positive_clip_rectangles(root):
         return None
+    # Canonical generated SVGs do not need inline CSS. Reject it entirely so CSS
+    # comments/escapes/cascade cannot create a second, unmodelled visibility surface.
+    if any("style" in element.attrib for element in root.iter()):
+        return None
 
     parent_map = {child: parent for parent in root.iter() for child in parent}
     for element in root.iter():
         if element.tag.rsplit("}", 1)[-1] not in {"text", "tspan"}:
             continue
+        if not _text_attributes_are_supported(element):
+            return None
         if not _ancestor_paint_is_demonstrably_visible(element, parent_map):
             return None
 
