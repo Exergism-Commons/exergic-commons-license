@@ -6,7 +6,8 @@
   "name": "Democratic Republic of the Congo",
   "iso3": "COD",
   "aliases": [
-    "COD"
+    "COD",
+    "DRC"
   ],
   "dossier": "../../dossiers/states/COD.md",
   "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/45",
