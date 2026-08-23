@@ -36,6 +36,13 @@ SCOPE_FIELDS = (
 )
 CAPACITY_SPLITS = (", only ", ", including ", " only when ", " only in ", " only where ")
 VALID_DISPOSITIONS = {"bound", "deferred", "partial-deferred"}
+SAFE_DISPOSITION_TAILS = (
+    ", only ", " only ", ", including ", " including ", ", associated ", " associated ",
+    ", arising ", " arising ", ", limited ", " limited ", ", subject ", " subject ",
+    ", where ", " where ", ", when ", " when ", ", under ", " under ",
+    ", involving ", " involving ", ", as ", " as ", ", identified ", " identified ",
+)
+PARTIAL_DEFERRED_TAILS = SAFE_DISPOSITION_TAILS + (" and ", ", and ")
 
 
 def norm(text: str) -> str:
@@ -79,6 +86,7 @@ def load_dispositions() -> list[dict]:
                 raise ValueError(f"missing disposition fields in {path}:{index}: {sorted(missing)}")
             copy = dict(row)
             copy["manifest"] = str(path.relative_to(ROOT))
+            copy["disposition_key"] = f"{path.relative_to(ROOT)}#{index}"
             rows.append(copy)
     return rows
 
@@ -137,6 +145,25 @@ def heuristic_resolve(raw: str, entities: list[dict], identity_index, expected: 
     return sorted({entity_id for score, entity_id in matches if score == best})
 
 
+def disposition_matches_raw(row: dict, raw: str) -> bool:
+    """Bind reviewed prefixes only across known scope/capacity tails.
+
+    A bare startswith check lets a newly added actor/project piggyback on an old reviewed
+    prefix (for example, `Named Agency and New Agency`). Bound/deferred rows therefore
+    accept only exact text or a known descriptive/capacity continuation. `partial-deferred`
+    may additionally retain an `and ...` tail because that status explicitly records an
+    exact component plus non-enumerated additional components.
+    """
+    prefix = row["match_prefix"]
+    if raw == prefix:
+        return True
+    if not raw.startswith(prefix):
+        return False
+    tail = raw[len(prefix):].lower()
+    allowed = PARTIAL_DEFERRED_TAILS if row["disposition"] == "partial-deferred" else SAFE_DISPOSITION_TAILS
+    return any(tail.startswith(token) for token in allowed)
+
+
 def matching_disposition(
     source: str, state: str | None, field: str, raw: str, dispositions: list[dict]
 ) -> dict | None:
@@ -145,7 +172,7 @@ def matching_disposition(
         if row["source"] == source
         and row["state"] == state
         and row["field"] == field
-        and raw.startswith(row["match_prefix"])
+        and disposition_matches_raw(row, raw)
     ]
     if len(matches) > 1:
         raise ValueError(f"multiple Schedule dispositions match {source} {state} {field}: {raw}")
@@ -184,17 +211,20 @@ def reference_row(
         source_kind = "reviewed-disposition"
         reason = disposition["reason"]
         disposition_manifest = disposition["manifest"]
+        disposition_key = disposition["disposition_key"]
     else:
         matches = heuristic_resolve(raw, entities, identity_index, expected, state)
         status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
         source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
         reason = None
         disposition_manifest = None
+        disposition_key = None
     return {
         "kind": kind, "state": state, "outcome": outcome, "field": field, "raw": raw,
         "identity_head": identity_head(raw), "resolved_ids": matches, "status": status,
         "resolution_source": source_kind, "disposition_reason": reason,
-        "disposition_manifest": disposition_manifest, "source": source, "record_index": record_index,
+        "disposition_manifest": disposition_manifest, "disposition_key": disposition_key,
+        "source": source, "record_index": record_index,
     }
 
 
@@ -229,18 +259,22 @@ def audit() -> dict:
                         "kind": "scope-reference", "state": state, "outcome": outcome, "field": field,
                         "raw": raw, "identity_head": None, "resolved_ids": [], "status": "context-only",
                         "resolution_source": None, "disposition_reason": None, "disposition_manifest": None,
-                        "source": source, "record_index": record_index,
+                        "disposition_key": None, "source": source, "record_index": record_index,
                     })
 
     counted = [row for row in references if row["kind"] != "scope-reference"]
     statuses = Counter(row["status"] for row in counted)
     kinds = Counter(row["kind"] for row in counted)
     states = {row["state"] for row in counted if isinstance(row["state"], str)}
+    used_dispositions = {row["disposition_key"] for row in counted if row.get("disposition_key")}
+    stale_dispositions = sorted(
+        row["disposition_key"] for row in dispositions if row["disposition_key"] not in used_dispositions
+    )
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "semantics": {
             "purpose": "coverage audit of already-curated Schedule-preparation actor/project references",
-            "completeness_rule": "Every curated actor/project reference must be resolved, deferred or partial-deferred; ambiguous/unresolved is a CI failure.",
+            "completeness_rule": "Every curated actor/project reference must be resolved, deferred or partial-deferred; ambiguous/unresolved and stale reviewed dispositions are CI failures.",
             "identity_resolution": "heuristic domestic identity matching is State-scoped; reviewed dispositions may explicitly bind cross-State referents",
             "non_inference": [
                 "reference matching is not attribution",
@@ -255,9 +289,10 @@ def audit() -> dict:
             "actor_references": kinds["actor-reference"], "project_references": kinds["project-reference"],
             "resolved": statuses["resolved"], "partial_deferred": statuses["partial-deferred"],
             "deferred": statuses["deferred"], "ambiguous": statuses["ambiguous"],
-            "unresolved": statuses["unresolved"],
+            "unresolved": statuses["unresolved"], "stale_dispositions": len(stale_dispositions),
             "scope_context_references": sum(row["kind"] == "scope-reference" for row in references),
         },
+        "stale_dispositions": stale_dispositions,
         "references": references,
     }
 
@@ -275,7 +310,8 @@ def write_markdown(report: dict, path: Path) -> None:
         f"- Partial/deferred: **{counts['partial_deferred']}**",
         f"- Deferred: **{counts['deferred']}**",
         f"- Ambiguous: **{counts['ambiguous']}**",
-        f"- Unresolved: **{counts['unresolved']}**", "",
+        f"- Unresolved: **{counts['unresolved']}**",
+        f"- Stale reviewed dispositions: **{counts['stale_dispositions']}**", "",
         "## Non-resolved curated references", "",
         "| State | Kind | Field | Identity head | Status | Reason | Source |",
         "|---|---|---|---|---|---|---|",
@@ -297,9 +333,12 @@ def self_test() -> None:
     sample = [{
         "source": "x.yml", "state": "ABC", "field": "candidate_parties",
         "match_prefix": "Named Agency", "disposition": "deferred", "resolved_ids": [],
-        "reason": "test", "manifest": "m.json"
+        "reason": "test", "manifest": "m.json", "disposition_key": "m.json#0",
     }]
     assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency, only here", sample)
+    assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency and New Agency, only here", sample) is None
+    partial = [{**sample[0], "disposition": "partial-deferred", "resolved_ids": ["AGENCY-ABC-NAMED"]}]
+    assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency and other implementation bodies only here", partial)
     synthetic = [
         {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
         {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
@@ -335,7 +374,11 @@ def main() -> int:
         args.markdown.parent.mkdir(parents=True, exist_ok=True)
         write_markdown(report, args.markdown)
     print(json.dumps(report["counts"], sort_keys=True))
-    if args.fail_on_unresolved_curated and (report["counts"]["unresolved"] or report["counts"]["ambiguous"]):
+    if args.fail_on_unresolved_curated and (
+        report["counts"]["unresolved"] or report["counts"]["ambiguous"] or report["counts"]["stale_dispositions"]
+    ):
+        if report["counts"]["stale_dispositions"]:
+            print("STALE_SCHEDULE_DISPOSITIONS=" + json.dumps(report["stale_dispositions"], sort_keys=True))
         return 2
     return 0
 
