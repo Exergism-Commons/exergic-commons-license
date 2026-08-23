@@ -49,6 +49,9 @@ def load_id_supersessions() -> dict[str, str]:
             assert isinstance(source, str) and source, (path, row)
             assert isinstance(target, str) and target and target != source, (path, row)
             assert isinstance(reason, str) and reason.strip(), (path, row)
+            assert source.split("-", 1)[0] == target.split("-", 1)[0], (
+                "supersession must preserve identity kind", path, row
+            )
             assert source not in mapping, f"duplicate identity supersession source: {source}"
             mapping[source] = target
 
@@ -121,17 +124,25 @@ def default_normalizer(value: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
 
-def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
-    """Reject duplicate first-class identities with the same primary name in one scope."""
+def load_repository_entities() -> tuple[list[dict], set[str]]:
     entities: list[dict] = []
-    state_codes: set[str] = set()
-    supersessions = load_id_supersessions()
+    entity_ids: set[str] = set()
     for path in sorted(ENTITY_DIR.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
-        entity_id = data.get("id")
-        if isinstance(entity_id, str) and entity_id in supersessions:
-            continue
         entities.append(data)
+        entity_id = data.get("id")
+        if isinstance(entity_id, str):
+            entity_ids.add(entity_id)
+    return entities, entity_ids
+
+
+def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
+    """Reject duplicate current first-class identities with the same primary name in one scope."""
+    entities, _ = load_repository_entities()
+    state_codes: set[str] = set()
+    supersessions = load_id_supersessions()
+    for data in entities:
+        entity_id = data.get("id")
         if data.get("type") == "State" and isinstance(entity_id, str) and entity_id.startswith("STATE-"):
             state_codes.add(entity_id.removeprefix("STATE-"))
 
@@ -139,7 +150,7 @@ def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
     for entity in entities:
         entity_id = entity.get("id")
         name = entity.get("name")
-        if not isinstance(entity_id, str) or not isinstance(name, str):
+        if not isinstance(entity_id, str) or not isinstance(name, str) or entity_id in supersessions:
             continue
         normalized = default_normalizer(name)
         if not normalized:
@@ -154,14 +165,14 @@ def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
     ]
 
 
-def audit_supersession_targets() -> list[str]:
-    entity_ids: set[str] = set()
-    for path in sorted(ENTITY_DIR.glob("*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        if isinstance(data.get("id"), str):
-            entity_ids.add(data["id"])
+def audit_supersession_integrity() -> dict[str, list[str]]:
+    """Superseded IDs must be historical-only and every canonical target must be materialized."""
+    _, entity_ids = load_repository_entities()
     supersessions = load_id_supersessions()
-    return sorted(target for target in supersessions.values() if target not in entity_ids)
+    return {
+        "missing_targets": sorted(target for target in supersessions.values() if target not in entity_ids),
+        "materialized_sources": sorted(source for source in supersessions if source in entity_ids),
+    }
 
 
 def self_test() -> None:
@@ -196,13 +207,14 @@ def self_test() -> None:
     assert resolve_normalized(index, state="NRU", normalized=default_normalizer("OHCHR")) == ["ORG-OHCHR"]
     assert eligible_in_state(index, "INSTITUTION-SVK-CONSTITUTIONAL-COURT", "KAZ") is False
     assert eligible_in_state(index, "ORG-OHCHR", "KAZ") is True
+    assert canonicalize_id("AGENCY-OLD", {"AGENCY-OLD": "AGENCY-NEW"}) == "AGENCY-NEW"
 
 
 if __name__ == "__main__":
     self_test()
-    missing_targets = audit_supersession_targets()
-    if missing_targets:
-        print("MISSING_SUPERSESSION_TARGETS=" + json.dumps(missing_targets))
+    supersession_integrity = audit_supersession_integrity()
+    if supersession_integrity["missing_targets"] or supersession_integrity["materialized_sources"]:
+        print("INVALID_SUPERSESSIONS=" + json.dumps(supersession_integrity, sort_keys=True))
         raise SystemExit(1)
     duplicates = audit_repository_primary_name_uniqueness()
     if duplicates:
