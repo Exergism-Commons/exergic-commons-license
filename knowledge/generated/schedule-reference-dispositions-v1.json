@@ -12,7 +12,7 @@
     "review_binding": "Every source containing reviewed dispositions is pinned to its exact Git blob. Any source edit invalidates the reviewed overlay until the source is re-reviewed and its pin is explicitly updated."
   },
   "source_blobs": {
-    "registry/schedule-state-s-freezes/batch-01-identity.yml": "2bfb8b89c5d39e89a86c1de6247d1ebf5755e6f36",
+    "registry/schedule-state-s-freezes/batch-01-identity.yml": "2bfb8e63ffbe297a4268cfd189e6537dabd79c79",
     "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml": "11d5be928437b65f5f2cb886df967b57eb51a396",
     "registry/schedule-state-s-freezes/batch-03a-usa.yml": "f0716773b0806e2b8d9b1dfbfc4a5fef3546acb9",
     "registry/schedule-state-s-freezes/batch-04-detention-digital.yml": "5e46fadec42a3947685489e26b3cbd54a610990c",
