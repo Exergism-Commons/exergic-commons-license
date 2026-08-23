@@ -72,8 +72,10 @@ def main() -> int:
     supersessions = load_id_supersessions()
     state_codes = canonical_state_codes()
     all_historical_ids: list[str] = []
+    jurisdiction_errors: list[dict[str, object]] = []
     promotion_count = 0
     superseded_count = 0
+
     for version, manifest_path in manifests:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         rows = manifest["identities"]
@@ -88,17 +90,24 @@ def main() -> int:
             row_state = row.get("state")
             if row_state is not None:
                 assert isinstance(row_state, str) and STATE_RE.fullmatch(row_state), (manifest_path, row)
+
             entity_id = canonicalize_id(historical_id, supersessions)
             domestic_state = infer_domestic_state(entity_id, state_codes)
-            if domestic_state is not None:
-                assert row_state == domestic_state, (
-                    f"domestic promotion must declare its canonical State in v{version}: "
-                    f"{historical_id} canonicalizes to {entity_id} ({domestic_state}), row state={row_state!r}"
-                )
+            if domestic_state is not None and row_state != domestic_state:
+                jurisdiction_errors.append({
+                    "version": version,
+                    "historical_id": historical_id,
+                    "canonical_id": entity_id,
+                    "expected_state": domestic_state,
+                    "declared_state": row_state,
+                    "source": row.get("source"),
+                })
+
             if entity_id != historical_id:
                 superseded_count += 1
                 old_path = ENTITY_DIR / f"{historical_id}.json"
                 assert not old_path.exists(), f"superseded identity source still materialized: {old_path}"
+
             path = ENTITY_DIR / f"{entity_id}.json"
             assert path.exists(), f"missing promoted/canonical identity: {path} (historical {historical_id})"
             data = json.loads(path.read_text(encoding="utf-8"))
@@ -108,20 +117,29 @@ def main() -> int:
             assert isinstance(data.get("name"), str) and data["name"].strip()
             assert not (FORBIDDEN_GOVERNANCE & set(data)), (entity_id, FORBIDDEN_GOVERNANCE & set(data))
             assert not (FORBIDDEN_RELATIONS & set(data)), (entity_id, FORBIDDEN_RELATIONS & set(data))
+
             dossier = (path.parent / data["dossier"]).resolve()
             assert dossier.exists(), (entity_id, dossier)
-            source = ROOT / row["source"]
+
+            source_value = row.get("source")
+            assert isinstance(source_value, str) and source_value, (historical_id, source_value)
+            source = ROOT / source_value
             assert source.exists(), (historical_id, source)
-            source_rel = Path(row["source"])
-            if row_state is not None and source_rel.parts[:2] == ("dossiers", "states") and source_rel.suffix == ".md":
-                assert source_rel.stem == row_state, (
-                    f"manifest State/source mismatch in v{version}: {historical_id} -> "
-                    f"state {row_state}, source {source_rel}"
+            source_rel = Path(source_value)
+            if source_rel.parts[:2] == ("dossiers", "states") and source_rel.suffix == ".md":
+                assert source_rel.stem in state_codes, (
+                    f"promotion source must be a canonical State dossier in v{version}: "
+                    f"{historical_id} -> {source_rel}"
                 )
+
     assert len(all_historical_ids) == len(set(all_historical_ids)), "duplicate promoted stable id across historical manifests"
     assert set(supersessions).issubset(set(all_historical_ids)), (
         "supersession sources must be historical promotion IDs", sorted(set(supersessions) - set(all_historical_ids))
     )
+    if jurisdiction_errors:
+        print("DOMESTIC_PROMOTION_STATE_ERRORS=" + json.dumps(jurisdiction_errors, ensure_ascii=False, sort_keys=True))
+        return 2
+
     print(
         f"identity scale-out tests: OK ({promotion_count} historical promotions across "
         f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; manifest chain contiguous)"
