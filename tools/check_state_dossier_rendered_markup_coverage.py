@@ -9,6 +9,7 @@ import re
 
 import audit_state_dossier_entities as base
 import review_state_dossier_candidates as reviewed
+from entity_identity_resolution import build_name_index
 
 ROOT = base.ROOT
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
@@ -20,6 +21,7 @@ HTML_BREAK_TAG_RE = re.compile(
 HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
 CODE_SPAN_RE = re.compile(r"(`+)([^\n]*?)\1")
+LEADING_DISCOURSE_RE = re.compile(r"^(?:only\s+the\s+|only\s+|the\s+)", re.I)
 
 
 def baseline_line(raw: str) -> str:
@@ -54,6 +56,55 @@ def rendered_only_candidates(raw: str) -> list[tuple[str, str, str]]:
     return [(normalized, value, kind) for normalized, (value, kind) in after.items() if normalized not in before]
 
 
+def strip_discourse_prefix(candidate: str) -> str:
+    return LEADING_DISCOURSE_RE.sub("", candidate, count=1).strip()
+
+
+def identity_kind_matches(index, entity_id: str, kind: str) -> bool:
+    entity = index.by_id.get(entity_id) or {}
+    is_project = entity.get("type") in {"Project", "Deployment"}
+    return is_project if kind == "project-or-deployment" else not is_project
+
+
+def covered_by_visible_materialized_identity(index, *, state: str, candidate: str, kind: str, rendered: str) -> bool:
+    """Accept only a syntactic fragment of one fully visible, already materialized identity.
+
+    Rendered markup can make TITLE_RE surface a grammatical prefix (`Only X`) or stop at an
+    em dash inside an exact canonical name (`Parent — Division`). We do not create broad
+    aliases for those fragments. Instead, coverage is accepted only when either:
+      * removing a narrow discourse determiner yields an exact resolvable identity; or
+      * that stripped fragment is the prefix of a unique in-scope canonical name/alias and
+        the complete canonical name/alias is visibly present on the same rendered line.
+    This prevents a partial regex match from being mistaken for representation of an
+    independently named parent body.
+    """
+    stripped = strip_discourse_prefix(candidate)
+    if stripped != candidate:
+        exact = base.resolve_name(index, state, stripped)
+        if exact is not None and identity_kind_matches(index, exact, kind):
+            return True
+
+    candidate_norm = base.norm(stripped)
+    rendered_norm = base.norm(rendered)
+    if not candidate_norm or not rendered_norm:
+        return False
+
+    name_maps = [index.state_names.get(state, {}), index.global_names]
+    for name_map in name_maps:
+        for full_name, ids in name_map.items():
+            if len(ids) != 1:
+                continue
+            entity_id = next(iter(ids))
+            if not identity_kind_matches(index, entity_id, kind):
+                continue
+            if not full_name.startswith(candidate_norm + " "):
+                continue
+            if f" {full_name} " not in f" {rendered_norm} ":
+                continue
+            return True
+    return False
+
+
 def audit() -> list[dict]:
     dossiers = base.canonical_state_dossiers()
     states = {front["iso3"] for _, front, _ in dossiers}
@@ -84,10 +135,15 @@ def audit() -> list[dict]:
                 continue
             if not raw.strip():
                 continue
+            rendered = rendered_line(raw)
             for normalized, candidate, kind in rendered_only_candidates(raw):
                 resolved = base.resolve_name(identity_index, state, candidate)
                 disposition = dispositions.get((state, normalized))
                 if resolved is not None or disposition is not None:
+                    continue
+                if covered_by_visible_materialized_identity(
+                    identity_index, state=state, candidate=candidate, kind=kind, rendered=rendered
+                ):
                     continue
                 failures.append({
                     "state": state,
@@ -112,6 +168,36 @@ def self_test() -> None:
     multi_code = rendered_only_candidates("Australian ``Human Rights`` Commission reported findings")
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in multi_code), multi_code
     assert rendered_only_candidates("Australian Human Rights Commission reported findings") == []
+
+    index = build_name_index(
+        [
+            {"id": "AGENCY-AAA-NCCIA", "type": "Agency", "name": "National Cyber Crime Investigation Agency", "aliases": ["NCCIA"]},
+            {"id": "AGENCY-AAA-DIV", "type": "Agency", "name": "Immigration Department of Example — Detention Division", "aliases": ["Detention Division"]},
+        ],
+        state_codes={"AAA"},
+        normalizer=base.norm,
+    )
+    assert covered_by_visible_materialized_identity(
+        index,
+        state="AAA",
+        candidate="Only the National Cyber Crime Investigation Agency",
+        kind="actor-or-institution",
+        rendered="Only the National Cyber Crime Investigation Agency (NCCIA) is in scope",
+    )
+    assert covered_by_visible_materialized_identity(
+        index,
+        state="AAA",
+        candidate="The Immigration Department of Example",
+        kind="actor-or-institution",
+        rendered="The Immigration Department of Example — Detention Division is in scope",
+    )
+    assert not covered_by_visible_materialized_identity(
+        index,
+        state="AAA",
+        candidate="Immigration Department of Example",
+        kind="actor-or-institution",
+        rendered="Immigration Department of Example is separately named here",
+    )
     print("State dossier rendered-markup coverage self-test: OK")
 
 
