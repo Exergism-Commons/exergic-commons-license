@@ -11,13 +11,12 @@ ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ROOT / "knowledge" / "generated"
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 MANIFEST_RE = re.compile(r"^state-dossier-entity-scaleout-v([1-9][0-9]*)\.json$")
-FORBIDDEN_GOVERNANCE = {
-    "provisional_outcome", "outcome", "tier", "derived_outcome", "score_outcome",
-    "governanceStatus", "governanceOutcome", "restrictionStatus"
-}
-FORBIDDEN_RELATIONS = {
-    "controls", "controlledBy", "partOf", "operates", "participatesIn", "deploys",
-    "materiallyBenefits", "tracks", "remediates", "reviews"
+# Promoted nodes are identity records only. This allowlist is deliberately structural:
+# adding any new key requires review instead of hoping a relation/governance blacklist
+# happened to anticipate its spelling.
+ALLOWED_IDENTITY_KEYS = {
+    "@context", "iri", "id", "type", "name", "aliases", "dossier", "provenance",
+    "lastSubstantiveReview", "reviewDue", "reviewClass", "reviewReason", "publicReviewIssue",
 }
 ALLOWED_TYPES = {"Agency", "Organization", "Institution", "Person", "Project", "Deployment"}
 STATE_RE = re.compile(r"^[A-Z]{3}$")
@@ -73,6 +72,7 @@ def main() -> int:
     state_codes = canonical_state_codes()
     all_historical_ids: list[str] = []
     jurisdiction_errors: list[dict[str, object]] = []
+    unexpected_key_errors: list[dict[str, object]] = []
     promotion_count = 0
     superseded_count = 0
 
@@ -115,10 +115,19 @@ def main() -> int:
             assert data["iri"] == f"ecl:{entity_id}"
             assert data["type"] == row["type"] in ALLOWED_TYPES
             assert isinstance(data.get("name"), str) and data["name"].strip()
-            assert not (FORBIDDEN_GOVERNANCE & set(data)), (entity_id, FORBIDDEN_GOVERNANCE & set(data))
-            assert not (FORBIDDEN_RELATIONS & set(data)), (entity_id, FORBIDDEN_RELATIONS & set(data))
 
-            dossier = (path.parent / data["dossier"]).resolve()
+            unexpected = sorted(set(data) - ALLOWED_IDENTITY_KEYS)
+            if unexpected:
+                unexpected_key_errors.append({
+                    "version": version,
+                    "historical_id": historical_id,
+                    "canonical_id": entity_id,
+                    "unexpected_keys": unexpected,
+                })
+
+            dossier_value = data.get("dossier")
+            assert isinstance(dossier_value, str) and dossier_value, (entity_id, dossier_value)
+            dossier = (path.parent / dossier_value).resolve()
             assert dossier.exists(), (entity_id, dossier)
 
             source_value = row.get("source")
@@ -139,10 +148,14 @@ def main() -> int:
     if jurisdiction_errors:
         print("DOMESTIC_PROMOTION_STATE_ERRORS=" + json.dumps(jurisdiction_errors, ensure_ascii=False, sort_keys=True))
         return 2
+    if unexpected_key_errors:
+        print("PROMOTED_IDENTITY_UNEXPECTED_KEYS=" + json.dumps(unexpected_key_errors, ensure_ascii=False, sort_keys=True))
+        return 3
 
     print(
         f"identity scale-out tests: OK ({promotion_count} historical promotions across "
-        f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; manifest chain contiguous)"
+        f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; "
+        "manifest chain contiguous; identity metadata allowlist enforced)"
     )
     return 0
 
