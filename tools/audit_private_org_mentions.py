@@ -127,12 +127,20 @@ def visible_prose(text: str) -> str:
     return html.unescape(text)
 
 
+def rendered_line_fragment(text: str) -> str:
+    """Normalize source-newline syntax that renders only as whitespace."""
+    value = text.rstrip()
+    if value.endswith("\\"):
+        value = value[:-1]
+    return value.strip()
+
+
 def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
     """Return paragraph-like rendered prose segments with 1-based source line numbers.
 
-    CommonMark soft line breaks inside a paragraph are spaces, so vendor/action phrases may
-    span source lines. Structural block boundaries are not joined. Fenced code is excluded
-    consistently with the existing inline-code policy.
+    CommonMark soft and hard line breaks inside a paragraph are whitespace, so vendor/action
+    phrases may span source lines. Structural block boundaries are not joined. Fenced code
+    is excluded consistently with the existing inline-code policy.
     """
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
@@ -143,7 +151,8 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
         if buffer and start_line is not None:
-            prose = visible_prose(" ".join(part.strip() for part in buffer if part.strip()))
+            parts = [rendered_line_fragment(part) for part in buffer]
+            prose = visible_prose(" ".join(part for part in parts if part))
             if prose.strip():
                 result.append((start_line, " ".join(part.strip() for part in raw_buffer)[:420], prose))
         buffer = []
@@ -265,12 +274,12 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 9,
+        "schema_version": 10,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
             "identity_resolution": "domestic identities resolve automatically only inside their State; transnational identities may resolve globally",
-            "visible_text_policy": "ordinary Markdown links/references/emphasis, structural versus inline HTML, HTML entities and CommonMark soft line breaks are normalized to rendered prose; fenced/inline code is excluded",
+            "visible_text_policy": "ordinary Markdown links/references/emphasis, structural versus inline HTML, HTML entities and CommonMark soft/hard line breaks are normalized to rendered prose; fenced/inline code is excluded",
             "non_inference": [
                 "private-organization mention does not prove legal-entity precision",
                 "identity does not prove supply, participation, control or culpability",
@@ -322,6 +331,8 @@ def self_test() -> None:
     assert extract_names(visible_prose("Celle<strong>brite</strong> supplied software")) == expected
     soft = rendered_prose_segments("Cellebrite\nsupplied software\n")
     assert len(soft) == 1 and extract_names(soft[0][2]) == expected
+    hard = rendered_prose_segments("Cellebrite\\\nsupplied software\n")
+    assert len(hard) == 1 and extract_names(hard[0][2]) == expected
     separate_items = rendered_prose_segments("- Cellebrite\n- supplied software\n")
     assert not any(extract_names(segment[2]) for segment in separate_items)
     fenced = rendered_prose_segments("```text\nCellebrite supplied software\n```\n")
