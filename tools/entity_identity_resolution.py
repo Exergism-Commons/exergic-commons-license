@@ -235,12 +235,29 @@ def audit_domestic_state_qualified_primary_duplicates() -> list[dict[str, object
     ]
 
 
-def audit_supersession_integrity() -> dict[str, list[str]]:
-    _, entity_ids = load_repository_entities()
+def supersession_scope_mismatches(supersessions: dict[str, str], state_codes: set[str]) -> list[dict[str, object]]:
+    failures: list[dict[str, object]] = []
+    for source, target in sorted(supersessions.items()):
+        source_scope = infer_domestic_state(source, state_codes)
+        target_scope = infer_domestic_state(target, state_codes)
+        if source_scope != target_scope:
+            failures.append({
+                "from": source,
+                "to": target,
+                "from_scope": source_scope or "GLOBAL",
+                "to_scope": target_scope or "GLOBAL",
+            })
+    return failures
+
+
+def audit_supersession_integrity() -> dict[str, list]:
+    entities, entity_ids = load_repository_entities()
+    state_codes, _ = repository_state_names(entities)
     supersessions = load_id_supersessions()
     return {
         "missing_targets": sorted(target for target in supersessions.values() if target not in entity_ids),
         "materialized_sources": sorted(source for source in supersessions if source in entity_ids),
+        "scope_mismatches": supersession_scope_mismatches(supersessions, state_codes),
     }
 
 
@@ -264,12 +281,14 @@ def self_test() -> None:
     assert domestic_primary_signature("South Sudan National Security Service", "South Sudan") == "national security service"
     assert domestic_primary_signature("National Security Service (South Sudan)", "South Sudan") == "national security service"
     assert domestic_primary_signature("Constitutional Court of Slovakia", "Slovakia") == "constitutional court"
+    assert supersession_scope_mismatches({"AGENCY-SVK-OLD": "AGENCY-KAZ-NEW"}, states)
+    assert supersession_scope_mismatches({"AGENCY-SVK-OLD": "AGENCY-SVK-NEW"}, states) == []
 
 
 if __name__ == "__main__":
     self_test()
     supersession_integrity = audit_supersession_integrity()
-    if supersession_integrity["missing_targets"] or supersession_integrity["materialized_sources"]:
+    if any(supersession_integrity.values()):
         print("INVALID_SUPERSESSIONS=" + json.dumps(supersession_integrity, sort_keys=True))
         raise SystemExit(1)
     duplicates = audit_repository_primary_name_uniqueness()
@@ -280,4 +299,4 @@ if __name__ == "__main__":
     if qualified_duplicates:
         print("DUPLICATE_STATE_QUALIFIED_IDENTITIES=" + json.dumps(qualified_duplicates, sort_keys=True))
         raise SystemExit(1)
-    print("entity identity resolution self-test: OK; supersession chain valid; repository identity names unique")
+    print("entity identity resolution self-test: OK; supersession chain/scope valid; repository identity names unique")
