@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from entity_identity_resolution import canonicalize_id, load_id_supersessions
@@ -83,12 +83,17 @@ def load_ratchet(path: Path) -> tuple[int, dict]:
 def review(audit: dict, dispositions: dict[tuple[str, str], dict], priority_threshold: int | None = None) -> dict:
     raw = [item for item in audit["candidates"] if item["resolution"] == "review-candidate"]
     occurrence_keys: set[tuple[str, str]] = set()
+    occurrence_resolved_ids: dict[tuple[str, str], set[str]] = defaultdict(set)
     for candidate in audit["candidates"]:
         for occurrence in candidate.get("occurrences", []):
             state = occurrence.get("state")
             normalized = occurrence.get("normalized")
             if isinstance(state, str) and isinstance(normalized, str):
-                occurrence_keys.add((state, normalized))
+                key = (state, normalized)
+                occurrence_keys.add(key)
+                resolved_id = occurrence.get("resolved_id")
+                if isinstance(resolved_id, str) and resolved_id:
+                    occurrence_resolved_ids[key].add(resolved_id)
 
     raw_keys: set[tuple[str, str]] = set()
     rows: list[dict] = []
@@ -118,6 +123,17 @@ def review(audit: dict, dispositions: dict[tuple[str, str], dict], priority_thre
         if key in raw_keys:
             continue
         if disposition["status"] == "curated-identity" and key in occurrence_keys:
+            expected_ids = set(disposition.get("resolved_ids") or [])
+            actual_ids = occurrence_resolved_ids.get(key, set())
+            if actual_ids and actual_ids == expected_ids:
+                continue
+            stale.append({
+                "state": key[0],
+                "normalized": key[1],
+                "status": disposition["status"],
+                "expected_resolved_ids": sorted(expected_ids),
+                "actual_resolved_ids": sorted(actual_ids),
+            })
             continue
         stale.append({"state": key[0], "normalized": key[1], "status": disposition["status"]})
 
@@ -208,6 +224,22 @@ def self_test() -> None:
     assert report["counts"]["unreviewed"] == 1
     assert report["counts"]["unreviewed_at_or_above_threshold"] == 0
     assert report["unreviewed_at_or_above_threshold"] == []
+
+    materialized = {"candidates": [{
+        "candidate": "The Court", "normalized": "the court", "resolution": "materialized",
+        "states": ["AAA"], "review_priority": 0, "kinds": ["actor-or-institution"],
+        "occurrences": [{"state": "AAA", "normalized": "the court", "resolved_id": "INSTITUTION-AAA-COURT"}],
+    }]}
+    curated = {("AAA", "the court"): {
+        "state": "AAA", "normalized": "the court", "status": "curated-identity",
+        "reason": "reviewed binding", "source": "x", "resolved_ids": ["INSTITUTION-AAA-COURT"],
+    }}
+    assert review(materialized, curated)["counts"]["stale_dispositions"] == 0
+    curated_wrong = {("AAA", "the court"): {**curated[("AAA", "the court")], "resolved_ids": ["INSTITUTION-AAA-OTHER"]}}
+    stale_report = review(materialized, curated_wrong)
+    assert stale_report["counts"]["stale_dispositions"] == 1
+    assert stale_report["stale_dispositions"][0]["actual_resolved_ids"] == ["INSTITUTION-AAA-COURT"]
+
     assert canonicalize_id("AGENCY-PHL-PNP", {"AGENCY-PHL-PNP": "AGENCY-PHL-PHILIPPINE-NATIONAL-POLICE"}) == "AGENCY-PHL-PHILIPPINE-NATIONAL-POLICE"
     print("State dossier candidate review self-test: OK")
 
