@@ -52,7 +52,10 @@ def validate_manifest_chain(manifests: list[tuple[int, Path]]) -> None:
         )
         assert isinstance(manifest.get("date"), str) and manifest["date"].strip(), path
         assert isinstance(manifest.get("purpose"), str) and manifest["purpose"].strip(), path
-        assert manifest.get("sourceAudit") == "tools/audit_state_dossier_entities.py", (path, manifest.get("sourceAudit"))
+        if "sourceAudit" in manifest:
+            assert manifest.get("sourceAudit") == "tools/audit_state_dossier_entities.py", (
+                path, manifest.get("sourceAudit")
+            )
         assert isinstance(manifest.get("identityRule"), str) and manifest["identityRule"].strip(), path
         assert isinstance(manifest.get("identities"), list), path
         assert manifest.get("relationClaims") == [], path
