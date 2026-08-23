@@ -16,16 +16,31 @@ import re
 import audit_schedule_reference_coverage as schedule
 
 HEURISTIC_SOURCE = "jurisdiction-safe-canonical-name-or-alias"
+POST_SCOPE_PUNCTUATED_CONNECTOR_RE = re.compile(r"[,;—–-]\s*(?:and|with)\b", re.I)
+POST_SCOPE_STRONG_CONNECTOR_RE = re.compile(r"\b(?:including|plus|as\s+well\s+as|together\s+with)\b", re.I)
 
 
 def has_including_clause(raw: str) -> bool:
-    """Treat every comma-delimited `including` clause as review-required.
+    """Any rendered `including` clause is composite and requires explicit review."""
+    return bool(re.search(r"\bincluding\b", raw, re.I))
 
-    Ordering relative to a capacity qualifier must not change semantics: a reference such
-    as `Agency, only in qualifying cases, including Unit B` still names an additional
-    component and cannot be declared fully covered by resolving only `Agency`.
-    """
-    return ", including " in raw.lower()
+
+def post_scope_tail(raw: str) -> str:
+    """Return the portion after the first capacity/scope split used by the heuristic."""
+    lower = raw.lower()
+    positions = [lower.find(token) for token in schedule.CAPACITY_SPLITS if lower.find(token) >= 0]
+    if not positions:
+        return ""
+    return raw[min(positions):]
+
+
+def has_unsafe_post_scope_connector(raw: str) -> bool:
+    tail = post_scope_tail(raw)
+    if not tail:
+        return False
+    if POST_SCOPE_STRONG_CONNECTOR_RE.search(tail):
+        return True
+    return bool(POST_SCOPE_PUNCTUATED_CONNECTOR_RE.search(tail))
 
 
 def exact_same_entity_head(head: str, aliases: set[str]) -> bool:
@@ -52,8 +67,11 @@ def unsafe_reason(row: dict, by_id: dict[str, dict]) -> str | None:
     head = row.get("identity_head") or ""
     if not exact_same_entity_head(head, aliases):
         return "heuristic match is not an exact canonical name/alias after capacity stripping"
-    if has_including_clause(row.get("raw") or ""):
+    raw = row.get("raw") or ""
+    if has_including_clause(raw):
         return "reference contains an including-clause and requires reviewed composite handling"
+    if has_unsafe_post_scope_connector(raw):
+        return "reference contains a post-scope composite connector and requires reviewed handling"
     return None
 
 
@@ -113,9 +131,21 @@ def self_test() -> None:
     including_after_scope = {
         **exact,
         "identity_head": "National Police",
-        "raw": "National Police, only in qualifying cases, including Rescue Coordination Centre",
+        "raw": "National Police, only in qualifying cases including Rescue Coordination Centre",
     }
     assert "including-clause" in (unsafe_reason(including_after_scope, by_id) or "")
+
+    semicolon_and = {
+        **exact,
+        "raw": "National Police, only in qualifying cases; and Rescue Coordination Centre",
+    }
+    assert "post-scope composite" in (unsafe_reason(semicolon_and, by_id) or "")
+
+    plus_unit = {
+        **exact,
+        "raw": "National Police, only in qualifying cases plus Rescue Coordination Centre",
+    }
+    assert "post-scope composite" in (unsafe_reason(plus_unit, by_id) or "")
 
     reviewed = {
         **including_after_scope,
