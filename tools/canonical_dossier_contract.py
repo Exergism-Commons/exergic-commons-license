@@ -72,18 +72,32 @@ def embedded_resource_targets(text: str) -> list[str]:
 _impl.embedded_resource_targets = embedded_resource_targets
 
 
+def _fully_unquote_path(value: str) -> str | None:
+    """Decode nested percent-encoding to a stable local-path representation."""
+    current = value
+    for _ in range(8):
+        decoded = unquote(current)
+        if decoded == current:
+            return decoded
+        current = decoded
+    return None
+
+
 def _local_resource_repo_path(root: Path, dossier_rel: Path, target: str) -> tuple[Path | None, bool]:
-    """Resolve a local embedded resource and report repository escape attempts."""
+    """Resolve a local embedded resource; bool marks invalid/escaping local targets."""
     parsed = urlsplit(target.strip())
     if parsed.scheme or parsed.netloc:
         return None, False
-    raw_path = unquote(parsed.path).strip()
-    if not raw_path:
-        return None, False
-    absolute = ((root / dossier_rel).parent / raw_path).resolve()
+    decoded = _fully_unquote_path(parsed.path.strip())
+    if decoded is None or not decoded or "\\" in decoded or "\x00" in decoded:
+        return None, True
+    reparsed = urlsplit(decoded)
+    if reparsed.scheme or reparsed.netloc or decoded.startswith("//"):
+        return None, True
     try:
+        absolute = ((root / dossier_rel).parent / decoded).resolve()
         return absolute.relative_to(root.resolve()), False
-    except ValueError:
+    except (OSError, RuntimeError, ValueError):
         return None, True
 
 
@@ -101,10 +115,10 @@ def validate_dossier_local_resources(
     for target in embedded_resource_targets(text):
         if _impl.nonlocal_resource_target(target):
             continue
-        rel, escaped = _local_resource_repo_path(root, dossier_rel, target)
-        if escaped:
+        rel, invalid = _local_resource_repo_path(root, dossier_rel, target)
+        if invalid:
             errors.append(
-                f"{dossier_rel}: local embedded resource {target!r} escapes the repository; "
+                f"{dossier_rel}: local embedded resource {target!r} does not resolve to a valid repository-local file path; "
                 "use a canonical generated visual or provenance-controlled raster facsimile"
             )
             continue
