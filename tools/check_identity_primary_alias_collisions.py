@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject exact same-scope collisions between one identity's primary name and another's alias."""
+"""Reject exact identity-name collisions that could make resolution silently unsafe."""
 from __future__ import annotations
 
 import argparse
@@ -9,29 +9,58 @@ from collections import defaultdict
 import entity_identity_resolution as identity
 
 
-def collisions() -> list[dict]:
+def indexed_names() -> tuple[dict[tuple[str, str], list[dict]], dict[str, list[dict]]]:
     entities, _ = identity.load_repository_entities()
     state_codes, _ = identity.repository_state_names(entities)
     supersessions = identity.load_id_supersessions()
-    names: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    by_scope: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    by_name: dict[str, list[dict]] = defaultdict(list)
     for entity in entities:
         entity_id = entity.get("id")
         if not isinstance(entity_id, str) or entity.get("type") == "State" or entity_id in supersessions:
             continue
         scope = identity.infer_domestic_state(entity_id, state_codes) or "GLOBAL"
+        values: list[tuple[str, str]] = []
         primary = entity.get("name")
         if isinstance(primary, str) and identity.default_normalizer(primary):
-            names[(scope, identity.default_normalizer(primary))].append({"id": entity_id, "kind": "primary", "text": primary})
+            values.append(("primary", primary))
         for alias in entity.get("aliases") or []:
             if isinstance(alias, str) and identity.default_normalizer(alias):
-                names[(scope, identity.default_normalizer(alias))].append({"id": entity_id, "kind": "alias", "text": alias})
+                values.append(("alias", alias))
+        for kind, text in values:
+            normalized = identity.default_normalizer(text)
+            row = {"id": entity_id, "scope": scope, "kind": kind, "text": text}
+            by_scope[(scope, normalized)].append(row)
+            by_name[normalized].append(row)
+    return by_scope, by_name
 
+
+def collisions() -> list[dict]:
+    by_scope, _ = indexed_names()
     failures: list[dict] = []
-    for (scope, normalized), rows in sorted(names.items()):
+    for (scope, normalized), rows in sorted(by_scope.items()):
         ids = {row["id"] for row in rows}
         if len(ids) < 2 or not any(row["kind"] == "primary" for row in rows):
             continue
         failures.append({"scope": scope, "normalized": normalized, "matches": rows})
+    return failures
+
+
+def global_domestic_shadows() -> list[dict]:
+    """A domestic exact name must never silently override an exact global name."""
+    _, by_name = indexed_names()
+    failures: list[dict] = []
+    for normalized, rows in sorted(by_name.items()):
+        global_ids = {row["id"] for row in rows if row["scope"] == "GLOBAL"}
+        domestic_scopes = {row["scope"] for row in rows if row["scope"] != "GLOBAL"}
+        if not global_ids or not domestic_scopes:
+            continue
+        failures.append({
+            "normalized": normalized,
+            "global_ids": sorted(global_ids),
+            "domestic_scopes": sorted(domestic_scopes),
+            "matches": rows,
+        })
     return failures
 
 
@@ -41,7 +70,13 @@ def self_test() -> None:
         {"id": "B", "kind": "alias", "text": "National Service"},
     ]
     assert len({row["id"] for row in sample}) == 2 and any(row["kind"] == "primary" for row in sample)
-    print("identity primary/alias collision self-test: OK")
+    shadow_sample = [
+        {"id": "ORG-GLOBAL", "scope": "GLOBAL"},
+        {"id": "AGENCY-AAA-LOCAL", "scope": "AAA"},
+    ]
+    assert any(row["scope"] == "GLOBAL" for row in shadow_sample)
+    assert any(row["scope"] != "GLOBAL" for row in shadow_sample)
+    print("identity collision/shadow self-test: OK")
 
 
 def main() -> int:
@@ -51,11 +86,15 @@ def main() -> int:
     if args.self_test:
         self_test()
         return 0
-    failures = collisions()
-    if failures:
-        print("PRIMARY_ALIAS_IDENTITY_COLLISIONS=" + json.dumps(failures, ensure_ascii=False, sort_keys=True))
+    same_scope = collisions()
+    shadows = global_domestic_shadows()
+    if same_scope or shadows:
+        print("IDENTITY_NAME_RESOLUTION_COLLISIONS=" + json.dumps({
+            "same_scope_primary_alias": same_scope,
+            "global_domestic_shadows": shadows,
+        }, ensure_ascii=False, sort_keys=True))
         return 2
-    print("identity primary/alias collisions: none")
+    print("identity name-resolution collisions: none")
     return 0
 
 
