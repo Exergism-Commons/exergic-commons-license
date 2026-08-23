@@ -91,7 +91,14 @@ entity_type: organization
             self.assertIn(traversal, contract.commonmark_image_targets(markdown))
             errors = contract.validate_universe(root)
             self.assertTrue(
-                any("escapes the repository" in error and traversal in error for error in errors),
+                any(
+                    traversal in error
+                    and (
+                        "escapes the repository" in error
+                        or "does not resolve to a valid repository-local file path" in error
+                    )
+                    for error in errors
+                ),
                 errors,
             )
 
