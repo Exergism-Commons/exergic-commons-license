@@ -55,8 +55,6 @@ def load_id_supersessions() -> dict[str, str]:
             assert source not in mapping, f"duplicate identity supersession source: {source}"
             mapping[source] = target
 
-    # Supersession chains are deliberately forbidden. One historical ID must point
-    # directly at the current canonical ID so provenance never depends on transitive drift.
     chained = sorted(source for source, target in mapping.items() if target in mapping)
     assert not chained, f"identity supersession chains are forbidden: {chained}"
     return mapping
@@ -102,13 +100,6 @@ def build_name_index(
 
 
 def resolve_normalized(index: NameIndex, *, state: str, normalized: str) -> list[str]:
-    """Resolve a normalized name without cross-State domestic leakage.
-
-    A local domestic name shadows a same-text global name. Multiple matches remain
-    ambiguous. Domestic identities from other States are never considered here; a
-    cross-State domestic reference must be explicitly reviewed/bound by the caller's
-    disposition surface.
-    """
     local = index.state_names.get(state, {}).get(normalized, set())
     if local:
         return sorted(local)
@@ -136,16 +127,26 @@ def load_repository_entities() -> tuple[list[dict], set[str]]:
     return entities, entity_ids
 
 
-def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
-    """Reject duplicate current first-class identities with the same primary name in one scope."""
-    entities, _ = load_repository_entities()
-    state_codes: set[str] = set()
-    supersessions = load_id_supersessions()
+def repository_state_names(entities: list[dict]) -> tuple[set[str], dict[str, str]]:
+    states: set[str] = set()
+    names: dict[str, str] = {}
     for data in entities:
         entity_id = data.get("id")
-        if data.get("type") == "State" and isinstance(entity_id, str) and entity_id.startswith("STATE-"):
-            state_codes.add(entity_id.removeprefix("STATE-"))
+        name = data.get("name")
+        if data.get("type") != "State" or not isinstance(entity_id, str) or not entity_id.startswith("STATE-"):
+            continue
+        state = entity_id.removeprefix("STATE-")
+        if len(state) != 3 or not isinstance(name, str):
+            continue
+        states.add(state)
+        names[state] = default_normalizer(name)
+    return states, names
 
+
+def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
+    entities, _ = load_repository_entities()
+    state_codes, _ = repository_state_names(entities)
+    supersessions = load_id_supersessions()
     groups: dict[tuple[str, str], set[str]] = defaultdict(set)
     for entity in entities:
         entity_id = entity.get("id")
@@ -157,7 +158,6 @@ def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
             continue
         scope = infer_domestic_state(entity_id, state_codes) or "GLOBAL"
         groups[(scope, normalized)].add(entity_id)
-
     return [
         {"scope": scope, "normalized_name": normalized, "ids": sorted(ids)}
         for (scope, normalized), ids in sorted(groups.items())
@@ -165,8 +165,50 @@ def audit_repository_primary_name_uniqueness() -> list[dict[str, object]]:
     ]
 
 
+def domestic_primary_signature(name: str, state_name: str) -> str:
+    """Strip only an exact leading/trailing State name from a domestic primary name.
+
+    This catches equivalent naming order such as `South Sudan National Security Service`
+    versus `National Security Service (South Sudan)` without fuzzy matching unrelated bodies.
+    """
+    normalized = default_normalizer(name)
+    state = default_normalizer(state_name)
+    if not normalized or not state:
+        return normalized
+    if normalized.startswith(state + " "):
+        normalized = normalized[len(state) + 1 :]
+    elif normalized.endswith(" of " + state):
+        normalized = normalized[: -(len(state) + 4)]
+    elif normalized.endswith(" " + state):
+        normalized = normalized[: -(len(state) + 1)]
+    return normalized.strip()
+
+
+def audit_domestic_state_qualified_primary_duplicates() -> list[dict[str, object]]:
+    entities, _ = load_repository_entities()
+    state_codes, state_names = repository_state_names(entities)
+    supersessions = load_id_supersessions()
+    groups: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for entity in entities:
+        entity_id = entity.get("id")
+        name = entity.get("name")
+        if not isinstance(entity_id, str) or not isinstance(name, str) or entity_id in supersessions:
+            continue
+        scope = infer_domestic_state(entity_id, state_codes)
+        if scope is None:
+            continue
+        signature = domestic_primary_signature(name, state_names[scope])
+        if len(signature) < 6:
+            continue
+        groups[(scope, signature)].add(entity_id)
+    return [
+        {"state": state, "state_stripped_primary": signature, "ids": sorted(ids)}
+        for (state, signature), ids in sorted(groups.items())
+        if len(ids) > 1
+    ]
+
+
 def audit_supersession_integrity() -> dict[str, list[str]]:
-    """Superseded IDs must be historical-only and every canonical target must be materialized."""
     _, entity_ids = load_repository_entities()
     supersessions = load_id_supersessions()
     return {
@@ -178,36 +220,23 @@ def audit_supersession_integrity() -> dict[str, list[str]]:
 def self_test() -> None:
     states = {"KAZ", "SVK", "AUS", "NRU"}
     entities = [
-        {
-            "id": "INSTITUTION-SVK-CONSTITUTIONAL-COURT",
-            "name": "Constitutional Court of Slovakia",
-            "aliases": ["Constitutional Court"],
-        },
-        {
-            "id": "INSTITUTION-KAZ-CONSTITUTIONAL-COURT",
-            "name": "Constitutional Court of Kazakhstan",
-            "aliases": ["Constitutional Court"],
-        },
-        {
-            "id": "INSTITUTION-AUS-HUMAN-RIGHTS-COMMISSION",
-            "name": "Australian Human Rights Commission",
-            "aliases": [],
-        },
-        {"id": "ORG-OHCHR", "name": "OHCHR", "aliases": ["UN Human Rights Office"]},
+        {"id":"INSTITUTION-SVK-CONSTITUTIONAL-COURT","name":"Constitutional Court of Slovakia","aliases":["Constitutional Court"]},
+        {"id":"INSTITUTION-KAZ-CONSTITUTIONAL-COURT","name":"Constitutional Court of Kazakhstan","aliases":["Constitutional Court"]},
+        {"id":"INSTITUTION-AUS-HUMAN-RIGHTS-COMMISSION","name":"Australian Human Rights Commission","aliases":[]},
+        {"id":"ORG-OHCHR","name":"OHCHR","aliases":["UN Human Rights Office"]},
     ]
     index = build_name_index(entities, state_codes=states, normalizer=default_normalizer)
-    assert resolve_normalized(index, state="SVK", normalized=default_normalizer("Constitutional Court")) == [
-        "INSTITUTION-SVK-CONSTITUTIONAL-COURT"
-    ]
-    assert resolve_normalized(index, state="KAZ", normalized=default_normalizer("Constitutional Court")) == [
-        "INSTITUTION-KAZ-CONSTITUTIONAL-COURT"
-    ]
+    assert resolve_normalized(index, state="SVK", normalized=default_normalizer("Constitutional Court")) == ["INSTITUTION-SVK-CONSTITUTIONAL-COURT"]
+    assert resolve_normalized(index, state="KAZ", normalized=default_normalizer("Constitutional Court")) == ["INSTITUTION-KAZ-CONSTITUTIONAL-COURT"]
     assert resolve_normalized(index, state="NRU", normalized=default_normalizer("Constitutional Court")) == []
     assert resolve_normalized(index, state="NRU", normalized=default_normalizer("Australian Human Rights Commission")) == []
     assert resolve_normalized(index, state="NRU", normalized=default_normalizer("OHCHR")) == ["ORG-OHCHR"]
     assert eligible_in_state(index, "INSTITUTION-SVK-CONSTITUTIONAL-COURT", "KAZ") is False
     assert eligible_in_state(index, "ORG-OHCHR", "KAZ") is True
     assert canonicalize_id("AGENCY-OLD", {"AGENCY-OLD": "AGENCY-NEW"}) == "AGENCY-NEW"
+    assert domestic_primary_signature("South Sudan National Security Service", "South Sudan") == "national security service"
+    assert domestic_primary_signature("National Security Service (South Sudan)", "South Sudan") == "national security service"
+    assert domestic_primary_signature("Constitutional Court of Slovakia", "Slovakia") == "constitutional court"
 
 
 if __name__ == "__main__":
@@ -220,4 +249,8 @@ if __name__ == "__main__":
     if duplicates:
         print("DUPLICATE_PRIMARY_IDENTITIES=" + json.dumps(duplicates, sort_keys=True))
         raise SystemExit(1)
-    print("entity identity resolution self-test: OK; supersessions valid; repository primary names unique")
+    qualified_duplicates = audit_domestic_state_qualified_primary_duplicates()
+    if qualified_duplicates:
+        print("DUPLICATE_STATE_QUALIFIED_IDENTITIES=" + json.dumps(qualified_duplicates, sort_keys=True))
+        raise SystemExit(1)
+    print("entity identity resolution self-test: OK; supersessions valid; repository identity names unique")
