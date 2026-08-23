@@ -56,6 +56,7 @@ jobs:
           python tools/audit_state_dossier_entities.py --self-test
           python tools/review_state_dossier_candidates.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
+          python tools/check_schedule_reference_resolution_safety.py --self-test
           python tools/audit_private_org_mentions.py --self-test
 
       - name: Generate full-corpus audits and reject unknown high-confidence references
@@ -75,6 +76,7 @@ jobs:
             --json build/schedule-reference-coverage.json \
             --markdown build/schedule-reference-coverage.md \
             --fail-on-unresolved-curated
+          python tools/check_schedule_reference_resolution_safety.py
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
             --markdown build/private-org-mention-audit.md \
