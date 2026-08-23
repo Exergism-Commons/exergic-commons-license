@@ -16,16 +16,16 @@ import re
 import audit_schedule_reference_coverage as schedule
 
 HEURISTIC_SOURCE = "jurisdiction-safe-canonical-name-or-alias"
-SCOPE_ONLY_SPLITS = (", only ", " only when ", " only in ", " only where ")
 
 
-def pre_scope_including(raw: str) -> bool:
-    lower = raw.lower()
-    include = lower.find(", including ")
-    if include < 0:
-        return False
-    scope_positions = [lower.find(token) for token in SCOPE_ONLY_SPLITS if lower.find(token) >= 0]
-    return not scope_positions or include < min(scope_positions)
+def has_including_clause(raw: str) -> bool:
+    """Treat every comma-delimited `including` clause as review-required.
+
+    Ordering relative to a capacity qualifier must not change semantics: a reference such
+    as `Agency, only in qualifying cases, including Unit B` still names an additional
+    component and cannot be declared fully covered by resolving only `Agency`.
+    """
+    return ", including " in raw.lower()
 
 
 def exact_same_entity_head(head: str, aliases: set[str]) -> bool:
@@ -52,8 +52,8 @@ def unsafe_reason(row: dict, by_id: dict[str, dict]) -> str | None:
     head = row.get("identity_head") or ""
     if not exact_same_entity_head(head, aliases):
         return "heuristic match is not an exact canonical name/alias after capacity stripping"
-    if pre_scope_including(row.get("raw") or ""):
-        return "reference introduces an including-clause before capacity scope and requires reviewed composite handling"
+    if has_including_clause(row.get("raw") or ""):
+        return "reference contains an including-clause and requires reviewed composite handling"
     return None
 
 
@@ -103,15 +103,22 @@ def self_test() -> None:
     }
     assert "not an exact" in (unsafe_reason(prefix, by_id) or "")
 
-    including = {
+    including_before_scope = {
         **exact,
         "identity_head": "National Police",
         "raw": "National Police, including Rescue Coordination Centre and other units, only in qualifying cases",
     }
-    assert "including-clause" in (unsafe_reason(including, by_id) or "")
+    assert "including-clause" in (unsafe_reason(including_before_scope, by_id) or "")
+
+    including_after_scope = {
+        **exact,
+        "identity_head": "National Police",
+        "raw": "National Police, only in qualifying cases, including Rescue Coordination Centre",
+    }
+    assert "including-clause" in (unsafe_reason(including_after_scope, by_id) or "")
 
     reviewed = {
-        **including,
+        **including_after_scope,
         "resolution_source": "reviewed-disposition",
     }
     assert unsafe_reason(reviewed, by_id) is None
