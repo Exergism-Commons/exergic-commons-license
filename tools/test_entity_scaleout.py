@@ -11,9 +11,15 @@ ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ROOT / "knowledge" / "generated"
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 MANIFEST_RE = re.compile(r"^state-dossier-entity-scaleout-v([1-9][0-9]*)\.json$")
-# Promoted nodes are identity records only. This allowlist is deliberately structural:
-# adding any new key requires review instead of hoping a relation/governance blacklist
-# happened to anticipate its spelling.
+# Promoted nodes are identity records only. These allowlists are deliberately structural:
+# adding any new manifest/row/entity key requires review instead of hoping a relation or
+# governance blacklist happened to anticipate its spelling.
+ALLOWED_MANIFEST_KEYS = {
+    "version", "date", "purpose", "follows", "sourceAudit", "identityRule", "identities",
+    "relationClaims", "formalAssessments", "governanceChanges", "explicitNonGoals",
+    "explicitDeferrals",
+}
+ALLOWED_PROMOTION_ROW_KEYS = {"id", "type", "state", "source"}
 ALLOWED_IDENTITY_KEYS = {
     "@context", "iri", "id", "type", "name", "aliases", "dossier", "provenance",
     "lastSubstantiveReview", "reviewDue", "reviewClass", "reviewReason", "publicReviewIssue",
@@ -39,9 +45,25 @@ def validate_manifest_chain(manifests: list[tuple[int, Path]]) -> None:
     previous: Path | None = None
     for version, path in manifests:
         manifest = json.loads(path.read_text(encoding="utf-8"))
+        unexpected = sorted(set(manifest) - ALLOWED_MANIFEST_KEYS)
+        assert not unexpected, f"unexpected scale-out manifest keys in {path.relative_to(ROOT)}: {unexpected}"
         assert manifest.get("version") == version, (
             f"manifest version/file mismatch: {path.relative_to(ROOT)} -> {manifest.get('version')!r}"
         )
+        assert isinstance(manifest.get("date"), str) and manifest["date"].strip(), path
+        assert isinstance(manifest.get("purpose"), str) and manifest["purpose"].strip(), path
+        assert manifest.get("sourceAudit") == "tools/audit_state_dossier_entities.py", (path, manifest.get("sourceAudit"))
+        assert isinstance(manifest.get("identityRule"), str) and manifest["identityRule"].strip(), path
+        assert isinstance(manifest.get("identities"), list), path
+        assert manifest.get("relationClaims") == [], path
+        assert manifest.get("formalAssessments") == [], path
+        assert manifest.get("governanceChanges") == [], path
+        for optional in ("explicitNonGoals", "explicitDeferrals"):
+            if optional in manifest:
+                value = manifest[optional]
+                assert isinstance(value, list) and all(isinstance(item, str) and item.strip() for item in value), (
+                    path, optional, value
+                )
         if previous is None:
             assert not manifest.get("follows"), f"v1 must not follow another manifest: {path.relative_to(ROOT)}"
         else:
@@ -73,17 +95,27 @@ def main() -> int:
     all_historical_ids: list[str] = []
     jurisdiction_errors: list[dict[str, object]] = []
     unexpected_key_errors: list[dict[str, object]] = []
+    row_schema_errors: list[dict[str, object]] = []
     promotion_count = 0
     superseded_count = 0
 
     for version, manifest_path in manifests:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         rows = manifest["identities"]
-        assert isinstance(rows, list), manifest_path
-        assert manifest["relationClaims"] == []
-        assert manifest["formalAssessments"] == []
-        assert manifest["governanceChanges"] == []
-        for row in rows:
+        for row_index, row in enumerate(rows):
+            assert isinstance(row, dict), (manifest_path, row_index, row)
+            unexpected_row_keys = sorted(set(row) - ALLOWED_PROMOTION_ROW_KEYS)
+            missing_row_keys = sorted({"id", "type", "source"} - set(row))
+            if unexpected_row_keys or missing_row_keys:
+                row_schema_errors.append({
+                    "version": version,
+                    "row_index": row_index,
+                    "id": row.get("id"),
+                    "unexpected_keys": unexpected_row_keys,
+                    "missing_required_keys": missing_row_keys,
+                })
+                continue
+
             promotion_count += 1
             historical_id = row["id"]
             all_historical_ids.append(historical_id)
@@ -141,6 +173,9 @@ def main() -> int:
                     f"{historical_id} -> {source_rel}"
                 )
 
+    if row_schema_errors:
+        print("PROMOTION_ROW_SCHEMA_ERRORS=" + json.dumps(row_schema_errors, ensure_ascii=False, sort_keys=True))
+        return 4
     assert len(all_historical_ids) == len(set(all_historical_ids)), "duplicate promoted stable id across historical manifests"
     assert set(supersessions).issubset(set(all_historical_ids)), (
         "supersession sources must be historical promotion IDs", sorted(set(supersessions) - set(all_historical_ids))
@@ -155,7 +190,7 @@ def main() -> int:
     print(
         f"identity scale-out tests: OK ({promotion_count} historical promotions across "
         f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; "
-        "manifest chain contiguous; identity metadata allowlist enforced)"
+        "manifest/row schema and identity metadata allowlists enforced)"
     )
     return 0
 
