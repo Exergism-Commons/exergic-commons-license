@@ -9,6 +9,7 @@ globally. This tool never creates attribution or governance semantics.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 from collections import Counter, defaultdict
@@ -46,6 +47,7 @@ BRACKET_LABEL_RE = re.compile(r"(?<!!)\[([^\]\n]{2,120})\]")
 HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 URL_RE = re.compile(r"https?://\S+")
 INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
+MARKDOWN_EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
 
 
 def norm(text: str) -> str:
@@ -104,14 +106,21 @@ def plausible(name: str) -> bool:
 
 
 def visible_prose(line: str) -> str:
-    """Preserve rendered labels while removing destinations/code/markup indirection."""
+    """Approximate rendered prose while excluding non-prose destinations/code.
+
+    Link/reference labels and HTML element text remain visible to the detector; link
+    destinations, tags and inline code do not. Common emphasis markers are removed after
+    label extraction so formatting cannot split an otherwise high-confidence vendor/action
+    phrase. HTML character references are decoded to their rendered characters.
+    """
     line = INLINE_LINK_RE.sub(lambda match: match.group(1), line)
     line = REFERENCE_LINK_RE.sub(lambda match: match.group(1), line)
     line = BRACKET_LABEL_RE.sub(lambda match: match.group(1), line)
     line = HTML_TAG_RE.sub("", line)
     line = URL_RE.sub("", line)
     line = INLINE_CODE_RE.sub("", line)
-    return line
+    line = MARKDOWN_EMPHASIS_RE.sub("", line)
+    return html.unescape(line)
 
 
 def extract_names(line: str) -> list[tuple[str, str]]:
@@ -185,11 +194,12 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 6,
+        "schema_version": 7,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
             "identity_resolution": "domestic identities resolve automatically only inside their State; transnational identities may resolve globally",
+            "visible_text_policy": "ordinary Markdown links/references/emphasis and HTML tags/entities are normalized to visible prose before high-confidence extraction",
             "non_inference": [
                 "private-organization mention does not prove legal-entity precision",
                 "identity does not prove supply, participation, control or culpability",
@@ -232,9 +242,11 @@ def self_test() -> None:
     expected = [("Cellebrite", "direct-supplier-action")]
     assert extract_names("Cellebrite halted product use in Serbia") == expected
     assert extract_names(visible_prose("[Cellebrite](https://example.test) supplied software")) == expected
+    assert extract_names(visible_prose("[**Cellebrite**](https://example.test) supplied software")) == expected
+    assert extract_names(visible_prose("**Cellebrite** supplied software")) == expected
     assert extract_names(visible_prose("[Cellebrite][vendor] supplied software")) == expected
     assert extract_names(visible_prose("[Cellebrite] supplied software")) == expected
-    assert extract_names(visible_prose('<a href="https://example.test">Cellebrite</a> supplied software')) == expected
+    assert extract_names(visible_prose('<a href="https://example.test"><strong>Cellebrite</strong></a>&nbsp;supplied software')) == expected
     assert extract_names("private contractor support was reported") == []
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
