@@ -19,6 +19,11 @@ ALLOWED_MANIFEST_KEYS = {
     "relationClaims", "formalAssessments", "governanceChanges", "explicitNonGoals",
     "explicitDeferrals",
 }
+ALLOWED_SOURCE_AUDITS = {
+    "tools/audit_state_dossier_entities.py",
+    "tools/audit_private_org_mentions.py",
+    "tools/audit_schedule_reference_coverage.py",
+}
 ALLOWED_PROMOTION_ROW_KEYS = {"id", "type", "state", "source"}
 ALLOWED_IDENTITY_KEYS = {
     "@context", "iri", "id", "type", "name", "aliases", "dossier", "provenance",
@@ -53,8 +58,9 @@ def validate_manifest_chain(manifests: list[tuple[int, Path]]) -> None:
         assert isinstance(manifest.get("date"), str) and manifest["date"].strip(), path
         assert isinstance(manifest.get("purpose"), str) and manifest["purpose"].strip(), path
         if "sourceAudit" in manifest:
-            assert manifest.get("sourceAudit") == "tools/audit_state_dossier_entities.py", (
-                path, manifest.get("sourceAudit")
+            source_audit = manifest.get("sourceAudit")
+            assert source_audit in ALLOWED_SOURCE_AUDITS and (ROOT / source_audit).is_file(), (
+                path, source_audit
             )
         assert isinstance(manifest.get("identityRule"), str) and manifest["identityRule"].strip(), path
         assert isinstance(manifest.get("identities"), list), path
