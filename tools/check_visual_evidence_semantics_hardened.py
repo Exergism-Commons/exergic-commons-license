@@ -16,6 +16,7 @@ for _name, _value in vars(_base).items():
 SVG_NS = "{http://www.w3.org/2000/svg}"
 MIN_VISIBLE_FONT_SIZE = 8.0
 MIN_VISIBLE_OPACITY = 0.05
+MIN_VISIBLE_STROKE_WIDTH = 0.5
 TRANSPARENT_PAINT = {
     "transparent",
     "rgba(0,0,0,0)",
@@ -23,6 +24,7 @@ TRANSPARENT_PAINT = {
     "#0000",
     "#00000000",
 }
+UNVERIFIABLE_PAINT = {"currentcolor", "context-fill", "context-stroke"}
 _original_visible_svg_text = _base.visible_svg_text
 
 
@@ -48,6 +50,59 @@ def _scalar(value: str | None, *, percent: bool = False) -> float | None:
     except ValueError:
         return None
     return number if math.isfinite(number) else None
+
+
+def _unit_interval(value: str | None) -> float | None:
+    number = _scalar(value, percent=True)
+    if number is None or number < 0 or number > 1:
+        return None
+    return number
+
+
+def _functional_alpha(raw: str) -> float | None:
+    """Parse alpha from CSS functional colors when present; fail closed if ambiguous."""
+    value = raw.strip().lower()
+    if not value.endswith(")"):
+        return None
+    inner = value[value.find("(") + 1 : -1].strip()
+    if "/" in inner:
+        alpha_raw = inner.rsplit("/", 1)[1].strip()
+        return _unit_interval(alpha_raw)
+    if value.startswith(("rgba(", "hsla(")):
+        parts = [part.strip() for part in inner.split(",")]
+        if len(parts) != 4:
+            return None
+        return _unit_interval(parts[3])
+    return 1.0
+
+
+def _paint_alpha(value: str | None) -> float | None:
+    """Return demonstrable paint alpha, 0 for no paint, None for indirection/ambiguity."""
+    raw = (value or "").strip().lower()
+    if not raw:
+        return 1.0
+    if raw == "none" or raw in TRANSPARENT_PAINT:
+        return 0.0
+    if raw in UNVERIFIABLE_PAINT or raw.startswith("url(") or raw.startswith("var("):
+        return None
+    if raw.startswith("#"):
+        digits = raw[1:]
+        if not re.fullmatch(r"[0-9a-f]+", digits):
+            return None
+        if len(digits) == 4:  # #RGBA
+            return int(digits[3], 16) / 15.0
+        if len(digits) == 8:  # #RRGGBBAA
+            return int(digits[6:8], 16) / 255.0
+        if len(digits) in {3, 6}:
+            return 1.0
+        return None
+    if raw.startswith(("rgb(", "rgba(", "hsl(", "hsla(")):
+        return _functional_alpha(raw)
+    # CSS named colors other than transparent are opaque. Unknown functional
+    # paint syntaxes fail closed rather than being assumed visible.
+    if "(" in raw or ")" in raw:
+        return None
+    return 1.0
 
 
 def _positive_viewbox(root: ET.Element) -> bool:
@@ -83,30 +138,82 @@ def _ancestor_paint_is_demonstrably_visible(
     element: ET.Element,
     parent_map: dict[ET.Element, ET.Element],
 ) -> bool:
+    """Resolve inherited paint and multiplicative group opacity for one text node."""
+    chain: list[ET.Element] = []
     node: ET.Element | None = element
     while node is not None:
+        chain.append(node)
+        node = parent_map.get(node)
+    chain.reverse()
+
+    effective_opacity = 1.0
+    font_size: float | None = None
+    fill = "black"
+    fill_opacity = 1.0
+    stroke = "none"
+    stroke_opacity = 1.0
+    stroke_width = 1.0
+
+    for node in chain:
         style = _style_map(node.get("style"))
+
+        opacity_raw = node.get("opacity") or style.get("opacity")
+        if opacity_raw is not None:
+            opacity = _unit_interval(opacity_raw)
+            if opacity is None:
+                return False
+            effective_opacity *= opacity
 
         font_raw = node.get("font-size") or style.get("font-size")
         if font_raw is not None:
             font_size = _scalar(font_raw)
-            if font_size is None or font_size < MIN_VISIBLE_FONT_SIZE:
+            if font_size is None:
                 return False
 
-        for attr in ("opacity", "fill-opacity"):
-            raw = node.get(attr) or style.get(attr)
-            if raw is None:
-                continue
-            opacity = _scalar(raw, percent=True)
-            if opacity is None or opacity < MIN_VISIBLE_OPACITY:
+        fill_raw = node.get("fill") or style.get("fill")
+        if fill_raw is not None:
+            fill = fill_raw.strip().lower()
+        fill_opacity_raw = node.get("fill-opacity") or style.get("fill-opacity")
+        if fill_opacity_raw is not None:
+            parsed = _unit_interval(fill_opacity_raw)
+            if parsed is None:
                 return False
+            fill_opacity = parsed
 
-        fill = (node.get("fill") or style.get("fill") or "").strip().lower()
-        if fill in TRANSPARENT_PAINT:
-            return False
+        stroke_raw = node.get("stroke") or style.get("stroke")
+        if stroke_raw is not None:
+            stroke = stroke_raw.strip().lower()
+        stroke_opacity_raw = node.get("stroke-opacity") or style.get("stroke-opacity")
+        if stroke_opacity_raw is not None:
+            parsed = _unit_interval(stroke_opacity_raw)
+            if parsed is None:
+                return False
+            stroke_opacity = parsed
+        stroke_width_raw = node.get("stroke-width") or style.get("stroke-width")
+        if stroke_width_raw is not None:
+            parsed_width = _scalar(stroke_width_raw)
+            if parsed_width is None or parsed_width < 0:
+                return False
+            stroke_width = parsed_width
 
-        node = parent_map.get(node)
-    return True
+    if font_size is not None and font_size < MIN_VISIBLE_FONT_SIZE:
+        return False
+    if effective_opacity < MIN_VISIBLE_OPACITY:
+        return False
+
+    fill_alpha = _paint_alpha(fill)
+    stroke_alpha = _paint_alpha(stroke)
+    if fill_alpha is None or stroke_alpha is None:
+        return False
+
+    fill_visible = (
+        fill_alpha * fill_opacity * effective_opacity >= MIN_VISIBLE_OPACITY
+    )
+    stroke_visible = (
+        stroke_width >= MIN_VISIBLE_STROKE_WIDTH
+        and stroke_alpha * stroke_opacity * effective_opacity >= MIN_VISIBLE_OPACITY
+    )
+    return fill_visible or stroke_visible
 
 
 def visible_svg_text(path: Path) -> str | None:
