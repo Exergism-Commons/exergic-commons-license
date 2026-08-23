@@ -16,7 +16,9 @@ REFERENCE_FIELD_RE = re.compile(
     r"(?:party|parties|operator|operators|actor|actors|agency|agencies|authority|authorities|"
     r"institution|institutions|organization|organisation|company|companies|vendor|supplier|"
     r"project|projects|deployment|deployments|participant|participants|implementer|implementers|"
-    r"entity|entities)",
+    r"entity|entities|owner|owners|controller|controllers|body|bodies|unit|units|department|"
+    r"departments|directorate|directorates|service|services|force|forces|office|offices|bureau|"
+    r"bureaux|command|commands|ministry|ministries)",
     re.I,
 )
 KNOWN_REFERENCE_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
@@ -153,6 +155,9 @@ def self_test() -> None:
     assert REFERENCE_FIELD_RE.search("candidate_actors")
     assert REFERENCE_FIELD_RE.search("deployment_owner")
     assert REFERENCE_FIELD_RE.search("responsible_authorities")
+    assert REFERENCE_FIELD_RE.search("responsible_unit")
+    assert REFERENCE_FIELD_RE.search("controlling_department")
+    assert REFERENCE_FIELD_RE.search("security_service")
     assert not REFERENCE_FIELD_RE.search("legal_basis")
     assert "candidate_parties" in KNOWN_REFERENCE_FIELDS
     assert "project_boundary" in KNOWN_REFERENCE_FIELDS
