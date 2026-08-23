@@ -71,7 +71,7 @@ A disposition must carry a repository provenance path and a reason. `curated-ide
 
 The CI threshold is a **ratchet, not ontology doctrine**. Its current value is stored in `knowledge/generated/state-dossier-review-ratchet.json`; CI reads that versioned file rather than hardcoding the threshold in workflow YAML. Lowering `min_review_priority` is a monotonic curation step and is allowed only after every candidate newly brought into scope has a reviewed disposition or resolves directly to a canonical identity. Priority only orders review work; it never changes the substantive meaning of a candidate or creates governance.
 
-Stale dispositions are rejected by CI unless a `curated-identity` became directly resolvable by the raw audit after the corresponding identity was materialized. This prevents review metadata from silently drifting away from the corpus.
+Stale dispositions are rejected by CI. If a previously reviewed `curated-identity` later becomes directly materialized by the raw audit, the exception remains valid only when the **complete set of currently resolved IDs exactly matches the reviewed `resolved_ids` set**. Alias reassignment or a newly competing identity therefore makes the old review metadata stale rather than silently changing its referent.
 
 ## Curated Schedule-reference gate
 
@@ -86,7 +86,9 @@ For every curated `candidate_parties`/`identified_party`/`identified_operators` 
 
 Reviewed exceptions live in `knowledge/generated/schedule-reference-dispositions-v*.json`. A disposition is identity-resolution metadata only. A multi-identity binding does not assert `partOf`, control, participation, operation or any other relation. A deferral is not evidence against the entity and is not a governance judgment.
 
-CI runs the Schedule audit with `--fail-on-unresolved-curated`, so adding or changing a curated actor/project reference cannot silently create new identity debt.
+Every Schedule source file referenced by a reviewed disposition is **content-addressed in the disposition manifest by its exact Git blob ID**. The audit recomputes those blob IDs from repository bytes before applying any reviewed `match_prefix`. If any reviewed Schedule source changes—even if an old prefix would still match—the overlay fails closed until the changed source is re-reviewed and its pin is explicitly updated. Unused disposition rows and unused source pins are also rejected. This prevents a changed reference such as an added actor/project from inheriting an older reviewed exception silently.
+
+CI runs the Schedule audit with `--fail-on-unresolved-curated`, so ambiguous/unresolved references, stale reviewed dispositions and changed review inputs are all blocking failures.
 
 `scope` fields such as `schedule_identity`, `project_boundary`, identified incidents/locations and remediation text are retained as context and are not automatically coerced into ontology individuals.
 
@@ -96,6 +98,8 @@ The general prose audit is deliberately broad and therefore unsuitable as a comp
 
 - explicit corporate-form names; or
 - a proper name directly tied to a supplier/vendor/private-company action involving a product, technology, software, spyware, platform, tool or service.
+
+Before extraction, visible Markdown/HTML labels are preserved while link destinations, tags, standalone URLs and inline code are removed. Thus a vendor written as `[Cellebrite](...) supplied software` remains semantically equivalent to visible plain text and cannot evade the private-organization gate through ordinary link markup.
 
 Unnamed phrases such as `private contractors` are not converted into invented companies. Product brands are not converted into organizations merely because they are products. International `Working Group` names are filtered rather than misclassified as companies.
 
@@ -121,12 +125,16 @@ For `Project`/`Deployment`, the reviewer must additionally record why the object
 
 After identity promotion, relation curation is a separate pass. A relation is created only as an auditable Claim with supporting EvidenceItem(s). The existence of two identities in the same dossier, freeze or project record is never enough.
 
+## CI trigger integrity
+
+The normative State-dossier audit workflow uses unconditional `tools/**` path triggers for both `push` and `pull_request`. A future helper split, import refactor, executable wrapper or alternate Python invocation under `tools/` therefore cannot change audit semantics without running the gate. The explicit dossier/entity/generated/Schedule/spec paths remain separate trigger surfaces for the data and contract inputs themselves.
+
 ## Intended workflow
 
 1. Prove exact State dossier/identity parity.
 2. Run the deterministic full-corpus State-dossier discovery audit.
 3. Apply the reviewed prose-candidate overlay and lower the versioned review ratchet in bounded tranches.
-4. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved references.
+4. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved/stale references with unchanged pinned review inputs.
 5. Run the high-precision private-organization audit and require zero unresolved high-confidence company/vendor names.
 6. Review unresolved prose candidates using dossier context and existing internal registry/review records.
 7. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
