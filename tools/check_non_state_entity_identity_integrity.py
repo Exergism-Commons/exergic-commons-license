@@ -66,10 +66,11 @@ def validate() -> list[dict]:
         aliases = data.get("aliases")
         if not isinstance(name, str) or not name.strip():
             failures.append({"file": rel, "id": entity_id, "reason": "missing canonical name"})
-        if not isinstance(aliases, list) or not all(isinstance(item, str) and item.strip() for item in aliases):
-            failures.append({"file": rel, "id": entity_id, "reason": "aliases must be a list of non-empty strings"})
-        elif len({identity.default_normalizer(item) for item in aliases}) != len(aliases):
-            failures.append({"file": rel, "id": entity_id, "reason": "duplicate normalized aliases within identity"})
+        if aliases is not None:
+            if not isinstance(aliases, list) or not all(isinstance(item, str) and item.strip() for item in aliases):
+                failures.append({"file": rel, "id": entity_id, "reason": "aliases, when present, must be a list of non-empty strings"})
+            elif len({identity.default_normalizer(item) for item in aliases}) != len(aliases):
+                failures.append({"file": rel, "id": entity_id, "reason": "duplicate normalized aliases within identity"})
 
         dossier = data.get("dossier")
         if not isinstance(dossier, str) or not dossier:
