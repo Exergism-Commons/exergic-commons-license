@@ -7,6 +7,7 @@ import json
 import re
 
 import audit_state_dossier_entities as base
+import check_state_dossier_rendered_markup_coverage as markup
 import review_state_dossier_candidates as reviewed
 
 ROOT = base.ROOT
@@ -16,12 +17,14 @@ TABLE_RE = re.compile(r"^\s*\|.*\|\s*$")
 
 
 def visible_line(raw: str) -> str:
-    line = base.URL_RE.sub("", raw)
-    line = base.MD_LINK_RE.sub(lambda match: match.group(1), line)
     # A backslash immediately before a source newline is a CommonMark hard-break marker,
-    # not visible prose. Remove it so a named phrase cannot hide across that break.
-    line = re.sub(r"\\\s*$", "", line)
-    return line
+    # not visible prose. Remove it before normalizing inline rendered markup.
+    line = re.sub(r"\\\s*$", "", raw)
+    line = markup.rendered_line(line)
+    # A code span can itself cross a soft line break, so a per-line normalizer may see an
+    # unmatched backtick run. The rendered code text remains visible; discard only the
+    # delimiter run so the cross-line name cannot hide behind it.
+    return re.sub(r"`+", "", line)
 
 
 def strip_quote(raw: str) -> str:
@@ -156,10 +159,16 @@ def self_test() -> None:
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in hard), hard
     three = cross_line_candidates("Australian\nHuman Rights\nCommission reported findings.\n")
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in three), three
+    bold = cross_line_candidates("Australian **Human\nRights** Commission reported findings.\n")
+    assert any(row["candidate"] == "Australian Human Rights Commission" for row in bold), bold
+    html_split = cross_line_candidates("Australian <strong>Human\nRights</strong> Commission reported findings.\n")
+    assert any(row["candidate"] == "Australian Human Rights Commission" for row in html_split), html_split
+    code_split = cross_line_candidates("Australian `Human\nRights` Commission reported findings.\n")
+    assert any(row["candidate"] == "Australian Human Rights Commission" for row in code_split), code_split
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
     assert cross_line_candidates("## Australian Human\nRights Commission\n") == []
-    print("State dossier soft/hard-wrap coverage self-test: OK")
+    print("State dossier soft/hard-wrap + inline-markup coverage self-test: OK")
 
 
 def main() -> int:
@@ -173,7 +182,7 @@ def main() -> int:
     if failures:
         print("UNREVIEWED_SOFTWRAP_CANDIDATES=" + json.dumps(failures, ensure_ascii=False, sort_keys=True))
         return 2
-    print("State dossier soft/hard-wrap coverage: OK")
+    print("State dossier soft/hard-wrap + inline-markup coverage: OK")
     return 0
 
 
