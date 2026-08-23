@@ -5,12 +5,11 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from pathlib import Path
 
 import audit_state_dossier_entities as base
 import review_state_dossier_candidates as reviewed
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = base.ROOT
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
 TABLE_RE = re.compile(r"^\s*\|.*\|\s*$")
@@ -25,68 +24,92 @@ def strip_quote(raw: str) -> str:
     return re.sub(r"^\s{0,3}(?:>\s*)+", "", raw)
 
 
-def cross_line_candidates(body: str) -> list[dict]:
-    """Extract only TITLE_RE candidates whose regex match crosses a valid line boundary."""
-    lines = body.splitlines()
-    sections: list[str] = []
+def prose_blocks(body: str) -> list[dict]:
+    """Build paragraph/list-item blocks while preserving every source-line boundary."""
+    blocks: list[dict] = []
     section = "preamble"
     fence_marker: str | None = None
-    usable: list[bool] = []
+    current: dict | None = None
 
-    for raw in lines:
+    def flush() -> None:
+        nonlocal current
+        if current and current["lines"]:
+            blocks.append(current)
+        current = None
+
+    for line_no, raw in enumerate(body.splitlines(), 1):
         fence = FENCE_RE.match(raw)
         if fence:
             marker = fence.group(1)[0]
             if fence_marker is None:
+                flush()
                 fence_marker = marker
             elif marker == fence_marker:
                 fence_marker = None
-            sections.append(section)
-            usable.append(False)
             continue
         if fence_marker is not None:
-            sections.append(section)
-            usable.append(False)
             continue
         heading = base.HEADING_RE.match(raw)
         if heading:
+            flush()
             section = heading.group(1).strip()
-            sections.append(section)
-            usable.append(False)
             continue
-        sections.append(section)
-        usable.append(bool(raw.strip()) and not TABLE_RE.match(raw))
+        if not raw.strip() or TABLE_RE.match(raw):
+            flush()
+            continue
 
+        list_match = LIST_RE.match(raw)
+        if list_match:
+            flush()
+            current = {
+                "relative_line": line_no,
+                "section": section,
+                "raw_lines": [raw],
+                "lines": [visible_line(strip_quote(raw[list_match.end():])).strip()],
+            }
+            continue
+
+        value = visible_line(strip_quote(raw)).strip()
+        if current is None:
+            current = {"relative_line": line_no, "section": section, "raw_lines": [raw], "lines": [value]}
+        else:
+            current["raw_lines"].append(raw)
+            current["lines"].append(value)
+    flush()
+    return blocks
+
+
+def cross_line_candidates(body: str) -> list[dict]:
+    """Extract TITLE_RE candidates whose match crosses one or more rendered line boundaries."""
     found: list[dict] = []
-    for index in range(len(lines) - 1):
-        if not usable[index] or not usable[index + 1] or sections[index] != sections[index + 1]:
+    for block in prose_blocks(body):
+        lines = [line for line in block["lines"] if line]
+        if len(lines) < 2:
             continue
-        left_raw, right_raw = lines[index], lines[index + 1]
-        # A new list item is a separate block. A list item followed by continuation prose
-        # is one block and remains eligible.
-        if LIST_RE.match(right_raw):
-            continue
-        left = LIST_RE.sub("", strip_quote(left_raw), count=1)
-        right = strip_quote(right_raw)
-        left = visible_line(left)
-        right = visible_line(right)
-        if not left.strip() or not right.strip():
-            continue
-        joined = left.rstrip() + " " + right.lstrip()
-        boundary = len(left.rstrip())
+        joined_parts: list[str] = []
+        boundaries: list[int] = []
+        length = 0
+        for index, line in enumerate(lines):
+            if index:
+                boundaries.append(length)
+                joined_parts.append(" ")
+                length += 1
+            joined_parts.append(line)
+            length += len(line)
+        joined = "".join(joined_parts)
         for match in base.TITLE_RE.finditer(joined):
-            if not (match.start() <= boundary < match.end()):
+            if not any(match.start() <= boundary < match.end() for boundary in boundaries):
                 continue
             value = base.clean_candidate(match.group(0))
             kind = base.classify(value)
             if kind and base.plausible(value):
                 found.append({
-                    "relative_line": index + 1,
-                    "section": sections[index],
+                    "relative_line": block["relative_line"],
+                    "section": block["section"],
                     "candidate": value,
                     "normalized": base.norm(value),
                     "kind": kind,
-                    "snippet": f"{left_raw.strip()} / {right_raw.strip()}"[:420],
+                    "snippet": " / ".join(raw.strip() for raw in block["raw_lines"])[:420],
                 })
     dedup: dict[tuple[int, str, str], dict] = {}
     for row in found:
@@ -125,6 +148,8 @@ def audit() -> list[dict]:
 def self_test() -> None:
     rows = cross_line_candidates("Australian Human\nRights Commission reported findings.\n")
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in rows), rows
+    three = cross_line_candidates("Australian\nHuman Rights\nCommission reported findings.\n")
+    assert any(row["candidate"] == "Australian Human Rights Commission" for row in three), three
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
     assert cross_line_candidates("## Australian Human\nRights Commission\n") == []
