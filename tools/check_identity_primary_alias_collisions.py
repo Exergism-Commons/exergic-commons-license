@@ -64,6 +64,37 @@ def global_domestic_shadows() -> list[dict]:
     return failures
 
 
+def state_non_state_shadows() -> list[dict]:
+    """Country names/aliases must not resolve as non-State identities in the prose index."""
+    entities, _ = identity.load_repository_entities()
+    supersessions = identity.load_id_supersessions()
+    state_rows: dict[str, list[dict]] = defaultdict(list)
+    non_state_rows: dict[str, list[dict]] = defaultdict(list)
+    for entity in entities:
+        entity_id = entity.get("id")
+        if not isinstance(entity_id, str) or entity_id in supersessions:
+            continue
+        values: list[tuple[str, str]] = []
+        name = entity.get("name")
+        if isinstance(name, str) and identity.default_normalizer(name):
+            values.append(("primary", name))
+        for alias in entity.get("aliases") or []:
+            if isinstance(alias, str) and identity.default_normalizer(alias):
+                values.append(("alias", alias))
+        target = state_rows if entity.get("type") == "State" else non_state_rows
+        for kind, text in values:
+            target[identity.default_normalizer(text)].append({"id": entity_id, "kind": kind, "text": text})
+
+    failures: list[dict] = []
+    for normalized in sorted(set(state_rows) & set(non_state_rows)):
+        failures.append({
+            "normalized": normalized,
+            "state_matches": state_rows[normalized],
+            "non_state_matches": non_state_rows[normalized],
+        })
+    return failures
+
+
 def self_test() -> None:
     sample = [
         {"id": "A", "kind": "primary", "text": "National Service"},
@@ -88,10 +119,12 @@ def main() -> int:
         return 0
     same_scope = collisions()
     shadows = global_domestic_shadows()
-    if same_scope or shadows:
+    state_shadows = state_non_state_shadows()
+    if same_scope or shadows or state_shadows:
         print("IDENTITY_NAME_RESOLUTION_COLLISIONS=" + json.dumps({
             "same_scope_primary_alias": same_scope,
             "global_domestic_shadows": shadows,
+            "state_non_state_shadows": state_shadows,
         }, ensure_ascii=False, sort_keys=True))
         return 2
     print("identity name-resolution collisions: none")
