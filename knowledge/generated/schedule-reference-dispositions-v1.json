@@ -8,7 +8,17 @@
       "deferred means the representation boundary is not exact enough; it is not an evidence or governance judgment",
       "multi-identity bindings do not imply hierarchy or relations between the bound identities",
       "partial-deferred preserves the exact resolved component while keeping unspecified components unresolved"
-    ]
+    ],
+    "review_binding": "Every source containing reviewed dispositions is pinned to its exact Git blob. Any source edit invalidates the reviewed overlay until the source is re-reviewed and its pin is explicitly updated."
+  },
+  "source_blobs": {
+    "registry/schedule-state-s-freezes/batch-01-identity.yml": "2bfb8b89c5d39e89a86c1de6247d1ebf5755e6f36",
+    "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml": "11d5be928437b65f5f2cb886df967b57eb51a396",
+    "registry/schedule-state-s-freezes/batch-03a-usa.yml": "f0716773b0806e2b8d9b1dfbfc4a5fef3546acb9",
+    "registry/schedule-state-s-freezes/batch-04-detention-digital.yml": "5e46fadec42a3947685489e26b3cbd54a610990c",
+    "registry/schedule-state-s-freezes/batch-05-project-status.yml": "40b8b89c5d39e89a86c1de6247d1ebf5755e6f36",
+    "registry/schedule-state-s-freezes/batch-06-statutory-cases.yml": "79d8b07b8de777b47ca38bf16da86cab8a417aa9",
+    "registry/schedule-state-s-freezes/batch-07-identified-projects.yml": "dc096fac9c6abdbd15d19b08ab9b67e8e46ef67b"
   },
   "entries": [
     {"source":"registry/schedule-state-s-freezes/batch-01-identity.yml","state":"HRV","field":"candidate_projects","match_prefix":"Croatian external-border operations materially involving violence","disposition":"deferred","resolved_ids":[],"reason":"Qualifying external-border operation class, not one stable Project/Deployment identity."},
