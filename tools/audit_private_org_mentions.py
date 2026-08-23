@@ -40,6 +40,12 @@ STOP = {
     "State Security", "Human Rights", "State Delta", "Federal Government", "High Court",
     "Court of Appeal", "United Nations", "European Union",
 }
+INLINE_LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\((?:[^()\n]|\([^()\n]*\))*\)")
+REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\[[^\]\n]*\]")
+BRACKET_LABEL_RE = re.compile(r"(?<!!)\[([^\]\n]{2,120})\]")
+HTML_TAG_RE = re.compile(r"<[^>\n]+>")
+URL_RE = re.compile(r"https?://\S+")
+INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 
 
 def norm(text: str) -> str:
@@ -97,6 +103,17 @@ def plausible(name: str) -> bool:
     return True
 
 
+def visible_prose(line: str) -> str:
+    """Preserve rendered labels while removing destinations/code/markup indirection."""
+    line = INLINE_LINK_RE.sub(lambda match: match.group(1), line)
+    line = REFERENCE_LINK_RE.sub(lambda match: match.group(1), line)
+    line = BRACKET_LABEL_RE.sub(lambda match: match.group(1), line)
+    line = HTML_TAG_RE.sub("", line)
+    line = URL_RE.sub("", line)
+    line = INLINE_CODE_RE.sub("", line)
+    return line
+
+
 def extract_names(line: str) -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = []
     for match in CORPORATE_FORM_RE.finditer(line):
@@ -131,8 +148,7 @@ def audit() -> dict:
         text = path.read_text(encoding="utf-8")
         line_offset = text[:offset].count("\n")
         for rel_line, raw in enumerate(text[offset:].splitlines(), 1):
-            line = re.sub(r"https?://\S+", "", raw)
-            line = re.sub(r"`[^`]+`", "", line)
+            line = visible_prose(raw)
             for name, method in extract_names(line):
                 matches = resolve_normalized(known, state=iso, normalized=norm(name))
                 resolved = matches[0] if len(matches) == 1 else None
@@ -213,7 +229,12 @@ def write_markdown(report: dict, path: Path) -> None:
 
 
 def self_test() -> None:
-    assert extract_names("Cellebrite halted product use in Serbia") == [("Cellebrite", "direct-supplier-action")]
+    expected = [("Cellebrite", "direct-supplier-action")]
+    assert extract_names("Cellebrite halted product use in Serbia") == expected
+    assert extract_names(visible_prose("[Cellebrite](https://example.test) supplied software")) == expected
+    assert extract_names(visible_prose("[Cellebrite][vendor] supplied software")) == expected
+    assert extract_names(visible_prose("[Cellebrite] supplied software")) == expected
+    assert extract_names(visible_prose('<a href="https://example.test">Cellebrite</a> supplied software')) == expected
     assert extract_names("private contractor support was reported") == []
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
