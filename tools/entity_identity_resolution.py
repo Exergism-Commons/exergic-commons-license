@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 GENERATED_DIR = ROOT / "knowledge" / "generated"
 SUPERSESSION_GLOB = "entity-id-supersessions-v*.json"
+SUPERSESSION_RE = re.compile(r"^entity-id-supersessions-v([1-9][0-9]*)\.json$")
 
 DOMESTIC_ID_RE = re.compile(
     r"^(?:AGENCY|INSTITUTION|ORG|PROJECT|DEPLOYMENT|PERSON)-([A-Z]{3})(?:-|$)"
@@ -37,11 +38,36 @@ def infer_domestic_state(entity_id: str, state_codes: set[str]) -> str | None:
     return state if state in state_codes else None
 
 
+def supersession_manifests() -> list[tuple[int, Path]]:
+    manifests: list[tuple[int, Path]] = []
+    for path in GENERATED_DIR.glob(SUPERSESSION_GLOB):
+        match = SUPERSESSION_RE.fullmatch(path.name)
+        assert match, f"malformed identity supersession filename: {path.name}"
+        manifests.append((int(match.group(1)), path))
+    manifests.sort()
+    if not manifests:
+        return []
+    versions = [version for version, _ in manifests]
+    assert versions == list(range(1, versions[-1] + 1)), f"non-contiguous identity supersession versions: {versions}"
+    return manifests
+
+
 def load_id_supersessions() -> dict[str, str]:
     mapping: dict[str, str] = {}
-    for path in sorted(GENERATED_DIR.glob(SUPERSESSION_GLOB)):
+    previous: Path | None = None
+    for version, path in supersession_manifests():
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert isinstance(data.get("version"), int) and data["version"] >= 1, path
+        assert data.get("version") == version, (
+            f"supersession version/file mismatch: {path.relative_to(ROOT)} -> {data.get('version')!r}"
+        )
+        if previous is None:
+            assert not data.get("follows"), f"v1 supersessions must not follow another manifest: {path.relative_to(ROOT)}"
+        else:
+            expected = str(previous.relative_to(ROOT))
+            assert data.get("follows") == expected, (
+                f"broken supersession follows chain at {path.relative_to(ROOT)}: "
+                f"expected {expected!r}, got {data.get('follows')!r}"
+            )
         for row in data.get("supersessions", []):
             source = row.get("from")
             target = row.get("to")
@@ -54,6 +80,7 @@ def load_id_supersessions() -> dict[str, str]:
             )
             assert source not in mapping, f"duplicate identity supersession source: {source}"
             mapping[source] = target
+        previous = path
 
     chained = sorted(source for source, target in mapping.items() if target in mapping)
     assert not chained, f"identity supersession chains are forbidden: {chained}"
@@ -253,4 +280,4 @@ if __name__ == "__main__":
     if qualified_duplicates:
         print("DUPLICATE_STATE_QUALIFIED_IDENTITIES=" + json.dumps(qualified_duplicates, sort_keys=True))
         raise SystemExit(1)
-    print("entity identity resolution self-test: OK; supersessions valid; repository identity names unique")
+    print("entity identity resolution self-test: OK; supersession chain valid; repository identity names unique")
