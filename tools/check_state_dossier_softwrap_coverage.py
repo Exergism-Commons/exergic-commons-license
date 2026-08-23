@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed on named State-dossier candidates hidden across Markdown soft line breaks."""
+"""Fail closed on named State-dossier candidates hidden across Markdown soft/hard line breaks."""
 from __future__ import annotations
 
 import argparse
@@ -17,7 +17,11 @@ TABLE_RE = re.compile(r"^\s*\|.*\|\s*$")
 
 def visible_line(raw: str) -> str:
     line = base.URL_RE.sub("", raw)
-    return base.MD_LINK_RE.sub(lambda match: match.group(1), line)
+    line = base.MD_LINK_RE.sub(lambda match: match.group(1), line)
+    # A backslash immediately before a source newline is a CommonMark hard-break marker,
+    # not visible prose. Remove it so a named phrase cannot hide across that break.
+    line = re.sub(r"\\\s*$", "", line)
+    return line
 
 
 def strip_quote(raw: str) -> str:
@@ -148,12 +152,14 @@ def audit() -> list[dict]:
 def self_test() -> None:
     rows = cross_line_candidates("Australian Human\nRights Commission reported findings.\n")
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in rows), rows
+    hard = cross_line_candidates("Australian Human\\\nRights Commission reported findings.\n")
+    assert any(row["candidate"] == "Australian Human Rights Commission" for row in hard), hard
     three = cross_line_candidates("Australian\nHuman Rights\nCommission reported findings.\n")
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in three), three
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
     assert cross_line_candidates("## Australian Human\nRights Commission\n") == []
-    print("State dossier soft-wrap coverage self-test: OK")
+    print("State dossier soft/hard-wrap coverage self-test: OK")
 
 
 def main() -> int:
@@ -167,7 +173,7 @@ def main() -> int:
     if failures:
         print("UNREVIEWED_SOFTWRAP_CANDIDATES=" + json.dumps(failures, ensure_ascii=False, sort_keys=True))
         return 2
-    print("State dossier soft-wrap coverage: OK")
+    print("State dossier soft/hard-wrap coverage: OK")
     return 0
 
 
