@@ -5,10 +5,11 @@ import json
 import re
 from pathlib import Path
 
-from entity_identity_resolution import canonicalize_id, load_id_supersessions
+from entity_identity_resolution import canonicalize_id, infer_domestic_state, load_id_supersessions
 
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ROOT / "knowledge" / "generated"
+ENTITY_DIR = ROOT / "knowledge" / "entities"
 MANIFEST_RE = re.compile(r"^state-dossier-entity-scaleout-v([1-9][0-9]*)\.json$")
 FORBIDDEN_GOVERNANCE = {
     "provisional_outcome", "outcome", "tier", "derived_outcome", "score_outcome",
@@ -53,10 +54,23 @@ def validate_manifest_chain(manifests: list[tuple[int, Path]]) -> None:
         previous = path
 
 
+def canonical_state_codes() -> set[str]:
+    result: set[str] = set()
+    for path in ENTITY_DIR.glob("STATE-*.json"):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        entity_id = data.get("id")
+        if data.get("type") == "State" and isinstance(entity_id, str) and entity_id.startswith("STATE-"):
+            state = entity_id.removeprefix("STATE-")
+            if STATE_RE.fullmatch(state):
+                result.add(state)
+    return result
+
+
 def main() -> int:
     manifests = manifests_by_version()
     validate_manifest_chain(manifests)
     supersessions = load_id_supersessions()
+    state_codes = canonical_state_codes()
     all_historical_ids: list[str] = []
     promotion_count = 0
     superseded_count = 0
@@ -75,11 +89,17 @@ def main() -> int:
             if row_state is not None:
                 assert isinstance(row_state, str) and STATE_RE.fullmatch(row_state), (manifest_path, row)
             entity_id = canonicalize_id(historical_id, supersessions)
+            domestic_state = infer_domestic_state(entity_id, state_codes)
+            if row_state is not None and domestic_state is not None:
+                assert row_state == domestic_state, (
+                    f"manifest State/ID mismatch in v{version}: {historical_id} canonicalizes to {entity_id} "
+                    f"({domestic_state}) but row declares {row_state}"
+                )
             if entity_id != historical_id:
                 superseded_count += 1
-                old_path = ROOT / "knowledge" / "entities" / f"{historical_id}.json"
+                old_path = ENTITY_DIR / f"{historical_id}.json"
                 assert not old_path.exists(), f"superseded identity source still materialized: {old_path}"
-            path = ROOT / "knowledge" / "entities" / f"{entity_id}.json"
+            path = ENTITY_DIR / f"{entity_id}.json"
             assert path.exists(), f"missing promoted/canonical identity: {path} (historical {historical_id})"
             data = json.loads(path.read_text(encoding="utf-8"))
             assert data["id"] == entity_id
@@ -99,6 +119,9 @@ def main() -> int:
                     f"state {row_state}, source {source_rel}"
                 )
     assert len(all_historical_ids) == len(set(all_historical_ids)), "duplicate promoted stable id across historical manifests"
+    assert set(supersessions).issubset(set(all_historical_ids)), (
+        "supersession sources must be historical promotion IDs", sorted(set(supersessions) - set(all_historical_ids))
+    )
     print(
         f"identity scale-out tests: OK ({promotion_count} historical promotions across "
         f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; manifest chain contiguous)"
