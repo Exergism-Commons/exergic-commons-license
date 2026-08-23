@@ -44,6 +44,9 @@ STOP = {
 INLINE_LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\((?:[^()\n]|\([^()\n]*\))*\)")
 REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\[[^\]\n]*\]")
 BRACKET_LABEL_RE = re.compile(r"(?<!!)\[([^\]\n]{2,120})\]")
+HTML_BREAK_TAG_RE = re.compile(
+    r"</?(?:br|p|div|li|ul|ol|table|tr|td|th|blockquote|section|article|h[1-6])\b[^>\n]*>", re.I
+)
 HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 URL_RE = re.compile(r"https?://\S+")
 INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
@@ -113,6 +116,10 @@ def visible_prose(text: str) -> str:
     text = INLINE_LINK_RE.sub(lambda match: match.group(1), text)
     text = REFERENCE_LINK_RE.sub(lambda match: match.group(1), text)
     text = BRACKET_LABEL_RE.sub(lambda match: match.group(1), text)
+    # Structural HTML creates a rendered separation; inline tags do not. Keeping that
+    # distinction prevents both `Cellebrite<br>supplied` and `Celle<strong>brite</strong>`
+    # from becoming detector bypasses in opposite directions.
+    text = HTML_BREAK_TAG_RE.sub(" ", text)
     text = HTML_TAG_RE.sub("", text)
     text = URL_RE.sub("", text)
     text = INLINE_CODE_RE.sub("", text)
@@ -258,12 +265,12 @@ def audit() -> dict:
     unresolved = [row for row in candidates if row["resolution"] == "review-candidate"]
     resolved = [row for row in candidates if row["resolution"] == "materialized"]
     return {
-        "schema_version": 8,
+        "schema_version": 9,
         "semantics": {
             "purpose": "high-precision discovery of named private-organization/vendor candidates",
             "precision_policy": "corporate-form or direct vendor/private action only; unnamed contractor/supplier classes are not fabricated",
             "identity_resolution": "domestic identities resolve automatically only inside their State; transnational identities may resolve globally",
-            "visible_text_policy": "ordinary Markdown links/references/emphasis, HTML tags/entities and CommonMark soft line breaks are normalized to rendered prose; fenced/inline code is excluded",
+            "visible_text_policy": "ordinary Markdown links/references/emphasis, structural versus inline HTML, HTML entities and CommonMark soft line breaks are normalized to rendered prose; fenced/inline code is excluded",
             "non_inference": [
                 "private-organization mention does not prove legal-entity precision",
                 "identity does not prove supply, participation, control or culpability",
@@ -311,6 +318,8 @@ def self_test() -> None:
     assert extract_names(visible_prose("[Cellebrite][vendor] supplied software")) == expected
     assert extract_names(visible_prose("[Cellebrite] supplied software")) == expected
     assert extract_names(visible_prose('<a href="https://example.test"><strong>Cellebrite</strong></a>&nbsp;supplied software')) == expected
+    assert extract_names(visible_prose("Cellebrite<br>supplied software")) == expected
+    assert extract_names(visible_prose("Celle<strong>brite</strong> supplied software")) == expected
     soft = rendered_prose_segments("Cellebrite\nsupplied software\n")
     assert len(soft) == 1 and extract_names(soft[0][2]) == expected
     separate_items = rendered_prose_segments("- Cellebrite\n- supplied software\n")
