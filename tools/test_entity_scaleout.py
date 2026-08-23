@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from entity_identity_resolution import canonicalize_id, load_id_supersessions
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFESTS = sorted((ROOT / "knowledge" / "generated").glob("state-dossier-entity-scaleout-v*.json"))
+GENERATED = ROOT / "knowledge" / "generated"
+MANIFEST_RE = re.compile(r"^state-dossier-entity-scaleout-v([1-9][0-9]*)\.json$")
 FORBIDDEN_GOVERNANCE = {
     "provisional_outcome", "outcome", "tier", "derived_outcome", "score_outcome",
     "governanceStatus", "governanceOutcome", "restrictionStatus"
@@ -17,17 +19,51 @@ FORBIDDEN_RELATIONS = {
     "materiallyBenefits", "tracks", "remediates", "reviews"
 }
 ALLOWED_TYPES = {"Agency", "Organization", "Institution", "Person", "Project", "Deployment"}
+STATE_RE = re.compile(r"^[A-Z]{3}$")
+
+
+def manifests_by_version() -> list[tuple[int, Path]]:
+    rows: list[tuple[int, Path]] = []
+    for path in GENERATED.glob("state-dossier-entity-scaleout-v*.json"):
+        match = MANIFEST_RE.fullmatch(path.name)
+        assert match, f"malformed scale-out manifest filename: {path.name}"
+        rows.append((int(match.group(1)), path))
+    rows.sort()
+    return rows
+
+
+def validate_manifest_chain(manifests: list[tuple[int, Path]]) -> None:
+    assert manifests, "no entity scale-out manifests"
+    versions = [version for version, _ in manifests]
+    assert versions == list(range(1, versions[-1] + 1)), f"non-contiguous scale-out manifest versions: {versions}"
+    previous: Path | None = None
+    for version, path in manifests:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        assert manifest.get("version") == version, (
+            f"manifest version/file mismatch: {path.relative_to(ROOT)} -> {manifest.get('version')!r}"
+        )
+        if previous is None:
+            assert not manifest.get("follows"), f"v1 must not follow another manifest: {path.relative_to(ROOT)}"
+        else:
+            expected = str(previous.relative_to(ROOT))
+            assert manifest.get("follows") == expected, (
+                f"broken scale-out follows chain at {path.relative_to(ROOT)}: "
+                f"expected {expected!r}, got {manifest.get('follows')!r}"
+            )
+        previous = path
 
 
 def main() -> int:
-    assert MANIFESTS, "no entity scale-out manifests"
+    manifests = manifests_by_version()
+    validate_manifest_chain(manifests)
     supersessions = load_id_supersessions()
     all_historical_ids: list[str] = []
     promotion_count = 0
     superseded_count = 0
-    for manifest_path in MANIFESTS:
+    for version, manifest_path in manifests:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         rows = manifest["identities"]
+        assert isinstance(rows, list), manifest_path
         assert manifest["relationClaims"] == []
         assert manifest["formalAssessments"] == []
         assert manifest["governanceChanges"] == []
@@ -35,6 +71,9 @@ def main() -> int:
             promotion_count += 1
             historical_id = row["id"]
             all_historical_ids.append(historical_id)
+            row_state = row.get("state")
+            if row_state is not None:
+                assert isinstance(row_state, str) and STATE_RE.fullmatch(row_state), (manifest_path, row)
             entity_id = canonicalize_id(historical_id, supersessions)
             if entity_id != historical_id:
                 superseded_count += 1
@@ -53,10 +92,16 @@ def main() -> int:
             assert dossier.exists(), (entity_id, dossier)
             source = ROOT / row["source"]
             assert source.exists(), (historical_id, source)
+            source_rel = Path(row["source"])
+            if row_state is not None and source_rel.parts[:2] == ("dossiers", "states") and source_rel.suffix == ".md":
+                assert source_rel.stem == row_state, (
+                    f"manifest State/source mismatch in v{version}: {historical_id} -> "
+                    f"state {row_state}, source {source_rel}"
+                )
     assert len(all_historical_ids) == len(set(all_historical_ids)), "duplicate promoted stable id across historical manifests"
     print(
         f"identity scale-out tests: OK ({promotion_count} historical promotions across "
-        f"{len(MANIFESTS)} manifests; {superseded_count} canonicalized IDs)"
+        f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; manifest chain contiguous)"
     )
     return 0
 
