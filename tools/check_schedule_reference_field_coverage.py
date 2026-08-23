@@ -76,6 +76,61 @@ def metadata_failure(field: str, value: object, record: dict, state_names: dict[
     return "not-metadata"
 
 
+def append_failure(failures: list[dict], *, path, record_index: int | None, field_path: tuple[str, ...], reason: str) -> None:
+    row = {
+        "source": str(path.relative_to(schedule.ROOT)),
+        "field_path": ".".join(field_path),
+        "reason": reason,
+    }
+    if record_index is not None:
+        row["record_index"] = record_index
+    failures.append(row)
+
+
+def validate_record_fields(path, record_index: int, record: dict, state_names: dict[str, str], cross_ids: dict[str, set[str]], failures: list[dict]) -> None:
+    for field_path, value in walk_dict_fields(record):
+        field = field_path[-1]
+        top_level = len(field_path) == 1
+
+        if top_level and field in KNOWN_REFERENCE_FIELDS:
+            continue
+        if top_level and field in {"entity", *PROVENANCE_FIELDS}:
+            problem = metadata_failure(field, value, record, state_names)
+            if problem is None:
+                continue
+            append_failure(failures, path=path, record_index=record_index, field_path=field_path, reason=problem)
+            continue
+        if top_level and field in CROSS_ENTITY_LINK_FIELDS:
+            if not isinstance(value, str) or value not in cross_ids[field]:
+                append_failure(
+                    failures, path=path, record_index=record_index, field_path=field_path,
+                    reason=f"cross-entity link does not resolve in {CROSS_ENTITY_LINK_FIELDS[field]}",
+                )
+            continue
+
+        if field in KNOWN_REFERENCE_FIELDS or field in {"entity", *PROVENANCE_FIELDS, *CROSS_ENTITY_LINK_FIELDS}:
+            reason = "identity/provenance field is nested outside the flat schema audited by coverage"
+        elif REFERENCE_FIELD_RE.search(field):
+            reason = "identity-bearing-looking field is not classified by the Schedule coverage schema"
+        else:
+            continue
+        append_failure(failures, path=path, record_index=record_index, field_path=field_path, reason=reason)
+
+
+def validate_document_root(path, data: object, failures: list[dict]) -> None:
+    """Multi-record document metadata must not acquire a second unaudited identity surface."""
+    if not isinstance(data, dict) or not isinstance(data.get("records"), list):
+        return
+    root = {key: value for key, value in data.items() if key != "records"}
+    for field_path, _ in walk_dict_fields(root):
+        field = field_path[-1]
+        if field in KNOWN_REFERENCE_FIELDS or field in {"entity", *PROVENANCE_FIELDS, *CROSS_ENTITY_LINK_FIELDS} or REFERENCE_FIELD_RE.search(field):
+            append_failure(
+                failures, path=path, record_index=None, field_path=field_path,
+                reason="identity-bearing field appears at multi-record document root outside audited records",
+            )
+
+
 def unknown_reference_fields() -> list[dict]:
     failures: list[dict] = []
     files = sorted(schedule.FREEZE_DIR.glob("*.yml")) + sorted(schedule.FREEZE_DIR.glob("*.yaml"))
@@ -84,49 +139,12 @@ def unknown_reference_fields() -> list[dict]:
 
     for path in files:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        validate_document_root(path, data, failures)
         for record_index, record in enumerate(schedule.records_from_document(data)):
-            for field_path, value in walk_dict_fields(record):
-                field = field_path[-1]
-                top_level = len(field_path) == 1
+            validate_record_fields(path, record_index, record, state_names, cross_ids, failures)
 
-                if top_level and field in KNOWN_REFERENCE_FIELDS:
-                    continue
-                if top_level and field in {"entity", *PROVENANCE_FIELDS}:
-                    problem = metadata_failure(field, value, record, state_names)
-                    if problem is None:
-                        continue
-                    failures.append({
-                        "source": str(path.relative_to(schedule.ROOT)),
-                        "record_index": record_index,
-                        "field_path": field,
-                        "reason": problem,
-                    })
-                    continue
-                if top_level and field in CROSS_ENTITY_LINK_FIELDS:
-                    if not isinstance(value, str) or value not in cross_ids[field]:
-                        failures.append({
-                            "source": str(path.relative_to(schedule.ROOT)),
-                            "record_index": record_index,
-                            "field_path": field,
-                            "reason": f"cross-entity link does not resolve in {CROSS_ENTITY_LINK_FIELDS[field]}",
-                        })
-                    continue
-
-                if field in KNOWN_REFERENCE_FIELDS or field in {"entity", *PROVENANCE_FIELDS, *CROSS_ENTITY_LINK_FIELDS}:
-                    reason = "identity/provenance field is nested outside the flat schema audited by coverage"
-                elif REFERENCE_FIELD_RE.search(field):
-                    reason = "identity-bearing-looking field is not classified by the Schedule coverage schema"
-                else:
-                    continue
-                failures.append({
-                    "source": str(path.relative_to(schedule.ROOT)),
-                    "record_index": record_index,
-                    "field_path": ".".join(field_path),
-                    "reason": reason,
-                })
-
-    dedup: dict[tuple[str, int, str], dict] = {
-        (row["source"], row["record_index"], row["field_path"]): row for row in failures
+    dedup: dict[tuple[str, object, str], dict] = {
+        (row["source"], row.get("record_index"), row["field_path"]): row for row in failures
     }
     return list(dedup.values())
 
@@ -142,6 +160,12 @@ def self_test() -> None:
     assert any(path == ("details", "candidate_parties") for path, _ in nested)
     assert "MITIGA-DETENTION-APPARATUS" in registry_ids("registry/projects.yml")
     assert "SDF-RADA" in registry_ids("registry/organizations.yml")
+    synthetic_failures: list[dict] = []
+    validate_document_root(
+        schedule.ROOT / "registry" / "schedule-state-s-freezes" / "synthetic.yml",
+        {"records": [], "candidate_parties": ["Agency"]}, synthetic_failures,
+    )
+    assert synthetic_failures and synthetic_failures[0]["field_path"] == "candidate_parties"
     print("Schedule reference-field coverage self-test: OK")
 
 
