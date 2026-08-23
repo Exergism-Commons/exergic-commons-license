@@ -25,6 +25,9 @@ REFERENCE_FIELD_RE = re.compile(
 )
 KNOWN_REFERENCE_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
 PROVENANCE_FIELDS = {"identity_sources"}
+# These fields are explicitly negative/contextual boundaries. Exact named identities may
+# appear here precisely to say they are excluded from the candidate Schedule scope.
+CONTEXT_IDENTITY_FIELDS = {"exclusions", "residual_unfrozen_scope"}
 CROSS_ENTITY_LINK_FIELDS = {
     "linked_project_id": "registry/projects.yml",
     "linked_organization_id": "registry/organizations.yml",
@@ -172,6 +175,8 @@ def validate_record_fields(
                     reason=f"cross-entity link does not resolve in {CROSS_ENTITY_LINK_FIELDS[field]}",
                 )
             continue
+        if top_level and field in CONTEXT_IDENTITY_FIELDS:
+            continue
 
         if field in KNOWN_REFERENCE_FIELDS or field in {"entity", *PROVENANCE_FIELDS, *CROSS_ENTITY_LINK_FIELDS}:
             reason = "identity/provenance field is nested outside the flat schema audited by coverage"
@@ -266,6 +271,7 @@ def self_test() -> None:
     assert not REFERENCE_FIELD_RE.search("legal_basis")
     assert "candidate_parties" in KNOWN_REFERENCE_FIELDS
     assert "project_boundary" in KNOWN_REFERENCE_FIELDS
+    assert "exclusions" in CONTEXT_IDENTITY_FIELDS
     assert reference_value_failure("candidate_parties", ["Agency"]) is None
     assert reference_value_failure("candidate_parties", ["Agency", 7]) is not None
     assert reference_value_failure("candidate_parties", {"name": "Agency"}) is not None
