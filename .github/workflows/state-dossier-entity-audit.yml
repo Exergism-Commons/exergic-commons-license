@@ -44,6 +44,13 @@ jobs:
       - name: Install Schedule parser dependency
         run: python -m pip install -r tools/schedule-requirements.txt
 
+      - name: Reject duplicate structured-data keys
+        run: |
+          python tools/check_json_duplicate_keys.py --self-test
+          python tools/check_schedule_yaml_duplicate_keys.py --self-test
+          python tools/check_json_duplicate_keys.py
+          python tools/check_schedule_yaml_duplicate_keys.py
+
       - name: Require exact State dossier/identity parity
         run: python tools/check_state_dossier_identity_sets.py
 
