@@ -9,6 +9,7 @@ State-scoped; explicit reviewed dispositions may intentionally bind cross-State 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 from collections import Counter
@@ -36,19 +37,18 @@ SCOPE_FIELDS = (
 )
 CAPACITY_SPLITS = (", only ", ", including ", " only when ", " only in ", " only where ")
 VALID_DISPOSITIONS = {"bound", "deferred", "partial-deferred"}
-SAFE_DISPOSITION_TAILS = (
-    ", only ", " only ", ", including ", " including ", ", associated ", " associated ",
-    ", arising ", " arising ", ", limited ", " limited ", ", subject ", " subject ",
-    ", where ", " where ", ", when ", " when ", ", under ", " under ",
-    ", involving ", " involving ", ", as ", " as ", ", identified ", " identified ",
-)
-PARTIAL_DEFERRED_TAILS = SAFE_DISPOSITION_TAILS + (" and ", ", and ")
+BLOB_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def norm(text: str) -> str:
     text = text.lower().replace("’", "'")
     text = re.sub(r"[^a-z0-9]+", " ", text)
     return " ".join(text.split())
+
+
+def git_blob_sha1(content: bytes) -> str:
+    header = f"blob {len(content)}\0".encode("ascii")
+    return hashlib.sha1(header + content).hexdigest()
 
 
 def load_entities():
@@ -75,8 +75,20 @@ def load_entities():
 
 def load_dispositions() -> list[dict]:
     rows: list[dict] = []
+    pinned_sources: dict[str, str] = {}
+    referenced_sources: set[str] = set()
     for path in sorted((ROOT / "knowledge" / "generated").glob(DISPOSITION_GLOB)):
         data = json.loads(path.read_text(encoding="utf-8"))
+        source_blobs = data.get("source_blobs")
+        if not isinstance(source_blobs, dict) or not source_blobs:
+            raise ValueError(f"reviewed Schedule dispositions must pin source_blobs: {path}")
+        for source, expected_sha in source_blobs.items():
+            if not isinstance(source, str) or not source or not isinstance(expected_sha, str) or not BLOB_SHA_RE.fullmatch(expected_sha):
+                raise ValueError(f"invalid source blob pin in {path}: {source!r} -> {expected_sha!r}")
+            previous = pinned_sources.get(source)
+            if previous is not None and previous != expected_sha:
+                raise ValueError(f"conflicting source blob pins for {source}: {previous} vs {expected_sha}")
+            pinned_sources[source] = expected_sha
         for index, row in enumerate(data.get("entries", [])):
             if row.get("disposition") not in VALID_DISPOSITIONS:
                 raise ValueError(f"invalid disposition in {path}:{index}: {row.get('disposition')!r}")
@@ -84,10 +96,29 @@ def load_dispositions() -> list[dict]:
             missing = required - set(row)
             if missing:
                 raise ValueError(f"missing disposition fields in {path}:{index}: {sorted(missing)}")
+            source = row["source"]
+            if not isinstance(source, str) or source not in source_blobs:
+                raise ValueError(f"disposition source is not blob-pinned in {path}:{index}: {source!r}")
+            referenced_sources.add(source)
             copy = dict(row)
             copy["manifest"] = str(path.relative_to(ROOT))
             copy["disposition_key"] = f"{path.relative_to(ROOT)}#{index}"
             rows.append(copy)
+
+    stale_pins = sorted(set(pinned_sources) - referenced_sources)
+    if stale_pins:
+        raise ValueError(f"unused Schedule source blob pins: {stale_pins}")
+    for source in sorted(referenced_sources):
+        source_path = ROOT / source
+        if not source_path.is_file():
+            raise ValueError(f"pinned Schedule source does not exist: {source}")
+        actual_sha = git_blob_sha1(source_path.read_bytes())
+        expected_sha = pinned_sources[source]
+        if actual_sha != expected_sha:
+            raise ValueError(
+                f"reviewed Schedule source changed: {source}; expected blob {expected_sha}, got {actual_sha}. "
+                "Re-review its actor/project references before updating the pin."
+            )
     return rows
 
 
@@ -145,34 +176,18 @@ def heuristic_resolve(raw: str, entities: list[dict], identity_index, expected: 
     return sorted({entity_id for score, entity_id in matches if score == best})
 
 
-def disposition_matches_raw(row: dict, raw: str) -> bool:
-    """Bind reviewed prefixes only across known scope/capacity tails.
-
-    A bare startswith check lets a newly added actor/project piggyback on an old reviewed
-    prefix (for example, `Named Agency and New Agency`). Bound/deferred rows therefore
-    accept only exact text or a known descriptive/capacity continuation. `partial-deferred`
-    may additionally retain an `and ...` tail because that status explicitly records an
-    exact component plus non-enumerated additional components.
-    """
-    prefix = row["match_prefix"]
-    if raw == prefix:
-        return True
-    if not raw.startswith(prefix):
-        return False
-    tail = raw[len(prefix):].lower()
-    allowed = PARTIAL_DEFERRED_TAILS if row["disposition"] == "partial-deferred" else SAFE_DISPOSITION_TAILS
-    return any(tail.startswith(token) for token in allowed)
-
-
 def matching_disposition(
     source: str, state: str | None, field: str, raw: str, dispositions: list[dict]
 ) -> dict | None:
+    # Prefixes are safe here because the containing source file is content-addressed and
+    # checked by load_dispositions(). Any edit to the reviewed reference invalidates the
+    # source blob pin before this matcher runs.
     matches = [
         row for row in dispositions
         if row["source"] == source
         and row["state"] == state
         and row["field"] == field
-        and disposition_matches_raw(row, raw)
+        and raw.startswith(row["match_prefix"])
     ]
     if len(matches) > 1:
         raise ValueError(f"multiple Schedule dispositions match {source} {state} {field}: {raw}")
@@ -276,6 +291,7 @@ def audit() -> dict:
             "purpose": "coverage audit of already-curated Schedule-preparation actor/project references",
             "completeness_rule": "Every curated actor/project reference must be resolved, deferred or partial-deferred; ambiguous/unresolved and stale reviewed dispositions are CI failures.",
             "identity_resolution": "heuristic domestic identity matching is State-scoped; reviewed dispositions may explicitly bind cross-State referents",
+            "review_binding": "reviewed dispositions are valid only while their entire Schedule source file retains its pinned Git blob identity",
             "non_inference": [
                 "reference matching is not attribution",
                 "identity resolution does not inherit the State outcome",
@@ -330,15 +346,13 @@ def write_markdown(report: dict, path: Path) -> None:
 def self_test() -> None:
     assert identity_head("Zambia Police Service, only in qualifying cases") == "Zambia Police Service"
     assert identity_head("NISA only where evidence exists") == "NISA"
+    assert git_blob_sha1(b"") == "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     sample = [{
         "source": "x.yml", "state": "ABC", "field": "candidate_parties",
         "match_prefix": "Named Agency", "disposition": "deferred", "resolved_ids": [],
         "reason": "test", "manifest": "m.json", "disposition_key": "m.json#0",
     }]
     assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency, only here", sample)
-    assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency and New Agency, only here", sample) is None
-    partial = [{**sample[0], "disposition": "partial-deferred", "resolved_ids": ["AGENCY-ABC-NAMED"]}]
-    assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency and other implementation bodies only here", partial)
     synthetic = [
         {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
         {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
