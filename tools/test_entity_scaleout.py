@@ -90,10 +90,10 @@ def main() -> int:
                 assert isinstance(row_state, str) and STATE_RE.fullmatch(row_state), (manifest_path, row)
             entity_id = canonicalize_id(historical_id, supersessions)
             domestic_state = infer_domestic_state(entity_id, state_codes)
-            if row_state is not None and domestic_state is not None:
+            if domestic_state is not None:
                 assert row_state == domestic_state, (
-                    f"manifest State/ID mismatch in v{version}: {historical_id} canonicalizes to {entity_id} "
-                    f"({domestic_state}) but row declares {row_state}"
+                    f"domestic promotion must declare its canonical State in v{version}: "
+                    f"{historical_id} canonicalizes to {entity_id} ({domestic_state}), row state={row_state!r}"
                 )
             if entity_id != historical_id:
                 superseded_count += 1
