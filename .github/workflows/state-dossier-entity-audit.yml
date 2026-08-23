@@ -3,7 +3,7 @@ name: State dossier entity audit
 on:
   push:
     paths:
-      - 'dossiers/states/**'
+      - 'dossiers/**'
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
       - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
@@ -18,7 +18,7 @@ on:
       - '.github/workflows/state-dossier-entity-audit.yml'
   pull_request:
     paths:
-      - 'dossiers/states/**'
+      - 'dossiers/**'
       - 'knowledge/entities/**'
       - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
       - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
