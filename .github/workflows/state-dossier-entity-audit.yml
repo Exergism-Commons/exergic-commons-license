@@ -54,6 +54,7 @@ jobs:
         run: |
           python tools/entity_identity_resolution.py
           python tools/check_identity_primary_alias_collisions.py --self-test
+          python tools/check_non_state_entity_identity_integrity.py --self-test
           python tools/audit_state_dossier_entities.py --self-test
           python tools/review_state_dossier_candidates.py --self-test
           python tools/check_state_dossier_softwrap_coverage.py --self-test
@@ -68,6 +69,7 @@ jobs:
         run: |
           mkdir -p build
           python tools/check_identity_primary_alias_collisions.py
+          python tools/check_non_state_entity_identity_integrity.py
           python tools/audit_state_dossier_entities.py \
             --json build/state-dossier-entity-audit.json \
             --markdown build/state-dossier-entity-audit.md \
@@ -103,6 +105,7 @@ jobs:
           cp build/private-org-mention-audit.json build/private-org-mention-audit.first.json
           cp build/private-org-mention-audit.md build/private-org-mention-audit.first.md
           python tools/check_identity_primary_alias_collisions.py
+          python tools/check_non_state_entity_identity_integrity.py
           python tools/audit_state_dossier_entities.py \
             --json build/state-dossier-entity-audit.json \
             --markdown build/state-dossier-entity-audit.md \
