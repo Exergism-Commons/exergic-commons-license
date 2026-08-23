@@ -3,9 +3,9 @@
 
 The raw audit intentionally over-generates candidates. This tool records human-reviewed
 State-scoped decisions without mutating the raw discovery output or treating a disposition
-as attribution/governance. `curated-identity` only binds a mention to existing ABox IDs;
-`deferred` preserves insufficient precision; `rejected` classifies extractor noise or a
-non-individual at the current ontology granularity.
+as attribution/governance. `curated-identity` only binds a mention to existing non-State
+ABox IDs; `deferred` preserves insufficient precision; `rejected` classifies extractor
+noise or a non-individual at the current ontology granularity.
 """
 from __future__ import annotations
 
@@ -29,11 +29,12 @@ GIT_OBJECT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def load_entity_ids() -> set[str]:
+    """Return only non-State first-class IDs: this audit discovers non-State entities/projects."""
     ids: set[str] = set()
     for path in sorted(ENTITY_DIR.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         entity_id = data.get("id")
-        if isinstance(entity_id, str):
+        if data.get("type") != "State" and isinstance(entity_id, str):
             ids.add(entity_id)
     return ids
 
@@ -97,7 +98,9 @@ def load_dispositions() -> tuple[dict[tuple[str, str], dict], list[str]]:
             if status == "curated-identity":
                 assert isinstance(resolved_ids, list) and resolved_ids, (path, row)
                 canonical_ids = [canonicalize_id(item, supersessions) for item in resolved_ids]
-                assert all(isinstance(item, str) and item in entity_ids for item in canonical_ids), (path, row, canonical_ids)
+                assert all(isinstance(item, str) and item in entity_ids for item in canonical_ids), (
+                    "curated prose dispositions must resolve to current non-State ABox IDs", path, row, canonical_ids
+                )
                 assert len(canonical_ids) == len(set(canonical_ids)), (path, row, canonical_ids)
                 reviewed["resolved_ids"] = canonical_ids
                 if canonical_ids != resolved_ids:
@@ -205,7 +208,7 @@ def review(audit: dict, dispositions: dict[tuple[str, str], dict], priority_thre
             "purpose": "review overlay for broad State-dossier discovery candidates",
             "raw_audit_remains_authoritative_for_discovery": True,
             "non_inference": [
-                "curated-identity is identity resolution only",
+                "curated-identity is non-State identity resolution only",
                 "deferred is insufficient precision, not adverse evidence",
                 "rejected classifies the extractor candidate, not the underlying subject",
                 "no review status changes Claims, Formal Exergism or governance",
@@ -295,6 +298,7 @@ def self_test() -> None:
     assert stale_report["stale_dispositions"][0]["actual_resolved_ids"] == ["INSTITUTION-AAA-COURT"]
 
     assert canonicalize_id("AGENCY-PHL-PNP", {"AGENCY-PHL-PNP": "AGENCY-PHL-PHILIPPINE-NATIONAL-POLICE"}) == "AGENCY-PHL-PHILIPPINE-NATIONAL-POLICE"
+    assert all(not value.startswith("STATE-") for value in load_entity_ids())
     print("State dossier candidate review self-test: OK")
 
 
