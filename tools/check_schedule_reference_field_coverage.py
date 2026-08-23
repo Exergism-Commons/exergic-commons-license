@@ -78,6 +78,19 @@ def metadata_failure(field: str, value: object, record: dict, state_names: dict[
     return "not-metadata"
 
 
+def reference_value_failure(field: str, value: object) -> str | None:
+    """Known identity/scope fields must not rely on list_values() silently dropping data."""
+    if isinstance(value, str):
+        return None if value.strip() else f"{field} must not be an empty string"
+    if isinstance(value, list):
+        if not value:
+            return f"{field} must not be an empty list"
+        if not all(isinstance(item, str) and item.strip() for item in value):
+            return f"{field} must be a non-empty string or a list of non-empty strings"
+        return None
+    return f"{field} must be a string or list of strings; got {type(value).__name__}"
+
+
 def append_failure(failures: list[dict], *, path, record_index: int | None, field_path: tuple[str, ...], reason: str) -> None:
     row = {
         "source": str(path.relative_to(schedule.ROOT)),
@@ -90,11 +103,21 @@ def append_failure(failures: list[dict], *, path, record_index: int | None, fiel
 
 
 def validate_record_fields(path, record_index: int, record: dict, state_names: dict[str, str], cross_ids: dict[str, set[str]], failures: list[dict]) -> None:
+    state = record.get("state")
+    if not isinstance(state, str) or state not in state_names:
+        append_failure(
+            failures, path=path, record_index=record_index, field_path=("state",),
+            reason=f"Schedule record must name one canonical State ISO3; got {state!r}",
+        )
+
     for field_path, value in walk_dict_fields(record):
         field = field_path[-1]
         top_level = len(field_path) == 1
 
         if top_level and field in KNOWN_REFERENCE_FIELDS:
+            problem = reference_value_failure(field, value)
+            if problem is not None:
+                append_failure(failures, path=path, record_index=record_index, field_path=field_path, reason=problem)
             continue
         if top_level and field in {"entity", *PROVENANCE_FIELDS}:
             problem = metadata_failure(field, value, record, state_names)
@@ -120,17 +143,40 @@ def validate_record_fields(path, record_index: int, record: dict, state_names: d
 
 
 def validate_document_root(path, data: object, failures: list[dict]) -> None:
-    """Multi-record document metadata must not acquire a second unaudited identity surface."""
-    if not isinstance(data, dict) or not isinstance(data.get("records"), list):
+    """Validate document shape and keep multi-record metadata from becoming a second identity surface."""
+    if not isinstance(data, dict):
+        append_failure(
+            failures, path=path, record_index=None, field_path=("<document>",),
+            reason="Schedule freeze document must be a mapping/object",
+        )
         return
-    root = {key: value for key, value in data.items() if key != "records"}
-    for field_path, _ in walk_dict_fields(root):
-        field = field_path[-1]
-        if field in KNOWN_REFERENCE_FIELDS or field in {"entity", *PROVENANCE_FIELDS, *CROSS_ENTITY_LINK_FIELDS} or REFERENCE_FIELD_RE.search(field):
+    if "records" in data:
+        records = data.get("records")
+        if not isinstance(records, list) or not records:
             append_failure(
-                failures, path=path, record_index=None, field_path=field_path,
-                reason="identity-bearing field appears at multi-record document root outside audited records",
+                failures, path=path, record_index=None, field_path=("records",),
+                reason="multi-record Schedule document must contain a non-empty records list",
             )
+            return
+        for index, item in enumerate(records):
+            if not isinstance(item, dict):
+                append_failure(
+                    failures, path=path, record_index=index, field_path=("records", f"[{index}]"),
+                    reason="Schedule records entries must be mappings/objects",
+                )
+        root = {key: value for key, value in data.items() if key != "records"}
+        for field_path, _ in walk_dict_fields(root):
+            field = field_path[-1]
+            if field in KNOWN_REFERENCE_FIELDS or field in {"entity", *PROVENANCE_FIELDS, *CROSS_ENTITY_LINK_FIELDS} or REFERENCE_FIELD_RE.search(field):
+                append_failure(
+                    failures, path=path, record_index=None, field_path=field_path,
+                    reason="identity-bearing field appears at multi-record document root outside audited records",
+                )
+    elif not isinstance(data.get("state"), str):
+        append_failure(
+            failures, path=path, record_index=None, field_path=("state",),
+            reason="single-record Schedule document must contain a State field",
+        )
 
 
 def unknown_reference_fields() -> list[dict]:
@@ -142,7 +188,16 @@ def unknown_reference_fields() -> list[dict]:
     for path in files:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         validate_document_root(path, data, failures)
-        for record_index, record in enumerate(schedule.records_from_document(data)):
+        if not isinstance(data, dict):
+            continue
+        raw_records = data.get("records")
+        if isinstance(raw_records, list):
+            records = [item for item in raw_records if isinstance(item, dict)]
+        elif isinstance(data.get("state"), str):
+            records = [data]
+        else:
+            records = []
+        for record_index, record in enumerate(records):
             validate_record_fields(path, record_index, record, state_names, cross_ids, failures)
 
     dedup: dict[tuple[str, object, str], dict] = {
@@ -161,6 +216,9 @@ def self_test() -> None:
     assert not REFERENCE_FIELD_RE.search("legal_basis")
     assert "candidate_parties" in KNOWN_REFERENCE_FIELDS
     assert "project_boundary" in KNOWN_REFERENCE_FIELDS
+    assert reference_value_failure("candidate_parties", ["Agency"]) is None
+    assert reference_value_failure("candidate_parties", ["Agency", 7]) is not None
+    assert reference_value_failure("candidate_parties", {"name": "Agency"}) is not None
     nested = list(walk_dict_fields({"details": {"candidate_parties": ["Agency"]}}))
     assert any(path == ("details", "candidate_parties") for path, _ in nested)
     assert "MITIGA-DETENTION-APPARATUS" in registry_ids("registry/projects.yml")
@@ -168,9 +226,15 @@ def self_test() -> None:
     synthetic_failures: list[dict] = []
     validate_document_root(
         schedule.ROOT / "registry" / "schedule-state-s-freezes" / "synthetic.yml",
-        {"records": [], "candidate_parties": ["Agency"]}, synthetic_failures,
+        {"records": [{}], "candidate_parties": ["Agency"]}, synthetic_failures,
     )
-    assert synthetic_failures and synthetic_failures[0]["field_path"] == "candidate_parties"
+    assert any(row["field_path"] == "candidate_parties" for row in synthetic_failures)
+    malformed_failures: list[dict] = []
+    validate_document_root(
+        schedule.ROOT / "registry" / "schedule-state-s-freezes" / "synthetic.yml",
+        {"records": ["not-a-record"]}, malformed_failures,
+    )
+    assert malformed_failures
     print("Schedule reference-field coverage self-test: OK")
 
 
