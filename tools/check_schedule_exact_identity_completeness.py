@@ -37,10 +37,12 @@ PERSON_CUE_RE = re.compile(
     re.I,
 )
 PERSON_MONTH = r"(?:January|February|March|April|May|June|July|August|September|October|November|December)"
+PERSON_PREFIX_QUALIFIER = r"(?:[A-Z]{2,}(?:-[A-Za-z]+)+)"
 PERSON_PREFIX_CUE_RE = re.compile(
     rf"(?:^|[—–/;:]\s*)"
     rf"({PERSON_WORD}(?:\s+{PERSON_WORD}){{1,4}}?)"
     rf"(?:\s+{PERSON_MONTH}\s+\d{{4}}|\s+\d{{4}})?"
+    rf"(?:\s+{PERSON_PREFIX_QUALIFIER})?"
     rf"\s+(?:arrest|detention|prosecution|proceeding|proceedings|case|sentence|conviction|investigation|trial)\b",
     re.UNICODE | re.I,
 )
@@ -103,7 +105,9 @@ def named_person_mentions(raw: str) -> list[str]:
     (and immediately after a strong separator) when the name itself precedes a legal cue,
     e.g. `Jane Doe June 2026 detention project`. Bare slash/dash separators are otherwise
     not person cues, avoiding place/facility false positives such as `El Haoud Prison`,
-    `Yaoundé Military Tribunal` and `San Martin qualifying deployment`.
+    `Yaoundé Military Tribunal` and `San Martin qualifying deployment`. A compact technical
+    qualifier such as `EIT-law` may sit between the person and legal cue without being
+    absorbed into the person's name.
     """
     mentions: list[str] = []
 
@@ -348,6 +352,7 @@ def self_test() -> None:
     assert named_person_signal("the prosecution of Esra Işık and measures concerning Halime Şaman")
     assert named_person_mentions("UNHCR measures concerning Jane Doe") == ["Jane Doe"]
     assert named_person_mentions("Jane Doe June 2026 detention project") == ["Jane Doe"]
+    assert named_person_mentions("Khariq Anhar EIT-law prosecution project") == ["Khariq Anhar"]
     assert not named_person_signal("implementation of Law No. 32735 under the new rules")
     assert not named_person_signal("Queen Elizabeth Barracks, Nabua, Suva")
     assert named_person_mentions("Hassan Bouras detention project — DZA 3/2026 / El Haoud Prison, El Bayadh") == ["Hassan Bouras"]
