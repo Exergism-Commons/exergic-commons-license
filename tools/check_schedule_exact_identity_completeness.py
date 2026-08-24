@@ -36,6 +36,14 @@ PERSON_CUE_RE = re.compile(
     r"\b(?:concerning|against|named|involving))",
     re.I,
 )
+PERSON_MONTH = r"(?:January|February|March|April|May|June|July|August|September|October|November|December)"
+PERSON_PREFIX_CUE_RE = re.compile(
+    rf"(?:^|[—–/;:]\s*)"
+    rf"({PERSON_WORD}(?:\s+{PERSON_WORD}){{1,4}}?)"
+    rf"(?:\s+{PERSON_MONTH}\s+\d{{4}}|\s+\d{{4}})?"
+    rf"\s+(?:arrest|detention|prosecution|proceeding|proceedings|case|sentence|conviction|investigation|trial)\b",
+    re.UNICODE | re.I,
+)
 PERSON_PARTICLES = {"al", "bin", "bint", "da", "das", "de", "del", "do", "dos", "el", "ibn", "la", "le", "van", "von"}
 PERSON_STOPWORDS = {
     "act", "administration", "agency", "amendment", "article", "articles", "barracks", "border",
@@ -90,13 +98,12 @@ def _add_mention(mentions: list[str], tokens: list[str]) -> None:
 def named_person_mentions(raw: str) -> list[str]:
     """Extract high-precision named-person candidates from scope text.
 
-    Single names require a person-oriented legal/custody cue such as `concerning Jane Doe`
-    or `prosecution of Jane Doe`. Bare slash/dash separators are not treated as person cues,
-    because they frequently introduce facilities, places or institutional sub-scopes. The
-    one separator-only form accepted is the stronger paired case-label shape
-    `— First Last / First Last`, which covers curated named-case labels without classifying
-    `El Haoud Prison`, `Yaoundé Military Tribunal` or `San Martin qualifying deployment`
-    as people.
+    Names are accepted in three narrow forms: after a person-oriented legal/custody cue,
+    in the paired case-label form `— First Last / First Last`, or at the start of a scope
+    (and immediately after a strong separator) when the name itself precedes a legal cue,
+    e.g. `Jane Doe June 2026 detention project`. Bare slash/dash separators are otherwise
+    not person cues, avoiding place/facility false positives such as `El Haoud Prison`,
+    `Yaoundé Military Tribunal` and `San Martin qualifying deployment`.
     """
     mentions: list[str] = []
 
@@ -104,6 +111,9 @@ def named_person_mentions(raw: str) -> list[str]:
         first_a, first_b, second_a, second_b = match.groups()
         _add_mention(mentions, [first_a, first_b])
         _add_mention(mentions, [second_a, second_b])
+
+    for match in PERSON_PREFIX_CUE_RE.finditer(raw):
+        _add_mention(mentions, match.group(1).split())
 
     for cue in PERSON_CUE_RE.finditer(raw):
         segment = raw[cue.end(): cue.end() + 160]
@@ -180,17 +190,22 @@ def independent_exact_matches(
     return sorted(matches)
 
 
-def materialized_person_ids_for_mention(
+def materialized_ids_for_mention(
     mention: str,
     entities: list[dict],
     identity_index,
     state: str | None,
+    *,
+    person: bool | None,
 ) -> list[str]:
-    """Return current State-safe Person IDs whose exact surface equals a detected mention."""
+    """Return current State-safe IDs whose exact surface equals a detected mention."""
     mention_norm = schedule.norm(mention)
     matches: set[str] = set()
     for entity in entities:
-        if entity.get("type") != "Person":
+        is_person = entity.get("type") == "Person"
+        if person is True and not is_person:
+            continue
+        if person is False and is_person:
             continue
         if not eligible_in_state(identity_index, entity["id"], state):
             continue
@@ -206,6 +221,24 @@ def materialized_person_ids_for_mention(
     return sorted(matches)
 
 
+def materialized_person_ids_for_mention(
+    mention: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+) -> list[str]:
+    return materialized_ids_for_mention(mention, entities, identity_index, state, person=True)
+
+
+def materialized_non_person_ids_for_mention(
+    mention: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+) -> list[str]:
+    return materialized_ids_for_mention(mention, entities, identity_index, state, person=False)
+
+
 def expected_kind(row: dict) -> str:
     kind = row.get("kind")
     if kind == "actor-reference":
@@ -216,13 +249,16 @@ def expected_kind(row: dict) -> str:
 
 
 def explicitly_defers_person(row: dict, mention: str) -> bool:
-    """Require a reviewed deferral to identify the unmatched person by name."""
+    """Require a reviewed deferral to identify the unmatched person by whole name."""
     if row.get("resolution_source") != "reviewed-disposition":
         return False
     if row.get("status") not in {"deferred", "partial-deferred"}:
         return False
-    reason = row.get("disposition_reason") or ""
-    return schedule.norm(mention) in schedule.norm(reason)
+    mention_norm = schedule.norm(mention)
+    reason_norm = schedule.norm(row.get("disposition_reason") or "")
+    if not mention_norm or not reason_norm:
+        return False
+    return f" {mention_norm} " in f" {reason_norm} "
 
 
 def completeness_failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
@@ -279,6 +315,12 @@ def completeness_failures(report: dict, entities: list[dict], identity_index) ->
                         "status": row.get("status"),
                     })
                 continue
+
+            # A title-cased exact organization/institution/agency surface is not person debt.
+            # Its coverage is already enforced above by the all-identity exact-match invariant.
+            if materialized_non_person_ids_for_mention(mention, entities, identity_index, state):
+                continue
+
             if not explicitly_defers_person(row, mention):
                 failures.append({
                     "reason": "scope row contains unmaterialized named person without explicit reviewed deferral",
@@ -305,10 +347,11 @@ def self_test() -> None:
     assert named_person_mentions("TUR 6/2026 — Esra Işık / Halime Şaman enforcement project") == ["Esra Işık", "Halime Şaman"]
     assert named_person_signal("the prosecution of Esra Işık and measures concerning Halime Şaman")
     assert named_person_mentions("UNHCR measures concerning Jane Doe") == ["Jane Doe"]
+    assert named_person_mentions("Jane Doe June 2026 detention project") == ["Jane Doe"]
     assert not named_person_signal("implementation of Law No. 32735 under the new rules")
     assert not named_person_signal("Queen Elizabeth Barracks, Nabua, Suva")
-    assert not named_person_signal("Hassan Bouras detention project — DZA 3/2026 / El Haoud Prison, El Bayadh")
-    assert not named_person_signal("Abdu Karim Ali detention / Yaoundé Military Tribunal life-sentence project")
+    assert named_person_mentions("Hassan Bouras detention project — DZA 3/2026 / El Haoud Prison, El Bayadh") == ["Hassan Bouras"]
+    assert named_person_mentions("Abdu Karim Ali detention / Yaoundé Military Tribunal life-sentence project") == ["Abdu Karim Ali"]
     assert not named_person_signal("Polish Border Guard / Interior Belarus-border asylum-suspension and pushback project")
     assert not named_person_signal("Exterminio Total / San Martin qualifying deployment")
 
@@ -350,6 +393,12 @@ def self_test() -> None:
             "surface_forms": [{"text": "UNHCR", "normalized": "unhcr"}],
         },
         {
+            "id": "ORG-HUMAN-RIGHTS-WATCH",
+            "type": "Organization",
+            "aliases": [schedule.norm("Human Rights Watch")],
+            "surface_forms": [{"text": "Human Rights Watch", "normalized": schedule.norm("Human Rights Watch")}],
+        },
+        {
             "id": "PERSON-AAA-ESRA-ISIK",
             "type": "Person",
             "aliases": [schedule.norm("Esra Işık")],
@@ -363,6 +412,7 @@ def self_test() -> None:
         {"id": "AGENCY-AAA-DOD", "type": "Agency", "name": "Defence Department", "aliases": ["DoD"]},
         {"id": "ORG-AAA-M23", "type": "Organization", "name": "March 23 Movement", "aliases": ["M23"]},
         {"id": "ORG-GLOBAL-UNHCR", "type": "Organization", "name": "UNHCR", "aliases": []},
+        {"id": "ORG-HUMAN-RIGHTS-WATCH", "type": "Organization", "name": "Human Rights Watch", "aliases": []},
         {"id": "PERSON-AAA-ESRA-ISIK", "type": "Person", "name": "Esra Işık", "aliases": []},
     ]
     idx = build_name_index(raw_entities, state_codes={"AAA"}, normalizer=schedule.norm)
@@ -376,6 +426,7 @@ def self_test() -> None:
     letter_digit = independent_exact_matches("State Security Court / M23", synthetic, idx, "actor", "AAA")
     assert letter_digit == ["INSTITUTION-AAA-COURT", "ORG-AAA-M23"]
     assert materialized_person_ids_for_mention("Esra Işık", synthetic, idx, "AAA") == ["PERSON-AAA-ESRA-ISIK"]
+    assert materialized_non_person_ids_for_mention("Human Rights Watch", synthetic, idx, "AAA") == ["ORG-HUMAN-RIGHTS-WATCH"]
 
     longest_match_report = {
         "references": [{
@@ -408,6 +459,30 @@ def self_test() -> None:
     failures = completeness_failures(resolved_person_bypass, synthetic, idx)
     assert any(f.get("person") == "Jane Doe" and "unmaterialized" in f["reason"] for f in failures)
 
+    prefix_person_bypass = {
+        "references": [{
+            **resolved_person_bypass["references"][0],
+            "raw": "Jane Doe June 2026 detention project / UNHCR",
+        }]
+    }
+    failures = completeness_failures(prefix_person_bypass, synthetic, idx)
+    assert any(f.get("person") == "Jane Doe" and "unmaterialized" in f["reason"] for f in failures)
+
+    exact_org_after_cue = {
+        "references": [{
+            "kind": "scope-identity-reference",
+            "state": "AAA",
+            "field": "project_boundary",
+            "source": "x.yml",
+            "raw": "case concerning Human Rights Watch",
+            "status": "resolved",
+            "resolution_source": "state-safe-exact-embedded-name-or-alias",
+            "resolved_ids": ["ORG-HUMAN-RIGHTS-WATCH"],
+            "disposition_reason": None,
+        }]
+    }
+    assert completeness_failures(exact_org_after_cue, synthetic, idx) == []
+
     reviewed_person_deferral = {
         "references": [{
             "kind": "scope-identity-reference",
@@ -431,6 +506,15 @@ def self_test() -> None:
     }
     failures = completeness_failures(vague_person_deferral, synthetic, idx)
     assert any(f.get("person") == "Jane Doe" for f in failures)
+
+    ann_row = {
+        "resolution_source": "reviewed-disposition",
+        "status": "partial-deferred",
+        "disposition_reason": "Joann Lee is identity-deferred pending materialization.",
+    }
+    assert not explicitly_defers_person(ann_row, "Ann Lee")
+    ann_row["disposition_reason"] = "Ann Lee is identity-deferred pending materialization."
+    assert explicitly_defers_person(ann_row, "Ann Lee")
 
     print("Schedule exact-identity completeness self-test: OK")
 
