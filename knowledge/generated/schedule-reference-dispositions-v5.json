@@ -68,8 +68,8 @@
       "field": "schedule_identity",
       "match_prefix": "State Security Court / Media Commission / governor detention qualifying project class",
       "disposition": "partial-deferred",
-      "resolved_ids": ["INSTITUTION-JOR-STATE-SECURITY-COURT"],
-      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+      "resolved_ids": ["AGENCY-JOR-MEDIA-COMMISSION", "INSTITUTION-JOR-STATE-SECURITY-COURT"],
+      "reason": "Reviewed composite/free-form scope reference preserves every exact current ABox binding while the non-enumerated governor context remains deferred. Identity-only; no participation, attribution or governance inference."
     },
     {
       "source": "registry/schedule-state-s-freezes/promoted-ready-03a.yml",
