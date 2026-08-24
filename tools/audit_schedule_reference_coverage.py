@@ -2,9 +2,10 @@
 """Audit ABox coverage of already-curated State Schedule-freeze references.
 
 This is an identity-coverage gate, not an attribution engine. Every actor/project
-reference in the curated freeze corpus must either resolve to one or more exact ABox
-identities or carry an explicit reviewed deferral. Domestic heuristic resolution is
-State-scoped; explicit reviewed dispositions may intentionally bind cross-State referents.
+reference, and every identity-bearing scope mention, must either resolve to one or more
+exact ABox identities or carry an explicit reviewed deferral. Domestic heuristic
+resolution is State-scoped; explicit reviewed dispositions may intentionally bind
+cross-State referents.
 """
 from __future__ import annotations
 
@@ -38,6 +39,24 @@ SCOPE_FIELDS = (
 CAPACITY_SPLITS = (", only ", ", including ", " only when ", " only in ", " only where ")
 VALID_DISPOSITIONS = {"bound", "deferred", "partial-deferred"}
 BLOB_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+SCOPE_NAMED_IDENTITY_RE = re.compile(
+    r"\b(?:"
+    r"(?:[A-Z][A-Za-z0-9'’.-]*(?:\s+|[-/])){1,6}"
+    r"(?:Ministry|Department|Directorate|Bureau|Office|Commission|Committee|Council|Court|Tribunal|Agency|"
+    r"Secretariat|Administration|Police|Prison|Penitentiary|Service|Force|Forces|Branch|Unit|Centre|Center)"
+    r"|(?:Ministry|Department|Directorate|Bureau|Office|Commission|Committee|Council|Court|Tribunal|Agency|"
+    r"Secretariat|Administration|Police|Prison|Penitentiary|Service|Force|Forces|Branch|Unit|Centre|Center)"
+    r"(?:\s+of)?(?:\s+[A-Z][A-Za-z0-9'’.-]*){1,6}"
+    r"|Penitentiary\s+no\.\s*\d+\s+[A-Z][A-Za-z0-9'’.-]*"
+    r")\b"
+)
+SCOPE_ROLE_IDENTITY_RE = re.compile(
+    r"\b(?:competent|responsible|participating|implementing|administering|custodial|prosecuting|designated)\s+"
+    r"(?:[a-z0-9'’.-]+\s+){0,4}"
+    r"(?:agency|department|ministry|directorate|bureau|office|commission|committee|council|court|tribunal|"
+    r"police|prison|penitentiary|service|force|forces|branch|unit|secretariat|administration)\b",
+    re.I,
+)
 
 
 def norm(text: str) -> str:
@@ -117,7 +136,7 @@ def load_dispositions() -> list[dict]:
         if actual_sha != expected_sha:
             raise ValueError(
                 f"reviewed Schedule source changed: {source}; expected blob {expected_sha}, got {actual_sha}. "
-                "Re-review its actor/project references before updating the pin."
+                "Re-review its actor/project/scope identity references before updating the pin."
             )
     return rows
 
@@ -174,6 +193,18 @@ def heuristic_resolve(raw: str, entities: list[dict], identity_index, expected: 
         return []
     best = max(score for score, _ in matches)
     return sorted({entity_id for score, entity_id in matches if score == best})
+
+
+def scope_identity_signal(raw: str, entities: list[dict], identity_index, state: str | None) -> bool:
+    """Return true when a scope value contains a specific identity worth coverage review.
+
+    Existing State-safe ABox aliases always count. The regexes additionally catch named
+    institutions/facilities and role-qualified organizational references that are not yet
+    materialized, so they cannot disappear merely because the field is nominally scope.
+    """
+    if heuristic_resolve(raw, entities, identity_index, "identity", state):
+        return True
+    return bool(SCOPE_NAMED_IDENTITY_RE.search(raw) or SCOPE_ROLE_IDENTITY_RE.search(raw))
 
 
 def matching_disposition(
@@ -270,14 +301,21 @@ def audit() -> dict:
                     ))
             for field in SCOPE_FIELDS:
                 for raw in list_values(record.get(field)):
-                    references.append({
-                        "kind": "scope-reference", "state": state, "outcome": outcome, "field": field,
-                        "raw": raw, "identity_head": None, "resolved_ids": [], "status": "context-only",
-                        "resolution_source": None, "disposition_reason": None, "disposition_manifest": None,
-                        "disposition_key": None, "source": source, "record_index": record_index,
-                    })
+                    if scope_identity_signal(raw, entities, identity_index, state):
+                        references.append(reference_row(
+                            kind="scope-identity-reference", expected="identity", state=state, outcome=outcome,
+                            field=field, raw=raw, source=source, record_index=record_index,
+                            entities=entities, by_id=by_id, identity_index=identity_index, dispositions=dispositions,
+                        ))
+                    else:
+                        references.append({
+                            "kind": "scope-reference", "state": state, "outcome": outcome, "field": field,
+                            "raw": raw, "identity_head": None, "resolved_ids": [], "status": "context-only",
+                            "resolution_source": None, "disposition_reason": None, "disposition_manifest": None,
+                            "disposition_key": None, "source": source, "record_index": record_index,
+                        })
 
-    counted = [row for row in references if row["kind"] != "scope-reference"]
+    counted = [row for row in references if row["status"] != "context-only"]
     statuses = Counter(row["status"] for row in counted)
     kinds = Counter(row["kind"] for row in counted)
     states = {row["state"] for row in counted if isinstance(row["state"], str)}
@@ -286,27 +324,29 @@ def audit() -> dict:
         row["disposition_key"] for row in dispositions if row["disposition_key"] not in used_dispositions
     )
     return {
-        "schema_version": 4,
+        "schema_version": 5,
         "semantics": {
-            "purpose": "coverage audit of already-curated Schedule-preparation actor/project references",
-            "completeness_rule": "Every curated actor/project reference must be resolved, deferred or partial-deferred; ambiguous/unresolved and stale reviewed dispositions are CI failures.",
+            "purpose": "coverage audit of curated Schedule-preparation actor/project references and identity-bearing scope mentions",
+            "completeness_rule": "Every curated actor/project reference and every identity-bearing scope mention must be resolved, deferred or partial-deferred; ambiguous/unresolved and stale reviewed dispositions are CI failures.",
             "identity_resolution": "heuristic domestic identity matching is State-scoped; reviewed dispositions may explicitly bind cross-State referents",
             "review_binding": "reviewed dispositions are valid only while their entire Schedule source file retains its pinned Git blob identity",
             "non_inference": [
                 "reference matching is not attribution",
                 "identity resolution does not inherit the State outcome",
                 "cross-State domestic matching requires an explicit reviewed disposition",
-                "scope-reference fields are context only and are never coerced into an Actor or Project identity",
+                "a scope-identity reference records only that a named identity occurs in scope text; it does not coerce that identity into an Actor or Project role",
+                "scope values with no specific identity signal remain context-only",
                 "deferred and partial-deferred are explicit representation states, not evidence or governance judgments",
             ],
         },
         "counts": {
-            "freeze_files": len(files), "states_with_actor_or_project_references": len(states),
+            "freeze_files": len(files), "states_with_audited_references": len(states),
             "actor_references": kinds["actor-reference"], "project_references": kinds["project-reference"],
+            "scope_identity_references": kinds["scope-identity-reference"],
             "resolved": statuses["resolved"], "partial_deferred": statuses["partial-deferred"],
             "deferred": statuses["deferred"], "ambiguous": statuses["ambiguous"],
             "unresolved": statuses["unresolved"], "stale_dispositions": len(stale_dispositions),
-            "scope_context_references": sum(row["kind"] == "scope-reference" for row in references),
+            "scope_context_references": sum(row["status"] == "context-only" for row in references),
         },
         "stale_dispositions": stale_dispositions,
         "references": references,
@@ -319,9 +359,11 @@ def write_markdown(report: dict, path: Path) -> None:
         "# Schedule freeze reference coverage", "",
         "> Identity-coverage audit only. Resolution has no governance or attribution effect.", "",
         f"- Freeze files: **{counts['freeze_files']}**",
-        f"- States with actor/project references: **{counts['states_with_actor_or_project_references']}**",
+        f"- States with audited references: **{counts['states_with_audited_references']}**",
         f"- Actor references: **{counts['actor_references']}**",
         f"- Project references: **{counts['project_references']}**",
+        f"- Scope identity mentions: **{counts['scope_identity_references']}**",
+        f"- Scope context-only values: **{counts['scope_context_references']}**",
         f"- Resolved: **{counts['resolved']}**",
         f"- Partial/deferred: **{counts['partial_deferred']}**",
         f"- Deferred: **{counts['deferred']}**",
@@ -367,6 +409,11 @@ def self_test() -> None:
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-NATIONAL-POLICE"]
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "CCC") == []
     assert heuristic_resolve("Global Source", synthetic, idx, "actor", "AAA") == ["ORG-GLOBAL"]
+    assert scope_identity_signal("28 February 2026 Ministry of Interior enforcement cohort", synthetic, idx, "AAA")
+    assert scope_identity_signal("identified by Qatar News Agency and the competent cybercrime department", synthetic, idx, "AAA")
+    assert scope_identity_signal("after the Supreme Court retrial order", synthetic, idx, "AAA")
+    assert scope_identity_signal("custody at Penitentiary no. 2 Lipcani", synthetic, idx, "AAA")
+    assert not scope_identity_signal("the 313-person cohort active during the review period", synthetic, idx, "AAA")
     print("Schedule reference audit self-test: OK")
 
 
