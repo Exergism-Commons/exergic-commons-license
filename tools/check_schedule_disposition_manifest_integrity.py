@@ -14,7 +14,7 @@ GENERATED = ROOT / "knowledge" / "generated"
 MANIFEST_RE = re.compile(r"^schedule-reference-dispositions-v([1-9][0-9]*)\.json$")
 STATE_RE = re.compile(r"^[A-Z]{3}$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-VALID_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS)
+VALID_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
 VALID_DISPOSITIONS = {"bound", "deferred", "partial-deferred"}
 REQUIRED_ENTRY_FIELDS = {"source", "state", "field", "match_prefix", "disposition", "resolved_ids", "reason"}
 
@@ -126,6 +126,8 @@ def self_test() -> None:
     assert not MANIFEST_RE.fullmatch("schedule-reference-dispositions-v01.json")
     assert "candidate_parties" in VALID_FIELDS
     assert "candidate_projects" in VALID_FIELDS
+    assert "schedule_identity" in VALID_FIELDS
+    assert "project_boundary" in VALID_FIELDS
     print("Schedule disposition manifest integrity self-test: OK")
 
 
