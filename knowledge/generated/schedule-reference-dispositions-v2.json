@@ -1,0 +1,128 @@
+{
+  "version": 2,
+  "follows": "knowledge/generated/schedule-reference-dispositions-v1.json",
+  "source_blobs": {
+    "registry/schedule-state-s-freezes/batch-09c-tcd-freeze.yml": "1ada48ef1471dcb4f0324493b8942c7e4fdfaf6b",
+    "registry/schedule-state-s-freezes/batch-15a-bhr-freeze.yml": "026a3ed200708c5fc6b80311c33ee4c09ffc0fc7",
+    "registry/schedule-state-s-freezes/batch-18c-pry-freeze.yml": "c1e4bd9e81da6caf8e9e27fe8aa5659071025b36",
+    "registry/schedule-state-s-freezes/batch-19a-qat-freeze.yml": "642acca573cc4606cd6cbef2b33752f602773be4",
+    "registry/schedule-state-s-freezes/batch-19c-syr-freeze.yml": "0824495d9fa363ff192e0be9ee44869375a56ec7",
+    "registry/schedule-state-s-freezes/batch-21a-mda-freeze.yml": "7a2e8dd70e3634edcf1c1b9fd12d704cd9ff7846",
+    "registry/schedule-state-s-freezes/batch-22b-irq-freeze.yml": "f222fea69a55d2a446ccc237188f0219ee6ae1c4",
+    "registry/schedule-state-s-freezes/promoted-ready-01.yml": "eacea63dfacc72c8df93db393c95b1b5a6355db3",
+    "registry/schedule-state-s-freezes/promoted-ready-02.yml": "0b8e0545bc33a62e27e94ab020f5809911555808",
+    "registry/schedule-state-s-freezes/promoted-ready-hti.yml": "279b23420801455fd6adc0b0a349927f5022191e"
+  },
+  "entries": [
+    {
+      "source": "registry/schedule-state-s-freezes/batch-09c-tcd-freeze.yml",
+      "state": "TCD",
+      "field": "schedule_identity",
+      "match_prefix": "Ministry of Territorial Administration orders 011 and 012",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-15a-bhr-freeze.yml",
+      "state": "BHR",
+      "field": "schedule_identity",
+      "match_prefix": "Jaww Prison detention-conditions",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-18c-pry-freeze.yml",
+      "state": "PRY",
+      "field": "project_boundary",
+      "match_prefix": "the continuing criminal proceeding against the three Ayoreo community members",
+      "disposition": "partial-deferred",
+      "resolved_ids": [
+        "AGENCY-PRY-SEN"
+      ],
+      "reason": "The reviewed English label National Emergency Secretariat maps to AGENCY-PRY-SEN; other persons/place context in the free-form scope remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-19a-qat-freeze.yml",
+      "state": "QAT",
+      "field": "schedule_identity",
+      "match_prefix": "28 February-9 March 2026 Ministry of Interior",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-19a-qat-freeze.yml",
+      "state": "QAT",
+      "field": "project_boundary",
+      "match_prefix": "the 313-person cohort publicly identified by Qatar News Agency",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-19c-syr-freeze.yml",
+      "state": "SYR",
+      "field": "project_boundary",
+      "match_prefix": "continued enforcement in 2026 of Law No. 20 of 2022",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-21a-mda-freeze.yml",
+      "state": "MDA",
+      "field": "schedule_identity",
+      "match_prefix": "2025 CPT-observed informal-prisoner-hierarchy control project",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-22b-irq-freeze.yml",
+      "state": "IRQ",
+      "field": "project_boundary",
+      "match_prefix": "the Al-Karkh Central Prison and designated Karkh investigation-site functions",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-01.yml",
+      "state": "ARM",
+      "field": "schedule_identity",
+      "match_prefix": "Police of the Ministry of Internal Affairs",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-01.yml",
+      "state": "LTU",
+      "field": "schedule_identity",
+      "match_prefix": "State Border Guard Service Belarus-border",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-02.yml",
+      "state": "AGO",
+      "field": "schedule_identity",
+      "match_prefix": "Rapid Intervention Police / National Police",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-hti.yml",
+      "state": "HTI",
+      "field": "schedule_identity",
+      "match_prefix": "Prime-Minister-created Security Task Force",
+      "disposition": "deferred",
+      "resolved_ids": [],
+      "reason": "Reviewed identity-bearing scope text has no exact current State-safe ABox binding. Representation remains explicit debt rather than context-only; no participation, attribution or governance inference."
+    }
+  ]
+}
