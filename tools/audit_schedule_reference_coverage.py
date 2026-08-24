@@ -39,6 +39,7 @@ SCOPE_FIELDS = (
 CAPACITY_SPLITS = (", only ", ", including ", " only when ", " only in ", " only where ")
 VALID_DISPOSITIONS = {"bound", "deferred", "partial-deferred"}
 BLOB_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+ACRONYM_SURFACE_RE = re.compile(r"^[A-Z0-9][A-Z0-9.-]{2,}$")
 SCOPE_NAMED_IDENTITY_RE = re.compile(
     r"\b(?:"
     r"(?:[A-Z][A-Za-z0-9'’.-]*(?:\s+|[-/])){1,6}"
@@ -84,7 +85,19 @@ def load_entities():
             continue
         names = [data.get("name"), *(data.get("aliases") or [])]
         aliases = sorted({norm(x) for x in names if isinstance(x, str) and norm(x)}, key=len, reverse=True)
-        row = {"id": data["id"], "type": data["type"], "aliases": aliases, "name": data.get("name")}
+        surface_forms = [
+            {
+                "text": x,
+                "normalized": norm(x),
+                "acronym": bool(ACRONYM_SURFACE_RE.fullmatch(x) and re.search(r"[A-Z]", x)),
+            }
+            for x in names
+            if isinstance(x, str) and norm(x)
+        ]
+        row = {
+            "id": data["id"], "type": data["type"], "aliases": aliases,
+            "surface_forms": surface_forms, "name": data.get("name"),
+        }
         rows.append(row)
         by_id[data["id"]] = row
         raw_non_state.append(data)
@@ -195,13 +208,55 @@ def heuristic_resolve(raw: str, entities: list[dict], identity_index, expected: 
     return sorted({entity_id for score, entity_id in matches if score == best})
 
 
+def embedded_identity_matches(
+    raw: str, entities: list[dict], identity_index, expected: str, state: str | None
+) -> list[str]:
+    """Return every exact State-safe ABox identity surface embedded in free-form text.
+
+    Long names/aliases use normalized token boundaries. Acronym-like surfaces are matched
+    case-sensitively against the original text, which lets short current aliases such as
+    FACA, BIA or KNCHR participate without turning ordinary short words into identities.
+    """
+    raw_norm = norm(raw)
+    padded_raw = f" {raw_norm} "
+    matches: set[str] = set()
+    for entity in entities:
+        if not eligible_in_state(identity_index, entity["id"], state):
+            continue
+        is_project = entity["type"] in {"Project", "Deployment"}
+        if expected == "actor" and is_project:
+            continue
+        if expected == "project" and not is_project:
+            continue
+        forms = entity.get("surface_forms") or [
+            {"text": alias, "normalized": alias, "acronym": False}
+            for alias in entity.get("aliases", [])
+        ]
+        for form in forms:
+            text = form.get("text") or ""
+            alias = form.get("normalized") or norm(text)
+            if not alias:
+                continue
+            if form.get("acronym"):
+                if re.search(rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])", raw):
+                    matches.add(entity["id"])
+                    break
+            elif len(alias) >= 6 and f" {alias} " in padded_raw:
+                matches.add(entity["id"])
+                break
+    return sorted(matches)
+
+
 def scope_identity_signal(raw: str, entities: list[dict], identity_index, state: str | None) -> bool:
     """Return true when a scope value contains a specific identity worth coverage review.
 
-    Existing State-safe ABox aliases always count. The regexes additionally catch named
-    institutions/facilities and role-qualified organizational references that are not yet
-    materialized, so they cannot disappear merely because the field is nominally scope.
+    Exact State-safe embedded ABox surfaces count first, including short case-sensitive
+    acronyms. The regexes additionally catch named institutions/facilities and role-qualified
+    organizational references that are not yet materialized, so they cannot disappear merely
+    because the field is nominally scope.
     """
+    if embedded_identity_matches(raw, entities, identity_index, "identity", state):
+        return True
     if heuristic_resolve(raw, entities, identity_index, "identity", state):
         return True
     return bool(SCOPE_NAMED_IDENTITY_RE.search(raw) or SCOPE_ROLE_IDENTITY_RE.search(raw))
@@ -242,6 +297,13 @@ def validate_disposition_targets(row: dict, by_id: dict[str, dict], expected: st
         raise ValueError(f"partial-deferred disposition needs at least one exact target: {row}")
 
 
+def missing_reviewed_identity_bindings(
+    row: dict, raw: str, entities: list[dict], identity_index, expected: str, state: str | None
+) -> list[str]:
+    embedded = set(embedded_identity_matches(raw, entities, identity_index, expected, state))
+    return sorted(embedded - set(row["resolved_ids"]))
+
+
 def reference_row(
     *, kind: str, expected: str, state: str | None, outcome: str | None, field: str, raw: str,
     source: str, record_index: int, entities: list[dict], by_id: dict[str, dict], identity_index,
@@ -250,6 +312,14 @@ def reference_row(
     disposition = matching_disposition(source, state, field, raw, dispositions)
     if disposition:
         validate_disposition_targets(disposition, by_id, expected)
+        missing_bindings = missing_reviewed_identity_bindings(
+            disposition, raw, entities, identity_index, expected, state
+        )
+        if missing_bindings:
+            raise ValueError(
+                "reviewed Schedule disposition omits exact current ABox identities "
+                f"{missing_bindings}: {disposition['disposition_key']}"
+            )
         status = {
             "bound": "resolved", "deferred": "deferred", "partial-deferred": "partial-deferred",
         }[disposition["disposition"]]
@@ -259,9 +329,19 @@ def reference_row(
         disposition_manifest = disposition["manifest"]
         disposition_key = disposition["disposition_key"]
     else:
-        matches = heuristic_resolve(raw, entities, identity_index, expected, state)
-        status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
-        source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
+        if expected == "identity":
+            matches = embedded_identity_matches(raw, entities, identity_index, expected, state)
+            if matches:
+                status = "resolved"
+                source_kind = "state-safe-exact-embedded-name-or-alias"
+            else:
+                matches = heuristic_resolve(raw, entities, identity_index, expected, state)
+                status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
+                source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
+        else:
+            matches = heuristic_resolve(raw, entities, identity_index, expected, state)
+            status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
+            source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
         reason = None
         disposition_manifest = None
         disposition_key = None
@@ -324,12 +404,12 @@ def audit() -> dict:
         row["disposition_key"] for row in dispositions if row["disposition_key"] not in used_dispositions
     )
     return {
-        "schema_version": 5,
+        "schema_version": 6,
         "semantics": {
             "purpose": "coverage audit of curated Schedule-preparation actor/project references and identity-bearing scope mentions",
             "completeness_rule": "Every curated actor/project reference and every identity-bearing scope mention must be resolved, deferred or partial-deferred; ambiguous/unresolved and stale reviewed dispositions are CI failures.",
             "identity_resolution": "heuristic domestic identity matching is State-scoped; reviewed dispositions may explicitly bind cross-State referents",
-            "review_binding": "reviewed dispositions are valid only while their entire Schedule source file retains its pinned Git blob identity",
+            "review_binding": "reviewed dispositions are valid only while their entire Schedule source file retains its pinned Git blob identity and must include every exact current State-safe ABox identity embedded in the reviewed value",
             "non_inference": [
                 "reference matching is not attribution",
                 "identity resolution does not inherit the State outcome",
@@ -396,19 +476,52 @@ def self_test() -> None:
     }]
     assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency, only here", sample)
     synthetic = [
-        {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
-        {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
-        {"id": "ORG-GLOBAL", "type": "Organization", "aliases": ["global source"]},
+        {
+            "id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"],
+            "surface_forms": [{"text": "National Police", "normalized": "national police", "acronym": False}],
+        },
+        {
+            "id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"],
+            "surface_forms": [{"text": "National Police", "normalized": "national police", "acronym": False}],
+        },
+        {
+            "id": "AGENCY-AAA-FACA", "type": "Agency", "aliases": ["central armed forces", "faca"],
+            "surface_forms": [
+                {"text": "Central Armed Forces", "normalized": "central armed forces", "acronym": False},
+                {"text": "FACA", "normalized": "faca", "acronym": True},
+            ],
+        },
+        {
+            "id": "AGENCY-AAA-MEDIA-COMMISSION", "type": "Agency", "aliases": ["media commission"],
+            "surface_forms": [{"text": "Media Commission", "normalized": "media commission", "acronym": False}],
+        },
+        {
+            "id": "ORG-GLOBAL", "type": "Organization", "aliases": ["global source"],
+            "surface_forms": [{"text": "Global Source", "normalized": "global source", "acronym": False}],
+        },
     ]
     raw = [
         {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "name": "National Police", "aliases": []},
         {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "name": "National Police", "aliases": []},
+        {"id": "AGENCY-AAA-FACA", "type": "Agency", "name": "Central Armed Forces", "aliases": ["FACA"]},
+        {"id": "AGENCY-AAA-MEDIA-COMMISSION", "type": "Agency", "name": "Media Commission", "aliases": []},
         {"id": "ORG-GLOBAL", "type": "Organization", "name": "Global Source", "aliases": []},
     ]
     idx = build_name_index(raw, state_codes={"AAA", "BBB"}, normalizer=norm)
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-NATIONAL-POLICE"]
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "CCC") == []
     assert heuristic_resolve("Global Source", synthetic, idx, "actor", "AAA") == ["ORG-GLOBAL"]
+    assert embedded_identity_matches("incident documented by FACA", synthetic, idx, "identity", "AAA") == ["AGENCY-AAA-FACA"]
+    assert not embedded_identity_matches("incident documented by faca", synthetic, idx, "identity", "AAA")
+    assert scope_identity_signal("the incident documented by FACA", synthetic, idx, "AAA")
+    composite = embedded_identity_matches(
+        "National Police / Media Commission workflow", synthetic, idx, "identity", "AAA"
+    )
+    assert composite == ["AGENCY-AAA-MEDIA-COMMISSION", "AGENCY-AAA-NATIONAL-POLICE"]
+    reviewed = {"resolved_ids": ["AGENCY-AAA-NATIONAL-POLICE"]}
+    assert missing_reviewed_identity_bindings(
+        reviewed, "National Police / Media Commission workflow", synthetic, idx, "identity", "AAA"
+    ) == ["AGENCY-AAA-MEDIA-COMMISSION"]
     assert scope_identity_signal("28 February 2026 Ministry of Interior enforcement cohort", synthetic, idx, "AAA")
     assert scope_identity_signal("identified by Qatar News Agency and the competent cybercrime department", synthetic, idx, "AAA")
     assert scope_identity_signal("after the Supreme Court retrial order", synthetic, idx, "AAA")
