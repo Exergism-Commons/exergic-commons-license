@@ -79,6 +79,7 @@ jobs:
           python tools/check_schedule_disposition_manifest_integrity.py --self-test
           python tools/check_schedule_reference_resolution_safety.py --self-test
           python tools/check_schedule_exact_identity_completeness.py --self-test
+          python tools/check_schedule_named_identity_strictness.py --self-test
           python tools/check_schedule_reference_field_coverage.py --self-test
           python tools/audit_private_org_mentions.py --self-test
 
@@ -107,6 +108,7 @@ jobs:
             --fail-on-unresolved-curated
           python tools/check_schedule_reference_resolution_safety.py
           python tools/check_schedule_exact_identity_completeness.py
+          python tools/check_schedule_named_identity_strictness.py
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
             --markdown build/private-org-mention-audit.md \
@@ -144,6 +146,7 @@ jobs:
             --fail-on-unresolved-curated
           python tools/check_schedule_reference_resolution_safety.py
           python tools/check_schedule_exact_identity_completeness.py
+          python tools/check_schedule_named_identity_strictness.py
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
             --markdown build/private-org-mention-audit.md \
