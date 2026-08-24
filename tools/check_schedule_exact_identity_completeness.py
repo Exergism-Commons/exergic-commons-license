@@ -4,9 +4,9 @@
 This checker is deliberately separate from audit_schedule_reference_coverage.py. It
 re-derives exact embedded ABox matches with stricter surface handling and verifies that
 all such identities are present in the audit row's resolved_ids. It also checks every
-scope row for cue-bound named people, including rows already resolved to another current
-identity: each detected person must either be a current exact Person identity or be
-explicitly named in a reviewed deferred/partial-deferred reason.
+scope row for high-confidence named people, including rows already resolved to another
+current identity: each detected person must either be a current exact Person identity or
+be explicitly named in a reviewed deferred/partial-deferred reason.
 
 The result is a defense-in-depth gate: changing the primary resolver cannot silently
 reintroduce longest-match, short-alias, context-only, reviewed-disposition or named-person
@@ -25,8 +25,12 @@ from entity_identity_resolution import build_name_index, eligible_in_state
 
 PERSON_WORD = r"[^\W\d_]+(?:['’.-][^\W\d_]+)*"
 PERSON_TOKEN_RE = re.compile(rf"\s*({PERSON_WORD})", re.UNICODE)
+PERSON_PAIR_LABEL_RE = re.compile(
+    rf"[—–]\s*({PERSON_WORD})\s+({PERSON_WORD})\s*/\s*({PERSON_WORD})\s+({PERSON_WORD})(?=\s|$)",
+    re.UNICODE,
+)
 PERSON_CUE_RE = re.compile(
-    r"(?:[—–/]|"
+    r"(?:"
     r"\b(?:arrest|detention|prosecution|proceeding|proceedings|case|measures|measure|sentence|conviction|investigation|trial)"
     r"\s+(?:of|against|concerning)|"
     r"\b(?:concerning|against|named|involving))",
@@ -37,10 +41,10 @@ PERSON_STOPWORDS = {
     "act", "administration", "agency", "amendment", "article", "articles", "barracks", "border",
     "branch", "bureau", "centre", "center", "code", "commission", "committee", "constitutional",
     "council", "court", "criminal", "department", "digital", "directorate", "force", "forces",
-    "government", "indigenous", "institution", "law", "media", "ministry", "national", "nations",
-    "office", "operation", "peoples", "police", "prison", "procedure", "project", "prosecution",
-    "public", "secretariat", "security", "service", "state", "supreme", "tribunal", "united", "unit",
-    "units", "university",
+    "government", "indigenous", "institution", "interior", "law", "media", "military", "ministry",
+    "national", "nations", "office", "operation", "peoples", "police", "prison", "procedure", "project",
+    "prosecution", "public", "secretariat", "security", "service", "state", "supreme", "tribunal", "united",
+    "unit", "units", "university",
     "january", "february", "march", "april", "may", "june", "july", "august", "september",
     "october", "november", "december",
 }
@@ -64,20 +68,49 @@ def looks_like_acronym_surface(text: str) -> bool:
     return (len(letters) >= 2 and uppercase >= 2) or (uppercase >= 1 and bool(digits))
 
 
-def named_person_mentions(raw: str) -> list[str]:
-    """Extract high-precision person-name candidates after person-oriented scope cues.
+def _valid_name_word(token: str) -> bool:
+    lower = token.lower()
+    return (
+        bool(token)
+        and token[0].isupper()
+        and lower not in PERSON_STOPWORDS
+        and not (len(token) > 1 and token.isupper())
+    )
 
-    This is intentionally not generic NER. It consumes consecutive title-cased name tokens
-    (with common lowercase surname particles) immediately after legal/custody cues or case
-    separators. That keeps the detector narrow while allowing more than two-token names.
+
+def _add_mention(mentions: list[str], tokens: list[str]) -> None:
+    capitalized = [token for token in tokens if token.lower() not in PERSON_PARTICLES]
+    if len(capitalized) < 2 or any(not _valid_name_word(token) for token in capitalized):
+        return
+    mention = " ".join(tokens).strip()
+    if mention and mention not in mentions:
+        mentions.append(mention)
+
+
+def named_person_mentions(raw: str) -> list[str]:
+    """Extract high-precision named-person candidates from scope text.
+
+    Single names require a person-oriented legal/custody cue such as `concerning Jane Doe`
+    or `prosecution of Jane Doe`. Bare slash/dash separators are not treated as person cues,
+    because they frequently introduce facilities, places or institutional sub-scopes. The
+    one separator-only form accepted is the stronger paired case-label shape
+    `— First Last / First Last`, which covers curated named-case labels without classifying
+    `El Haoud Prison`, `Yaoundé Military Tribunal` or `San Martin qualifying deployment`
+    as people.
     """
     mentions: list[str] = []
+
+    for match in PERSON_PAIR_LABEL_RE.finditer(raw):
+        first_a, first_b, second_a, second_b = match.groups()
+        _add_mention(mentions, [first_a, first_b])
+        _add_mention(mentions, [second_a, second_b])
+
     for cue in PERSON_CUE_RE.finditer(raw):
         segment = raw[cue.end(): cue.end() + 160]
         pos = 0
         tokens: list[str] = []
         capitalized_words = 0
-        for _ in range(6):
+        for _ in range(7):
             match = PERSON_TOKEN_RE.match(segment, pos)
             if not match:
                 break
@@ -87,20 +120,16 @@ def named_person_mentions(raw: str) -> list[str]:
                 tokens.append(token)
                 pos = match.end()
                 continue
-            if not token[0].isupper() or lower in PERSON_STOPWORDS:
-                break
-            if len(token) > 1 and token.isupper():
+            if not _valid_name_word(token):
                 break
             tokens.append(token)
             capitalized_words += 1
             pos = match.end()
             if capitalized_words >= 4:
                 break
-        if capitalized_words < 2:
-            continue
-        mention = " ".join(tokens).strip()
-        if mention and mention not in mentions:
-            mentions.append(mention)
+        if capitalized_words >= 2:
+            _add_mention(mentions, tokens)
+
     return mentions
 
 
@@ -216,7 +245,6 @@ def completeness_failures(report: dict, entities: list[dict], identity_index) ->
                     "raw": raw,
                     "missing_ids": exact_ids,
                 })
-            # Do not stop here: named-person completeness is checked below for every scope row.
         elif missing_ids:
             failures.append({
                 "reason": "Schedule row omits one or more exact current ABox identities",
@@ -279,6 +307,10 @@ def self_test() -> None:
     assert named_person_mentions("UNHCR measures concerning Jane Doe") == ["Jane Doe"]
     assert not named_person_signal("implementation of Law No. 32735 under the new rules")
     assert not named_person_signal("Queen Elizabeth Barracks, Nabua, Suva")
+    assert not named_person_signal("Hassan Bouras detention project — DZA 3/2026 / El Haoud Prison, El Bayadh")
+    assert not named_person_signal("Abdu Karim Ali detention / Yaoundé Military Tribunal life-sentence project")
+    assert not named_person_signal("Polish Border Guard / Interior Belarus-border asylum-suspension and pushback project")
+    assert not named_person_signal("Exterminio Total / San Martin qualifying deployment")
 
     synthetic = [
         {
@@ -320,7 +352,7 @@ def self_test() -> None:
         {
             "id": "PERSON-AAA-ESRA-ISIK",
             "type": "Person",
-            "aliases": ["esra i k"],
+            "aliases": [schedule.norm("Esra Işık")],
             "surface_forms": [{"text": "Esra Işık", "normalized": schedule.norm("Esra Işık")}],
         },
     ]
