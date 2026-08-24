@@ -32,7 +32,8 @@ PREFIX_CUE_RE = re.compile(
     rf"({NAME_WORD}(?:\s+{NAME_WORD}){{1,4}}?)"
     rf"(?:\s+{MONTH}\s+\d{{4}}|\s+\d{{4}})?"
     rf"(?:\s+{TECH_QUALIFIER})?"
-    rf"\s+{LEGAL_CUE}\b",
+    rf"\s+{LEGAL_CUE}\b"
+    rf"(?=\s+(?i:project|activity|case|matter|proceeding)\b|\s*(?:$|[/;,—–]))",
     re.UNICODE,
 )
 CUE_BEFORE_RE = re.compile(
@@ -199,6 +200,10 @@ def self_test() -> None:
     assert strict_named_mentions("Khariq Anhar EIT-law prosecution project", "scope-identity-reference") == ["Khariq Anhar"]
     assert strict_named_mentions("Jane Doe Smith-Jones prosecution project", "scope-identity-reference") == ["Jane Doe Smith-Jones"]
     assert "Jane Doe" in strict_named_mentions("Human Rights Watch / Jane Doe", "actor-reference")
+    assert "Counter Terrorist" not in strict_named_mentions(
+        "Sri Lanka Police — Counter Terrorist Investigation Division (CTID), only in actual detention activity",
+        "actor-reference",
+    )
 
     ann = {
         "resolution_source": "reviewed-disposition",
