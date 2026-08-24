@@ -14,8 +14,8 @@
       "field": "schedule_identity",
       "match_prefix": "Udbetaling Danmark / ATP automated welfare risk-profiling workflows",
       "disposition": "partial-deferred",
-      "resolved_ids": ["INSTITUTION-DNK-UDBETALING-DANMARK"],
-      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+      "resolved_ids": ["INSTITUTION-DNK-UDBETALING-DANMARK", "INSTITUTION-DNK-ATP"],
+      "reason": "Both Udbetaling Danmark and ATP are exact current ABox identities embedded in the reviewed composite. Binding both is identity-coverage only; additional workflow context remains deferred."
     },
     {
       "source": "registry/schedule-state-s-freezes/promoted-ready-01.yml",
@@ -32,8 +32,8 @@
       "field": "schedule_identity",
       "match_prefix": "BIA / Ministry of Internal Affairs repressive spyware and mobile-forensic deployment class",
       "disposition": "partial-deferred",
-      "resolved_ids": ["AGENCY-SRB-MINISTRY-INTERNAL-AFFAIRS"],
-      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+      "resolved_ids": ["AGENCY-SRB-BIA", "AGENCY-SRB-MINISTRY-INTERNAL-AFFAIRS"],
+      "reason": "BIA and the Ministry of Internal Affairs are both exact current ABox identities embedded in the reviewed composite. Binding both is identity-coverage only; no participation, hierarchy or governance inference is created."
     },
     {
       "source": "registry/schedule-state-s-freezes/promoted-ready-02.yml",
@@ -104,8 +104,8 @@
       "field": "schedule_identity",
       "match_prefix": "STATIC-99R, STABLE-2007 and ACUTE-2007 probation risk-assessment workflows",
       "disposition": "partial-deferred",
-      "resolved_ids": ["PROJECT-NLD-STATIC-99R"],
-      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+      "resolved_ids": ["PROJECT-NLD-STATIC-99R", "PROJECT-NLD-STABLE-2007", "PROJECT-NLD-ACUTE-2007"],
+      "reason": "All three exact named workflow identities currently materialized in ABox are preserved; the broader probation-workflow context remains deferred. Identity-only; no relation or governance inference."
     }
   ]
 }
