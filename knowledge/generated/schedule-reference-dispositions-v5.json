@@ -1,0 +1,111 @@
+{
+  "version": 5,
+  "follows": "knowledge/generated/schedule-reference-dispositions-v4.json",
+  "source_blobs": {
+    "registry/schedule-state-s-freezes/promoted-ready-01.yml": "eacea63dfacc72c8df93db393c95b1b5a6355db3",
+    "registry/schedule-state-s-freezes/promoted-ready-02.yml": "0b8e0545bc33a62e27e94ab020f5809911555808",
+    "registry/schedule-state-s-freezes/promoted-ready-03a.yml": "d51324e4e4e2961293f0cf11608de8d58a8a2500",
+    "registry/schedule-state-s-freezes/status-resolved-nld.yml": "44f1a7b28395f0b9e98ad72672f55d316decf363"
+  },
+  "entries": [
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-01.yml",
+      "state": "DNK",
+      "field": "schedule_identity",
+      "match_prefix": "Udbetaling Danmark / ATP automated welfare risk-profiling workflows",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["INSTITUTION-DNK-UDBETALING-DANMARK"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-01.yml",
+      "state": "DNK",
+      "field": "project_boundary",
+      "match_prefix": "specified Udbetaling Danmark automated fraud/risk-profiling models",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["INSTITUTION-DNK-UDBETALING-DANMARK"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-01.yml",
+      "state": "SRB",
+      "field": "schedule_identity",
+      "match_prefix": "BIA / Ministry of Internal Affairs repressive spyware and mobile-forensic deployment class",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["AGENCY-SRB-MINISTRY-INTERNAL-AFFAIRS"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-02.yml",
+      "state": "POL",
+      "field": "schedule_identity",
+      "match_prefix": "Polish Border Guard / Interior Belarus-border asylum-suspension and pushback project",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["AGENCY-POL-BORDER-GUARD"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-02.yml",
+      "state": "ECU",
+      "field": "schedule_identity",
+      "match_prefix": "Exterminio Total / San Martin qualifying deployment",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["PROJECT-ECU-EXTERMINIO-TOTAL"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-02.yml",
+      "state": "ECU",
+      "field": "project_boundary",
+      "match_prefix": "Exterminio Total only to the extent the San Martin/related deployment satisfies the canonical coerci",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["PROJECT-ECU-EXTERMINIO-TOTAL"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-03a.yml",
+      "state": "JOR",
+      "field": "schedule_identity",
+      "match_prefix": "State Security Court / Media Commission / governor detention qualifying project class",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["INSTITUTION-JOR-STATE-SECURITY-COURT"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-03a.yml",
+      "state": "LSO",
+      "field": "schedule_identity",
+      "match_prefix": "Lesotho Correctional Service qualifying detention/conditions project",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["AGENCY-LSO-CORRECTIONAL-SERVICE"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-03a.yml",
+      "state": "NGA",
+      "field": "schedule_identity",
+      "match_prefix": "Imo State Police Anti-Kidnapping Unit (Tiger Base) detention/custody project",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["AGENCY-NGA-IMO-ANTI-KIDNAPPING-UNIT"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-03a.yml",
+      "state": "NGA",
+      "field": "project_boundary",
+      "match_prefix": "Tiger Base detention/custody project described by the canonical dossier",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["AGENCY-NGA-IMO-ANTI-KIDNAPPING-UNIT"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/status-resolved-nld.yml",
+      "state": "NLD",
+      "field": "schedule_identity",
+      "match_prefix": "STATIC-99R, STABLE-2007 and ACUTE-2007 probation risk-assessment workflows",
+      "disposition": "partial-deferred",
+      "resolved_ids": ["PROJECT-NLD-STATIC-99R"],
+      "reason": "Reviewed composite/free-form scope reference preserves the exact current ABox binding while additional identity/context remains deferred. Identity-only; no participation, attribution or governance inference."
+    }
+  ]
+}
