@@ -24,7 +24,7 @@ import check_schedule_exact_identity_completeness as exact
 from entity_identity_resolution import build_name_index, eligible_in_state
 
 
-NAME_WORD = r"[^\W\d_]+(?:['’.-][^\W\d_]+)*"
+NAME_WORD = r"(?:[^\W\d_]\.|[^\W\d_]+(?:['’.-][^\W\d_]+)*)"
 NAME_TOKEN_RE = re.compile(NAME_WORD, re.UNICODE)
 MONTH = r"(?i:January|February|March|April|May|June|July|August|September|October|November|December)"
 LEGAL_CUE = r"(?i:arrest|detention|prosecution|proceeding|proceedings|case|sentence|conviction|investigation|trial)"
@@ -213,8 +213,20 @@ def exact_non_person_actor_spans(raw: str, entities: list[dict], identity_index,
             text = form.get("text") or ""
             if not text:
                 continue
-            flags = 0 if exact.looks_like_acronym_surface(text) else re.I
-            pattern = rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])"
+            if exact.looks_like_acronym_surface(text):
+                pattern = rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])"
+                flags = 0
+            else:
+                # Mirror the repository normalizer: exact long surfaces may differ only in
+                # punctuation/spacing (e.g. `Human-Rights Watch`). Keep span recovery
+                # tolerant to that typography so anchored actor-list checks cannot be
+                # bypassed by changing a space to punctuation.
+                alias = form.get("normalized") or schedule.norm(text)
+                tokens = alias.split()
+                if not tokens:
+                    continue
+                pattern = r"(?<![A-Za-z0-9])" + r"[^A-Za-z0-9]+".join(map(re.escape, tokens)) + r"(?![A-Za-z0-9])"
+                flags = re.I
             for match in re.finditer(pattern, raw, flags):
                 spans.append(match.span())
     return sorted(set(spans))
@@ -462,6 +474,8 @@ def self_test() -> None:
     assert strict_named_mentions("Juan Carlos de la Cruz Gomez detention project", "scope-identity-reference") == ["Juan Carlos de la Cruz Gomez"]
     assert "Jane DOE" in strict_named_mentions("detention of Jane DOE pending trial", "actor-reference")
     assert "JANE DOE" in strict_named_mentions("detention of JANE DOE pending trial", "actor-reference")
+    assert "J. Doe" in strict_named_mentions("detention of J. Doe pending trial", "actor-reference")
+    assert "Jane A. Doe" in strict_named_mentions("detention of Jane A. Doe pending trial", "actor-reference")
     assert "Jane Doe" in strict_named_mentions('detention of "Jane Doe" pending trial', "actor-reference")
     assert "Jean Marie Michel Mokoko" in strict_named_mentions(
         "TUR 6/2026 — Jean Marie Michel Mokoko / Andre Okombi Salissa enforcement project",
@@ -521,6 +535,7 @@ def self_test() -> None:
         "Human Rights Watch and Jane Doe, acting only where participation is established",
         "Human Rights Watch & Jane Doe, in an advisory capacity",
         "Human Rights Watch, Jane Doe, only where participation is established",
+        "Human-Rights Watch and Jane Doe, acting only where participation is established",
     ):
         assert anchored_actor_list_mentions(raw, synthetic, idx, "AAA") == ["Jane Doe"]
     assert anchored_actor_list_mentions(
