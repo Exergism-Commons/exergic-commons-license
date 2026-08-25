@@ -105,12 +105,17 @@ def contextual_labels(row: dict) -> list[str]:
     return labels
 
 
-def normalized_phrase_occurrences(raw: str, label: str) -> int:
-    raw_norm = schedule.norm(raw)
-    label_norm = schedule.norm(label)
-    if not raw_norm or not label_norm:
+def normalized_tokens(value: str) -> list[str]:
+    return schedule.norm(value).split()
+
+
+def token_phrase_occurrences(text: str, phrase: str) -> int:
+    haystack = normalized_tokens(text)
+    needle = normalized_tokens(phrase)
+    if not haystack or not needle or len(needle) > len(haystack):
         return 0
-    return f" {raw_norm} ".count(f" {label_norm} ")
+    width = len(needle)
+    return sum(haystack[index:index + width] == needle for index in range(len(haystack) - width + 1))
 
 
 def resolved_project_covers_label(row: dict, label: str, by_id: dict[str, dict]) -> bool:
@@ -122,24 +127,20 @@ def resolved_project_covers_label(row: dict, label: str, by_id: dict[str, dict])
     only once. That last condition prevents `Operation Alpha / Operation Alpha Beta` from
     letting the resolved second project erase debt for the distinct first occurrence.
     """
-    if normalized_phrase_occurrences(row.get("raw") or "", label) != 1:
+    raw = row.get("raw") or ""
+    if token_phrase_occurrences(raw, label) != 1:
         return False
-    raw_norm = schedule.norm(row.get("raw") or "")
-    label_norm = schedule.norm(label)
-    padded_raw = f" {raw_norm} "
-    padded_label = f" {label_norm} "
     for entity_id in row.get("resolved_ids") or []:
         entity = by_id.get(entity_id)
         if not entity or entity.get("type") not in {"Project", "Deployment"}:
             continue
         for form in entity.get("surface_forms") or []:
-            form_norm = form.get("normalized") or schedule.norm(form.get("text") or "")
-            if not form_norm:
+            form_text = form.get("text") or form.get("normalized") or ""
+            if not form_text:
                 continue
-            padded_form = f" {form_norm} "
-            if padded_form not in padded_raw:
+            if token_phrase_occurrences(raw, form_text) != 1:
                 continue
-            if padded_label in padded_form:
+            if token_phrase_occurrences(form_text, label) >= 1:
                 return True
     return False
 
@@ -199,6 +200,9 @@ def self_test() -> None:
     assert "Jane Doe" in contextual_labels({
         "kind": "scope-reference", "status": "context-only", "field": "identified_incident", "raw": "2026 Jane Doe matter"
     })
+
+    assert token_phrase_occurrences("Operação Contenção — 28 October 2025 phase", "Operação Contenção") == 1
+    assert token_phrase_occurrences("Operation Alpha / Operation Alpha Beta", "Operation Alpha") == 2
 
     phase = {
         "id": "PROJECT-BRA-PHASE", "type": "Project", "aliases": ["operacao contencao 28 october 2025 phase"],
