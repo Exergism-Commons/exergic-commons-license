@@ -35,9 +35,9 @@ NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]*|[A-Z]\.)"
 NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
 NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
 PASSIVE_ACTION_RE = re.compile(
-    rf"\b(?P<name>{NAME_PHRASE})\s+(?i:was|were|is|remains|remain)\s+"
+    rf"\b(?P<name>{NAME_PHRASE})\s+(?i:was|were|is|remains|remain|remained)\s+"
     r"(?i:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
-    r"disappeared|released|pardoned|executed|killed)\b"
+    r"disappeared|released|pardoned|executed|killed|incommunicado|missing|unaccounted\s+for)\b"
 )
 FRONTMATTER_PERSON_KEYS = {"provisional_scope", "adversarial_result"}
 LOCAL_STOP = {
@@ -69,8 +69,6 @@ def leading_action_name(tail: str) -> str | None:
         return None
     match = re.match(re.escape(candidate), tail, flags=re.I)
     remainder = tail[match.end():].lstrip() if match else ""
-    # Legal titles such as "Incarceration of Unlawful Combatants Law" are not people even
-    # though the first two words are title-cased and human-name shaped.
     if re.match(r"(?i)^Law\b", remainder):
         return None
     return candidate
@@ -79,8 +77,6 @@ def leading_action_name(tail: str) -> str | None:
 def names_from_prose(prose: str) -> list[str]:
     names: list[str] = []
 
-    # Explicit human-role syntax is the strongest signal and also catches nested prose such
-    # as "journalist/defender Hugues ..." via the final role token.
     for match in ROLE_RE.finditer(prose):
         add_name(names, leading_action_name(prose[match.end():]))
 
@@ -88,9 +84,6 @@ def names_from_prose(prose: str) -> list[str]:
         for match in regex.finditer(prose):
             add_name(names, leading_action_name(prose[match.end():]))
 
-    # Passive clauses require an immediately adjacent, title-cased name phrase rather than a
-    # greedy prose fragment. This catches "Dorgelesse Nguessan was released" and "Aung San
-    # Suu Kyi remain detained" without manufacturing people from locations or section prose.
     for match in PASSIVE_ACTION_RE.finditer(prose):
         add_name(names, match.group("name"))
     return names
@@ -142,6 +135,8 @@ def self_test() -> None:
     assert "Boualem Sansal" in names_from_prose("the November 2025 pardon of writer Boualem Sansal")
     assert "Jane Doe" in names_from_prose("journalist Jane Doe reported the detention")
     assert "Jane Doe" in names_from_prose("Jane Doe was detained pending trial")
+    assert "Jane Doe" in names_from_prose("Jane Doe remained incommunicado after transfer")
+    assert "Jane Doe" in names_from_prose("Jane Doe remained unaccounted for after transfer")
     assert "Kokila Annamalai" in names_from_prose("rights groups called for charges against Kokila Annamalai to be dropped")
     assert "Martinez Zogo" in names_from_prose("the trial concerning journalist Martinez Zogo's killing resumed")
     assert names_from_prose("detention involving Hong Kong democracy/human-rights defenders") == []
