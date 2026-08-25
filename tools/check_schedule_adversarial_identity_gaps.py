@@ -62,15 +62,24 @@ def contextual_labels(row: dict) -> list[str]:
     raw = row.get("raw") or ""
     labels: list[str] = []
 
+    # Actor-list debt can be hidden inside a row that otherwise resolved/reviewed, so it is
+    # checked regardless of row status.
     if row.get("kind") == "actor-reference":
         labels.extend(ambiguous_actor_list_mentions(raw))
+
+    # Scope residual checks exist specifically to prevent identity-looking values from being
+    # classified as context-only. Once a scope row is identity-bearing/resolved, the exact
+    # and strict guards own completeness. Re-parsing a shorter stem here would incorrectly
+    # demand a broad alias (e.g. `Operação Contenção`) for an exact phase identity.
+    if row.get("kind") != "scope-reference" or row.get("status") != "context-only":
+        return labels
 
     if row.get("field") == "schedule_identity":
         bare = strict.full_name_phrase(raw, allow_all_caps=True)
         if bare and bare not in labels:
             labels.append(bare)
 
-    if row.get("kind") in {"scope-reference", "scope-identity-reference"} and row.get("field") in SCOPE_OBJECT_FIELDS:
+    if row.get("field") in SCOPE_OBJECT_FIELDS:
         for match in NAMED_OBJECT_RE.finditer(raw):
             label = " ".join(match.group(1).split())
             if label not in labels:
@@ -93,7 +102,6 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
             non_person_ids = exact.materialized_non_person_ids_for_mention(label, entities, identity_index, state)
             materialized_ids = sorted(set(person_ids) | set(non_person_ids))
             if materialized_ids:
-                # Exact-current identities are enforced by the existing exact/strict gates.
                 continue
             if strict.explicitly_defers_complete_name(row, label):
                 continue
@@ -115,16 +123,25 @@ def self_test() -> None:
     assert ambiguous_actor_list_mentions("Jane Doe and John Roe") == ["Jane Doe", "John Roe"]
     assert ambiguous_actor_list_mentions("Jane Doe, John Roe, acting only where authorized") == ["Jane Doe", "John Roe"]
     assert ambiguous_actor_list_mentions("Ministry of Interior and Narcotics Control") == []
-    assert contextual_labels({"kind": "scope-reference", "field": "schedule_identity", "raw": "Jane Doe"}) == ["Jane Doe"]
+
+    context = {"kind": "scope-reference", "status": "context-only", "field": "schedule_identity", "raw": "Jane Doe"}
+    assert contextual_labels(context) == ["Jane Doe"]
     assert "Operation Silent Dawn" in contextual_labels({
-        "kind": "scope-reference", "field": "identified_incident", "raw": "Operation Silent Dawn"
+        "kind": "scope-reference", "status": "context-only", "field": "identified_incident", "raw": "Operation Silent Dawn"
     })
     assert "Operação Contenção" in contextual_labels({
-        "kind": "scope-reference", "field": "schedule_identity", "raw": "Operação Contenção — 28 October 2025 phase"
+        "kind": "scope-reference", "status": "context-only", "field": "schedule_identity",
+        "raw": "Operação Contenção — 28 October 2025 phase"
     })
     assert "Jane Doe" in contextual_labels({
-        "kind": "scope-reference", "field": "identified_incident", "raw": "2026 Jane Doe matter"
+        "kind": "scope-reference", "status": "context-only", "field": "identified_incident", "raw": "2026 Jane Doe matter"
     })
+    # Once the exact phase becomes an identity-bearing resolved scope row, shorter stems are
+    # not separate debt; exact/strict completeness checks own that row.
+    assert contextual_labels({
+        "kind": "scope-identity-reference", "status": "resolved", "field": "schedule_identity",
+        "raw": "Operação Contenção — 28 October 2025 Alemão/Penha phase"
+    }) == []
 
     entities: list[dict] = []
     index = {"by_id": {}, "by_name": {}}
@@ -137,6 +154,7 @@ def self_test() -> None:
 
     reviewed = report["references"][0]
     reviewed.update({
+        "kind": "scope-identity-reference",
         "status": "partial-deferred",
         "resolution_source": "reviewed-disposition",
         "disposition_reason": "Jane Doe remains explicitly identity-deferred pending materialization.",
