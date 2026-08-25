@@ -8,6 +8,11 @@ preserves hyphenated surnames, independently re-derives every exact current Pers
 surface, and accepts reviewed deferral only when the exact complete name is followed by
 explicit deferral language.
 
+For project-reference rows, role binding and identity coverage remain separate:
+`resolved_ids` stays Project/Deployment-only, while an optional reviewed
+`identity_coverage_ids` list may preserve exact named Person identities without implying
+that those people are projects or participants.
+
 Identity coverage is not attribution and does not infer participation, control,
 operation, supply, culpability, membership or a governance outcome.
 """
@@ -19,7 +24,7 @@ import re
 
 import audit_schedule_reference_coverage as schedule
 import check_schedule_exact_identity_completeness as exact
-from entity_identity_resolution import build_name_index
+from entity_identity_resolution import build_name_index, eligible_in_state
 
 
 NAME_WORD = r"[^\W\d_]+(?:['’.-][^\W\d_]+)*"
@@ -96,13 +101,7 @@ def add_unique(out: list[str], mention: str) -> None:
 
 
 def actor_component_name(fragment: str) -> str | None:
-    """Return a complete leading actor name, allowing only recognized capacity prose.
-
-    A bare full component remains valid. If the component has a comma, only an explicitly
-    recognized capacity/conditional tail may be stripped. This catches e.g.
-    `Jane Doe, only where participation is established` without turning arbitrary prose
-    into a person candidate.
-    """
+    """Return a complete leading actor name, allowing only recognized capacity prose."""
     cleaned = fragment.strip(" ,;:()[]")
     match = ACTOR_FRAGMENT_RE.fullmatch(cleaned)
     if match:
@@ -130,10 +129,6 @@ def strict_named_mentions(raw: str, kind: str) -> list[str]:
         for match in MATTER_NAME_RE.finditer(raw):
             add_unique(mentions, match.group(1))
 
-    # Actor fields are identity-bearing by definition. For list-like composites, inspect
-    # slash/semicolon components. A recognized comma-delimited capacity tail may follow the
-    # leading complete name; exact organizations are suppressed later, while an unknown
-    # named component must be explicitly reviewed rather than disappearing in vague prose.
     if kind == "actor-reference":
         for fragment in re.split(r"\s*(?:/|;)\s*", raw):
             candidate = actor_component_name(fragment)
@@ -147,11 +142,7 @@ def reason_tokens(text: str) -> list[str]:
 
 
 def explicitly_defers_complete_name(row: dict, mention: str) -> bool:
-    """Require the exact complete name immediately followed by deferral grammar.
-
-    This intentionally rejects prefixes such as `Ann Lee` in `Ann Lee Jones ...` and
-    `Ann Lee-Smith ...`; the token after the exact name must begin the deferral phrase.
-    """
+    """Require the exact complete name immediately followed by deferral grammar."""
     if row.get("resolution_source") != "reviewed-disposition":
         return False
     if row.get("status") not in {"deferred", "partial-deferred"}:
@@ -181,9 +172,86 @@ def checked_row_kind(kind: str) -> bool:
     return kind in {"actor-reference", "project-reference", "scope-reference", "scope-identity-reference"}
 
 
-def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
+def load_identity_coverage_entries(by_id: dict[str, dict], identity_index) -> list[dict]:
+    """Load and validate supplemental Person identity coverage from reviewed manifests."""
+    entries: list[dict] = []
+    for path in sorted((schedule.ROOT / "knowledge" / "generated").glob("schedule-reference-dispositions-v*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for index, row in enumerate(data.get("entries", [])):
+            ids = row.get("identity_coverage_ids")
+            if ids is None:
+                continue
+            if not isinstance(ids, list) or not ids or not all(isinstance(item, str) and item for item in ids):
+                raise ValueError(f"invalid identity_coverage_ids at {path.relative_to(schedule.ROOT)}#{index}")
+            if len(ids) != len(set(ids)):
+                raise ValueError(f"duplicate identity_coverage_ids at {path.relative_to(schedule.ROOT)}#{index}: {ids}")
+            if row.get("field") not in schedule.PROJECT_FIELDS:
+                raise ValueError(
+                    f"identity_coverage_ids are only valid for project-role dispositions: "
+                    f"{path.relative_to(schedule.ROOT)}#{index}"
+                )
+            if row.get("disposition") not in {"bound", "partial-deferred"}:
+                raise ValueError(
+                    f"identity_coverage_ids require bound/partial-deferred review: "
+                    f"{path.relative_to(schedule.ROOT)}#{index}"
+                )
+            resolved = set(row.get("resolved_ids") or [])
+            overlap = sorted(resolved & set(ids))
+            if overlap:
+                raise ValueError(
+                    f"identity_coverage_ids must stay separate from role-bound resolved_ids: {overlap}"
+                )
+            state = row.get("state")
+            for entity_id in ids:
+                entity = by_id.get(entity_id)
+                if entity is None:
+                    raise ValueError(f"identity_coverage_ids target does not resolve: {entity_id}")
+                if entity.get("type") != "Person":
+                    raise ValueError(f"identity_coverage_ids target is not a Person: {entity_id}")
+                if not eligible_in_state(identity_index, entity_id, state):
+                    raise ValueError(f"identity_coverage_ids target is not State-safe for {state}: {entity_id}")
+            entries.append({
+                "source": row["source"],
+                "state": row["state"],
+                "field": row["field"],
+                "match_prefix": row["match_prefix"],
+                "identity_coverage_ids": list(ids),
+            })
+    return entries
+
+
+def supplemental_ids_for_row(row: dict, raw: str, coverage_entries: list[dict]) -> tuple[set[str], tuple[str, str, str, str] | None]:
+    matches = [
+        entry for entry in coverage_entries
+        if entry["source"] == row.get("source")
+        and entry["state"] == row.get("state")
+        and entry["field"] == row.get("field")
+        and raw.startswith(entry["match_prefix"])
+    ]
+    if len(matches) > 1:
+        raise ValueError(f"multiple supplemental identity-coverage entries match row: {row}")
+    if not matches:
+        return set(), None
+    entry = matches[0]
+    if row.get("resolution_source") != "reviewed-disposition":
+        raise ValueError(f"supplemental identity coverage matched a non-reviewed row: {row}")
+    key = (entry["source"], entry["state"], entry["field"], entry["match_prefix"])
+    return set(entry["identity_coverage_ids"]), key
+
+
+def failures(
+    report: dict,
+    entities: list[dict],
+    identity_index,
+    coverage_entries: list[dict] | None = None,
+) -> list[dict]:
     out: list[dict] = []
     person_entities = [entity for entity in entities if entity.get("type") == "Person"]
+    by_id = {entity["id"]: entity for entity in entities}
+    if coverage_entries is None:
+        coverage_entries = load_identity_coverage_entries(by_id, identity_index)
+    used_coverage_keys: set[tuple[str, str, str, str]] = set()
+
     for row in report.get("references", []):
         kind = row.get("kind") or ""
         if not checked_row_kind(kind):
@@ -191,14 +259,26 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
         raw = row.get("raw") or ""
         state = row.get("state")
         resolved_ids = set(row.get("resolved_ids") or [])
+        supplemental_ids, coverage_key = supplemental_ids_for_row(row, raw, coverage_entries)
+        if coverage_key is not None:
+            used_coverage_keys.add(coverage_key)
+        covered_ids = resolved_ids | supplemental_ids
 
-        # Person coverage is independent of the row's role. A project reference can name a
-        # materialized Person while correctly resolving its project identity; both identities
-        # must remain visible in reviewed coverage.
-        exact_person_ids = exact.independent_exact_matches(
+        exact_person_ids = set(exact.independent_exact_matches(
             raw, person_entities, identity_index, "identity", state
-        )
-        missing_exact_people = sorted(set(exact_person_ids) - resolved_ids)
+        ))
+        extraneous_supplemental = sorted(supplemental_ids - exact_person_ids)
+        if extraneous_supplemental:
+            out.append({
+                "reason": "reviewed supplemental Person coverage is not an exact embedded identity",
+                "state": state,
+                "kind": kind,
+                "field": row.get("field"),
+                "source": row.get("source"),
+                "raw": raw,
+                "extraneous_ids": extraneous_supplemental,
+            })
+        missing_exact_people = sorted(exact_person_ids - covered_ids)
         if missing_exact_people:
             out.append({
                 "reason": "Schedule row omits one or more exact current Person identities",
@@ -208,7 +288,8 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
                 "source": row.get("source"),
                 "raw": raw,
                 "missing_ids": missing_exact_people,
-                "reported_ids": sorted(resolved_ids),
+                "role_bound_ids": sorted(resolved_ids),
+                "identity_coverage_ids": sorted(supplemental_ids),
                 "resolution_source": row.get("resolution_source"),
                 "status": row.get("status"),
             })
@@ -216,13 +297,10 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
         for mention in strict_named_mentions(raw, kind):
             person_ids = exact.materialized_person_ids_for_mention(mention, entities, identity_index, state)
             if person_ids:
-                # Exact Person omissions were already reported above from an independent
-                # surface scan; avoid duplicate diagnostics for the same debt.
                 continue
 
             non_person_ids = exact.materialized_non_person_ids_for_mention(mention, entities, identity_index, state)
             if non_person_ids:
-                # Exact non-Person coverage is enforced by the existing all-identity gate.
                 continue
 
             if not explicitly_defers_complete_name(row, mention):
@@ -234,10 +312,21 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
                     "source": row.get("source"),
                     "raw": raw,
                     "name": mention,
-                    "reported_ids": sorted(resolved_ids),
+                    "role_bound_ids": sorted(resolved_ids),
+                    "identity_coverage_ids": sorted(supplemental_ids),
                     "resolution_source": row.get("resolution_source"),
                     "status": row.get("status"),
                 })
+
+    all_coverage_keys = {
+        (entry["source"], entry["state"], entry["field"], entry["match_prefix"])
+        for entry in coverage_entries
+    }
+    for key in sorted(all_coverage_keys - used_coverage_keys):
+        out.append({
+            "reason": "unused reviewed supplemental Person identity coverage",
+            "source": key[0], "state": key[1], "field": key[2], "match_prefix": key[3],
+        })
     return out
 
 
@@ -288,12 +377,12 @@ def self_test() -> None:
         "resolution_source": "reviewed-disposition", "resolved_ids": ["ORG-HRW"],
         "disposition_reason": "Human Rights Watch is bound exactly; remaining actor context is deferred.",
     }]}
-    found = failures(actor_bypass, synthetic, idx)
+    found = failures(actor_bypass, synthetic, idx, [])
     assert any(item.get("name") == "Jane Doe" for item in found)
     actor_bypass["references"][0]["disposition_reason"] = (
         "Human Rights Watch is bound exactly; Jane Doe remains explicitly identity-deferred pending materialization."
     )
-    assert failures(actor_bypass, synthetic, idx) == []
+    assert failures(actor_bypass, synthetic, idx, []) == []
 
     project_bypass = {"references": [{
         "kind": "project-reference", "state": "AAA", "field": "candidate_projects", "source": "x.yml",
@@ -301,10 +390,14 @@ def self_test() -> None:
         "status": "resolved", "resolution_source": "reviewed-disposition", "resolved_ids": ["PROJECT-AAA-X"],
         "disposition_reason": "Exact project bound.",
     }]}
-    found = failures(project_bypass, synthetic, idx)
+    found = failures(project_bypass, synthetic, idx, [])
     assert any(item.get("missing_ids") == ["PERSON-MACPHERSON"] for item in found)
-    project_bypass["references"][0]["resolved_ids"].append("PERSON-MACPHERSON")
-    assert failures(project_bypass, synthetic, idx) == []
+    supplemental = [{
+        "source": "x.yml", "state": "AAA", "field": "candidate_projects",
+        "match_prefix": "Cyber Crimes Act enforcement",
+        "identity_coverage_ids": ["PERSON-MACPHERSON"],
+    }]
+    assert failures(project_bypass, synthetic, idx, supplemental) == []
     print("Schedule strict named-identity self-test: OK")
 
 
