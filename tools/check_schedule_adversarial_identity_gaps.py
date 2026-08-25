@@ -4,7 +4,8 @@
 The primary Schedule audit and the exact/strict companion checks intentionally use
 high-precision heuristics. This final guard targets syntactic gaps that can otherwise stay
 `context-only`: bare values in `schedule_identity`, named operations/projects in scope
-fields, and multi-name actor lists whose components are joined by ambiguous separators.
+fields, person-labelled matters, and multi-name actor lists whose components are joined by
+ambiguous separators.
 
 It is identity coverage only. A detected name/object is not attributed to conduct and does
 not inherit any State governance outcome.
@@ -20,9 +21,10 @@ import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
 
 
+OBJECT_WORD = r"[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’.-]*"
 NAMED_OBJECT_RE = re.compile(
-    r"\b((?:Operation|Project|Programme|Program|System|Platform|Tool|Deployment|Initiative|Campaign)"
-    r"(?:\s+[A-Z][A-Za-z0-9'’.-]*){1,6})\b"
+    rf"\b((?:Operation|Operação|Operación|Opération|Project|Programme|Program|System|Platform|Tool|Deployment|Initiative|Campaign)"
+    rf"(?:\s+{OBJECT_WORD}){{1,6}})\b"
 )
 SCOPE_OBJECT_FIELDS = {"schedule_identity", "project_boundary", "identified_incident", "identified_measure"}
 
@@ -73,6 +75,10 @@ def contextual_labels(row: dict) -> list[str]:
             label = " ".join(match.group(1).split())
             if label not in labels:
                 labels.append(label)
+        for match in strict.MATTER_NAME_RE.finditer(raw):
+            label = " ".join(match.group(1).split())
+            if strict.valid_name(label, allow_all_caps=True) and label not in labels:
+                labels.append(label)
     return labels
 
 
@@ -112,6 +118,12 @@ def self_test() -> None:
     assert contextual_labels({"kind": "scope-reference", "field": "schedule_identity", "raw": "Jane Doe"}) == ["Jane Doe"]
     assert "Operation Silent Dawn" in contextual_labels({
         "kind": "scope-reference", "field": "identified_incident", "raw": "Operation Silent Dawn"
+    })
+    assert "Operação Contenção" in contextual_labels({
+        "kind": "scope-reference", "field": "schedule_identity", "raw": "Operação Contenção — 28 October 2025 phase"
+    })
+    assert "Jane Doe" in contextual_labels({
+        "kind": "scope-reference", "field": "identified_incident", "raw": "2026 Jane Doe matter"
     })
 
     entities: list[dict] = []
