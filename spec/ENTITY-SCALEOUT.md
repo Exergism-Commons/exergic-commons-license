@@ -77,20 +77,43 @@ Stale dispositions are rejected by CI. If a previously reviewed `curated-identit
 
 State dossiers contain noisy prose, while `registry/schedule-state-s-freezes/` already contains a narrower set of reviewed actor/project references used in Schedule preparation. `tools/audit_schedule_reference_coverage.py` therefore provides a stronger second layer.
 
-For every curated `candidate_parties`/`identified_party`/`identified_operators` and `candidate_projects`/`identified_projects` reference, exactly one of the following representation states must be explainable:
+For every curated `candidate_parties`/`identified_party`/`identified_operators` and `candidate_projects`/`identified_projects` reference, and for every scope value that carries a specific identity signal, exactly one of the following representation states must be explainable:
 
 - **resolved** — canonical name/alias or a reviewed binding resolves the reference to one or more exact ABox identities;
 - **partial-deferred** — an exact component is resolved but the source also contains unspecified/composite components that must not be invented;
 - **deferred** — the source deliberately describes a plural, functional, conditional or otherwise non-enumerated class rather than one sufficiently exact identity;
-- **ambiguous / unresolved** — forbidden by the CI gate.
+- **ambiguous / unresolved** — forbidden by the CI gate;
+- **context-only** — permitted only for scope text that contains no specific identity signal after all independent completeness guards run.
+
+Scope fields such as `schedule_identity`, `project_boundary`, identified incidents/locations and remediation text are **not automatically coerced into Actor or Project roles**. When a scope value contains an exact or high-confidence identity surface, it is audited as a neutral `scope-identity-reference`; otherwise it may remain `context-only`. Recording a scope identity means only that the identity occurs in the reviewed scope text.
 
 Reviewed exceptions live in `knowledge/generated/schedule-reference-dispositions-v*.json`. A disposition is identity-resolution metadata only. A multi-identity binding does not assert `partOf`, control, participation, operation or any other relation. A deferral is not evidence against the entity and is not a governance judgment.
 
+### Role binding versus supplemental identity coverage
+
+`resolved_ids` preserves the role semantics of the row being audited:
+
+- actor-reference rows may bind Actor identities but not Project/Deployment identities;
+- project-reference rows may bind Project/Deployment identities but not Persons or other Actors;
+- scope-identity references are identity coverage only and do not assign an Actor/Project role.
+
+A reviewed project-reference disposition may additionally carry `identity_coverage_ids` for exact current `Person` identities named inside the project text. This field is deliberately separate from `resolved_ids`: preserving a named person for representational completeness does **not** make that person a Project, a participant in the Project, a culpable actor or a Restricted Party. Supplemental IDs must be unique, Person-typed, State-safe, exact-embedded in the reviewed text, disjoint from role-bound IDs and actually consumed by a reviewed project row; otherwise CI fails closed.
+
+### Independent Schedule completeness guards
+
+Schedule completeness does not trust a single resolver. CI layers independent checks so a heuristic bug cannot silently erase identity debt:
+
+- `tools/check_schedule_reference_resolution_safety.py` rejects unsafe heuristic partial/composite resolution;
+- `tools/check_schedule_exact_identity_completeness.py` re-derives every exact current State-safe ABox surface, including short/mixed-case/letter-digit aliases, and requires complete coverage;
+- `tools/check_schedule_named_identity_strictness.py` independently re-parses named-person surfaces across actor, project and scope rows, including capacity prose, legal-cue forms, multi-token names, initials, hyphenated/all-caps surnames and reviewed complete-name deferrals;
+- `tools/check_schedule_adversarial_identity_gaps.py` catches residual identity-looking scope values that would otherwise remain `context-only`, multilingual named operations/projects, named matters and ambiguous actor-name lists;
+- `tools/check_schedule_reference_field_coverage.py` rejects identity-bearing-looking fields that sit outside the audited flat Schedule schema.
+
+These are representational gates only. They never infer participation, control, operation, supply, culpability, membership, project involvement or an R/S/U/N outcome.
+
 Every Schedule source file referenced by a reviewed disposition is **content-addressed in the disposition manifest by its exact Git blob ID**. The audit recomputes those blob IDs from repository bytes before applying any reviewed `match_prefix`. If any reviewed Schedule source changes—even if an old prefix would still match—the overlay fails closed until the changed source is re-reviewed and its pin is explicitly updated. Unused disposition rows and unused source pins are also rejected. This prevents a changed reference such as an added actor/project from inheriting an older reviewed exception silently.
 
-CI runs the Schedule audit with `--fail-on-unresolved-curated`, so ambiguous/unresolved references, stale reviewed dispositions and changed review inputs are all blocking failures.
-
-`scope` fields such as `schedule_identity`, `project_boundary`, identified incidents/locations and remediation text are retained as context and are not automatically coerced into ontology individuals.
+CI runs the Schedule audit with `--fail-on-unresolved-curated`, so ambiguous/unresolved references, stale reviewed dispositions and changed review inputs are all blocking failures. The independent exact, strict and adversarial completeness guards are also run in self-test, full-corpus and deterministic-regeneration phases.
 
 ## High-precision private-organization gate
 
@@ -134,7 +157,7 @@ The normative State-dossier audit workflow uses unconditional `tools/**` path tr
 1. Prove exact State dossier/identity parity.
 2. Run the deterministic full-corpus State-dossier discovery audit.
 3. Apply the reviewed prose-candidate overlay and lower the versioned review ratchet in bounded tranches.
-4. Run the stronger curated Schedule-reference audit and require zero ambiguous/unresolved/stale references with unchanged pinned review inputs.
+4. Run the stronger curated Schedule-reference audit and its independent exact/strict/adversarial completeness guards; require zero ambiguous/unresolved/stale references and no unexplained identity-looking context-only debt with unchanged pinned review inputs.
 5. Run the high-precision private-organization audit and require zero unresolved high-confidence company/vendor names.
 6. Review unresolved prose candidates using dossier context and existing internal registry/review records.
 7. Mark each reviewed candidate `curated-identity`, `deferred`, or `rejected` rather than manufacturing certainty.
