@@ -75,6 +75,7 @@ jobs:
           python tools/review_state_dossier_candidates.py --self-test
           python tools/check_state_dossier_softwrap_coverage.py --self-test
           python tools/check_state_dossier_rendered_markup_coverage.py --self-test
+          python tools/check_state_dossier_named_person_coverage.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
           python tools/check_schedule_disposition_manifest_integrity.py --self-test
           python tools/check_schedule_reference_resolution_safety.py --self-test
@@ -101,6 +102,7 @@ jobs:
             --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
           python tools/check_state_dossier_softwrap_coverage.py
           python tools/check_state_dossier_rendered_markup_coverage.py
+          python tools/check_state_dossier_named_person_coverage.py
           python tools/check_schedule_disposition_manifest_integrity.py
           python tools/check_schedule_reference_field_coverage.py
           python tools/audit_schedule_reference_coverage.py \
@@ -140,6 +142,7 @@ jobs:
             --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
           python tools/check_state_dossier_softwrap_coverage.py
           python tools/check_state_dossier_rendered_markup_coverage.py
+          python tools/check_state_dossier_named_person_coverage.py
           python tools/check_schedule_disposition_manifest_integrity.py
           python tools/check_schedule_reference_field_coverage.py
           python tools/audit_schedule_reference_coverage.py \
