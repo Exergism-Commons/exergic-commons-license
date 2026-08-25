@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from collections import defaultdict
 
 import audit_private_org_mentions as rendered
 import audit_schedule_reference_coverage as schedule
@@ -20,20 +19,23 @@ import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
 
 
-ROLE_RE = re.compile(
-    r"(?i)\b(?:journalist|reporter|activist|lawyer|attorney|writer|blogger|defender|"
+ROLE = (
+    r"journalist|reporter|activist|lawyer|attorney|writer|blogger|defender|critic|dissident|"
     r"human[- ]rights defender|rights defender|peace activist|opposition leader|politician|"
-    r"academic|researcher|student|unionist|trade unionist|cleric|pastor|imam|priest|doctor|physician)\s+"
+    r"academic|researcher|student|unionist|trade unionist|cleric|pastor|imam|priest|doctor|physician"
 )
+ROLE_RE = re.compile(rf"(?i)\b(?:{ROLE})\s+")
 ACTION_OF_RE = re.compile(
-    r"(?i)\b(?:arrest|detention|prosecution|conviction|sentencing|sentence|trial|imprisonment|"
-    r"incarceration|abduction|disappearance|release|pardon|clemency|killing|execution)\s+of\s+"
-    r"(?:(?:journalist|reporter|activist|lawyer|attorney|writer|blogger|defender|"
-    r"human[- ]rights defender|rights defender|peace activist|opposition leader|politician|"
-    r"academic|researcher|student|unionist|trade unionist|cleric|pastor|imam|priest|doctor|physician)\s+)?"
+    rf"(?i)\b(?:arrest|detention|prosecution|conviction|sentencing|sentence|trial|imprisonment|"
+    rf"incarceration|abduction|disappearance|release|pardon|clemency|killing|execution)\s+of\s+"
+    rf"(?:(?:{ROLE})(?:/(?:{ROLE}))?\s+)?"
 )
+ACTION_TARGET_RE = re.compile(r"(?i)\b(?:charges?|prosecution|proceedings?|case)\s+against\s+")
+NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]*|[A-Z]\.)"
+NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
+NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
 PASSIVE_ACTION_RE = re.compile(
-    r"\b(?P<name>[^\n,;:()]{2,100}?)\s+(?i:was|were|is|remains|remain)\s+"
+    rf"\b(?P<name>{NAME_PHRASE})\s+(?i:was|were|is|remains|remain)\s+"
     r"(?i:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
     r"disappeared|released|pardoned|executed|killed)\b"
 )
@@ -41,42 +43,56 @@ FRONTMATTER_PERSON_KEYS = {"provisional_scope", "adversarial_result"}
 LOCAL_STOP = {
     "current evidence", "current reporting", "the evidence", "the dossier", "the state",
     "the government", "this review", "the review", "the law", "the court", "the regime",
+    "unlawful combatants",
 }
 
 
-def add_name(out: list[str], candidate: str | None) -> None:
+def clean_candidate(candidate: str | None) -> str | None:
     if not candidate:
-        return
+        return None
     value = " ".join(candidate.split()).strip(" ,;:()[]{}\"'“”‘’*_`")
+    value = re.sub(r"(?:['’]s)$", "", value).strip()
+    return value or None
+
+
+def add_name(out: list[str], candidate: str | None) -> None:
+    value = clean_candidate(candidate)
     if not value or value.casefold() in LOCAL_STOP:
         return
     if strict.valid_name(value, allow_all_caps=True) and value not in out:
         out.append(value)
 
 
+def leading_action_name(tail: str) -> str | None:
+    candidate = clean_candidate(strict.leading_name_phrase(tail, allow_all_caps=True))
+    if not candidate:
+        return None
+    match = re.match(re.escape(candidate), tail, flags=re.I)
+    remainder = tail[match.end():].lstrip() if match else ""
+    # Legal titles such as "Incarceration of Unlawful Combatants Law" are not people even
+    # though the first two words are title-cased and human-name shaped.
+    if re.match(r"(?i)^Law\b", remainder):
+        return None
+    return candidate
+
+
 def names_from_prose(prose: str) -> list[str]:
     names: list[str] = []
 
-    # Reuse the hardened Schedule parser for cue-before-name and prefix-name legal forms.
-    for name in strict.strict_named_mentions(prose, "scope-reference"):
-        add_name(names, name)
-
+    # Explicit human-role syntax is the strongest signal and also catches nested prose such
+    # as "journalist/defender Hugues ..." via the final role token.
     for match in ROLE_RE.finditer(prose):
-        add_name(names, strict.leading_name_phrase(prose[match.end():], allow_all_caps=True))
+        add_name(names, leading_action_name(prose[match.end():]))
 
-    for match in ACTION_OF_RE.finditer(prose):
-        add_name(names, strict.leading_name_phrase(prose[match.end():], allow_all_caps=True))
+    for regex in (ACTION_OF_RE, ACTION_TARGET_RE):
+        for match in regex.finditer(prose):
+            add_name(names, leading_action_name(prose[match.end():]))
 
+    # Passive clauses require an immediately adjacent, title-cased name phrase rather than a
+    # greedy prose fragment. This catches "Dorgelesse Nguessan was released" and "Aung San
+    # Suu Kyi remain detained" without manufacturing people from locations or section prose.
     for match in PASSIVE_ACTION_RE.finditer(prose):
-        fragment = match.group("name")
-        # Only the trailing name-shaped phrase before the passive verb is relevant. Walk
-        # backwards over at most eight tokens and choose the longest valid suffix.
-        tokens = strict.NAME_TOKEN_RE.findall(fragment)
-        for width in range(min(8, len(tokens)), 1, -1):
-            candidate = " ".join(tokens[-width:])
-            if strict.valid_name(candidate, allow_all_caps=True):
-                add_name(names, candidate)
-                break
+        add_name(names, match.group("name"))
     return names
 
 
@@ -89,8 +105,6 @@ def audit() -> list[dict]:
         for name in names_from_prose(prose):
             if exact.materialized_person_ids_for_mention(name, entities, identity_index, state):
                 continue
-            # A title-cased institution following a human-looking cue must not manufacture a
-            # Person debt when an exact current non-Person identity owns that surface.
             if exact.materialized_non_person_ids_for_mention(name, entities, identity_index, state):
                 continue
             key = (state, schedule.norm(name))
@@ -124,9 +138,17 @@ def audit() -> list[dict]:
 
 def self_test() -> None:
     assert "Hassan Bouras" in names_from_prose("arbitrary detention of journalist Hassan Bouras continued")
+    assert "Hugues Comlan Sossoukpè" in names_from_prose("detention/prosecution of journalist/defender Hugues Comlan Sossoukpè after transfer")
     assert "Boualem Sansal" in names_from_prose("the November 2025 pardon of writer Boualem Sansal")
     assert "Jane Doe" in names_from_prose("journalist Jane Doe reported the detention")
     assert "Jane Doe" in names_from_prose("Jane Doe was detained pending trial")
+    assert "Kokila Annamalai" in names_from_prose("rights groups called for charges against Kokila Annamalai to be dropped")
+    assert "Martinez Zogo" in names_from_prose("the trial concerning journalist Martinez Zogo's killing resumed")
+    assert names_from_prose("detention involving Hong Kong democracy/human-rights defenders") == []
+    assert names_from_prose("investigation of North Sinai abuses") == []
+    assert names_from_prose("Independent San Martín investigation and judicial review") == []
+    assert names_from_prose("the Incarceration of Unlawful Combatants Law detention process") == []
+    assert names_from_prose("UPHOLD / NARROW S. The detention basis remains current") == []
     assert names_from_prose("the Human Rights Commission was established") == []
     assert names_from_prose("current evidence was reviewed") == []
     print("State dossier named-person coverage self-test: OK")
