@@ -13,6 +13,7 @@ import entity_identity_resolution as identity
 ROOT = identity.ROOT
 ENTITY_DIR = identity.ENTITY_DIR
 DOSSIER_ROOT = (ROOT / "dossiers").resolve()
+STATE_DOSSIER_ROOT = (DOSSIER_ROOT / "states").resolve()
 TYPE_PREFIX = {
     "Agency": "AGENCY-",
     "Institution": "INSTITUTION-",
@@ -35,6 +36,8 @@ def inside(path: Path, parent: Path) -> bool:
 def validate() -> list[dict]:
     failures: list[dict] = []
     ids: dict[str, list[str]] = defaultdict(list)
+    repository_entities, _ = identity.load_repository_entities()
+    state_codes, _ = identity.repository_state_names(repository_entities)
 
     for path in sorted(ENTITY_DIR.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -81,6 +84,21 @@ def validate() -> list[dict]:
                 failures.append({"file": rel, "id": entity_id, "reason": "dossier provenance target does not exist", "value": dossier})
             elif not inside(target, DOSSIER_ROOT):
                 failures.append({"file": rel, "id": entity_id, "reason": "dossier provenance escapes dossiers/", "value": dossier})
+            else:
+                domestic_state = identity.infer_domestic_state(entity_id, state_codes)
+                # A domestic identity may legitimately point at a dedicated project dossier,
+                # but if it claims a canonical State dossier as provenance that dossier must
+                # be the same ISO3 encoded by its stable ID. Otherwise a typo can leave a
+                # jurisdiction-scoped identity backed by another State while all resolution
+                # checks still pass.
+                if domestic_state is not None and target.parent == STATE_DOSSIER_ROOT and target.stem != domestic_state:
+                    failures.append({
+                        "file": rel,
+                        "id": entity_id,
+                        "reason": "domestic identity points at a different State dossier",
+                        "expected_state": domestic_state,
+                        "dossier": str(target.relative_to(ROOT)),
+                    })
 
     for entity_id, files in sorted(ids.items()):
         if len(files) > 1:
@@ -93,6 +111,8 @@ def self_test() -> None:
     assert ID_RE.fullmatch("AGENCY-AAA-EXAMPLE")
     assert not ID_RE.fullmatch("agency-aaa-example")
     assert inside((DOSSIER_ROOT / "states" / "AAA.md").resolve(), DOSSIER_ROOT)
+    assert identity.infer_domestic_state("AGENCY-AAA-EXAMPLE", {"AAA", "BBB"}) == "AAA"
+    assert identity.infer_domestic_state("ORG-GLOBAL-EXAMPLE", {"AAA", "BBB"}) is None
     print("non-State entity identity integrity self-test: OK")
 
 
