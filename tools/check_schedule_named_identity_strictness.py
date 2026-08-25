@@ -44,10 +44,12 @@ PREFIX_CUE_RE = re.compile(
     rf"(?=\s+(?i:project|activity|case|matter|proceeding)\b|\s*(?:$|[/;,—–]))",
     re.UNICODE,
 )
-CUE_BEFORE_RE = re.compile(
+# Locate only the legal/name cue here. The name itself is parsed token-by-token below so
+# ordinary lowercase prose after a name ("Jane Doe pending trial") terminates the name
+# instead of being greedily captured and invalidating the whole candidate.
+CUE_BEFORE_HEAD_RE = re.compile(
     rf"(?i:(?:arrest|detention|prosecution|proceeding|proceedings|case|measures|measure|sentence|conviction|investigation|trial)"
-    rf"\s+(?:of|against|concerning)|(?:concerning|against|named|involving))"
-    rf"\s+({NAME_WORD}(?:\s+{NAME_WORD}){{1,3}})",
+    rf"\s+(?:of|against|concerning)|(?:concerning|against|named|involving))\s+",
     re.UNICODE,
 )
 PAIR_RE = re.compile(
@@ -60,8 +62,9 @@ MATTER_NAME_RE = re.compile(
 )
 ACTOR_FRAGMENT_RE = re.compile(rf"^({NAME_WORD}(?:\s+{NAME_WORD}){{1,3}})$", re.UNICODE)
 CAPACITY_TAIL_RE = re.compile(
-    r"(?i)^(?:only\b|where\b|when\b|to\s+the\s+extent\b|subject\s+to\b|as\b|"
-    r"in\s+(?:the|its|their|this|that)\b)"
+    r"(?i)^(?:only\b|where\b|when\b|acting\b|serving\b|appearing\b|"
+    r"to\s+the\s+extent\b|subject\s+to\b|as\b|"
+    r"in\s+(?:a|an|the|its|their|this|that)\b)"
 )
 
 PARTICLES = {"al", "bin", "bint", "da", "das", "de", "del", "do", "dos", "el", "ibn", "la", "le", "van", "von"}
@@ -80,18 +83,61 @@ DEFER_BRIDGE = {"is", "remains", "remain", "was", "were", "explicitly", "identit
 DEFER_WORDS = {"deferred", "identity-deferred", "deferral"}
 
 
+def semantic_name_token(token: str) -> bool:
+    """Return whether one non-particle token can belong to a person name.
+
+    Plain all-caps words remain excluded as likely acronyms, but fully uppercase
+    hyphenated surnames such as ``SMITH-JONES`` are valid name tokens.
+    """
+    lower = token.casefold()
+    if not token or not token[0].isupper() or lower in STOPWORDS:
+        return False
+    if len(token) > 1 and token.isupper() and "-" not in token:
+        return False
+    return True
+
+
 def valid_name(mention: str) -> bool:
     tokens = NAME_TOKEN_RE.findall(mention)
     semantic = [token for token in tokens if token.casefold() not in PARTICLES]
     if len(semantic) < 2:
         return False
-    for token in semantic:
+    return all(semantic_name_token(token) for token in semantic)
+
+
+def leading_name_phrase(text: str, max_tokens: int = 5) -> str | None:
+    """Parse a leading complete name and stop at the first non-name token/prose.
+
+    Lowercase particles are allowed inside a name after its first token. Other lowercase
+    prose terminates the candidate. Tokens must remain whitespace-separated; punctuation
+    therefore also terminates the name rather than being silently skipped.
+    """
+    text = text.lstrip()
+    accepted: list[str] = []
+    position = 0
+    for match in NAME_TOKEN_RE.finditer(text):
+        if len(accepted) >= max_tokens:
+            break
+        gap = text[position:match.start()]
+        if gap and not gap.isspace():
+            break
+        if match.start() != position and not gap.isspace():
+            break
+        token = match.group(0)
         lower = token.casefold()
-        if not token[0].isupper() or lower in STOPWORDS:
-            return False
-        if len(token) > 1 and token.isupper():
-            return False
-    return True
+        if lower in PARTICLES:
+            if not accepted:
+                break
+            accepted.append(token)
+        elif semantic_name_token(token):
+            accepted.append(token)
+        else:
+            break
+        position = match.end()
+    while accepted and accepted[-1].casefold() in PARTICLES:
+        accepted.pop()
+    candidate = " ".join(accepted)
+    return candidate if valid_name(candidate) else None
 
 
 def add_unique(out: list[str], mention: str) -> None:
@@ -123,8 +169,10 @@ def strict_named_mentions(raw: str, kind: str) -> list[str]:
         add_unique(mentions, match.group(2))
     for match in PREFIX_CUE_RE.finditer(raw):
         add_unique(mentions, match.group(1))
-    for match in CUE_BEFORE_RE.finditer(raw):
-        add_unique(mentions, match.group(1))
+    for match in CUE_BEFORE_HEAD_RE.finditer(raw):
+        candidate = leading_name_phrase(raw[match.end():])
+        if candidate:
+            add_unique(mentions, candidate)
     if kind == "project-reference":
         for match in MATTER_NAME_RE.finditer(raw):
             add_unique(mentions, match.group(1))
@@ -335,9 +383,19 @@ def self_test() -> None:
     assert strict_named_mentions("Khariq Anhar EIT-law prosecution project", "scope-identity-reference") == ["Khariq Anhar"]
     assert strict_named_mentions("Jane Doe Smith-Jones prosecution project", "scope-identity-reference") == ["Jane Doe Smith-Jones"]
     assert strict_named_mentions("Jane Doe SMITH-Jones prosecution project", "scope-identity-reference") == ["Jane Doe SMITH-Jones"]
+    assert strict_named_mentions("Jane Doe SMITH-JONES prosecution project", "scope-identity-reference") == ["Jane Doe SMITH-JONES"]
     assert "Jane Doe" in strict_named_mentions("Human Rights Watch / Jane Doe", "actor-reference")
     assert "Jane Doe" in strict_named_mentions(
         "Human Rights Watch / Jane Doe, only where participation is established", "actor-reference"
+    )
+    assert "Jane Doe" in strict_named_mentions(
+        "Human Rights Watch / Jane Doe, acting only where participation is established", "actor-reference"
+    )
+    assert "Jane Doe" in strict_named_mentions(
+        "Human Rights Watch / Jane Doe, in an advisory capacity", "actor-reference"
+    )
+    assert "Jane Doe" in strict_named_mentions(
+        "Human Rights Watch / detention of Jane Doe pending trial", "actor-reference"
     )
     assert "MacPherson Mukuka" in strict_named_mentions(
         "Cyber Crimes Act enforcement, including the frozen 2026 MacPherson Mukuka matter", "project-reference"
@@ -373,7 +431,7 @@ def self_test() -> None:
     idx = build_name_index(raw_entities, state_codes={"AAA"}, normalizer=schedule.norm)
     actor_bypass = {"references": [{
         "kind": "actor-reference", "state": "AAA", "field": "candidate_parties", "source": "x.yml",
-        "raw": "Human Rights Watch / Jane Doe, only where participation is established", "status": "partial-deferred",
+        "raw": "Human Rights Watch / Jane Doe, acting only where participation is established", "status": "partial-deferred",
         "resolution_source": "reviewed-disposition", "resolved_ids": ["ORG-HRW"],
         "disposition_reason": "Human Rights Watch is bound exactly; remaining actor context is deferred.",
     }]}
@@ -383,6 +441,15 @@ def self_test() -> None:
         "Human Rights Watch is bound exactly; Jane Doe remains explicitly identity-deferred pending materialization."
     )
     assert failures(actor_bypass, synthetic, idx, []) == []
+
+    cue_bypass = {"references": [{
+        "kind": "actor-reference", "state": "AAA", "field": "candidate_parties", "source": "x.yml",
+        "raw": "Human Rights Watch / detention of Jane Doe pending trial", "status": "partial-deferred",
+        "resolution_source": "reviewed-disposition", "resolved_ids": ["ORG-HRW"],
+        "disposition_reason": "Human Rights Watch is bound exactly; remaining actor context is deferred.",
+    }]}
+    found = failures(cue_bypass, synthetic, idx, [])
+    assert any(item.get("name") == "Jane Doe" for item in found)
 
     project_bypass = {"references": [{
         "kind": "project-reference", "state": "AAA", "field": "candidate_projects", "source": "x.yml",
