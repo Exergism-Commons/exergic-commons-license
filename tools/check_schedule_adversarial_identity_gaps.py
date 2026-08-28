@@ -30,7 +30,7 @@ import check_schedule_residual_identity_dispositions as residual
 OBJECT_WORD = r"[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’.-]*"
 NAMED_OBJECT_RE = re.compile(
     rf"\b((?:Operation|Operação|Operación|Opération|Project|Programme|Program|System|Platform|Tool|Deployment|Initiative|Campaign)"
-    rf"(?:\s+{OBJECT_WORD}){{1,6}})\b"
+    rf"(?:\s+{OBJECT_WORD})+)\b"
 )
 SCOPE_OBJECT_FIELDS = {"schedule_identity", "project_boundary", "identified_incident", "identified_measure"}
 AUDITED_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
@@ -168,10 +168,10 @@ def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tup
 def mapping_key_surfaces(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
     """Return textual mapping keys as auditable surfaces, recursively.
 
-    YAML mappings can carry semantic data in keys just as easily as in values.  The field
+    YAML mappings can carry semantic data in keys just as easily as in values. The field
     coverage guard classifies schema-looking key names, but a free-form key such as
     ``detention of Jane Doe pending trial`` is not itself a schema field and previously
-    escaped every identity detector.  We expose keys to the same high-precision residual
+    escaped every identity detector. We expose keys to the same high-precision residual
     detectors without treating ordinary structural names (``review``, ``notes``) as debt.
     """
     surfaces: list[tuple[tuple[str, ...], str]] = []
@@ -200,8 +200,6 @@ def extra_context_rows() -> list[dict]:
                 if field in AUDITED_FIELDS or field in SKIP_EXTRA_FIELDS:
                     continue
 
-                # The top-level key itself can be a free-form identity surface.  This does not
-                # duplicate primary schema fields because those are excluded above.
                 if isinstance(field, str) and field.strip():
                     rows.append({
                         "kind": "extra-context-reference", "state": state,
@@ -329,6 +327,9 @@ def self_test() -> None:
         "kind": "project-reference", "status": "resolved", "field": "candidate_projects",
         "raw": "Known Project / Operation Silent Dawn"
     })
+    assert named_object_labels("Operation Alpha Bravo Charlie Delta Echo Foxtrot Golf") == [
+        "Operation Alpha Bravo Charlie Delta Echo Foxtrot Golf"
+    ]
     assert "Operação Contenção" in contextual_labels({
         "kind": "scope-reference", "status": "context-only", "field": "schedule_identity",
         "raw": "Operação Contenção — 28 October 2025 phase"
