@@ -19,10 +19,17 @@ import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
 
 
+# Longer role phrases precede their shorter suffixes so a title such as "Attorney General"
+# or "human-rights defender" is consumed as one role rather than leaking "General" or
+# "defender" into the detected personal name.
 ROLE = (
+    r"human[- ]rights defender|rights defender|peace activist|opposition leader|"
+    r"attorney general|public defender|prime minister|deputy minister|vice president|"
+    r"member of parliament|trade unionist|"
     r"journalist|reporter|activist|lawyer|attorney|writer|blogger|defender|critic|dissident|"
-    r"human[- ]rights defender|rights defender|peace activist|opposition leader|politician|"
-    r"academic|researcher|student|unionist|trade unionist|cleric|pastor|imam|priest|doctor|physician"
+    r"politician|academic|researcher|student|unionist|cleric|pastor|imam|priest|doctor|physician|"
+    r"president|minister|governor|mayor|judge|justice|prosecutor|ombudsperson|commissioner|"
+    r"general|colonel|major|captain|senator|representative|secretary|mp"
 )
 ROLE_RE = re.compile(rf"(?i)\b(?:{ROLE})\s+")
 ACTION_OF_RE = re.compile(
@@ -34,10 +41,19 @@ ACTION_TARGET_RE = re.compile(r"(?i)\b(?:charges?|prosecution|proceedings?|case)
 NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]*|[A-Z]\.)"
 NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
 NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
+NAME_SEPARATOR = r"(?:\s*,\s*|\s+(?i:and)\s+|\s*&\s*)"
+NAME_LIST = rf"{NAME_PHRASE}(?:{NAME_SEPARATOR}{NAME_PHRASE}){{0,4}}"
+CUSTODY_STATE = (
+    r"arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
+    r"disappeared|released|pardoned|executed|killed|incommunicado|missing|unaccounted\s+for"
+)
 PASSIVE_ACTION_RE = re.compile(
-    rf"\b(?P<name>{NAME_PHRASE})\s+(?i:was|were|is|remains|remain|remained)\s+"
-    r"(?i:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
-    r"disappeared|released|pardoned|executed|killed|incommunicado|missing|unaccounted\s+for)\b"
+    rf"\b(?P<names>{NAME_LIST})\s+(?i:was|were|is|remains|remain|remained)\s+(?i:{CUSTODY_STATE})\b"
+)
+ACTIVE_ACTION_RE = re.compile(
+    rf"\b(?i:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
+    rf"released|pardoned|executed|killed)\s+"
+    rf"(?:(?i:(?:{ROLE}))(?:/(?i:(?:{ROLE})))?\s+)?(?P<names>{NAME_LIST})"
 )
 FRONTMATTER_PERSON_KEYS = {"provisional_scope", "adversarial_result"}
 LOCAL_STOP = {
@@ -52,10 +68,9 @@ def clean_candidate(candidate: str | None) -> str | None:
         return None
     value = " ".join(candidate.split()).strip(" ,;:()[]{}\"'“”‘’*_`")
     value = re.sub(r"(?:['’]s)$", "", value).strip()
-    # PASSIVE_ACTION_RE deliberately allows a bounded title-cased prefix so long names are
-    # not truncated. If that prefix is an explicit human role (e.g. "Defender Joaquín Elo
-    # Ayeto remained unaccounted for"), strip the role rather than creating a second fake
-    # Person surface alongside the already-detected name.
+    # A bounded name-list match may include a human role immediately before the real name,
+    # e.g. "Defender Joaquín Elo Ayeto remained unaccounted for". Strip only the explicit
+    # role lexicon so the same person is not emitted twice under a role-prefixed surface.
     value = re.sub(rf"(?i)^(?:{ROLE})\s+", "", value).strip()
     return value or None
 
@@ -68,29 +83,47 @@ def add_name(out: list[str], candidate: str | None) -> None:
         out.append(value)
 
 
-def leading_action_name(tail: str) -> str | None:
-    candidate = clean_candidate(strict.leading_name_phrase(tail, allow_all_caps=True))
-    if not candidate:
-        return None
-    match = re.match(re.escape(candidate), tail, flags=re.I)
-    remainder = tail[match.end():].lstrip() if match else ""
+def split_name_list(value: str) -> list[str]:
+    return [part for part in re.split(r"\s*,\s*|\s+(?:and|&)\s+", value, flags=re.I) if part.strip()]
+
+
+def leading_action_names(tail: str) -> list[str]:
+    tail = tail.lstrip()
+    # Legal/institutional titles such as "Incarceration of Unlawful Combatants Law" and
+    # "Minister of Interior" must not manufacture a person from the title words.
+    if re.match(r"(?i)^(?:of\b|the\b)", tail):
+        return []
+    match = re.match(rf"(?P<names>{NAME_LIST})", tail)
+    if not match:
+        return []
+    names = split_name_list(match.group("names"))
+    remainder = tail[match.end():].lstrip()
     if re.match(r"(?i)^Law\b", remainder):
-        return None
-    return candidate
+        return []
+    cleaned: list[str] = []
+    for name in names:
+        value = clean_candidate(name)
+        if value:
+            cleaned.append(value)
+    return cleaned
 
 
 def names_from_prose(prose: str) -> list[str]:
     names: list[str] = []
 
     for match in ROLE_RE.finditer(prose):
-        add_name(names, leading_action_name(prose[match.end():]))
+        for name in leading_action_names(prose[match.end():]):
+            add_name(names, name)
 
     for regex in (ACTION_OF_RE, ACTION_TARGET_RE):
         for match in regex.finditer(prose):
-            add_name(names, leading_action_name(prose[match.end():]))
+            for name in leading_action_names(prose[match.end():]):
+                add_name(names, name)
 
-    for match in PASSIVE_ACTION_RE.finditer(prose):
-        add_name(names, match.group("name"))
+    for regex in (PASSIVE_ACTION_RE, ACTIVE_ACTION_RE):
+        for match in regex.finditer(prose):
+            for name in split_name_list(match.group("names")):
+                add_name(names, name)
     return names
 
 
@@ -139,12 +172,18 @@ def self_test() -> None:
     assert "Hugues Comlan Sossoukpè" in names_from_prose("detention/prosecution of journalist/defender Hugues Comlan Sossoukpè after transfer")
     assert "Boualem Sansal" in names_from_prose("the November 2025 pardon of writer Boualem Sansal")
     assert "Jane Doe" in names_from_prose("journalist Jane Doe reported the detention")
+    assert "Jane Doe" in names_from_prose("authorities arrested Jane Doe after the protest")
+    assert set(names_from_prose("authorities detained Jane Doe and John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert "Jane Doe" in names_from_prose("Jane Doe was detained pending trial")
     assert "Jane Doe" in names_from_prose("Jane Doe remained incommunicado after transfer")
     assert "Jane Doe" in names_from_prose("Jane Doe remained unaccounted for after transfer")
+    assert set(names_from_prose("Luis Pacheco and Héctor Chaclán remained imprisoned")) == {"Luis Pacheco", "Héctor Chaclán"}
     assert names_from_prose("Defender Joaquín Elo Ayeto remained unaccounted for after transfer") == ["Joaquín Elo Ayeto"]
+    assert "Jane Doe" in names_from_prose("Prime Minister Jane Doe announced the measure")
+    assert "Jane Doe" in names_from_prose("Attorney General Jane Doe announced the measure")
     assert "Kokila Annamalai" in names_from_prose("rights groups called for charges against Kokila Annamalai to be dropped")
     assert "Martinez Zogo" in names_from_prose("the trial concerning journalist Martinez Zogo's killing resumed")
+    assert names_from_prose("Minister of Interior announced the measure") == []
     assert names_from_prose("detention involving Hong Kong democracy/human-rights defenders") == []
     assert names_from_prose("investigation of North Sinai abuses") == []
     assert names_from_prose("Independent San Martín investigation and judicial review") == []
