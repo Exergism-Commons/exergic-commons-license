@@ -52,6 +52,11 @@ def clean_candidate(candidate: str | None) -> str | None:
         return None
     value = " ".join(candidate.split()).strip(" ,;:()[]{}\"'“”‘’*_`")
     value = re.sub(r"(?:['’]s)$", "", value).strip()
+    # PASSIVE_ACTION_RE deliberately allows a bounded title-cased prefix so long names are
+    # not truncated. If that prefix is an explicit human role (e.g. "Defender Joaquín Elo
+    # Ayeto remained unaccounted for"), strip the role rather than creating a second fake
+    # Person surface alongside the already-detected name.
+    value = re.sub(rf"(?i)^(?:{ROLE})\s+", "", value).strip()
     return value or None
 
 
@@ -137,6 +142,7 @@ def self_test() -> None:
     assert "Jane Doe" in names_from_prose("Jane Doe was detained pending trial")
     assert "Jane Doe" in names_from_prose("Jane Doe remained incommunicado after transfer")
     assert "Jane Doe" in names_from_prose("Jane Doe remained unaccounted for after transfer")
+    assert names_from_prose("Defender Joaquín Elo Ayeto remained unaccounted for after transfer") == ["Joaquín Elo Ayeto"]
     assert "Kokila Annamalai" in names_from_prose("rights groups called for charges against Kokila Annamalai to be dropped")
     assert "Martinez Zogo" in names_from_prose("the trial concerning journalist Martinez Zogo's killing resumed")
     assert names_from_prose("detention involving Hong Kong democracy/human-rights defenders") == []
