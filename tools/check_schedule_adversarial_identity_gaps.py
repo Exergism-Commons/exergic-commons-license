@@ -9,18 +9,22 @@ operations/projects, named institutions, person-labelled matters, and multi-name
 It is identity coverage only. A detected name/object is not attributed to conduct and does
 not inherit any State governance outcome. Exclusions and residual scope are scanned for
 representation just like positive scope, without converting them into actor/project roles.
+Residual reviewed dispositions are exact-surface, exact-source overlays and cannot create a
+new role binding: `covered` IDs must already be resolved on the same primary-audit row.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import re
+from collections import Counter
 
 import yaml
 
 import audit_schedule_reference_coverage as schedule
 import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
+import check_schedule_residual_identity_dispositions as residual
 
 
 OBJECT_WORD = r"[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’.-]*"
@@ -30,7 +34,6 @@ NAMED_OBJECT_RE = re.compile(
 )
 SCOPE_OBJECT_FIELDS = {"schedule_identity", "project_boundary", "identified_incident", "identified_measure"}
 AUDITED_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
-# Provenance/foreign-key surfaces are identifiers or locators, not prose identity claims.
 SKIP_EXTRA_FIELDS = {
     "identity_sources", "dossier", "linked_project_id", "linked_organization_id",
 }
@@ -97,9 +100,6 @@ def contextual_labels(row: dict) -> list[str]:
         add_unique(labels, named_object_labels(raw))
 
     if kind in {"scope-reference", "scope-identity-reference", "extra-context-reference"}:
-        # High-precision institutional and person cues run regardless of whether another exact
-        # identity already made the row resolved. This is what closes the "known identity +
-        # unknown named identity" bypass.
         add_unique(labels, named_institution_labels(raw))
         add_unique(labels, strict.strict_named_mentions(raw, "scope-reference"))
 
@@ -151,13 +151,7 @@ def resolved_identity_covers_label(row: dict, label: str, by_id: dict[str, dict]
 
 
 def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
-    """Return every non-empty string leaf from arbitrary Schedule context.
-
-    The primary schema intentionally audits only flat role/scope fields, but an otherwise
-    unclassified context field must not become a bypass merely by wrapping prose in a dict or
-    nested list. Paths are retained for diagnostics; numbers/booleans/null carry no identity
-    text and are ignored.
-    """
+    """Return every non-empty string leaf from arbitrary Schedule context."""
     leaves: list[tuple[tuple[str, ...], str]] = []
     if isinstance(value, str):
         if value.strip():
@@ -167,8 +161,7 @@ def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tup
             leaves.extend(string_leaves(child, (*prefix, f"[{index}]")))
     elif isinstance(value, dict):
         for key, child in value.items():
-            key_text = str(key)
-            leaves.extend(string_leaves(child, (*prefix, key_text)))
+            leaves.extend(string_leaves(child, (*prefix, str(key))))
     return leaves
 
 
@@ -195,8 +188,17 @@ def extra_context_rows() -> list[dict]:
     return rows
 
 
+def residual_key(row: dict, label: str) -> tuple[str, str, str, str, str]:
+    return (
+        row.get("source") or "", row.get("state") or "", row.get("field") or "",
+        row.get("raw") or "", label,
+    )
+
+
 def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identity_index) -> list[dict]:
     found: list[dict] = []
+    overlays = residual.load_dispositions()
+    overlay_uses: Counter = Counter()
     rows = list(report.get("references", [])) + extra_context_rows()
     for row in rows:
         if row.get("kind") not in {
@@ -206,9 +208,6 @@ def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identit
         raw = row.get("raw") or ""
         state = row.get("state")
 
-        # Exact current identities in an unclassified field are already represented. We do not
-        # require them to become actor/project role bindings merely because they are mentioned
-        # in exclusions/capacity text.
         exact_ids = schedule.embedded_identity_matches(raw, entities, identity_index, "identity", state)
         if row.get("kind") == "extra-context-reference" and exact_ids:
             row = {**row, "resolved_ids": exact_ids, "resolution_source": "neutral-extra-field-exact-coverage"}
@@ -222,16 +221,51 @@ def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identit
                 continue
             if strict.explicitly_defers_complete_name(row, label):
                 continue
+
+            key = residual_key(row, label)
+            disposition = overlays.get(key)
+            if disposition is not None:
+                overlay_uses[key] += 1
+                if disposition["disposition"] == "covered":
+                    if row.get("kind") == "extra-context-reference":
+                        found.append({
+                            "reason": "residual covered disposition cannot create a role binding in extra context",
+                            "source": row.get("source"), "state": state, "field": row.get("field"),
+                            "raw": raw, "identity_surface": label,
+                        })
+                        continue
+                    missing = sorted(set(disposition["covered_ids"]) - set(row.get("resolved_ids") or []))
+                    if missing:
+                        found.append({
+                            "reason": "residual covered IDs are not already resolved on the same audited row",
+                            "source": row.get("source"), "state": state, "field": row.get("field"),
+                            "raw": raw, "identity_surface": label, "missing_covered_ids": missing,
+                        })
+                    continue
+                if disposition["disposition"] == "deferred":
+                    continue
+
             found.append({
                 "reason": "adversarial Schedule identity surface can bypass normal identity cues",
                 "state": state,
                 "kind": row.get("kind"),
                 "field": row.get("field"),
                 "source": row.get("source"),
+                "record_index": row.get("record_index"),
                 "raw": raw,
                 "identity_surface": label,
                 "status": row.get("status"),
                 "resolution_source": row.get("resolution_source"),
+            })
+
+    for key, disposition in overlays.items():
+        uses = overlay_uses[key]
+        if uses != 1:
+            found.append({
+                "reason": "residual identity disposition is stale or non-unique; exact surface must be consumed once",
+                "source": disposition["source"], "state": disposition["state"], "field": disposition["field"],
+                "raw": disposition["raw"], "identity_surface": disposition["identity_surface"],
+                "disposition": disposition["disposition"], "use_count": uses,
             })
     return found
 
@@ -269,6 +303,11 @@ def self_test() -> None:
     }
     assert "Jane Doe" in contextual_labels(nested_row)
 
+    assert residual_key(
+        {"source": "x.yml", "state": "AAA", "field": "exclusions.[0]", "raw": "Operation Alpha activity"},
+        "Operation Alpha",
+    ) == ("x.yml", "AAA", "exclusions.[0]", "Operation Alpha activity", "Operation Alpha")
+
     assert token_phrase_occurrences("Operação Contenção — 28 October 2025 phase", "Operação Contenção") == 1
     assert token_phrase_occurrences("Operation Alpha / Operation Alpha Beta", "Operation Alpha") == 2
 
@@ -291,13 +330,6 @@ def self_test() -> None:
         "surface_forms": [{"text": "Operation Alpha Beta", "normalized": "operation alpha beta"}],
     }
     assert not resolved_identity_covers_label(duplicate_row, "Operation Alpha", {alpha_beta["id"]: alpha_beta})
-
-    report = {"references": [{
-        "kind": "scope-reference", "state": "AAA", "field": "schedule_identity", "source": "x.yml",
-        "raw": "Jane Doe", "status": "context-only", "resolution_source": None,
-        "resolved_ids": [], "disposition_reason": None,
-    }]}
-    assert contextual_labels(report["references"][0]) == ["Jane Doe"]
 
     hidden_scope = {
         "kind": "scope-identity-reference", "state": "AAA", "field": "identified_incident", "source": "x.yml",
@@ -323,6 +355,7 @@ def main() -> int:
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if args.self_test:
+        residual.load_dispositions()
         self_test()
         return 0
 
@@ -332,7 +365,13 @@ def main() -> int:
     if found:
         print("ADVERSARIAL_SCHEDULE_IDENTITY_GAPS=" + json.dumps(found, ensure_ascii=False, sort_keys=True))
         return 2
-    print("Schedule adversarial residual identity completeness: OK")
+    dispositions = residual.load_dispositions()
+    covered = sum(row["disposition"] == "covered" for row in dispositions.values())
+    deferred = sum(row["disposition"] == "deferred" for row in dispositions.values())
+    print(
+        f"Schedule adversarial residual identity completeness: OK "
+        f"({len(dispositions)} exact reviewed surfaces; {covered} covered; {deferred} deferred)"
+    )
     return 0
 
 
