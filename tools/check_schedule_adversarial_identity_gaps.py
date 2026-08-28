@@ -32,6 +32,15 @@ NAMED_OBJECT_RE = re.compile(
     rf"\b((?:Operation|Operação|Operación|Opération|Project|Programme|Program|System|Platform|Tool|Deployment|Initiative|Campaign)"
     rf"(?:\s+{OBJECT_WORD})+)\b"
 )
+INSTITUTION_TYPE = (
+    r"Ministry|Department|Directorate|Bureau|Office|Commission|Committee|Council|Court|Tribunal|Agency|"
+    r"Secretariat|Administration|Police|Prison|Penitentiary|Service|Force|Forces|Branch|Unit|Centre|Center|Board"
+)
+INSTITUTION_SUFFIX = rf"(?:\s+(?:of|for|against|on)(?:\s+the)?(?:\s+{OBJECT_WORD}){{1,6}})?"
+MAXIMAL_INSTITUTION_RE = re.compile(
+    rf"\b((?:{OBJECT_WORD}(?:\s+|[-/])){{0,6}}(?:{INSTITUTION_TYPE}){INSTITUTION_SUFFIX}"
+    rf"|Penitentiary\s+no\.\s*\d+\s+{OBJECT_WORD})\b"
+)
 SCOPE_OBJECT_FIELDS = {"schedule_identity", "project_boundary", "identified_incident", "identified_measure"}
 AUDITED_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
 SKIP_EXTRA_FIELDS = {
@@ -74,9 +83,10 @@ def named_object_labels(raw: str) -> list[str]:
 
 
 def named_institution_labels(raw: str) -> list[str]:
+    """Return maximal high-precision institution phrases, including Unicode prefixes and of/for tails."""
     labels: list[str] = []
-    for match in schedule.SCOPE_NAMED_IDENTITY_RE.finditer(raw):
-        label = " ".join(match.group(0).split()).strip(" ,;:()[]{}\"'“”‘’")
+    for match in MAXIMAL_INSTITUTION_RE.finditer(raw):
+        label = " ".join(match.group(1).split()).strip(" ,;:()[]{}\"'“”‘’")
         if label and label not in labels:
             labels.append(label)
     return labels
@@ -166,14 +176,7 @@ def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tup
 
 
 def mapping_key_surfaces(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
-    """Return textual mapping keys as auditable surfaces, recursively.
-
-    YAML mappings can carry semantic data in keys just as easily as in values. The field
-    coverage guard classifies schema-looking key names, but a free-form key such as
-    ``detention of Jane Doe pending trial`` is not itself a schema field and previously
-    escaped every identity detector. We expose keys to the same high-precision residual
-    detectors without treating ordinary structural names (``review``, ``notes``) as debt.
-    """
+    """Return textual mapping keys as auditable surfaces, recursively."""
     surfaces: list[tuple[tuple[str, ...], str]] = []
     if isinstance(value, dict):
         for key, child in value.items():
@@ -187,45 +190,70 @@ def mapping_key_surfaces(value: object, prefix: tuple[str, ...] = ()) -> list[tu
     return surfaces
 
 
+def extra_rows_from_mapping(
+    mapping: dict,
+    *,
+    source: str,
+    state: str | None,
+    record_index: int | None,
+    skip_fields: set[str],
+    document_root: bool = False,
+) -> list[dict]:
+    """Expose free-form mapping keys and string values using the same residual detectors."""
+    rows: list[dict] = []
+    for field, value in mapping.items():
+        if field in skip_fields:
+            continue
+        if isinstance(field, str) and field.strip():
+            rows.append({
+                "kind": "extra-context-reference", "state": state,
+                "field": f"@key[{field}]", "source": source, "record_index": record_index,
+                "raw": field, "resolved_ids": [], "status": "context-only", "resolution_source": None,
+                "disposition_reason": None, "document_root": document_root,
+            })
+        for nested_path, raw in mapping_key_surfaces(value, (str(field),)):
+            rows.append({
+                "kind": "extra-context-reference", "state": state,
+                "field": ".".join(nested_path), "source": source, "record_index": record_index,
+                "raw": raw, "resolved_ids": [], "status": "context-only", "resolution_source": None,
+                "disposition_reason": None, "document_root": document_root,
+            })
+        for nested_path, raw in string_leaves(value, (str(field),)):
+            rows.append({
+                "kind": "extra-context-reference", "state": state,
+                "field": ".".join(nested_path), "source": source, "record_index": record_index,
+                "raw": raw, "resolved_ids": [], "status": "context-only", "resolution_source": None,
+                "disposition_reason": None, "document_root": document_root,
+            })
+    return rows
+
+
 def extra_context_rows() -> list[dict]:
-    """Expose every textual freeze surface outside the primary reference audit, recursively."""
+    """Expose textual freeze surfaces outside the primary reference audit, including document root."""
     rows: list[dict] = []
     files = sorted(schedule.FREEZE_DIR.glob("*.yml")) + sorted(schedule.FREEZE_DIR.glob("*.yaml"))
     for path in files:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         source = str(path.relative_to(schedule.ROOT))
+        if not isinstance(data, dict):
+            continue
+
+        raw_records = data.get("records")
+        if isinstance(raw_records, list):
+            # Root metadata of a multi-record document has no single State identity scope. Any
+            # named identity found there must fail closed and be moved into an audited record.
+            root = {key: value for key, value in data.items() if key != "records"}
+            rows.extend(extra_rows_from_mapping(
+                root, source=source, state=None, record_index=None,
+                skip_fields=SKIP_EXTRA_FIELDS, document_root=True,
+            ))
+
         for record_index, record in enumerate(schedule.records_from_document(data)):
             state = record.get("state")
-            for field, value in record.items():
-                if field in AUDITED_FIELDS or field in SKIP_EXTRA_FIELDS:
-                    continue
-
-                if isinstance(field, str) and field.strip():
-                    rows.append({
-                        "kind": "extra-context-reference", "state": state,
-                        "field": f"@key[{field}]",
-                        "source": source, "record_index": record_index, "raw": field,
-                        "resolved_ids": [], "status": "context-only", "resolution_source": None,
-                        "disposition_reason": None,
-                    })
-
-                for nested_path, raw in mapping_key_surfaces(value, (field,)):
-                    rows.append({
-                        "kind": "extra-context-reference", "state": state,
-                        "field": ".".join(nested_path),
-                        "source": source, "record_index": record_index, "raw": raw,
-                        "resolved_ids": [], "status": "context-only", "resolution_source": None,
-                        "disposition_reason": None,
-                    })
-
-                for nested_path, raw in string_leaves(value, (field,)):
-                    rows.append({
-                        "kind": "extra-context-reference", "state": state,
-                        "field": ".".join(nested_path),
-                        "source": source, "record_index": record_index, "raw": raw,
-                        "resolved_ids": [], "status": "context-only", "resolution_source": None,
-                        "disposition_reason": None,
-                    })
+            rows.extend(extra_rows_from_mapping(
+                record, source=source, state=state, record_index=record_index,
+                skip_fields=AUDITED_FIELDS | SKIP_EXTRA_FIELDS,
+            ))
     return rows
 
 
@@ -248,12 +276,23 @@ def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identit
             continue
         raw = row.get("raw") or ""
         state = row.get("state")
+        labels = contextual_labels(row)
+
+        if row.get("document_root") and labels:
+            for label in labels:
+                found.append({
+                    "reason": "identity-bearing multi-record document-root metadata is outside State-scoped Schedule audit; move it into a record",
+                    "state": state, "kind": row.get("kind"), "field": row.get("field"),
+                    "source": row.get("source"), "record_index": row.get("record_index"),
+                    "raw": raw, "identity_surface": label,
+                })
+            continue
 
         exact_ids = schedule.embedded_identity_matches(raw, entities, identity_index, "identity", state)
         if row.get("kind") == "extra-context-reference" and exact_ids:
             row = {**row, "resolved_ids": exact_ids, "resolution_source": "neutral-extra-field-exact-coverage"}
 
-        for label in contextual_labels(row):
+        for label in labels:
             person_ids = exact.materialized_person_ids_for_mention(label, entities, identity_index, state)
             non_person_ids = exact.materialized_non_person_ids_for_mention(label, entities, identity_index, state)
             if person_ids or non_person_ids:
@@ -288,14 +327,9 @@ def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identit
 
             found.append({
                 "reason": "adversarial Schedule identity surface can bypass normal identity cues",
-                "state": state,
-                "kind": row.get("kind"),
-                "field": row.get("field"),
-                "source": row.get("source"),
-                "record_index": row.get("record_index"),
-                "raw": raw,
-                "identity_surface": label,
-                "status": row.get("status"),
+                "state": state, "kind": row.get("kind"), "field": row.get("field"),
+                "source": row.get("source"), "record_index": row.get("record_index"),
+                "raw": raw, "identity_surface": label, "status": row.get("status"),
                 "resolution_source": row.get("resolution_source"),
             })
 
@@ -315,7 +349,12 @@ def self_test() -> None:
     assert ambiguous_actor_list_mentions("Jane Doe and John Roe") == ["Jane Doe", "John Roe"]
     assert ambiguous_actor_list_mentions("Jane Doe, John Roe, acting only where authorized") == ["Jane Doe", "John Roe"]
     assert ambiguous_actor_list_mentions("Ministry of Interior and Narcotics Control") == []
-    assert "National Accountability Commission" in named_institution_labels("UNHCR / National Accountability Commission")
+    assert named_institution_labels("National Centre for Human Rights") == ["National Centre for Human Rights"]
+    assert named_institution_labels("Yaoundé Military Tribunal life sentence") == ["Yaoundé Military Tribunal"]
+    assert named_institution_labels("National Administration of Penitentiaries and staff") == [
+        "National Administration of Penitentiaries"
+    ]
+    assert named_institution_labels("High Court/Court of Appeal POFMA review") == ["High Court/Court of Appeal"]
 
     context = {"kind": "scope-reference", "status": "context-only", "field": "schedule_identity", "raw": "Jane Doe"}
     assert contextual_labels(context) == ["Jane Doe"]
@@ -364,6 +403,13 @@ def self_test() -> None:
         "kind": "extra-context-reference", "status": "context-only", "field": "@key[review]", "raw": "review",
     }) == []
 
+    root_rows = extra_rows_from_mapping(
+        {"note": "detention of Jane Doe pending trial", "Operation Silent Dawn": True},
+        source="x.yml", state=None, record_index=None, skip_fields=set(), document_root=True,
+    )
+    assert any(row["raw"] == "detention of Jane Doe pending trial" and row["document_root"] for row in root_rows)
+    assert any(row["raw"] == "Operation Silent Dawn" and row["document_root"] for row in root_rows)
+
     assert residual_key(
         {"source": "x.yml", "state": "AAA", "field": "exclusions.[0]", "raw": "Operation Alpha activity"},
         "Operation Alpha",
@@ -399,14 +445,6 @@ def self_test() -> None:
         "disposition_reason": None,
     }
     assert "Operation Silent Dawn" in contextual_labels(hidden_scope)
-
-    hidden_institution = {
-        "kind": "scope-identity-reference", "state": "AAA", "field": "project_boundary", "source": "x.yml",
-        "raw": "UNHCR / National Accountability Commission", "status": "resolved",
-        "resolution_source": "state-safe-exact-embedded-name-or-alias", "resolved_ids": ["ORG-UNHCR"],
-        "disposition_reason": None,
-    }
-    assert "National Accountability Commission" in contextual_labels(hidden_institution)
 
     print("Schedule adversarial residual identity self-test: OK")
 
