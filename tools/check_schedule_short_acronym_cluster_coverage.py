@@ -184,7 +184,7 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
         if count != 1:
             found.append({
                 "reason": "short-acronym reviewed disposition is stale or non-unique",
-                "source": entry["source"], "state": entry["state"], "field": entry["field"],
+                "source": entry["source"], "state": entry["state"], "field": entry["field"),
                 "record_index": entry["record_index"], "raw": entry["raw"],
                 "identity_surface": entry["identity_surface"], "uses": count,
             })
@@ -199,7 +199,7 @@ def self_test() -> None:
     assert short_slash_acronyms("FARDC-backed CMC-FDP / Wazalendo") == []
     assert short_slash_acronyms("NAPOLCOM/IMIS") == []
     overlay = load_overlay()
-    assert {entry["identity_surface"] for entry in overlay} == {"SAR", "PTA", "NPM"}
+    assert {entry["identity_surface"] for entry in overlay} == {"SAR", "PTA", "NPM", "ICT"}
     print("Schedule short slash-acronym coverage self-test: OK")
 
 
