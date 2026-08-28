@@ -150,8 +150,30 @@ def resolved_identity_covers_label(row: dict, label: str, by_id: dict[str, dict]
     return False
 
 
+def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
+    """Return every non-empty string leaf from arbitrary Schedule context.
+
+    The primary schema intentionally audits only flat role/scope fields, but an otherwise
+    unclassified context field must not become a bypass merely by wrapping prose in a dict or
+    nested list. Paths are retained for diagnostics; numbers/booleans/null carry no identity
+    text and are ignored.
+    """
+    leaves: list[tuple[tuple[str, ...], str]] = []
+    if isinstance(value, str):
+        if value.strip():
+            leaves.append((prefix, value))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            leaves.extend(string_leaves(child, (*prefix, f"[{index}]")))
+    elif isinstance(value, dict):
+        for key, child in value.items():
+            key_text = str(key)
+            leaves.extend(string_leaves(child, (*prefix, key_text)))
+    return leaves
+
+
 def extra_context_rows() -> list[dict]:
-    """Expose every top-level textual freeze field outside the primary reference audit."""
+    """Expose every textual freeze surface outside the primary reference audit, recursively."""
     rows: list[dict] = []
     files = sorted(schedule.FREEZE_DIR.glob("*.yml")) + sorted(schedule.FREEZE_DIR.glob("*.yaml"))
     for path in files:
@@ -162,9 +184,10 @@ def extra_context_rows() -> list[dict]:
             for field, value in record.items():
                 if field in AUDITED_FIELDS or field in SKIP_EXTRA_FIELDS:
                     continue
-                for raw in schedule.list_values(value):
+                for nested_path, raw in string_leaves(value, (field,)):
                     rows.append({
-                        "kind": "extra-context-reference", "state": state, "field": field,
+                        "kind": "extra-context-reference", "state": state,
+                        "field": ".".join(nested_path),
                         "source": source, "record_index": record_index, "raw": raw,
                         "resolved_ids": [], "status": "context-only", "resolution_source": None,
                         "disposition_reason": None,
@@ -238,6 +261,14 @@ def self_test() -> None:
         "raw": "detention of Jane Doe pending trial"
     })
 
+    nested = string_leaves({"review": {"notes": ["ordinary text", {"detail": "detention of Jane Doe pending trial"}]}})
+    assert (("review", "notes", "[1]", "detail"), "detention of Jane Doe pending trial") in nested
+    nested_row = {
+        "kind": "extra-context-reference", "status": "context-only", "field": "notes.detail",
+        "raw": "detention of Jane Doe pending trial",
+    }
+    assert "Jane Doe" in contextual_labels(nested_row)
+
     assert token_phrase_occurrences("Operação Contenção — 28 October 2025 phase", "Operação Contenção") == 1
     assert token_phrase_occurrences("Operation Alpha / Operation Alpha Beta", "Operation Alpha") == 2
 
@@ -261,15 +292,11 @@ def self_test() -> None:
     }
     assert not resolved_identity_covers_label(duplicate_row, "Operation Alpha", {alpha_beta["id"]: alpha_beta})
 
-    entities: list[dict] = []
-    by_id: dict[str, dict] = {}
-    index = {"by_id": {}, "by_name": {}}
     report = {"references": [{
         "kind": "scope-reference", "state": "AAA", "field": "schedule_identity", "source": "x.yml",
         "raw": "Jane Doe", "status": "context-only", "resolution_source": None,
         "resolved_ids": [], "disposition_reason": None,
     }]}
-    # Avoid reading the real corpus in synthetic tests by testing the row parser directly here.
     assert contextual_labels(report["references"][0]) == ["Jane Doe"]
 
     hidden_scope = {
