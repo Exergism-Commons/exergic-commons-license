@@ -31,11 +31,27 @@ INSTITUTION_TYPE = (
     r"Secretariat|Administration|Police|Prison|Penitentiary|Service|Force|Forces|Branch|Unit|Centre|Center|Board"
 )
 # Repeatable tails cover locators such as "Police of the Ministry of Internal Affairs".
-# All-caps qualifiers such as POFMA stop the tail via TAIL_WORD.
-INSTITUTION_SUFFIX = rf"(?:\s+(?:of|for|against|on)(?:\s+the)?(?:\s+{TAIL_WORD}){{1,6}})*"
+# Lowercase conjunctions are permitted *inside* a prepositional qualifier so names such as
+# "Court of Bosnia and Herzegovina" are not truncated. All-caps qualifiers such as POFMA
+# still stop the tail via TAIL_WORD.
+INSTITUTION_QUALIFIER = rf"(?:{TAIL_WORD}|and|&)"
+INSTITUTION_SUFFIX = rf"(?:\s+(?:of|for|against|on)(?:\s+the)?(?:\s+{INSTITUTION_QUALIFIER}){{1,8}})*"
 MAXIMAL_INSTITUTION_RE = re.compile(
     rf"\b(Penitentiary\s+no\.\s*\d+\s+{OBJECT_WORD}"
     rf"|(?:{OBJECT_WORD}(?:\s+|[-/])){{0,6}}(?:{INSTITUTION_TYPE}){INSTITUTION_SUFFIX})\b"
+)
+ACRONYM_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{3,})(?![A-Za-z0-9])")
+ACRONYM_CLUSTER_RE = re.compile(
+    r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{3,}(?:/[A-Z][A-Z0-9]{3,})+)(?![A-Za-z0-9])"
+)
+ACRONYM_ROLE_BEFORE_RE = re.compile(
+    r"(?i)(?:agency|commission|committee|council|court|tribunal|police|service|unit|branch|office|"
+    r"department|directorate|bureau|force|forces|division)\s*$"
+)
+ACRONYM_ROLE_AFTER_RE = re.compile(
+    r"(?i)^\s+(?:agency|commission|committee|council|court|tribunal|police|service|unit|branch|office|"
+    r"department|directorate|bureau|force|forces|division|personnel|staff|officers?|operations?|activity|"
+    r"functions?|authorities)\b"
 )
 SCOPE_OBJECT_FIELDS = {"schedule_identity", "project_boundary", "identified_incident", "identified_measure"}
 AUDITED_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
@@ -88,16 +104,45 @@ def named_institution_labels(raw: str) -> list[str]:
     return labels
 
 
+def acronym_identity_labels(raw: str, *, include_all: bool = False) -> list[str]:
+    """Extract high-precision acronym-only identity surfaces.
+
+    Slash-delimited acronym clusters are strong identity syntax (for example NAPOLCOM/IMIS).
+    Standalone 4+ character acronyms are accepted only in actor rows, as the entire value, or
+    next to an organizational/operational role cue. This avoids treating legal/technical
+    abbreviations such as POFMA as identities merely because they are uppercase.
+    """
+    labels: list[str] = []
+    cluster_spans: list[tuple[int, int]] = []
+    for match in ACRONYM_CLUSTER_RE.finditer(raw):
+        cluster_spans.append(match.span())
+        add_unique(labels, match.group(1).split("/"))
+
+    stripped = raw.strip(" \t\r\n,;:()[]{}\"'“”‘’")
+    for match in ACRONYM_TOKEN_RE.finditer(raw):
+        if any(start <= match.start() and match.end() <= end for start, end in cluster_spans):
+            continue
+        token = match.group(1)
+        before = raw[max(0, match.start() - 72):match.start()]
+        after = raw[match.end():match.end() + 72]
+        if (include_all or stripped == token or ACRONYM_ROLE_BEFORE_RE.search(before)
+                or ACRONYM_ROLE_AFTER_RE.match(after)):
+            add_unique(labels, [token])
+    return labels
+
+
 def contextual_labels(row: dict) -> list[str]:
     raw = row.get("raw") or ""
     labels: list[str] = []
     kind = row.get("kind")
     if kind == "actor-reference":
         add_unique(labels, ambiguous_actor_list_mentions(raw))
+        add_unique(labels, acronym_identity_labels(raw, include_all=True))
     if kind == "project-reference":
         add_unique(labels, named_object_labels(raw))
     if kind in {"scope-reference", "scope-identity-reference", "extra-context-reference"}:
         add_unique(labels, named_institution_labels(raw))
+        add_unique(labels, acronym_identity_labels(raw))
         add_unique(labels, strict.strict_named_mentions(raw, "scope-reference"))
         if kind == "scope-reference" and row.get("status") == "context-only" and row.get("field") == "schedule_identity":
             bare = strict.full_name_phrase(raw, allow_all_caps=True)
@@ -283,7 +328,13 @@ def self_test() -> None:
     assert named_institution_labels("High Court/Court of Appeal POFMA review") == ["High Court/Court of Appeal"]
     assert named_institution_labels("UN Committee against Torture findings") == ["UN Committee against Torture"]
     assert named_institution_labels("Police of the Ministry of Internal Affairs framework") == ["Police of the Ministry of Internal Affairs"]
+    assert named_institution_labels("Court of Bosnia and Herzegovina judgment") == ["Court of Bosnia and Herzegovina"]
+    assert named_institution_labels("Ministry of Justice and Human Rights circular") == ["Ministry of Justice and Human Rights"]
     assert named_institution_labels("Penitentiary no. 2 Lipcani, no. 6 Soroca") == ["Penitentiary no. 2 Lipcani"]
+    assert acronym_identity_labels("NAPOLCOM/IMIS, prosecutors") == ["NAPOLCOM", "IMIS"]
+    assert acronym_identity_labels("NISA operations") == ["NISA"]
+    assert acronym_identity_labels("POFMA review") == []
+    assert acronym_identity_labels("ABCD", include_all=False) == ["ABCD"]
     assert named_object_labels("Operation Alpha Bravo Charlie Delta Echo Foxtrot Golf") == ["Operation Alpha Bravo Charlie Delta Echo Foxtrot Golf"]
     assert "Jane Doe" in contextual_labels({"kind": "extra-context-reference", "status": "context-only", "field": "notes.detail", "raw": "detention of Jane Doe pending trial"})
     keyed = mapping_key_surfaces({"detention of Jane Doe pending trial": True}, ("review",))
