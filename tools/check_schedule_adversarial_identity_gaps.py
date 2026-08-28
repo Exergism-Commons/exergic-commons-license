@@ -32,10 +32,11 @@ INSTITUTION_TYPE = (
 )
 # Repeatable tails cover locators such as "Police of the Ministry of Internal Affairs".
 # Lowercase conjunctions are permitted *inside* a prepositional qualifier so names such as
-# "Court of Bosnia and Herzegovina" are not truncated. All-caps qualifiers such as POFMA
-# still stop the tail via TAIL_WORD.
-INSTITUTION_QUALIFIER = rf"(?:{TAIL_WORD}|and|&)"
-INSTITUTION_SUFFIX = rf"(?:\s+(?:of|for|against|on)(?:\s+the)?(?:\s+{INSTITUTION_QUALIFIER}){{1,8}})*"
+# "Court of Bosnia and Herzegovina" are not truncated, but a conjunction can never terminate
+# the matched identity (e.g. "National Administration of Penitentiaries and staff").
+# All-caps qualifiers such as POFMA still stop the tail via TAIL_WORD.
+INSTITUTION_QUALIFIER = rf"{TAIL_WORD}(?:\s+(?:(?:and|&)\s+)?{TAIL_WORD}){{0,7}}"
+INSTITUTION_SUFFIX = rf"(?:\s+(?:of|for|against|on)(?:\s+the)?\s+{INSTITUTION_QUALIFIER})*"
 MAXIMAL_INSTITUTION_RE = re.compile(
     rf"\b(Penitentiary\s+no\.\s*\d+\s+{OBJECT_WORD}"
     rf"|(?:{OBJECT_WORD}(?:\s+|[-/])){{0,6}}(?:{INSTITUTION_TYPE}){INSTITUTION_SUFFIX})\b"
