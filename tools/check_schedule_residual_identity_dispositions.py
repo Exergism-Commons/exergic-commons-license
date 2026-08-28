@@ -81,6 +81,25 @@ def token_phrase_present(raw: str, surface: str) -> bool:
     return any(haystack[index:index + width] == needle for index in range(len(haystack) - width + 1))
 
 
+def entity_surface_contains(entity: dict, surface: str) -> bool:
+    """True only when a current canonical name/alias structurally contains the residual surface."""
+    for form in entity.get("surface_forms") or []:
+        form_text = form.get("text") or form.get("normalized") or ""
+        if form_text and token_phrase_present(form_text, surface):
+            return True
+    return False
+
+
+def covered_surface_candidate_ids(row: dict, surface: str, by_id: dict[str, dict]) -> list[str]:
+    """Re-derive every same-row binding whose current ABox surface represents this residual stem."""
+    candidates: list[str] = []
+    for entity_id in row.get("resolved_ids") or []:
+        entity = by_id.get(entity_id)
+        if entity is not None and entity_surface_contains(entity, surface):
+            candidates.append(entity_id)
+    return sorted(set(candidates))
+
+
 def disposition_key(entry: dict) -> tuple[str, str, str, str, str]:
     return (
         entry["source"], entry["state"], entry["field"], entry["raw"], entry["identity_surface"]
@@ -178,10 +197,16 @@ def load_dispositions() -> dict[tuple[str, str, str, str, str], dict]:
                 f"-> {row.get('resolution_source')!r}"
             )
             if entry["disposition"] == "covered":
-                missing_ids = sorted(set(entry["covered_ids"]) - set(row.get("resolved_ids") or []))
-                assert not missing_ids, (
-                    f"residual covered IDs must already be bound by the same reviewed primary row: "
-                    f"{entry_primary_key(entry)} missing {missing_ids}"
+                actual_candidates = covered_surface_candidate_ids(row, entry["identity_surface"], by_id)
+                expected_candidates = sorted(entry["covered_ids"])
+                assert actual_candidates, (
+                    f"no same-row bound identity has a current ABox surface representing residual "
+                    f"{entry['identity_surface']!r}: {entry_primary_key(entry)}"
+                )
+                assert actual_candidates == expected_candidates, (
+                    f"residual covered IDs must equal the complete same-row surface-derived candidate set: "
+                    f"{entry_primary_key(entry)} surface={entry['identity_surface']!r} "
+                    f"expected={actual_candidates} declared={expected_candidates}"
                 )
         else:
             assert entry["disposition"] == "deferred", (
@@ -201,6 +226,21 @@ def self_test() -> None:
     assert git_blob_sha(b"") == "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     assert token_phrase_present("unrelated Operation Alpha activity", "Operation Alpha")
     assert not token_phrase_present("unrelated Operation Alphabet activity", "Operation Alpha")
+    synthetic_entity = {
+        "id": "PROJECT-AAA-ALPHA", "type": "Project",
+        "surface_forms": [{"text": "Operation Alpha — phase one", "normalized": "operation alpha phase one"}],
+    }
+    unrelated_entity = {
+        "id": "PROJECT-AAA-BETA", "type": "Project",
+        "surface_forms": [{"text": "Operation Beta", "normalized": "operation beta"}],
+    }
+    assert entity_surface_contains(synthetic_entity, "Operation Alpha")
+    assert not entity_surface_contains(unrelated_entity, "Operation Alpha")
+    synthetic_row = {"resolved_ids": ["PROJECT-AAA-ALPHA", "PROJECT-AAA-BETA"]}
+    assert covered_surface_candidate_ids(
+        synthetic_row, "Operation Alpha",
+        {"PROJECT-AAA-ALPHA": synthetic_entity, "PROJECT-AAA-BETA": unrelated_entity},
+    ) == ["PROJECT-AAA-ALPHA"]
     assert entry_primary_key({
         "source": "x.yml", "state": "AAA", "field": "schedule_identity", "raw": "Operation Alpha"
     }) == ("x.yml", "AAA", "schedule_identity", "Operation Alpha")
