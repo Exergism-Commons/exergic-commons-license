@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "date": "2026-08-28",
+  "purpose": "Exact Git-blob pins for every Schedule freeze source referenced by the residual identity review overlay. Where a normal Schedule disposition already pins the source, the residual integrity checker requires the two pins to be identical.",
+  "source_blobs": {
+    "registry/schedule-state-s-freezes/batch-01-identity.yml": "2bfb8e63ffbe297a4268cfd189e6537dabd79c79",
+    "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml": "11d5be928437b65f5f2cb886df967b57eb51a396",
+    "registry/schedule-state-s-freezes/batch-03a-usa.yml": "f0716773b0806e2b8d9b1dfbfc4a5fef3546acb9",
+    "registry/schedule-state-s-freezes/batch-05-project-status.yml": "40b8b89c5d39e89a86c1de6247d1ebf5755e6f36",
+    "registry/schedule-state-s-freezes/batch-07-identified-projects.yml": "dc096fac9c6abdbd15d19b08ab9b67e8e46ef67b",
+    "registry/schedule-state-s-freezes/batch-08-case-projects.yml": "7621c58aa14ae527a6d4c20c17f00d602be8a5a5",
+    "registry/schedule-state-s-freezes/batch-09c-tcd-freeze.yml": "1ada48ef1471dcb4f0324493b8942c7e4fdfaf6b",
+    "registry/schedule-state-s-freezes/batch-11a-kgz-freeze.yml": "a650a5f5c0ae6c0e2af8dcdd0c76594024b3d6fb",
+    "registry/schedule-state-s-freezes/batch-11b-mar-freeze.yml": "49efed6863efdf2831bcce08541b200619402f6c",
+    "registry/schedule-state-s-freezes/batch-11c-moz-freeze.yml": "59aff7bfa4e16a73545dd49b8a76bd7d8715e9a7",
+    "registry/schedule-state-s-freezes/batch-14b-svn-freeze.yml": "035bf7fbcdf0e8c3dbde27832374e73475533460",
+    "registry/schedule-state-s-freezes/batch-15a-bhr-freeze.yml": "026a3ed200708c5fc6b80311c33ee4c09ffc0fc7",
+    "registry/schedule-state-s-freezes/batch-16a-geo-freeze.yml": "5e36591e4d97bf4dd525a621ef0c4d09abc500c7",
+    "registry/schedule-state-s-freezes/batch-18c-pry-freeze.yml": "c1e4bd9e81da6caf8e9e27fe8aa5659071025b36",
+    "registry/schedule-state-s-freezes/batch-19a-qat-freeze.yml": "642acca573cc4606cd6cbef2b33752f602773be4",
+    "registry/schedule-state-s-freezes/batch-19c-syr-freeze.yml": "0824495d9fa363ff192e0be9ee44869375a56ec7",
+    "registry/schedule-state-s-freezes/batch-21a-mda-freeze.yml": "7a2e8dd70e3634edcf1c1b9fd12d704cd9ff7846",
+    "registry/schedule-state-s-freezes/batch-22a-phl-freeze.yml": "45e4c904b50115d62694d8fcda7cbe3496735dac",
+    "registry/schedule-state-s-freezes/batch-22b-irq-freeze.yml": "f222fea69a55d2a446ccc237188f0219ee6ae1c4",
+    "registry/schedule-state-s-freezes/promoted-ready-01.yml": "eacea63dfacc72c8df93db393c95b1b5a6355db3",
+    "registry/schedule-state-s-freezes/promoted-ready-02.yml": "0b8e0545bc33a62e27e94ab020f5809911555808",
+    "registry/schedule-state-s-freezes/promoted-ready-03a.yml": "d51324e4e4e2961293f0cf11608de8d58a8a2500",
+    "registry/schedule-state-s-freezes/promoted-ready-hti.yml": "279b23420801455fd6adc0b0a349927f5022191e",
+    "registry/schedule-state-s-freezes/promoted-ready-sgp.yml": "231751467ca4473c026efff5206e9c8356826ffb"
+  }
+}
