@@ -10,6 +10,7 @@ on:
       - 'knowledge/generated/state-dossier-review-ratchet.json'
       - 'knowledge/generated/entity-id-supersessions-*.json'
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
+      - 'knowledge/generated/schedule-residual-identity-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'registry/projects.yml'
       - 'registry/organizations.yml'
@@ -25,6 +26,7 @@ on:
       - 'knowledge/generated/state-dossier-review-ratchet.json'
       - 'knowledge/generated/entity-id-supersessions-*.json'
       - 'knowledge/generated/schedule-reference-dispositions-*.json'
+      - 'knowledge/generated/schedule-residual-identity-dispositions-*.json'
       - 'registry/schedule-state-s-freezes/**'
       - 'registry/projects.yml'
       - 'registry/organizations.yml'
@@ -78,6 +80,7 @@ jobs:
           python tools/check_state_dossier_named_person_coverage.py --self-test
           python tools/audit_schedule_reference_coverage.py --self-test
           python tools/check_schedule_disposition_manifest_integrity.py --self-test
+          python tools/check_schedule_residual_identity_dispositions.py --self-test
           python tools/check_schedule_reference_resolution_safety.py --self-test
           python tools/check_schedule_exact_identity_completeness.py --self-test
           python tools/check_schedule_named_identity_strictness.py --self-test
@@ -104,6 +107,7 @@ jobs:
           python tools/check_state_dossier_rendered_markup_coverage.py
           python tools/check_state_dossier_named_person_coverage.py
           python tools/check_schedule_disposition_manifest_integrity.py
+          python tools/check_schedule_residual_identity_dispositions.py
           python tools/check_schedule_reference_field_coverage.py
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
@@ -144,6 +148,7 @@ jobs:
           python tools/check_state_dossier_rendered_markup_coverage.py
           python tools/check_state_dossier_named_person_coverage.py
           python tools/check_schedule_disposition_manifest_integrity.py
+          python tools/check_schedule_residual_identity_dispositions.py
           python tools/check_schedule_reference_field_coverage.py
           python tools/audit_schedule_reference_coverage.py \
             --json build/schedule-reference-coverage.json \
