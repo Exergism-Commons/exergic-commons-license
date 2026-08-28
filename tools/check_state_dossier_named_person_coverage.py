@@ -19,9 +19,6 @@ import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
 
 
-# Longer role phrases precede their shorter suffixes so a title such as "Attorney General"
-# or "human-rights defender" is consumed as one role rather than leaking "General" or
-# "defender" into the detected personal name.
 ROLE = (
     r"human[- ]rights defender|rights defender|peace activist|opposition leader|"
     r"attorney general|public defender|prime minister|deputy minister|vice president|"
@@ -37,10 +34,11 @@ ACTION_OF_RE = re.compile(
     rf"incarceration|abduction|disappearance|release|pardon|clemency|killing|execution)\s+of\s+"
     rf"(?:(?:{ROLE})(?:/(?:{ROLE}))?\s+)?"
 )
-ACTION_TARGET_RE = re.compile(r"(?i)\b(?:charges?|prosecution|proceedings?|case)\s+against\s+")
-# A normal name token deliberately cannot consume a full stop. Dotted initials are handled
-# by the second alternative. This makes the sentence boundary a hard stop, so prose such as
-# "writer Boualem Sansal. Clemency ..." cannot become the fake name "Boualem Sansal. Clemency".
+ACTION_TARGET_RE = re.compile(r"(?i)\b(?:charges?|prosecution|proceedings?|case|appeal)\s+against\s+")
+CASE_OF_RE = re.compile(r"(?i)\b(?:case|appeal|proceedings?)\s+of\s+")
+REMEDIAL_TARGET_RE = re.compile(
+    r"(?i)\b(?:dropped|dismissed|withdrew|withdrew charges against|granted bail to|freed|acquitted|cleared)\s+(?:the\s+)?"
+)
 NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’-]*|[A-Z]\.)"
 NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
 NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
@@ -55,7 +53,7 @@ PASSIVE_ACTION_RE = re.compile(
 )
 ACTIVE_ACTION_RE = re.compile(
     rf"\b(?i:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
-    rf"released|pardoned|executed|killed)\s+"
+    rf"released|pardoned|executed|killed|freed|acquitted|cleared)\s+"
     rf"(?:(?i:(?:{ROLE}))(?:/(?i:(?:{ROLE})))?\s+)?(?P<names>{NAME_LIST})"
 )
 FRONTMATTER_PERSON_KEYS = {"provisional_scope", "adversarial_result"}
@@ -64,6 +62,13 @@ LOCAL_STOP = {
     "the government", "this review", "the review", "the law", "the court", "the regime",
     "unlawful combatants",
 }
+NON_PERSON_TERMS = {
+    "Administration", "Agency", "Army", "Assembly", "Authority", "Bank", "Brigade", "Bureau",
+    "Command", "Commission", "Committee", "Council", "Court", "Department", "Directorate",
+    "Force", "Forces", "Government", "Institute", "Law", "Ministry", "Navy", "Office",
+    "Operation", "Parliament", "Platform", "Police", "Program", "Programme", "Project",
+    "Service", "Services", "System", "Tribunal", "University",
+}
 
 
 def clean_candidate(candidate: str | None) -> str | None:
@@ -71,9 +76,6 @@ def clean_candidate(candidate: str | None) -> str | None:
         return None
     value = " ".join(candidate.split()).strip(" ,;:()[]{}\"'“”‘’*_`")
     value = re.sub(r"(?:['’]s)$", "", value).strip()
-    # A bounded name-list match may include a human role immediately before the real name,
-    # e.g. "Defender Joaquín Elo Ayeto remained unaccounted for". Strip only the explicit
-    # role lexicon so the same person is not emitted twice under a role-prefixed surface.
     value = re.sub(rf"(?i)^(?:{ROLE})\s+", "", value).strip()
     return value or None
 
@@ -81,6 +83,8 @@ def clean_candidate(candidate: str | None) -> str | None:
 def add_name(out: list[str], candidate: str | None) -> None:
     value = clean_candidate(candidate)
     if not value or value.casefold() in LOCAL_STOP:
+        return
+    if set(value.replace("-", " ").split()) & NON_PERSON_TERMS:
         return
     if strict.valid_name(value, allow_all_caps=True) and value not in out:
         out.append(value)
@@ -92,8 +96,6 @@ def split_name_list(value: str) -> list[str]:
 
 def leading_action_names(tail: str) -> list[str]:
     tail = tail.lstrip()
-    # Legal/institutional titles such as "Incarceration of Unlawful Combatants Law" and
-    # "Minister of Interior" must not manufacture a person from the title words.
     if re.match(r"(?i)^(?:of\b|the\b)", tail):
         return []
     match = re.match(rf"(?P<names>{NAME_LIST})", tail)
@@ -118,7 +120,7 @@ def names_from_prose(prose: str) -> list[str]:
         for name in leading_action_names(prose[match.end():]):
             add_name(names, name)
 
-    for regex in (ACTION_OF_RE, ACTION_TARGET_RE):
+    for regex in (ACTION_OF_RE, ACTION_TARGET_RE, CASE_OF_RE, REMEDIAL_TARGET_RE):
         for match in regex.finditer(prose):
             for name in leading_action_names(prose[match.end():]):
                 add_name(names, name)
@@ -187,8 +189,12 @@ def self_test() -> None:
     assert names_from_prose("Defender Joaquín Elo Ayeto remained unaccounted for after transfer") == ["Joaquín Elo Ayeto"]
     assert "Jane Doe" in names_from_prose("Prime Minister Jane Doe announced the measure")
     assert "Jane Doe" in names_from_prose("Attorney General Jane Doe announced the measure")
+    assert "Paul Chambers" in names_from_prose("prosecutors dropped the Paul Chambers lèse-majesté case in 2025")
+    assert "Jane Doe" in names_from_prose("the case of Jane Doe remains under review")
+    assert "Jane Doe" in names_from_prose("the court acquitted Jane Doe after trial")
     assert "Kokila Annamalai" in names_from_prose("rights groups called for charges against Kokila Annamalai to be dropped")
     assert "Martinez Zogo" in names_from_prose("the trial concerning journalist Martinez Zogo's killing resumed")
+    assert names_from_prose("the court dismissed the Constitutional Court challenge") == []
     assert names_from_prose("Minister of Interior announced the measure") == []
     assert names_from_prose("detention involving Hong Kong democracy/human-rights defenders") == []
     assert names_from_prose("investigation of North Sinai abuses") == []
