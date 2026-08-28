@@ -1,0 +1,39 @@
+name: Schedule cross-role identity audit
+
+on:
+  pull_request:
+    paths:
+      - "knowledge/entities/**"
+      - "knowledge/generated/**"
+      - "registry/schedule-state-s-freezes/**"
+      - "tools/**"
+      - ".github/workflows/schedule-cross-role-identity-audit.yml"
+  push:
+    paths:
+      - "knowledge/entities/**"
+      - "knowledge/generated/**"
+      - "registry/schedule-state-s-freezes/**"
+      - "tools/**"
+      - ".github/workflows/schedule-cross-role-identity-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install Schedule parser dependency
+        run: python -m pip install -r tools/schedule-requirements.txt
+      - name: Self-test cross-role Schedule guards
+        run: |
+          python tools/check_schedule_project_cross_role_identity_coverage.py --self-test
+          python tools/check_schedule_short_acronym_cluster_coverage.py --self-test
+      - name: Enforce project cross-role identity coverage
+        run: python tools/check_schedule_project_cross_role_identity_coverage.py
+      - name: Enforce short slash-acronym review coverage
+        run: python tools/check_schedule_short_acronym_cluster_coverage.py
