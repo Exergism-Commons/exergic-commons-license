@@ -23,7 +23,7 @@ import check_schedule_exact_identity_completeness as exact
 
 OVERLAY = schedule.ROOT / "knowledge" / "generated" / "schedule-short-acronym-cluster-dispositions-v1.json"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-SHORT_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9.-])([A-Z][A-Z0-9]{1,2})(?![A-Za-z0-9.-])")
+SHORT_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9-])([A-Z][A-Z0-9]{1,2})(?![A-Za-z0-9-])")
 VALID_DISPOSITIONS = {"deferred", "rejected"}
 
 
@@ -193,10 +193,14 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
 
 def self_test() -> None:
     assert short_slash_acronyms("National Human Rights Commission/NPM") == ["NPM"]
+    assert short_slash_acronyms("National Human Rights Commission/NPM.") == ["NPM"]
     assert short_slash_acronyms("relevant maritime/SAR units") == ["SAR"]
     assert short_slash_acronyms("actual PTA/counterterrorism detention") == ["PTA"]
+    assert short_slash_acronyms("NCHR/AB.") == ["AB"]
+    assert short_slash_acronyms("M23/oversight") == ["M23"]
     assert short_slash_acronyms("DGM / CESFRONT") == ["DGM"]
     assert short_slash_acronyms("FARDC-backed CMC-FDP / Wazalendo") == []
+    assert short_slash_acronyms("NPM-X/oversight") == []
     assert short_slash_acronyms("NAPOLCOM/IMIS") == []
     overlay = load_overlay()
     assert {entry["identity_surface"] for entry in overlay} == {"SAR", "PTA", "NPM", "ICT"}
