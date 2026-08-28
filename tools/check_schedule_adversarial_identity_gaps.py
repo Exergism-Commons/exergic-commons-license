@@ -151,7 +151,7 @@ def resolved_identity_covers_label(row: dict, label: str, by_id: dict[str, dict]
 
 
 def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
-    """Return every non-empty string leaf from arbitrary Schedule context."""
+    """Return every non-empty string value leaf from arbitrary Schedule context."""
     leaves: list[tuple[tuple[str, ...], str]] = []
     if isinstance(value, str):
         if value.strip():
@@ -163,6 +163,28 @@ def string_leaves(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tup
         for key, child in value.items():
             leaves.extend(string_leaves(child, (*prefix, str(key))))
     return leaves
+
+
+def mapping_key_surfaces(value: object, prefix: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
+    """Return textual mapping keys as auditable surfaces, recursively.
+
+    YAML mappings can carry semantic data in keys just as easily as in values.  The field
+    coverage guard classifies schema-looking key names, but a free-form key such as
+    ``detention of Jane Doe pending trial`` is not itself a schema field and previously
+    escaped every identity detector.  We expose keys to the same high-precision residual
+    detectors without treating ordinary structural names (``review``, ``notes``) as debt.
+    """
+    surfaces: list[tuple[tuple[str, ...], str]] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            key_text = str(key)
+            if isinstance(key, str) and key.strip():
+                surfaces.append(((*prefix, f"@key[{key_text}]"), key))
+            surfaces.extend(mapping_key_surfaces(child, (*prefix, key_text)))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            surfaces.extend(mapping_key_surfaces(child, (*prefix, f"[{index}]")))
+    return surfaces
 
 
 def extra_context_rows() -> list[dict]:
@@ -177,6 +199,27 @@ def extra_context_rows() -> list[dict]:
             for field, value in record.items():
                 if field in AUDITED_FIELDS or field in SKIP_EXTRA_FIELDS:
                     continue
+
+                # The top-level key itself can be a free-form identity surface.  This does not
+                # duplicate primary schema fields because those are excluded above.
+                if isinstance(field, str) and field.strip():
+                    rows.append({
+                        "kind": "extra-context-reference", "state": state,
+                        "field": f"@key[{field}]",
+                        "source": source, "record_index": record_index, "raw": field,
+                        "resolved_ids": [], "status": "context-only", "resolution_source": None,
+                        "disposition_reason": None,
+                    })
+
+                for nested_path, raw in mapping_key_surfaces(value, (field,)):
+                    rows.append({
+                        "kind": "extra-context-reference", "state": state,
+                        "field": ".".join(nested_path),
+                        "source": source, "record_index": record_index, "raw": raw,
+                        "resolved_ids": [], "status": "context-only", "resolution_source": None,
+                        "disposition_reason": None,
+                    })
+
                 for nested_path, raw in string_leaves(value, (field,)):
                     rows.append({
                         "kind": "extra-context-reference", "state": state,
@@ -302,6 +345,23 @@ def self_test() -> None:
         "raw": "detention of Jane Doe pending trial",
     }
     assert "Jane Doe" in contextual_labels(nested_row)
+
+    keyed = mapping_key_surfaces({"detention of Jane Doe pending trial": True}, ("review",))
+    assert (("review", "@key[detention of Jane Doe pending trial]"), "detention of Jane Doe pending trial") in keyed
+    keyed_row = {
+        "kind": "extra-context-reference", "status": "context-only",
+        "field": "review.@key[detention of Jane Doe pending trial]",
+        "raw": "detention of Jane Doe pending trial",
+    }
+    assert "Jane Doe" in contextual_labels(keyed_row)
+    top_level_key_row = {
+        "kind": "extra-context-reference", "status": "context-only",
+        "field": "@key[Operation Silent Dawn]", "raw": "Operation Silent Dawn",
+    }
+    assert "Operation Silent Dawn" in contextual_labels(top_level_key_row)
+    assert contextual_labels({
+        "kind": "extra-context-reference", "status": "context-only", "field": "@key[review]", "raw": "review",
+    }) == []
 
     assert residual_key(
         {"source": "x.yml", "state": "AAA", "field": "exclusions.[0]", "raw": "Operation Alpha activity"},
