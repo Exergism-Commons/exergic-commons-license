@@ -14,6 +14,14 @@ ENTITIES = ROOT / "knowledge" / "entities"
 FRONT = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 DOSSIER_ID = re.compile(r"^ECL-STATE-([A-Z]{3})$")
 ENTITY_ID = re.compile(r"^STATE-([A-Z]{3})$")
+# State-dossier frontmatter is intentionally a flat, reviewed contract. Identity-bearing prose
+# belongs in the two explicit textual fields below or in the dossier body; a newly invented
+# frontmatter key must be reviewed and added here instead of becoming an unaudited side channel.
+ALLOWED_DOSSIER_FRONTMATTER_KEYS = {
+    "id", "entity", "iso3", "issue", "provisional_outcome", "provisional_scope",
+    "confidence", "evidence_cutoff", "last_reviewed", "review_stage", "adversarial_result",
+    "operative",
+}
 
 
 def norm(value: str) -> str:
@@ -56,6 +64,13 @@ def main() -> int:
         iso = match.group(1)
         if path.stem != iso:
             continue
+        unexpected_keys = sorted(set(data) - ALLOWED_DOSSIER_FRONTMATTER_KEYS)
+        if unexpected_keys:
+            print(
+                f"unexpected canonical State dossier frontmatter keys in {path.relative_to(ROOT)}: "
+                f"{unexpected_keys}"
+            )
+            return 15
         if iso in dossier_by_iso:
             print(f"duplicate canonical dossier for {iso}: {dossier_by_iso[iso]} and {path}")
             return 2
