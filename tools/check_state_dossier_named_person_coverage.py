@@ -38,7 +38,10 @@ ACTION_OF_RE = re.compile(
     rf"(?:(?:{ROLE})(?:/(?:{ROLE}))?\s+)?"
 )
 ACTION_TARGET_RE = re.compile(r"(?i)\b(?:charges?|prosecution|proceedings?|case)\s+against\s+")
-NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]*|[A-Z]\.)"
+# A normal name token deliberately cannot consume a full stop. Dotted initials are handled
+# by the second alternative. This makes the sentence boundary a hard stop, so prose such as
+# "writer Boualem Sansal. Clemency ..." cannot become the fake name "Boualem Sansal. Clemency".
+NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’-]*|[A-Z]\.)"
 NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
 NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
 NAME_SEPARATOR = r"(?:\s*,\s*|\s+(?i:and)\s+|\s*&\s*)"
@@ -171,6 +174,9 @@ def self_test() -> None:
     assert "Hassan Bouras" in names_from_prose("arbitrary detention of journalist Hassan Bouras continued")
     assert "Hugues Comlan Sossoukpè" in names_from_prose("detention/prosecution of journalist/defender Hugues Comlan Sossoukpè after transfer")
     assert "Boualem Sansal" in names_from_prose("the November 2025 pardon of writer Boualem Sansal")
+    assert names_from_prose("writer Boualem Sansal. Clemency does not itself dismantle the system") == ["Boualem Sansal"]
+    assert names_from_prose("opposition leader Victoire Ingabire. UN reporting continued") == ["Victoire Ingabire"]
+    assert names_from_prose("TRANSITIONAL-JUSTICE EXCLUSIONS. Current attributable abuse remains sufficient") == []
     assert "Jane Doe" in names_from_prose("journalist Jane Doe reported the detention")
     assert "Jane Doe" in names_from_prose("authorities arrested Jane Doe after the protest")
     assert set(names_from_prose("authorities detained Jane Doe and John Roe after the protest")) == {"Jane Doe", "John Roe"}
