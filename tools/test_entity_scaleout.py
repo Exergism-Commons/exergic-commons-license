@@ -23,6 +23,7 @@ ALLOWED_SOURCE_AUDITS = {
     "tools/audit_state_dossier_entities.py",
     "tools/audit_private_org_mentions.py",
     "tools/audit_schedule_reference_coverage.py",
+    "tools/check_state_dossier_named_person_coverage.py",
 }
 ALLOWED_PROMOTION_ROW_KEYS = {"id", "type", "state", "source"}
 ALLOWED_IDENTITY_KEYS = {
