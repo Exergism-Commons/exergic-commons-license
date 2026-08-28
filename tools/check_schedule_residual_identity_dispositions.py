@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from collections import defaultdict
 from pathlib import Path
 
 import audit_schedule_reference_coverage as schedule
@@ -32,6 +33,7 @@ ALLOWED_ENTRY_KEYS = {
     "source", "state", "field", "raw", "identity_surface", "disposition", "covered_ids", "reason"
 }
 ALLOWED_DISPOSITIONS = {"covered", "deferred"}
+PRIMARY_FIELDS = set(schedule.ACTOR_FIELDS) | set(schedule.PROJECT_FIELDS) | set(schedule.SCOPE_FIELDS)
 
 
 def git_blob_sha(data: bytes) -> str:
@@ -85,6 +87,22 @@ def disposition_key(entry: dict) -> tuple[str, str, str, str, str]:
     )
 
 
+def primary_row_key(row: dict) -> tuple[str, str, str, str]:
+    return (row.get("source") or "", row.get("state") or "", row.get("field") or "", row.get("raw") or "")
+
+
+def entry_primary_key(entry: dict) -> tuple[str, str, str, str]:
+    return (entry["source"], entry["state"], entry["field"], entry["raw"])
+
+
+def current_primary_rows() -> dict[tuple[str, str, str, str], list[dict]]:
+    rows: dict[tuple[str, str, str, str], list[dict]] = defaultdict(list)
+    for row in schedule.audit().get("references", []):
+        if row.get("field") in PRIMARY_FIELDS:
+            rows[primary_row_key(row)].append(row)
+    return rows
+
+
 def load_dispositions() -> dict[tuple[str, str, str, str, str], dict]:
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     unexpected_top = sorted(set(data) - ALLOWED_TOP_KEYS)
@@ -101,6 +119,7 @@ def load_dispositions() -> dict[tuple[str, str, str, str, str], dict]:
     pins = residual_source_pins()
     entities, by_id, identity_index = schedule.load_entities()
     del entities
+    primary_rows = current_primary_rows()
     checked_sources: set[str] = set()
     used_sources: set[str] = set()
     result: dict[tuple[str, str, str, str, str], dict] = {}
@@ -147,6 +166,28 @@ def load_dispositions() -> dict[tuple[str, str, str, str, str], dict]:
                 f"cross-State residual coverage: {entry['state']} -> {entity_id}"
             )
 
+        if entry["field"] in PRIMARY_FIELDS:
+            matches = primary_rows.get(entry_primary_key(entry), [])
+            assert len(matches) == 1, (
+                f"residual disposition must match exactly one current primary Schedule row: "
+                f"{entry_primary_key(entry)} -> {len(matches)} matches"
+            )
+            row = matches[0]
+            assert row.get("resolution_source") == "reviewed-disposition", (
+                f"residual overlay cannot suppress an unreviewed primary Schedule row: {entry_primary_key(entry)} "
+                f"-> {row.get('resolution_source')!r}"
+            )
+            if entry["disposition"] == "covered":
+                missing_ids = sorted(set(entry["covered_ids"]) - set(row.get("resolved_ids") or []))
+                assert not missing_ids, (
+                    f"residual covered IDs must already be bound by the same reviewed primary row: "
+                    f"{entry_primary_key(entry)} missing {missing_ids}"
+                )
+        else:
+            assert entry["disposition"] == "deferred", (
+                f"extra-context residual surfaces may only be explicitly deferred, never bound: {entry}"
+            )
+
         key = disposition_key(entry)
         assert key not in result, f"duplicate residual disposition: {key}"
         result[key] = entry
@@ -160,6 +201,9 @@ def self_test() -> None:
     assert git_blob_sha(b"") == "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     assert token_phrase_present("unrelated Operation Alpha activity", "Operation Alpha")
     assert not token_phrase_present("unrelated Operation Alphabet activity", "Operation Alpha")
+    assert entry_primary_key({
+        "source": "x.yml", "state": "AAA", "field": "schedule_identity", "raw": "Operation Alpha"
+    }) == ("x.yml", "AAA", "schedule_identity", "Operation Alpha")
     synthetic = {
         "source": "x.yml", "state": "AAA", "field": "exclusions.[0]", "raw": "Operation Alpha activity",
         "identity_surface": "Operation Alpha", "disposition": "deferred", "covered_ids": [], "reason": "identity deferred",
