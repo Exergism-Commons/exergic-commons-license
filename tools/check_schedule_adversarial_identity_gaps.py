@@ -41,6 +41,12 @@ MAXIMAL_INSTITUTION_RE = re.compile(
     rf"\b(Penitentiary\s+no\.\s*\d+\s+{OBJECT_WORD}"
     rf"|(?:{OBJECT_WORD}(?:\s+|[-/])){{0,6}}(?:{INSTITUTION_TYPE}){INSTITUTION_SUFFIX})\b"
 )
+# A trailing coordinated adjective immediately before a generic people/function class is
+# context, not part of the institution name: "... Penitentiaries and Moldovan prison staff".
+TRAILING_CONTEXT_ROLE_RE = re.compile(
+    r"(?i)^\s+(?:(?:prison|police|military|security|government|public|civil|local|national)\s+)?"
+    r"(?:staff|personnel|officers?|authorities|functions?|units?|workers?|employees?)\b"
+)
 ACRONYM_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{3,})(?![A-Za-z0-9])")
 ACRONYM_CLUSTER_RE = re.compile(
     r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{3,}(?:/[A-Z][A-Z0-9]{3,})+)(?![A-Za-z0-9])"
@@ -100,6 +106,9 @@ def named_institution_labels(raw: str) -> list[str]:
     labels: list[str] = []
     for match in MAXIMAL_INSTITUTION_RE.finditer(raw):
         label = " ".join(match.group(1).split()).strip(" ,;:()[]{}\"'“”‘’")
+        remainder = raw[match.end():]
+        if TRAILING_CONTEXT_ROLE_RE.match(remainder) and re.search(r"\s+(?:and|&)\s+\S+$", label):
+            label = re.sub(r"\s+(?:and|&)\s+\S+$", "", label).rstrip()
         if label and label not in labels:
             labels.append(label)
     return labels
@@ -109,9 +118,10 @@ def acronym_identity_labels(raw: str, *, include_all: bool = False) -> list[str]
     """Extract high-precision acronym-only identity surfaces.
 
     Slash-delimited acronym clusters are strong identity syntax (for example NAPOLCOM/IMIS).
-    Standalone 4+ character acronyms are accepted only in actor rows, as the entire value, or
-    next to an organizational/operational role cue. This avoids treating legal/technical
-    abbreviations such as POFMA as identities merely because they are uppercase.
+    Standalone 4+ character acronyms are accepted only when explicitly requested, as the
+    entire value, or next to an organizational/operational role cue. This avoids treating
+    legal/technical abbreviations such as PECA or POFMA as identities merely because they are
+    uppercase.
     """
     labels: list[str] = []
     cluster_spans: list[tuple[int, int]] = []
@@ -138,7 +148,10 @@ def contextual_labels(row: dict) -> list[str]:
     kind = row.get("kind")
     if kind == "actor-reference":
         add_unique(labels, ambiguous_actor_list_mentions(raw))
-        add_unique(labels, acronym_identity_labels(raw, include_all=True))
+        # Actor rows still use the high-precision acronym cues. Exact current actor aliases are
+        # independently covered by the normal/exact guards; accepting every uppercase token here
+        # would turn statutory abbreviations such as PECA into false identity debt.
+        add_unique(labels, acronym_identity_labels(raw))
     if kind == "project-reference":
         add_unique(labels, named_object_labels(raw))
     if kind in {"scope-reference", "scope-identity-reference", "extra-context-reference"}:
@@ -326,6 +339,7 @@ def self_test() -> None:
     assert named_institution_labels("National Centre for Human Rights") == ["National Centre for Human Rights"]
     assert named_institution_labels("Yaoundé Military Tribunal life sentence") == ["Yaoundé Military Tribunal"]
     assert named_institution_labels("National Administration of Penitentiaries and staff") == ["National Administration of Penitentiaries"]
+    assert named_institution_labels("National Administration of Penitentiaries and Moldovan prison staff generally") == ["National Administration of Penitentiaries"]
     assert named_institution_labels("High Court/Court of Appeal POFMA review") == ["High Court/Court of Appeal"]
     assert named_institution_labels("UN Committee against Torture findings") == ["UN Committee against Torture"]
     assert named_institution_labels("Police of the Ministry of Internal Affairs framework") == ["Police of the Ministry of Internal Affairs"]
@@ -334,8 +348,14 @@ def self_test() -> None:
     assert named_institution_labels("Penitentiary no. 2 Lipcani, no. 6 Soroca") == ["Penitentiary no. 2 Lipcani"]
     assert acronym_identity_labels("NAPOLCOM/IMIS, prosecutors") == ["NAPOLCOM", "IMIS"]
     assert acronym_identity_labels("NISA operations") == ["NISA"]
+    assert acronym_identity_labels("PECA investigations/prosecutions") == []
     assert acronym_identity_labels("POFMA review") == []
     assert acronym_identity_labels("ABCD", include_all=False) == ["ABCD"]
+    actor_statute = {
+        "kind": "actor-reference", "status": "resolved", "field": "candidate_parties",
+        "raw": "National Cyber Crime Investigation Agency (NCCIA), Ministry of Interior and Narcotics Control, only in PECA investigations/prosecutions",
+    }
+    assert "PECA" not in contextual_labels(actor_statute)
     assert named_object_labels("Operation Alpha Bravo Charlie Delta Echo Foxtrot Golf") == ["Operation Alpha Bravo Charlie Delta Echo Foxtrot Golf"]
     assert "Jane Doe" in contextual_labels({"kind": "extra-context-reference", "status": "context-only", "field": "notes.detail", "raw": "detention of Jane Doe pending trial"})
     keyed = mapping_key_surfaces({"detention of Jane Doe pending trial": True}, ("review",))
