@@ -10,6 +10,7 @@ from entity_identity_resolution import canonicalize_id, infer_domestic_state, lo
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ROOT / "knowledge" / "generated"
 ENTITY_DIR = ROOT / "knowledge" / "entities"
+STATE_DOSSIER_DIR = (ROOT / "dossiers" / "states").resolve()
 MANIFEST_RE = re.compile(r"^state-dossier-entity-scaleout-v([1-9][0-9]*)\.json$")
 # Promoted nodes are identity records only. These allowlists are deliberately structural:
 # adding any new manifest/row/entity key requires review instead of hoping a relation or
@@ -95,6 +96,36 @@ def canonical_state_codes() -> set[str]:
             if STATE_RE.fullmatch(state):
                 result.add(state)
     return result
+
+
+def state_dossier_entities_without_promotion(promoted_ids: set[str]) -> list[dict[str, str]]:
+    """Require the scale-out history to explain every non-State node sourced from a State dossier.
+
+    This is the reverse half of the provenance invariant. Manifest rows already have to point
+    to real identity files; here an identity file whose `dossier` provenance lands in the
+    canonical State-dossier directory must also appear in the versioned promotion history.
+    The check is based on provenance, not `reviewClass`, so changing metadata cannot hide an
+    otherwise unreviewed State-dossier materialization.
+    """
+    missing: list[dict[str, str]] = []
+    for path in sorted(ENTITY_DIR.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if data.get("type") == "State":
+            continue
+        entity_id = data.get("id")
+        dossier_value = data.get("dossier")
+        if not isinstance(entity_id, str) or not isinstance(dossier_value, str):
+            continue
+        target = (path.parent / dossier_value).resolve()
+        if target.parent != STATE_DOSSIER_DIR or target.suffix != ".md":
+            continue
+        if entity_id not in promoted_ids:
+            missing.append({
+                "id": entity_id,
+                "entity_file": str(path.relative_to(ROOT)),
+                "dossier": str(target.relative_to(ROOT)),
+            })
+    return missing
 
 
 def main() -> int:
@@ -197,10 +228,18 @@ def main() -> int:
         print("PROMOTED_IDENTITY_UNEXPECTED_KEYS=" + json.dumps(unexpected_key_errors, ensure_ascii=False, sort_keys=True))
         return 3
 
+    promoted_current_ids = {canonicalize_id(entity_id, supersessions) for entity_id in all_historical_ids}
+    reverse_provenance_errors = state_dossier_entities_without_promotion(promoted_current_ids)
+    if reverse_provenance_errors:
+        print("STATE_DOSSIER_IDENTITIES_WITHOUT_PROMOTION=" + json.dumps(
+            reverse_provenance_errors, ensure_ascii=False, sort_keys=True
+        ))
+        return 5
+
     print(
         f"identity scale-out tests: OK ({promotion_count} historical promotions across "
         f"{len(manifests)} manifests; {superseded_count} canonicalized IDs; "
-        "manifest/row schema and identity metadata allowlists enforced)"
+        "manifest/row schema, reverse State-dossier provenance, and identity metadata allowlists enforced)"
     )
     return 0
 
