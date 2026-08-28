@@ -37,7 +37,7 @@ ACTION_OF_RE = re.compile(
 ACTION_TARGET_RE = re.compile(r"(?i)\b(?:charges?|prosecution|proceedings?|case|appeal)\s+against\s+")
 CASE_OF_RE = re.compile(r"(?i)\b(?:case|appeal|proceedings?)\s+of\s+")
 REMEDIAL_TARGET_RE = re.compile(
-    r"(?i)\b(?:dropped|dismissed|withdrew|withdrew charges against|granted bail to|freed|acquitted|cleared)\s+(?:the\s+)?"
+    r"(?i)\b(?:withdrew charges against|granted bail to|dropped|dismissed|withdrew|freed|acquitted|cleared)\s+(?:the\s+)?"
 )
 NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’-]*|[A-Z]\.)"
 NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
@@ -192,6 +192,8 @@ def self_test() -> None:
     assert "Paul Chambers" in names_from_prose("prosecutors dropped the Paul Chambers lèse-majesté case in 2025")
     assert "Jane Doe" in names_from_prose("the case of Jane Doe remains under review")
     assert "Jane Doe" in names_from_prose("the court acquitted Jane Doe after trial")
+    assert "Jane Doe" in names_from_prose("prosecutors withdrew charges against Jane Doe after review")
+    assert "Jane Doe" in names_from_prose("the court granted bail to Jane Doe after review")
     assert "Kokila Annamalai" in names_from_prose("rights groups called for charges against Kokila Annamalai to be dropped")
     assert "Martinez Zogo" in names_from_prose("the trial concerning journalist Martinez Zogo's killing resumed")
     assert names_from_prose("the court dismissed the Constitutional Court challenge") == []
