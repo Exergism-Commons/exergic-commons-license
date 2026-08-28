@@ -20,7 +20,7 @@ ENTITY_ID = re.compile(r"^STATE-([A-Z]{3})$")
 ALLOWED_DOSSIER_FRONTMATTER_KEYS = {
     "id", "entity", "iso3", "issue", "provisional_outcome", "provisional_scope",
     "confidence", "evidence_cutoff", "last_reviewed", "review_stage", "adversarial_result",
-    "operative",
+    "exergism_status", "exergism_assessment", "operative",
 }
 
 
