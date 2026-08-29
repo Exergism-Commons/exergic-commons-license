@@ -3,9 +3,10 @@
 
 The main named-identity parser recognizes ordinary actor components and reviewed comma
 capacity tails. This companion guard independently covers the equally natural form
-``Jane Doe (in an advisory capacity)`` including terminal sentence punctuation. It is
-identity-completeness only: it never creates actor participation, control, operation,
-supply, culpability, membership, or governance semantics.
+``Jane Doe (in an advisory capacity)`` including terminal punctuation and common
+quote/Markdown wrappers. It is identity-completeness only: it never creates actor
+participation, control, operation, supply, culpability, membership, or governance
+semantics.
 """
 from __future__ import annotations
 
@@ -19,13 +20,27 @@ import check_schedule_named_identity_strictness as strict
 
 
 PAREN_COMPONENT_RE = re.compile(r"^(.+?)\s*\(([^()]*)\)\s*[.!?,:]?\s*$", re.UNICODE)
+TRAILING_WRAPPERS = "\"'”’]}*_`"
+TRAILING_PUNCTUATION = ".!?,:"
+
+
+def normalized_component(fragment: str) -> str:
+    """Remove only terminal punctuation/wrappers that cannot belong to the actor name."""
+    cleaned = fragment.strip()
+    # Accept either `...)”.` or `...).”`-style ordering without stripping semantic prose.
+    for _ in range(2):
+        cleaned = cleaned.rstrip()
+        cleaned = cleaned.rstrip(TRAILING_PUNCTUATION)
+        cleaned = cleaned.rstrip()
+        cleaned = cleaned.rstrip(TRAILING_WRAPPERS)
+    return cleaned.strip()
 
 
 def parenthesized_actor_mentions(raw: str) -> list[str]:
     """Return complete names whose trailing parentheses contain recognized capacity prose."""
     out: list[str] = []
     for fragment in re.split(r"\s*(?:/|;)\s*", raw):
-        match = PAREN_COMPONENT_RE.fullmatch(fragment.strip())
+        match = PAREN_COMPONENT_RE.fullmatch(normalized_component(fragment))
         if not match:
             continue
         if not strict.CAPACITY_TAIL_RE.match(match.group(2).strip()):
@@ -72,6 +87,15 @@ def self_test() -> None:
     ) == ["JANE DOE"]
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (serving in an advisory capacity)!"
+    ) == ["Jane Doe"]
+    assert parenthesized_actor_mentions(
+        'Human Rights Watch / “Jane Doe (in an advisory capacity)”.'
+    ) == ["Jane Doe"]
+    assert parenthesized_actor_mentions(
+        "Human Rights Watch / **Jane Doe (in an advisory capacity)**"
+    ) == ["Jane Doe"]
+    assert parenthesized_actor_mentions(
+        "Human Rights Watch / [Jane Doe (in an advisory capacity)]"
     ) == ["Jane Doe"]
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)"
