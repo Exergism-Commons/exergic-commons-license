@@ -5,9 +5,12 @@ The main named-identity parser recognizes ordinary actor components and reviewed
 capacity tails. This companion guard independently covers the equally natural form
 ``Jane Doe (in an advisory capacity)`` including terminal punctuation, common
 quote/Markdown wrappers, an optional second comma-delimited capacity condition, and
-high-confidence lists whose separator follows a completed parenthesized component. It
-is identity-completeness only: it never creates actor participation, control, operation,
-supply, culpability, membership, or governance semantics.
+high-confidence actor lists. Ambiguous comma/``and`` separators are accepted only outside
+an exact current non-Person actor anchor, matching the main parser's protection for names
+such as ``Ministry of Interior and Narcotics Control``.
+
+This is identity-completeness only: it never creates actor participation, control,
+operation, supply, culpability, membership, or governance semantics.
 """
 from __future__ import annotations
 
@@ -21,10 +24,9 @@ import check_schedule_named_identity_strictness as strict
 
 
 PAREN_COMPONENT_RE = re.compile(r"^(.+?)\s*\(([^()]*)\)(.*)$", re.UNICODE)
-# `and`/`&`/comma are ambiguous inside ordinary organization names. They become strong
-# separators here only *after* a closed parenthesized component and before a new
-# capitalized/name-wrapped component. A lowercase second capacity tail such as
-# `), only where ...` therefore remains attached to the first actor.
+# These separators are safe without repository context only after a completed
+# parenthesized component. A lowercase second capacity tail such as `), only where ...`
+# therefore stays attached to the first actor.
 POST_CAPACITY_SEPARATOR_RE = re.compile(
     r"(?<=\))\s*(?:and\b|&|,|—|–)\s+(?=[A-ZÀ-ÖØ-Þ\"'“‘\[\{*_`])",
     re.UNICODE,
@@ -45,6 +47,28 @@ def normalized_component(fragment: str) -> str:
     return cleaned.strip()
 
 
+def parenthesized_actor_component(fragment: str) -> str | None:
+    """Parse one complete actor component with a closed-world parenthesized capacity tail."""
+    match = PAREN_COMPONENT_RE.fullmatch(normalized_component(fragment))
+    if not match:
+        return None
+    if not strict.CAPACITY_TAIL_RE.match(match.group(2).strip()):
+        return None
+
+    suffix = match.group(3).strip()
+    # Quotes/Markdown/brackets may close the actor component immediately after `)`.
+    suffix = suffix.lstrip(TRAILING_WRAPPERS).strip()
+    if suffix:
+        # A second tail is allowed only through the same closed-world capacity grammar.
+        if not suffix.startswith(","):
+            return None
+        second_tail = suffix[1:].strip()
+        if not second_tail or not strict.CAPACITY_TAIL_RE.match(second_tail):
+            return None
+
+    return strict.full_name_phrase(match.group(1).strip(), allow_all_caps=True)
+
+
 def actor_capacity_fragments(raw: str) -> list[str]:
     """Split only on separators that are unambiguous for this parenthesized-capacity form."""
     out: list[str] = []
@@ -54,27 +78,56 @@ def actor_capacity_fragments(raw: str) -> list[str]:
 
 
 def parenthesized_actor_mentions(raw: str) -> list[str]:
-    """Return complete names whose trailing parentheses contain recognized capacity prose."""
+    """Return complete parenthesized-capacity names from unambiguous component boundaries."""
     out: list[str] = []
     for fragment in actor_capacity_fragments(raw):
-        match = PAREN_COMPONENT_RE.fullmatch(normalized_component(fragment))
-        if not match:
-            continue
-        if not strict.CAPACITY_TAIL_RE.match(match.group(2).strip()):
-            continue
+        mention = parenthesized_actor_component(fragment)
+        if mention and mention not in out:
+            out.append(mention)
+    return out
 
-        suffix = match.group(3).strip()
-        # Quotes/Markdown/brackets may close the actor component immediately after `)`.
-        suffix = suffix.lstrip(TRAILING_WRAPPERS).strip()
-        if suffix:
-            # A second tail is allowed only through the same closed-world capacity grammar.
-            if not suffix.startswith(","):
-                continue
-            second_tail = suffix[1:].strip()
-            if not second_tail or not strict.CAPACITY_TAIL_RE.match(second_tail):
-                continue
 
-        mention = strict.full_name_phrase(match.group(1).strip(), allow_all_caps=True)
+def _anchored_segments(raw: str, anchor_spans: list[tuple[int, int]]) -> list[str]:
+    """Return non-anchor actor-list segments while protecting separators inside anchors."""
+    if not anchor_spans:
+        return []
+    separators: list[tuple[int, int]] = []
+    for match in strict.ACTOR_LIST_SEPARATOR_RE.finditer(raw):
+        if strict._inside_span(match.start(), anchor_spans):
+            continue
+        token = match.group(0)
+        if token.lstrip().startswith(",") and strict.CAPACITY_TAIL_RE.match(raw[match.end():].lstrip()):
+            continue
+        separators.append(match.span())
+    if not separators:
+        return []
+
+    segments: list[tuple[int, int, str]] = []
+    start = 0
+    for sep_start, sep_end in separators:
+        segments.append((start, sep_start, raw[start:sep_start]))
+        start = sep_end
+    segments.append((start, len(raw), raw[start:]))
+
+    anchored_indexes = {
+        index
+        for index, (seg_start, seg_end, _) in enumerate(segments)
+        if any(seg_start <= anchor_start and anchor_end <= seg_end for anchor_start, anchor_end in anchor_spans)
+    }
+    return [segment for index, (_, _, segment) in enumerate(segments) if index not in anchored_indexes]
+
+
+def anchored_parenthesized_actor_mentions(
+    raw: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+) -> list[str]:
+    """Parse parenthesized actors after ambiguous list separators only when an exact anchor exists."""
+    anchor_spans = strict.exact_non_person_actor_spans(raw, entities, identity_index, state)
+    out: list[str] = []
+    for segment in _anchored_segments(raw, anchor_spans):
+        mention = parenthesized_actor_component(segment)
         if mention and mention not in out:
             out.append(mention)
     return out
@@ -87,7 +140,11 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
             continue
         raw = row.get("raw") or ""
         state = row.get("state")
-        for mention in parenthesized_actor_mentions(raw):
+        mentions = parenthesized_actor_mentions(raw)
+        for mention in anchored_parenthesized_actor_mentions(raw, entities, identity_index, state):
+            if mention not in mentions:
+                mentions.append(mention)
+        for mention in mentions:
             if exact.materialized_person_ids_for_mention(mention, entities, identity_index, state):
                 continue
             if exact.materialized_non_person_ids_for_mention(mention, entities, identity_index, state):
@@ -141,6 +198,14 @@ def self_test() -> None:
     assert parenthesized_actor_mentions(
         "Jane Doe (in an advisory capacity) — John Smith (serving only where participation is established)"
     ) == ["Jane Doe", "John Smith"]
+
+    anchored = "Human Rights Watch and Jane Doe (in an advisory capacity)."
+    hrw_span = (0, len("Human Rights Watch"))
+    assert [parenthesized_actor_component(part) for part in _anchored_segments(anchored, [hrw_span])] == ["Jane Doe"]
+    ministry = "Ministry of Interior and Narcotics Control and Jane Doe (in an advisory capacity)."
+    ministry_span = (0, len("Ministry of Interior and Narcotics Control"))
+    assert [parenthesized_actor_component(part) for part in _anchored_segments(ministry, [ministry_span])] == ["Jane Doe"]
+
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)"
     ) == []
