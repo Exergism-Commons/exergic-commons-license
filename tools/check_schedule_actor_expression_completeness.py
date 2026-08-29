@@ -3,10 +3,10 @@
 
 This guard treats actor-list segmentation as an identity-completeness concern only. It never
 creates participation, control, operation, supply, membership, culpability, or governance
-semantics. Exact actor surfaces protect separators that are genuinely part of a current
-identity, while closed-world capacity spans protect legal/capacity prose from being mistaken
-for actor alternatives. Every identity-like component exposed outside those spans must then
-be exactly bound or explicitly deferred by surface.
+semantics. Exact actor surfaces and high-confidence complete institution surfaces protect
+separators that genuinely belong to one identity, while closed-world capacity spans protect
+legal/capacity prose from being mistaken for actor alternatives. Every alternative component
+must then be exactly covered or explicitly reviewed; no materialized anchor is required.
 
 The design deliberately enforces two monotonicity properties:
 
@@ -133,6 +133,17 @@ def safe_actor_anchor_spans(
     return _merge_spans(spans)
 
 
+def heuristic_institution_spans(raw: str) -> list[tuple[int, int]]:
+    """Protect maximal unmaterialized institution names before considering internal ``and``."""
+    spans: list[tuple[int, int]] = []
+    for label in adversarial.named_institution_labels(raw):
+        if len(schedule.norm(label).split()) < 2:
+            continue
+        pattern = rf"(?<!\w){_literal_surface_pattern(label)}(?!\w)"
+        spans.extend(match.span() for match in re.finditer(pattern, raw, re.I | re.UNICODE))
+    return _merge_spans(spans)
+
+
 def parenthesized_capacity_spans(raw: str) -> list[tuple[int, int]]:
     """Protect balanced parenthesized text only when it begins with closed-world capacity syntax."""
     stack: list[int] = []
@@ -161,13 +172,24 @@ def capacity_spans(raw: str) -> list[tuple[int, int]]:
     return _merge_spans(spans)
 
 
+def alternative_separator_spans(
+    raw: str,
+    protected_spans: list[tuple[int, int]],
+) -> list[tuple[int, int]]:
+    return [
+        match.span()
+        for match in ALTERNATIVE_SEPARATOR_RE.finditer(raw)
+        if not _overlaps(match.span(), protected_spans)
+    ]
+
+
 def structural_separator_spans(
     raw: str,
     anchor_spans: list[tuple[int, int]],
     capacity_regions: list[tuple[int, int]],
 ) -> list[tuple[int, int]]:
-    """Return non-overlapping actor separators outside exact anchors and capacity prose."""
-    protected = _merge_spans(anchor_spans + capacity_regions)
+    """Return non-overlapping actor separators outside identity and capacity spans."""
+    protected = _merge_spans(anchor_spans + heuristic_institution_spans(raw) + capacity_regions)
     candidates: list[tuple[int, int, int]] = []
 
     # Alternatives have highest priority so ``and / or`` is one separator rather than a
@@ -285,34 +307,45 @@ def component_identity_surfaces(component: str) -> list[str]:
     return out
 
 
+def _capacity_fragment_surfaces(fragment: str) -> list[str]:
+    out: list[str] = []
+    tail = fragment.lstrip()
+    candidate = strict.leading_name_phrase(tail, allow_all_caps=True)
+    if candidate:
+        _add_unique(out, candidate)
+        return out
+
+    for label in adversarial.named_institution_labels(tail[:160]):
+        complete = _complete_institution_surface(tail[:160], label)
+        if complete:
+            _add_unique(out, complete)
+            return out
+
+    single = SINGLE_IDENTITY_RE.match(tail)
+    if single:
+        token = single.group(1)
+        if _specific_single_identity_token(token):
+            _add_unique(out, token)
+    return out
+
+
 def capacity_identity_surfaces(raw: str) -> list[str]:
     """Find named actors introduced inside recognized capacity prose.
 
     Generic legal alternatives remain ignored because the cue must be followed by a
-    title-cased/name-like surface. This catches moves such as ``acting with Jane Doe`` or
-    ``acting as adviser or John Smith`` without treating ``or successor powers`` as an actor.
+    title-cased/name-like surface. Strong slash/semicolon lists after a relational capacity
+    cue are walked component-by-component, so ``with Jane Doe / John Smith`` cannot hide the
+    second name.
     """
     out: list[str] = []
     for start, end in capacity_spans(raw):
         region = raw[start:end]
         for cue in CAPACITY_IDENTITY_CUE_RE.finditer(region):
-            tail = region[cue.end():].lstrip()
-            candidate = strict.leading_name_phrase(tail, allow_all_caps=True)
-            if candidate:
-                _add_unique(out, candidate)
-                continue
-
-            for label in adversarial.named_institution_labels(tail[:160]):
-                complete = _complete_institution_surface(tail[:160], label)
-                if complete:
-                    _add_unique(out, complete)
-                    break
-            else:
-                single = SINGLE_IDENTITY_RE.match(tail)
-                if single:
-                    token = single.group(1)
-                    if _specific_single_identity_token(token):
-                        _add_unique(out, token)
+            tail = region[cue.end():]
+            for fragment in STRONG_ACTOR_SEPARATOR_RE.split(tail):
+                surfaces = _capacity_fragment_surfaces(fragment)
+                for surface in surfaces:
+                    _add_unique(out, surface)
     return out
 
 
@@ -347,9 +380,8 @@ def exact_actor_ids_for_surface(
 
 
 def _bound_identity_extends_surface(surface: str, raw: str, bound_ids: set[str], by_id: dict[str, dict]) -> bool:
-    """Suppress only a parser stem proven to sit inside a longer exact bound surface in raw."""
+    """Suppress only a parser stem proven inside a longer literal bound surface in the row."""
     surface_tokens = schedule.norm(surface).split()
-    raw_tokens = schedule.norm(raw).split()
     if not surface_tokens:
         return False
     for entity_id in bound_ids:
@@ -360,12 +392,15 @@ def _bound_identity_extends_surface(surface: str, raw: str, bound_ids: set[str],
             if isinstance(value, str) and value.strip()
         ]
         for form in forms:
-            normalized = form.get("normalized") or schedule.norm(form.get("text") or "")
+            text = form.get("text") or ""
+            normalized = form.get("normalized") or schedule.norm(text)
             form_tokens = normalized.split()
             if len(form_tokens) <= len(surface_tokens) or form_tokens[:len(surface_tokens)] != surface_tokens:
                 continue
-            width = len(form_tokens)
-            if any(raw_tokens[index:index + width] == form_tokens for index in range(len(raw_tokens) - width + 1)):
+            if not text:
+                continue
+            pattern = rf"(?<!\w){_literal_surface_pattern(text)}(?!\w)"
+            if re.search(pattern, raw, re.I | re.UNICODE):
                 return True
     return False
 
@@ -405,11 +440,21 @@ def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identit
         raw = row.get("raw") or ""
         state = row.get("state")
         bound_ids = {item for item in row.get("resolved_ids") or [] if item in by_id}
+        anchors = safe_actor_anchor_spans(raw, entities, identity_index, state, bound_ids)
+        capacities = capacity_spans(raw)
+        protected = _merge_spans(anchors + heuristic_institution_spans(raw) + capacities)
+        has_top_level_alternative = bool(alternative_separator_spans(raw, protected))
 
         surfaces: list[str] = []
         for component in actor_components(raw, entities, identity_index, state, bound_ids):
-            for surface in component_identity_surfaces(component):
+            component_surfaces = component_identity_surfaces(component)
+            for surface in component_surfaces:
                 _add_unique(surfaces, surface)
+            # Alternative syntax is an explicit actor-component claim. If a complete side is
+            # not name-shaped, require review of that exact side rather than silently dropping
+            # it. This is the fail-closed path requested by the current P1.
+            if has_top_level_alternative and not component_surfaces:
+                _add_unique(surfaces, parenthesized.normalized_component(component))
         for surface in capacity_identity_surfaces(raw):
             _add_unique(surfaces, surface)
 
@@ -511,10 +556,19 @@ def self_test() -> None:
     assert actor_components("Ministry of Interior and Narcotics Control or Jane Doe", entities, identity_index, "AAA") == [
         "Ministry of Interior and Narcotics Control", "Jane Doe"
     ]
+    # The same protection is available before materialization through the hardened complete
+    # institution parser, so adding/removing an ABox row does not change this segmentation.
+    no_ministry_entities = [item for item in entities if item["id"] != "AGENCY-AAA-MINISTRY"]
+    no_ministry_raw = [item for item in raw_entities if item["id"] != "AGENCY-AAA-MINISTRY"]
+    no_ministry_index = build_name_index(no_ministry_raw, state_codes={"AAA"}, normalizer=schedule.norm)
+    assert actor_components(
+        "Ministry of Interior and Narcotics Control or Jane Doe", no_ministry_entities, no_ministry_index, "AAA"
+    ) == ["Ministry of Interior and Narcotics Control", "Jane Doe"]
     assert actor_components("Leger des Heils Jeugdbescherming & Reclassering", entities, identity_index, "AAA") == []
 
     # Exact anchors are literal enough that actor punctuation cannot be normalized through.
     assert safe_actor_anchor_spans("Human / Rights Watch or Jane Doe", entities, identity_index, "AAA") == []
+    assert not _bound_identity_extends_surface("Human", "Human / Rights Watch", {"ORG-HRW"}, by_id)
 
     # Institution extraction must keep a complete proper locator rather than a parser stem.
     assert component_identity_surfaces("Rescue Coordination Centre Malta") == ["Rescue Coordination Centre Malta"]
@@ -538,12 +592,19 @@ def self_test() -> None:
     assert capacity_identity_surfaces("Jane Doe (acting with John Smith)") == ["John Smith"]
     assert capacity_identity_surfaces("Jane Doe, only where assisted by John Smith") == ["John Smith"]
     assert capacity_identity_surfaces("Jane Doe, acting with Meta") == ["Meta"]
+    assert capacity_identity_surfaces("Jane Doe, acting with John Smith / Alice Brown") == ["John Smith", "Alice Brown"]
     assert capacity_identity_surfaces("Jane Doe, only where enforcing statute or State-security offences") == []
 
     # P1: no materialized anchor is required. Generic review cannot discharge either name.
     report = {"references": [_row("Jane Doe or John Smith")]}
     problems = failures(report, entities, by_id, identity_index)
     assert [problem["identity_surface"] for problem in problems] == ["Jane Doe", "John Smith"]
+
+    # An unparseable alternative component is still debt by exact component surface; it can
+    # never disappear merely because it is not a two-word personal name.
+    opaque = {"references": [_row("Unknown-actor or Jane Doe")]}
+    problems = failures(opaque, entities, by_id, identity_index)
+    assert [problem["identity_surface"] for problem in problems] == ["Unknown-actor", "Jane Doe"]
 
     # Deferral locality: naming John Smith does not discharge Jane Doe.
     report["references"][0]["disposition_reason"] = "John Smith remains explicitly identity-deferred pending materialization."
