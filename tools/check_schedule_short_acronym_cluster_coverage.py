@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""Fail closed on short acronym members hidden inside slash-delimited Schedule context.
+"""Fail closed on acronym members hidden inside slash-delimited Schedule context.
 
-Only 2-3 character uppercase/alphanumeric tokens immediately adjacent to ``/`` are in
-scope here. This deliberately narrow syntax catches identity-like members such as ``NPM``
-without turning standalone statutes/codes into identity debt. Current exact State-safe
-ABox identities need no overlay; otherwise each surface must have an exact blob-pinned
-reviewed disposition of ``deferred`` or ``rejected``.
+This guard is activated by a 2-3 character uppercase/alphanumeric member adjacent to ``/``.
+Once such a short member establishes a slash cluster, every connected uppercase/alphanumeric
+acronym-sized member in that cluster is audited. This catches mixed clusters such as
+``NPM/IMIS`` and ``NCHR/AB`` without duplicating the all-long cluster coverage already
+provided by the adversarial residual-identity guard. Balanced punctuation wrappers around
+cluster members are ignored for slash adjacency, while alphanumeric/hyphen compound
+boundaries remain excluded.
+
+Current exact State-safe ABox identities need no overlay; otherwise each emitted surface must
+have an exact blob-pinned reviewed disposition of ``deferred`` or ``rejected``. Multi-record
+document-root metadata is always rejected before materialization is considered because it has
+no State scope.
 
 This guard is representational only. It never creates actor/project roles, participation,
 control, operation, membership, supply, culpability, evidence, or governance semantics.
@@ -23,20 +30,104 @@ import check_schedule_exact_identity_completeness as exact
 
 OVERLAY = schedule.ROOT / "knowledge" / "generated" / "schedule-short-acronym-cluster-dispositions-v1.json"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-SHORT_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9-])([A-Z][A-Z0-9]{1,2})(?![A-Za-z0-9-])")
+ACRONYM_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9-])([A-Z][A-Z0-9]{1,})(?![A-Za-z0-9-])")
 VALID_DISPOSITIONS = {"deferred", "rejected"}
+WRAPPER_PAIRS = {
+    "(": ")",
+    "[": "]",
+    "{": "}",
+    '"': '"',
+    "'": "'",
+    "“": "”",
+    "‘": "’",
+}
 
 
-def short_slash_acronyms(raw: str) -> list[str]:
-    """Return distinct 2-3 char uppercase members directly adjacent to a slash."""
-    labels: list[str] = []
-    for match in SHORT_TOKEN_RE.finditer(raw):
-        before = raw[:match.start()].rstrip()
-        after = raw[match.end():].lstrip()
-        if not (before.endswith("/") or after.startswith("/")):
+def _wrapped_span(raw: str, start: int, end: int) -> tuple[int, int]:
+    """Expand an acronym token across immediately balanced punctuation wrappers."""
+    while True:
+        left = start
+        while left > 0 and raw[left - 1].isspace():
+            left -= 1
+        right = end
+        while right < len(raw) and raw[right].isspace():
+            right += 1
+        if left <= 0 or right >= len(raw):
+            return start, end
+        opening = raw[left - 1]
+        closing = raw[right]
+        if WRAPPER_PAIRS.get(opening) != closing:
+            return start, end
+        start, end = left - 1, right + 1
+
+
+def slash_cluster_acronyms(raw: str) -> list[str]:
+    """Return acronym members from slash clusters activated by at least one 2-3 char member.
+
+    Every eligible token must be a complete uppercase/alphanumeric surface, not a fragment of
+    an alphanumeric or hyphenated compound. A slash can be separated from a token by whitespace
+    and balanced wrappers such as ``(NPM)``, ``[AB]`` or ``“AB”``.
+    """
+    candidates: list[dict] = []
+    for match in ACRONYM_TOKEN_RE.finditer(raw):
+        wrapped_start, wrapped_end = _wrapped_span(raw, match.start(), match.end())
+        candidates.append({
+            "token": match.group(1),
+            "start": match.start(),
+            "end": match.end(),
+            "wrapped_start": wrapped_start,
+            "wrapped_end": wrapped_end,
+        })
+    if not candidates:
+        return []
+
+    graph: dict[int, set[int]] = {index: set() for index in range(len(candidates))}
+    touched: set[int] = set()
+
+    for slash_index, char in enumerate(raw):
+        if char != "/":
             continue
-        token = match.group(1)
-        if token not in labels:
+        left_candidates = [
+            index for index, candidate in enumerate(candidates)
+            if candidate["wrapped_end"] <= slash_index
+            and not raw[candidate["wrapped_end"]:slash_index].strip()
+        ]
+        right_candidates = [
+            index for index, candidate in enumerate(candidates)
+            if candidate["wrapped_start"] > slash_index
+            and not raw[slash_index + 1:candidate["wrapped_start"]].strip()
+        ]
+        left = max(left_candidates, key=lambda index: candidates[index]["wrapped_end"], default=None)
+        right = min(right_candidates, key=lambda index: candidates[index]["wrapped_start"], default=None)
+        if left is not None:
+            touched.add(left)
+        if right is not None:
+            touched.add(right)
+        if left is not None and right is not None:
+            graph[left].add(right)
+            graph[right].add(left)
+
+    active: set[int] = set()
+    visited: set[int] = set()
+    for index in sorted(touched):
+        if index in visited:
+            continue
+        stack = [index]
+        component: set[int] = set()
+        while stack:
+            current = stack.pop()
+            if current in component:
+                continue
+            component.add(current)
+            visited.add(current)
+            stack.extend(graph[current] - component)
+        if any(2 <= len(candidates[item]["token"]) <= 3 for item in component):
+            active.update(component)
+
+    labels: list[str] = []
+    for index, candidate in enumerate(candidates):
+        token = candidate["token"]
+        if index in active and token not in labels:
             labels.append(token)
     return labels
 
@@ -101,10 +192,10 @@ def load_overlay() -> list[dict]:
         if not isinstance(entry["raw"], str) or not entry["raw"]:
             raise ValueError(f"invalid short-acronym raw value at #{index}")
         label = entry["identity_surface"]
-        if not isinstance(label, str) or not SHORT_TOKEN_RE.fullmatch(label):
-            raise ValueError(f"invalid short-acronym identity_surface at #{index}: {label!r}")
-        if label not in short_slash_acronyms(entry["raw"]):
-            raise ValueError(f"short-acronym surface is not slash-adjacent in raw value at #{index}: {label!r}")
+        if not isinstance(label, str) or not ACRONYM_TOKEN_RE.fullmatch(label):
+            raise ValueError(f"invalid slash-acronym identity_surface at #{index}: {label!r}")
+        if label not in slash_cluster_acronyms(entry["raw"]):
+            raise ValueError(f"slash-acronym surface is not in a short-activated slash cluster at #{index}: {label!r}")
         if not isinstance(entry["reason"], str) or not entry["reason"].strip():
             raise ValueError(f"missing short-acronym reason at #{index}")
         key = (
@@ -144,15 +235,24 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
     for row in rows:
         raw = row.get("raw") or ""
         state = row.get("state")
-        for label in short_slash_acronyms(raw):
-            materialized = exact_materialized_ids(label, entities, identity_index, state)
+        for label in slash_cluster_acronyms(raw):
             key = overlay_key(row, label)
             entry = by_key.get(key)
 
+            if row.get("document_root"):
+                found.append({
+                    "reason": "identity-like slash acronym in multi-record document-root metadata is outside State-scoped audit",
+                    "state": state, "kind": row.get("kind"), "field": row.get("field"),
+                    "source": row.get("source"), "record_index": row.get("record_index"),
+                    "raw": raw, "identity_surface": label,
+                })
+                continue
+
+            materialized = exact_materialized_ids(label, entities, identity_index, state)
             if materialized:
                 if entry is not None:
                     found.append({
-                        "reason": "short slash acronym now materializes exactly but still has a reviewed disposition",
+                        "reason": "slash acronym now materializes exactly but still has a reviewed disposition",
                         "state": state, "kind": row.get("kind"), "field": row.get("field"),
                         "source": row.get("source"), "record_index": row.get("record_index"),
                         "raw": raw, "identity_surface": label, "materialized_ids": materialized,
@@ -160,18 +260,9 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
                     uses[key] += 1
                 continue
 
-            if row.get("document_root"):
-                found.append({
-                    "reason": "identity-like short slash acronym in multi-record document-root metadata is outside State-scoped audit",
-                    "state": state, "kind": row.get("kind"), "field": row.get("field"),
-                    "source": row.get("source"), "record_index": row.get("record_index"),
-                    "raw": raw, "identity_surface": label,
-                })
-                continue
-
             if entry is None:
                 found.append({
-                    "reason": "unmaterialized short slash acronym lacks exact reviewed disposition",
+                    "reason": "unmaterialized slash acronym in short-activated cluster lacks exact reviewed disposition",
                     "state": state, "kind": row.get("kind"), "field": row.get("field"),
                     "source": row.get("source"), "record_index": row.get("record_index"),
                     "raw": raw, "identity_surface": label,
@@ -183,7 +274,7 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
         count = uses[key]
         if count != 1:
             found.append({
-                "reason": "short-acronym reviewed disposition is stale or non-unique",
+                "reason": "slash-acronym reviewed disposition is stale or non-unique",
                 "source": entry["source"], "state": entry["state"], "field": entry["field"],
                 "record_index": entry["record_index"], "raw": entry["raw"],
                 "identity_surface": entry["identity_surface"], "uses": count,
@@ -192,19 +283,24 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
 
 
 def self_test() -> None:
-    assert short_slash_acronyms("National Human Rights Commission/NPM") == ["NPM"]
-    assert short_slash_acronyms("National Human Rights Commission/NPM.") == ["NPM"]
-    assert short_slash_acronyms("relevant maritime/SAR units") == ["SAR"]
-    assert short_slash_acronyms("actual PTA/counterterrorism detention") == ["PTA"]
-    assert short_slash_acronyms("NCHR/AB.") == ["AB"]
-    assert short_slash_acronyms("M23/oversight") == ["M23"]
-    assert short_slash_acronyms("DGM / CESFRONT") == ["DGM"]
-    assert short_slash_acronyms("FARDC-backed CMC-FDP / Wazalendo") == []
-    assert short_slash_acronyms("NPM-X/oversight") == []
-    assert short_slash_acronyms("NAPOLCOM/IMIS") == []
+    assert slash_cluster_acronyms("National Human Rights Commission/NPM") == ["NPM"]
+    assert slash_cluster_acronyms("National Human Rights Commission/NPM.") == ["NPM"]
+    assert slash_cluster_acronyms("National Human Rights Commission/(NPM)") == ["NPM"]
+    assert slash_cluster_acronyms("relevant maritime/SAR units") == ["SAR"]
+    assert slash_cluster_acronyms("actual PTA/counterterrorism detention") == ["PTA"]
+    assert slash_cluster_acronyms("NCHR/AB.") == ["NCHR", "AB"]
+    assert slash_cluster_acronyms("NCHR/[AB]") == ["NCHR", "AB"]
+    assert slash_cluster_acronyms("NCHR/“AB”") == ["NCHR", "AB"]
+    assert slash_cluster_acronyms("NPM/IMIS") == ["NPM", "IMIS"]
+    assert slash_cluster_acronyms("M23/SEMAR") == ["M23", "SEMAR"]
+    assert slash_cluster_acronyms("M23/oversight") == ["M23"]
+    assert slash_cluster_acronyms("DGM / CESFRONT") == ["DGM", "CESFRONT"]
+    assert slash_cluster_acronyms("FARDC-backed CMC-FDP / Wazalendo") == []
+    assert slash_cluster_acronyms("NPM-X/oversight") == []
+    assert slash_cluster_acronyms("NAPOLCOM/IMIS") == []
     overlay = load_overlay()
     assert {entry["identity_surface"] for entry in overlay} == {"SAR", "PTA", "NPM", "ICT"}
-    print("Schedule short slash-acronym coverage self-test: OK")
+    print("Schedule slash-acronym cluster coverage self-test: OK")
 
 
 def main() -> int:
@@ -225,7 +321,7 @@ def main() -> int:
 
     counts = Counter(entry["disposition"] for entry in overlay)
     print(
-        "Schedule short slash-acronym coverage: OK "
+        "Schedule slash-acronym cluster coverage: OK "
         f"({len(overlay)} reviewed; {counts['deferred']} deferred; {counts['rejected']} rejected)"
     )
     return 0
