@@ -6,8 +6,8 @@ capacity tails. This companion guard independently covers the equally natural fo
 ``Jane Doe (in an advisory capacity)`` including terminal punctuation, common
 quote/Markdown wrappers, an optional second comma-delimited capacity condition, and
 high-confidence actor lists. Ambiguous comma/``and`` separators are accepted only outside
-an exact current non-Person actor anchor, matching the main parser's protection for names
-such as ``Ministry of Interior and Narcotics Control``.
+an exact current State-safe actor anchor. Both non-Person and Person anchors are supported,
+while separators inside a materialized organization remain protected.
 
 This is identity-completeness only: it never creates actor participation, control,
 operation, supply, culpability, membership, or governance semantics.
@@ -117,14 +117,68 @@ def _anchored_segments(raw: str, anchor_spans: list[tuple[int, int]]) -> list[st
     return [segment for index, (_, _, segment) in enumerate(segments) if index not in anchored_indexes]
 
 
+def exact_person_actor_spans(
+    raw: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+) -> list[tuple[int, int]]:
+    """Return spans of exact current State-safe Person identities in actor text."""
+    spans: list[tuple[int, int]] = []
+    for entity in entities:
+        if entity.get("type") != "Person":
+            continue
+        entity_id = entity.get("id")
+        if not isinstance(entity_id, str) or not strict.eligible_in_state(identity_index, entity_id, state):
+            continue
+
+        forms = entity.get("surface_forms")
+        if not forms:
+            values = [entity.get("name"), *(entity.get("aliases") or [])]
+            forms = [
+                {"text": value, "normalized": schedule.norm(value)}
+                for value in values
+                if isinstance(value, str) and value.strip()
+            ]
+        for form in forms:
+            text = form.get("text") or ""
+            if not text:
+                continue
+            normalized = form.get("normalized") or schedule.norm(text)
+            tokens = normalized.split()
+            if not tokens:
+                continue
+            if exact.looks_like_acronym_surface(text):
+                pattern = rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])"
+                flags = 0
+            else:
+                pattern = r"(?<![A-Za-z0-9])" + r"[^A-Za-z0-9]+".join(map(re.escape, tokens)) + r"(?![A-Za-z0-9])"
+                flags = re.I
+            spans.extend(match.span() for match in re.finditer(pattern, raw, flags))
+    return sorted(set(spans))
+
+
+def exact_actor_anchor_spans(
+    raw: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+) -> list[tuple[int, int]]:
+    """Combine exact non-Person and Person actor anchors without changing row bindings."""
+    return sorted(set(
+        strict.exact_non_person_actor_spans(raw, entities, identity_index, state)
+        + exact_person_actor_spans(raw, entities, identity_index, state)
+    ))
+
+
 def anchored_parenthesized_actor_mentions(
     raw: str,
     entities: list[dict],
     identity_index,
     state: str | None,
 ) -> list[str]:
-    """Parse parenthesized actors after ambiguous list separators only when an exact anchor exists."""
-    anchor_spans = strict.exact_non_person_actor_spans(raw, entities, identity_index, state)
+    """Parse parenthesized actors after ambiguous separators only when an exact actor anchor exists."""
+    anchor_spans = exact_actor_anchor_spans(raw, entities, identity_index, state)
     out: list[str] = []
     for segment in _anchored_segments(raw, anchor_spans):
         mention = parenthesized_actor_component(segment)
@@ -205,6 +259,14 @@ def self_test() -> None:
     ministry = "Ministry of Interior and Narcotics Control and Jane Doe (in an advisory capacity)."
     ministry_span = (0, len("Ministry of Interior and Narcotics Control"))
     assert [parenthesized_actor_component(part) for part in _anchored_segments(ministry, [ministry_span])] == ["Jane Doe"]
+
+    fake_entities = [{"id": "PERSON-TUR-ESRA-ISIK", "type": "Person", "name": "Esra Işık", "aliases": []}]
+    fake_index = strict.build_name_index(fake_entities, state_codes={"TUR", "USA"}, normalizer=schedule.norm)
+    person_raw = "Esra Işık and Jane Doe (in an advisory capacity)."
+    assert exact_person_actor_spans(person_raw, fake_entities, fake_index, "TUR") == [(0, len("Esra Işık"))]
+    assert exact_person_actor_spans(person_raw, fake_entities, fake_index, "USA") == []
+    esra_span = (0, len("Esra Işık"))
+    assert [parenthesized_actor_component(part) for part in _anchored_segments(person_raw, [esra_span])] == ["Jane Doe"]
 
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)"
