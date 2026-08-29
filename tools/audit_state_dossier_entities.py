@@ -48,6 +48,7 @@ ACRONYM_STOP = {
     "UPHOLD", "UPHELD", "NARROW", "DEFINE", "DOWNGRADE", "ESCALATE", "RETAIN",
     "REMOVE", "REVIEW", "ADVERSARIAL", "UNKNOWN", "TODO", "TBD",
 }
+FRONTMATTER_IDENTITY_FIELDS = ("provisional_scope", "adversarial_result")
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
@@ -178,6 +179,70 @@ def material_section(section: str) -> bool:
     ))
 
 
+def extract_candidates(
+    text: str,
+    identity_index,
+    identity_ids: set[str],
+    state: str,
+) -> list[tuple[str, str, str | None]]:
+    """Apply the broad body-prose candidate extractor to one textual surface."""
+    line = URL_RE.sub("", text)
+    line = MD_LINK_RE.sub(lambda match: match.group(1), line)
+    if not line.strip() or line.lstrip().startswith("#"):
+        return []
+
+    extracted: list[tuple[str, str, str | None]] = []
+    for match in INLINE_CODE_RE.finditer(line):
+        value = clean_candidate(match.group(1))
+        if ENTITY_ID_RE.fullmatch(value):
+            extracted.append((value, "id-reference", value if value in identity_ids else None))
+        elif looks_named_opaque(value):
+            extracted.append((value, "opaque-name", resolve_name(identity_index, state, value)))
+    for match in QUOTED_RE.finditer(line):
+        value = clean_candidate(match.group(1))
+        if looks_named_opaque(value):
+            extracted.append((value, "quoted-name", resolve_name(identity_index, state, value)))
+    for match in TITLE_RE.finditer(line):
+        value = clean_candidate(match.group(0))
+        kind = classify(value)
+        if kind and plausible(value):
+            extracted.append((value, kind, resolve_name(identity_index, state, value)))
+    for match in ACRONYM_RE.finditer(line):
+        value = match.group(0)
+        if plausible(value) and value not in ACRONYM_STOP and not value.endswith("-"):
+            extracted.append((value, "acronym-review", resolve_name(identity_index, state, value)))
+
+    out: list[tuple[str, str, str | None]] = []
+    seen: set[tuple[str, str]] = set()
+    for value, kind, resolved in extracted:
+        marker = (norm(value), kind)
+        if marker in seen:
+            continue
+        seen.add(marker)
+        out.append((value, kind, resolved))
+    return out
+
+
+def frontmatter_identity_values(text: str, front: dict[str, str]) -> list[tuple[str, int, str]]:
+    """Return the two reviewed identity-bearing textual frontmatter fields with source lines."""
+    line_numbers: dict[str, int] = {}
+    match = FRONT_RE.match(text)
+    if match:
+        for lineno, raw in enumerate(match.group(1).splitlines(), 2):
+            if ":" not in raw:
+                continue
+            key = raw.split(":", 1)[0].strip()
+            if key in FRONTMATTER_IDENTITY_FIELDS and key not in line_numbers:
+                line_numbers[key] = lineno
+
+    rows: list[tuple[str, int, str]] = []
+    for field in FRONTMATTER_IDENTITY_FIELDS:
+        value = front.get(field)
+        if isinstance(value, str) and value.strip():
+            rows.append((field, line_numbers.get(field, 1), value))
+    return rows
+
+
 @dataclass(frozen=True)
 class Occurrence:
     candidate: str
@@ -204,51 +269,40 @@ def iter_occurrences(
     line_offset = text[:body_offset].count("\n")
     state = front["iso3"]
     outcome = front.get("provisional_outcome")
-    section = "preamble"
+    dossier = str(path.relative_to(ROOT))
 
+    # These are the only frontmatter fields whose contract explicitly permits identity-bearing
+    # prose. Feed them through exactly the same extractor/resolver as body prose so a tree-ratchet
+    # refresh cannot turn frontmatter into an identity-review side channel.
+    for field, lineno, raw in frontmatter_identity_values(text, front):
+        for value, kind, resolved in extract_candidates(raw, identity_index, identity_ids, state):
+            yield Occurrence(
+                candidate=value,
+                normalized=norm(value),
+                kind=kind,
+                dossier=dossier,
+                state=state,
+                outcome=outcome,
+                section=f"frontmatter:{field}",
+                line=lineno,
+                snippet=f"{field}: {raw}"[:360],
+                resolved_id=resolved,
+            )
+
+    section = "preamble"
     for relative_lineno, raw in enumerate(body.splitlines(), 1):
         lineno = line_offset + relative_lineno
         heading = HEADING_RE.match(raw)
         if heading:
             section = heading.group(1).strip()
             continue
-        line = URL_RE.sub("", raw)
-        line = MD_LINK_RE.sub(lambda match: match.group(1), line)
-        if not line.strip() or line.lstrip().startswith("#"):
-            continue
 
-        extracted: list[tuple[str, str, str | None]] = []
-        for match in INLINE_CODE_RE.finditer(line):
-            value = clean_candidate(match.group(1))
-            if ENTITY_ID_RE.fullmatch(value):
-                extracted.append((value, "id-reference", value if value in identity_ids else None))
-            elif looks_named_opaque(value):
-                extracted.append((value, "opaque-name", resolve_name(identity_index, state, value)))
-        for match in QUOTED_RE.finditer(line):
-            value = clean_candidate(match.group(1))
-            if looks_named_opaque(value):
-                extracted.append((value, "quoted-name", resolve_name(identity_index, state, value)))
-        for match in TITLE_RE.finditer(line):
-            value = clean_candidate(match.group(0))
-            kind = classify(value)
-            if kind and plausible(value):
-                extracted.append((value, kind, resolve_name(identity_index, state, value)))
-        for match in ACRONYM_RE.finditer(line):
-            value = match.group(0)
-            if plausible(value) and value not in ACRONYM_STOP and not value.endswith("-"):
-                extracted.append((value, "acronym-review", resolve_name(identity_index, state, value)))
-
-        seen_line: set[tuple[str, str]] = set()
-        for value, kind, resolved in extracted:
-            marker = (norm(value), kind)
-            if marker in seen_line:
-                continue
-            seen_line.add(marker)
+        for value, kind, resolved in extract_candidates(raw, identity_index, identity_ids, state):
             yield Occurrence(
                 candidate=value,
                 normalized=norm(value),
                 kind=kind,
-                dossier=str(path.relative_to(ROOT)),
+                dossier=dossier,
                 state=state,
                 outcome=outcome,
                 section=section,
@@ -398,8 +452,30 @@ def self_test() -> None:
     assert not plausible("../../reviews/2026/foo.md")
     assert not plausible("UPHOLD")
     assert plausible("OHCHR")
-    front, offset = parse_frontmatter("---\nid: ECL-STATE-DNK\niso3: DNK\n---\n# Denmark\n")
+    sample = (
+        "---\n"
+        "id: ECL-STATE-DNK\n"
+        "iso3: DNK\n"
+        "provisional_scope: \"NCCIA project\"\n"
+        "adversarial_result: Operation Aurora remains in scope\n"
+        "issue: Human Rights Watch\n"
+        "---\n"
+        "# Denmark\n"
+    )
+    front, offset = parse_frontmatter(sample)
     assert front["iso3"] == "DNK" and offset > 0
+    assert frontmatter_identity_values(sample, front) == [
+        ("provisional_scope", 4, "NCCIA project"),
+        ("adversarial_result", 5, "Operation Aurora remains in scope"),
+    ]
+    empty_index = build_name_index([], state_codes={"DNK"}, normalizer=norm)
+    scope_candidates = extract_candidates(front["provisional_scope"], empty_index, set(), "DNK")
+    result_candidates = extract_candidates(front["adversarial_result"], empty_index, set(), "DNK")
+    assert any(value == "NCCIA" and kind == "acronym-review" for value, kind, _ in scope_candidates)
+    assert any(
+        value == "Operation Aurora" and kind == "project-or-deployment"
+        for value, kind, _ in result_candidates
+    )
     resolution_self_test()
     print("entity audit self-test: OK")
 
