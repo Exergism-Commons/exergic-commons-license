@@ -30,6 +30,7 @@ from entity_identity_resolution import build_name_index
 
 
 ALTERNATIVE_SEPARATOR_RE = re.compile(r"\s+(?:and\s*/\s*or|and-or|or)\s+", re.I)
+STRONG_ACTOR_SEPARATOR_RE = re.compile(r"\s*(?:/|;)\s*")
 # Record-level ``dossier`` is ordinary schema metadata and remains excluded by the
 # adversarial scanner. At a multi-record document root there is no State-scoped record,
 # however, so a root ``dossier`` value must be inspected rather than skipped.
@@ -113,8 +114,56 @@ def document_root_failures(entities: list[dict]) -> list[dict]:
     return found
 
 
+def _actor_remainders_beside_anchors(segment: str, anchor_spans: list[tuple[int, int]]) -> list[str]:
+    """Return actor-list fragments beside exact anchors without splitting anchor text.
+
+    An ``or`` side may itself be a mixed actor list, for example
+    ``Human Rights Watch and Jane Doe``. Dropping that whole side because it contains the
+    HRW anchor also drops Jane Doe. Re-segment the side on ordinary actor separators, but
+    only outside exact anchor spans, and return every segment that does not contain an
+    anchor. Strong ``/`` and ``;`` separators are included because they create the same
+    mixed-separator bypass when combined with a later ``or``.
+    """
+    if not anchor_spans:
+        return []
+
+    separators: list[tuple[int, int]] = []
+    for match in strict.ACTOR_LIST_SEPARATOR_RE.finditer(segment):
+        if strict._inside_span(match.start(), anchor_spans):
+            continue
+        token = match.group(0)
+        if token.lstrip().startswith(",") and strict.CAPACITY_TAIL_RE.match(segment[match.end():].lstrip()):
+            continue
+        separators.append(match.span())
+    for match in STRONG_ACTOR_SEPARATOR_RE.finditer(segment):
+        if strict._inside_span(match.start(), anchor_spans):
+            continue
+        separators.append(match.span())
+
+    if not separators:
+        return []
+    separators = sorted(set(separators))
+
+    pieces: list[tuple[int, int, str]] = []
+    start = 0
+    for sep_start, sep_end in separators:
+        if sep_start < start:
+            continue
+        pieces.append((start, sep_start, segment[start:sep_start]))
+        start = sep_end
+    pieces.append((start, len(segment), segment[start:]))
+
+    out: list[str] = []
+    for piece_start, piece_end, piece in pieces:
+        if any(piece_start <= anchor_start and anchor_end <= piece_end for anchor_start, anchor_end in anchor_spans):
+            continue
+        if piece.strip():
+            out.append(piece)
+    return out
+
+
 def _alternative_segments(raw: str, anchor_spans: list[tuple[int, int]]) -> list[str]:
-    """Return non-anchor segments split on ``or`` / ``and/or`` outside exact anchors."""
+    """Return non-anchor actor fragments split on alternatives outside exact anchors."""
     if not anchor_spans:
         return []
     separators: list[tuple[int, int]] = []
@@ -139,7 +188,21 @@ def _alternative_segments(raw: str, anchor_spans: list[tuple[int, int]]) -> list
     }
     if not anchored_indexes:
         return []
-    return [segment for index, (_, _, segment) in enumerate(segments) if index not in anchored_indexes]
+
+    out: list[str] = []
+    for index, (seg_start, seg_end, segment) in enumerate(segments):
+        if index not in anchored_indexes:
+            if segment.strip():
+                out.append(segment)
+            continue
+
+        local_anchor_spans = [
+            (anchor_start - seg_start, anchor_end - seg_start)
+            for anchor_start, anchor_end in anchor_spans
+            if seg_start <= anchor_start and anchor_end <= seg_end
+        ]
+        out.extend(_actor_remainders_beside_anchors(segment, local_anchor_spans))
+    return out
 
 
 def actor_alternative_mentions(
@@ -252,6 +315,21 @@ def self_test() -> None:
     assert actor_alternative_mentions("Esra Işık or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
     assert actor_alternative_mentions("Jane Doe or John Smith", entities, identity_index, "AAA") == []
 
+    # Mixed separators must preserve unknown actors that share an ``or`` side with an
+    # exact anchor instead of dropping the entire anchored side.
+    assert actor_alternative_mentions(
+        "Human Rights Watch and Jane Doe or John Smith", entities, identity_index, "AAA"
+    ) == ["Jane Doe", "John Smith"]
+    assert actor_alternative_mentions(
+        "Human Rights Watch / Jane Doe or John Smith", entities, identity_index, "AAA"
+    ) == ["Jane Doe", "John Smith"]
+    assert actor_alternative_mentions(
+        "Truth or Reconciliation Institute and Jane Doe or John Smith", entities, identity_index, "AAA"
+    ) == ["Jane Doe", "John Smith"]
+    assert actor_alternative_mentions(
+        "Human Rights Watch and Jane Doe or John Smith and Esra Işık", entities, identity_index, "AAA"
+    ) == ["Jane Doe", "John Smith"]
+
     bypass = {"references": [{
         "kind": "actor-reference",
         "state": "AAA",
@@ -269,6 +347,27 @@ def self_test() -> None:
         "Human Rights Watch is bound exactly; Jane Doe remains explicitly identity-deferred pending materialization."
     )
     assert actor_alternative_failures(bypass, entities, identity_index) == []
+
+    mixed_bypass = {"references": [{
+        "kind": "actor-reference",
+        "state": "AAA",
+        "field": "candidate_parties",
+        "source": "x.yml",
+        "raw": "Human Rights Watch and Jane Doe or John Smith",
+        "status": "partial-deferred",
+        "resolution_source": "reviewed-disposition",
+        "resolved_ids": ["ORG-HRW"],
+        "disposition_reason": (
+            "Human Rights Watch is bound exactly; John Smith remains explicitly identity-deferred pending materialization."
+        ),
+    }]}
+    problems = actor_alternative_failures(mixed_bypass, entities, identity_index)
+    assert [item.get("name") for item in problems] == ["Jane Doe"]
+    mixed_bypass["references"][0]["disposition_reason"] = (
+        "Human Rights Watch is bound exactly; Jane Doe remains explicitly identity-deferred pending materialization; "
+        "John Smith remains explicitly identity-deferred pending materialization."
+    )
+    assert actor_alternative_failures(mixed_bypass, entities, identity_index) == []
     print("Schedule root/actor-alternative identity self-test: OK")
 
 
