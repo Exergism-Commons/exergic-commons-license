@@ -4,7 +4,8 @@
 The main named-identity parser recognizes ordinary actor components and reviewed comma
 capacity tails. This companion guard independently covers the equally natural form
 ``Jane Doe (in an advisory capacity)`` including terminal punctuation, common
-quote/Markdown wrappers, and an optional second comma-delimited capacity condition. It
+quote/Markdown wrappers, an optional second comma-delimited capacity condition, and
+high-confidence lists whose separator follows a completed parenthesized component. It
 is identity-completeness only: it never creates actor participation, control, operation,
 supply, culpability, membership, or governance semantics.
 """
@@ -20,6 +21,14 @@ import check_schedule_named_identity_strictness as strict
 
 
 PAREN_COMPONENT_RE = re.compile(r"^(.+?)\s*\(([^()]*)\)(.*)$", re.UNICODE)
+# `and`/`&`/comma are ambiguous inside ordinary organization names. They become strong
+# separators here only *after* a closed parenthesized component and before a new
+# capitalized/name-wrapped component. A lowercase second capacity tail such as
+# `), only where ...` therefore remains attached to the first actor.
+POST_CAPACITY_SEPARATOR_RE = re.compile(
+    r"(?<=\))\s*(?:and\b|&|,|—|–)\s+(?=[A-ZÀ-ÖØ-Þ\"'“‘\[\{*_`])",
+    re.UNICODE,
+)
 TRAILING_WRAPPERS = "\"'”’]}*_`"
 TRAILING_PUNCTUATION = ".!?,:"
 
@@ -36,10 +45,18 @@ def normalized_component(fragment: str) -> str:
     return cleaned.strip()
 
 
+def actor_capacity_fragments(raw: str) -> list[str]:
+    """Split only on separators that are unambiguous for this parenthesized-capacity form."""
+    out: list[str] = []
+    for strong in re.split(r"\s*(?:/|;)\s*", raw):
+        out.extend(part for part in POST_CAPACITY_SEPARATOR_RE.split(strong) if part.strip())
+    return out
+
+
 def parenthesized_actor_mentions(raw: str) -> list[str]:
     """Return complete names whose trailing parentheses contain recognized capacity prose."""
     out: list[str] = []
-    for fragment in re.split(r"\s*(?:/|;)\s*", raw):
+    for fragment in actor_capacity_fragments(raw):
         match = PAREN_COMPONENT_RE.fullmatch(normalized_component(fragment))
         if not match:
             continue
@@ -115,6 +132,15 @@ def self_test() -> None:
     assert parenthesized_actor_mentions(
         'Human Rights Watch / “Jane Doe (in an advisory capacity)”, acting only where participation is established'
     ) == ["Jane Doe"]
+    assert parenthesized_actor_mentions(
+        "Jane Doe (in an advisory capacity) and John Smith (serving only where participation is established)"
+    ) == ["Jane Doe", "John Smith"]
+    assert parenthesized_actor_mentions(
+        "Jane Doe (in an advisory capacity), John Smith (serving only where participation is established)"
+    ) == ["Jane Doe", "John Smith"]
+    assert parenthesized_actor_mentions(
+        "Jane Doe (in an advisory capacity) — John Smith (serving only where participation is established)"
+    ) == ["Jane Doe", "John Smith"]
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)"
     ) == []
