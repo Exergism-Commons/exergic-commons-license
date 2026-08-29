@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Fail closed on acronym members hidden inside slash-delimited Schedule context.
 
-This guard is activated by a 2-3 character uppercase/alphanumeric member adjacent to ``/``.
-Once such a short member establishes a slash cluster, every connected uppercase/alphanumeric
-acronym-sized member in that cluster is audited. This catches mixed clusters such as
-``NPM/IMIS`` and ``NCHR/AB`` without duplicating the all-long cluster coverage already
-provided by the adversarial residual-identity guard. Balanced punctuation wrappers around
-cluster members are ignored for slash adjacency, while alphanumeric/hyphen compound
-boundaries remain excluded.
+This guard is activated either by a 2-3 character uppercase/alphanumeric member adjacent to
+``/`` or by an all-long acronym cluster whose member is hidden behind balanced punctuation
+wrappers. Once activated, every connected uppercase/alphanumeric acronym-sized member in that
+cluster is audited. This catches mixed clusters such as ``NPM/IMIS`` and wrapped all-long
+clusters such as ``NAPOLCOM/(IMIS)`` without duplicating ordinary unwrapped all-long cluster
+coverage already provided by the adversarial residual-identity guard. Balanced punctuation
+wrappers around cluster members are ignored for slash adjacency, while alphanumeric/hyphen
+compound boundaries remain excluded.
 
 Current exact State-safe ABox identities need no overlay; otherwise each emitted surface must
 have an exact blob-pinned reviewed disposition of ``deferred`` or ``rejected``. Multi-record
@@ -62,11 +63,15 @@ def _wrapped_span(raw: str, start: int, end: int) -> tuple[int, int]:
 
 
 def slash_cluster_acronyms(raw: str) -> list[str]:
-    """Return acronym members from slash clusters activated by at least one 2-3 char member.
+    """Return acronym members from short-activated or wrapper-hidden slash clusters.
 
     Every eligible token must be a complete uppercase/alphanumeric surface, not a fragment of
     an alphanumeric or hyphenated compound. A slash can be separated from a token by whitespace
-    and balanced wrappers such as ``(NPM)``, ``[AB]`` or ``“AB”``.
+    and balanced wrappers such as ``(NPM)``, ``[AB]`` or ``“IMIS”``.
+
+    Ordinary all-long unwrapped clusters remain out of scope here so the adversarial residual
+    checker remains their single owner. An all-long component is activated here only when it
+    contains at least two connected acronym members and at least one member is actually wrapped.
     """
     candidates: list[dict] = []
     for match in ACRONYM_TOKEN_RE.finditer(raw):
@@ -121,7 +126,19 @@ def slash_cluster_acronyms(raw: str) -> list[str]:
             component.add(current)
             visited.add(current)
             stack.extend(graph[current] - component)
-        if any(2 <= len(candidates[item]["token"]) <= 3 for item in component):
+
+        has_short_member = any(2 <= len(candidates[item]["token"]) <= 3 for item in component)
+        has_wrapped_member = any(
+            candidates[item]["wrapped_start"] != candidates[item]["start"]
+            or candidates[item]["wrapped_end"] != candidates[item]["end"]
+            for item in component
+        )
+        wrapped_all_long_cluster = (
+            len(component) >= 2
+            and all(len(candidates[item]["token"]) >= 4 for item in component)
+            and has_wrapped_member
+        )
+        if has_short_member or wrapped_all_long_cluster:
             active.update(component)
 
     labels: list[str] = []
@@ -195,7 +212,7 @@ def load_overlay() -> list[dict]:
         if not isinstance(label, str) or not ACRONYM_TOKEN_RE.fullmatch(label):
             raise ValueError(f"invalid slash-acronym identity_surface at #{index}: {label!r}")
         if label not in slash_cluster_acronyms(entry["raw"]):
-            raise ValueError(f"slash-acronym surface is not in a short-activated slash cluster at #{index}: {label!r}")
+            raise ValueError(f"slash-acronym surface is not in an audited slash cluster at #{index}: {label!r}")
         if not isinstance(entry["reason"], str) or not entry["reason"].strip():
             raise ValueError(f"missing short-acronym reason at #{index}")
         key = (
@@ -262,7 +279,7 @@ def failures(report: dict, entities: list[dict], identity_index, overlay: list[d
 
             if entry is None:
                 found.append({
-                    "reason": "unmaterialized slash acronym in short-activated cluster lacks exact reviewed disposition",
+                    "reason": "unmaterialized slash acronym in audited cluster lacks exact reviewed disposition",
                     "state": state, "kind": row.get("kind"), "field": row.get("field"),
                     "source": row.get("source"), "record_index": row.get("record_index"),
                     "raw": raw, "identity_surface": label,
@@ -297,7 +314,16 @@ def self_test() -> None:
     assert slash_cluster_acronyms("DGM / CESFRONT") == ["DGM", "CESFRONT"]
     assert slash_cluster_acronyms("FARDC-backed CMC-FDP / Wazalendo") == []
     assert slash_cluster_acronyms("NPM-X/oversight") == []
+    # Ordinary all-long clusters remain owned by the adversarial residual checker.
     assert slash_cluster_acronyms("NAPOLCOM/IMIS") == []
+    # Wrapper-hidden all-long clusters are owned here because the ordinary residual regex
+    # cannot see across the wrapper between slash and acronym.
+    assert slash_cluster_acronyms("NAPOLCOM/(IMIS)") == ["NAPOLCOM", "IMIS"]
+    assert slash_cluster_acronyms("NAPOLCOM/[IMIS]") == ["NAPOLCOM", "IMIS"]
+    assert slash_cluster_acronyms("NAPOLCOM/“IMIS”") == ["NAPOLCOM", "IMIS"]
+    assert slash_cluster_acronyms("(NAPOLCOM)/IMIS") == ["NAPOLCOM", "IMIS"]
+    # A single wrapped long token next to lowercase prose is not promoted into cluster debt.
+    assert slash_cluster_acronyms("(IMIS)/oversight") == []
     overlay = load_overlay()
     assert {entry["identity_surface"] for entry in overlay} == {"SAR", "PTA", "NPM", "ICT"}
     print("Schedule slash-acronym cluster coverage self-test: OK")
