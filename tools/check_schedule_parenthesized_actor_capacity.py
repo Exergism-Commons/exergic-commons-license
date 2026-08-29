@@ -3,10 +3,10 @@
 
 The main named-identity parser recognizes ordinary actor components and reviewed comma
 capacity tails. This companion guard independently covers the equally natural form
-``Jane Doe (in an advisory capacity)`` including terminal punctuation and common
-quote/Markdown wrappers. It is identity-completeness only: it never creates actor
-participation, control, operation, supply, culpability, membership, or governance
-semantics.
+``Jane Doe (in an advisory capacity)`` including terminal punctuation, common
+quote/Markdown wrappers, and an optional second comma-delimited capacity condition. It
+is identity-completeness only: it never creates actor participation, control, operation,
+supply, culpability, membership, or governance semantics.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
 
 
-PAREN_COMPONENT_RE = re.compile(r"^(.+?)\s*\(([^()]*)\)\s*[.!?,:]?\s*$", re.UNICODE)
+PAREN_COMPONENT_RE = re.compile(r"^(.+?)\s*\(([^()]*)\)(.*)$", re.UNICODE)
 TRAILING_WRAPPERS = "\"'”’]}*_`"
 TRAILING_PUNCTUATION = ".!?,:"
 
@@ -45,6 +45,18 @@ def parenthesized_actor_mentions(raw: str) -> list[str]:
             continue
         if not strict.CAPACITY_TAIL_RE.match(match.group(2).strip()):
             continue
+
+        suffix = match.group(3).strip()
+        # Quotes/Markdown/brackets may close the actor component immediately after `)`.
+        suffix = suffix.lstrip(TRAILING_WRAPPERS).strip()
+        if suffix:
+            # A second tail is allowed only through the same closed-world capacity grammar.
+            if not suffix.startswith(","):
+                continue
+            second_tail = suffix[1:].strip()
+            if not second_tail or not strict.CAPACITY_TAIL_RE.match(second_tail):
+                continue
+
         mention = strict.full_name_phrase(match.group(1).strip(), allow_all_caps=True)
         if mention and mention not in out:
             out.append(mention)
@@ -98,10 +110,19 @@ def self_test() -> None:
         "Human Rights Watch / [Jane Doe (in an advisory capacity)]"
     ) == ["Jane Doe"]
     assert parenthesized_actor_mentions(
+        "Human Rights Watch / Jane Doe (in an advisory capacity), only where participation is established"
+    ) == ["Jane Doe"]
+    assert parenthesized_actor_mentions(
+        'Human Rights Watch / “Jane Doe (in an advisory capacity)”, acting only where participation is established'
+    ) == ["Jane Doe"]
+    assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)"
     ) == []
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe (case note)."
+    ) == []
+    assert parenthesized_actor_mentions(
+        "Human Rights Watch / Jane Doe (in an advisory capacity), unrelated prose"
     ) == []
     assert parenthesized_actor_mentions(
         "Human Rights Watch / Jane Doe-Smith (in an advisory capacity),"
