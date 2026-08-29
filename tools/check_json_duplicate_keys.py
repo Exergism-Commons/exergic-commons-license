@@ -31,6 +31,10 @@ def checked_files() -> list[Path]:
         "state-dossier-review-ratchet.json",
         "entity-id-supersessions-v*.json",
         "schedule-reference-dispositions-v*.json",
+        "schedule-residual-identity-dispositions-v*.json",
+        "schedule-residual-identity-source-pins-v*.json",
+        "schedule-project-cross-role-identity-coverage-v*.json",
+        "schedule-short-acronym-cluster-dispositions-v*.json",
     )
     for pattern in patterns:
         files.extend(generated.glob(pattern))
