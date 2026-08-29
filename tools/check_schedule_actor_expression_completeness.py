@@ -47,6 +47,11 @@ WHOLE_SINGLE_IDENTITY_RE = re.compile(
     r"^[\"'“‘([{*_`]*([A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’.-]{1,})[\"'”’)]}*_`.,:;!?]*$",
     re.UNICODE,
 )
+TITLE_TOKEN_RE = re.compile(r"^[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’.-]*$", re.UNICODE)
+SINGLE_CONTEXT_WORDS = {
+    "federal", "regional", "local", "national", "state", "successor", "relevant",
+    "participating", "materially", "specific", "protected", "territorial", "municipal",
+}
 
 
 def _merge_spans(spans: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -221,8 +226,42 @@ def _add_unique(out: list[str], value: str | None) -> None:
             out.append(cleaned)
 
 
+def _specific_single_identity_token(token: str) -> bool:
+    """Reject title-cased legal adjectives while retaining real one-token actor surfaces."""
+    folded = token.casefold()
+    if folded in strict.STOPWORDS or folded in strict.PARTICLES or folded in SINGLE_CONTEXT_WORDS:
+        return False
+    if "-" in token:
+        parts = [part for part in token.split("-") if part]
+        if len(parts) < 2 or not all(part[0].isupper() for part in parts):
+            return exact.looks_like_acronym_surface(token)
+    return True
+
+
+def _complete_institution_surface(component: str, label: str) -> str | None:
+    """Accept only a maximal institution surface, never a stem extracted from richer prose."""
+    cleaned = parenthesized.normalized_component(component).strip(" \t\r\n\"'“”‘’[]{}*_`")
+    if not cleaned.casefold().startswith(label.casefold()):
+        return None
+    suffix = cleaned[len(label):].strip()
+    if not suffix:
+        return label
+
+    # Parenthesized translated/acronym locators may follow an otherwise complete surface.
+    if suffix.startswith("(") and suffix.endswith(")") and suffix.count("(") == suffix.count(")") == 1:
+        return label
+
+    # The adversarial institution parser can stop before a final proper locator token
+    # (e.g. ``Rescue Coordination Centre Malta``). Extend only when the entire remaining
+    # component is a short title-cased suffix; never swallow an em-dash locator or prose.
+    suffix_tokens = suffix.split()
+    if 1 <= len(suffix_tokens) <= 3 and all(TITLE_TOKEN_RE.fullmatch(token) for token in suffix_tokens):
+        return f"{label} {suffix}".strip()
+    return None
+
+
 def component_identity_surfaces(component: str) -> list[str]:
-    """Return high-confidence identity surfaces carried by one structural actor component."""
+    """Return high-confidence complete identity surfaces carried by one actor component."""
     out: list[str] = []
     normalized = parenthesized.normalized_component(component)
 
@@ -232,17 +271,16 @@ def component_identity_surfaces(component: str) -> list[str]:
     _add_unique(out, candidate)
 
     for label in adversarial.named_institution_labels(normalized):
-        # A bare type word such as ``Police`` is not specific enough to create new identity
-        # debt by itself. Multi-token institutions remain strong actor surfaces.
-        if len(schedule.norm(label).split()) >= 2:
-            _add_unique(out, label)
+        complete = _complete_institution_surface(normalized, label)
+        if complete and len(schedule.norm(complete).split()) >= 2:
+            _add_unique(out, complete)
 
     _add_unique(out, strict.full_name_phrase(normalized, allow_all_caps=True))
 
     single = WHOLE_SINGLE_IDENTITY_RE.fullmatch(normalized.strip())
     if single:
         token = single.group(1)
-        if token.casefold() not in strict.STOPWORDS and token.casefold() not in strict.PARTICLES:
+        if _specific_single_identity_token(token):
             _add_unique(out, token)
     return out
 
@@ -265,16 +303,15 @@ def capacity_identity_surfaces(raw: str) -> list[str]:
                 continue
 
             for label in adversarial.named_institution_labels(tail[:160]):
-                stripped = tail.lstrip(" \t\r\n\"'“‘([{*_`")
-                lowered = stripped.casefold()
-                if stripped.startswith(label) or lowered.startswith("the " + label.casefold()):
-                    _add_unique(out, label)
+                complete = _complete_institution_surface(tail[:160], label)
+                if complete:
+                    _add_unique(out, complete)
                     break
             else:
                 single = SINGLE_IDENTITY_RE.match(tail)
                 if single:
                     token = single.group(1)
-                    if token.casefold() not in strict.STOPWORDS and token.casefold() not in strict.PARTICLES:
+                    if _specific_single_identity_token(token):
                         _add_unique(out, token)
     return out
 
@@ -307,6 +344,30 @@ def exact_actor_ids_for_surface(
                 matches.add(entity_id)
                 break
     return matches
+
+
+def _bound_identity_extends_surface(surface: str, raw: str, bound_ids: set[str], by_id: dict[str, dict]) -> bool:
+    """Suppress only a parser stem proven to sit inside a longer exact bound surface in raw."""
+    surface_tokens = schedule.norm(surface).split()
+    raw_tokens = schedule.norm(raw).split()
+    if not surface_tokens:
+        return False
+    for entity_id in bound_ids:
+        entity = by_id.get(entity_id) or {}
+        forms = entity.get("surface_forms") or [
+            {"text": value, "normalized": schedule.norm(value)}
+            for value in [entity.get("name"), *(entity.get("aliases") or [])]
+            if isinstance(value, str) and value.strip()
+        ]
+        for form in forms:
+            normalized = form.get("normalized") or schedule.norm(form.get("text") or "")
+            form_tokens = normalized.split()
+            if len(form_tokens) <= len(surface_tokens) or form_tokens[:len(surface_tokens)] != surface_tokens:
+                continue
+            width = len(form_tokens)
+            if any(raw_tokens[index:index + width] == form_tokens for index in range(len(raw_tokens) - width + 1)):
+                return True
+    return False
 
 
 def explicitly_defers_surface(row: dict, surface: str) -> bool:
@@ -353,6 +414,8 @@ def failures(report: dict, entities: list[dict], by_id: dict[str, dict], identit
             _add_unique(surfaces, surface)
 
         for surface in surfaces:
+            if _bound_identity_extends_surface(surface, raw, bound_ids, by_id):
+                continue
             exact_ids = exact_actor_ids_for_surface(surface, entities, identity_index, state, bound_ids)
             if exact_ids:
                 missing = sorted(exact_ids - bound_ids)
@@ -419,6 +482,7 @@ def self_test() -> None:
         _entity("ORG-LEGER", "Organization", "Leger des Heils Jeugdbescherming & Reclassering"),
         _entity("AGENCY-AAA-MINISTRY", "Agency", "Ministry of Interior and Narcotics Control"),
         _entity("AGENCY-AAA-MEDIA", "Agency", "Maldives Media and Broadcasting Commission"),
+        _entity("AGENCY-AAA-RCC", "Agency", "Rescue Coordination Centre Malta"),
         _entity("PERSON-ESRA", "Person", "Esra Işık"),
         _entity("ORG-META", "Organization", "Meta"),
     ]
@@ -449,9 +513,14 @@ def self_test() -> None:
     ]
     assert actor_components("Leger des Heils Jeugdbescherming & Reclassering", entities, identity_index, "AAA") == []
 
-    # A protected anchor may never jump across a structural slash merely because normalized
-    # tokens happen to match an existing identity.
+    # Exact anchors are literal enough that actor punctuation cannot be normalized through.
     assert safe_actor_anchor_spans("Human / Rights Watch or Jane Doe", entities, identity_index, "AAA") == []
+
+    # Institution extraction must keep a complete proper locator rather than a parser stem.
+    assert component_identity_surfaces("Rescue Coordination Centre Malta") == ["Rescue Coordination Centre Malta"]
+    assert component_identity_surfaces(
+        "Police Directorate (Ravnateljstvo policije) — Border Directorate (Uprava za granicu)"
+    ) == []
 
     # Parenthesized and terminal capacity prose protects its own conjunctions, while an
     # external alternative remains structural.
@@ -469,6 +538,7 @@ def self_test() -> None:
     assert capacity_identity_surfaces("Jane Doe (acting with John Smith)") == ["John Smith"]
     assert capacity_identity_surfaces("Jane Doe, only where assisted by John Smith") == ["John Smith"]
     assert capacity_identity_surfaces("Jane Doe, acting with Meta") == ["Meta"]
+    assert capacity_identity_surfaces("Jane Doe, only where enforcing statute or State-security offences") == []
 
     # P1: no materialized anchor is required. Generic review cannot discharge either name.
     report = {"references": [_row("Jane Doe or John Smith")]}
