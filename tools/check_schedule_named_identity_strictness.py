@@ -145,10 +145,20 @@ def add_unique(out: list[str], mention: str, *, allow_all_caps: bool = False) ->
 
 def actor_component_name(fragment: str) -> str | None:
     """Return a complete actor-name component, allowing recognized capacity prose."""
-    cleaned = fragment.strip(" \t\r\n,;:()[]{}")
+    cleaned = fragment.strip(" \t\r\n,;:[]{}")
     direct = full_name_phrase(cleaned, allow_all_caps=True)
     if direct:
         return direct
+
+    # A trailing parenthesized capacity is equivalent to the already-supported comma tail,
+    # but only when its inner text begins with the same closed-world capacity grammar.
+    # Arbitrary parenthetical prose is deliberately not discarded.
+    parenthesized = re.fullmatch(r"(.+?)\s*\(([^()]*)\)\s*", cleaned)
+    if parenthesized and CAPACITY_TAIL_RE.match(parenthesized.group(2).strip()):
+        candidate = full_name_phrase(parenthesized.group(1), allow_all_caps=True)
+        if candidate:
+            return candidate
+
     if "," not in cleaned:
         return None
     head, tail = cleaned.split(",", 1)
@@ -494,6 +504,15 @@ def self_test() -> None:
         "Human Rights Watch / Jane Doe, in an advisory capacity", "actor-reference"
     )
     assert "Jane Doe" in strict_named_mentions(
+        "Human Rights Watch / Jane Doe (in an advisory capacity)", "actor-reference"
+    )
+    assert "Jane Doe" in strict_named_mentions(
+        "Human Rights Watch / Jane Doe (acting only where participation is established)", "actor-reference"
+    )
+    assert "Jane Doe" not in strict_named_mentions(
+        "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)", "actor-reference"
+    )
+    assert "Jane Doe" in strict_named_mentions(
         "Human Rights Watch / detention of Jane Doe pending trial", "actor-reference"
     )
     assert "MacPherson Mukuka" in strict_named_mentions(
@@ -536,6 +555,7 @@ def self_test() -> None:
         "Human Rights Watch & Jane Doe, in an advisory capacity",
         "Human Rights Watch, Jane Doe, only where participation is established",
         "Human-Rights Watch and Jane Doe, acting only where participation is established",
+        "Human Rights Watch and Jane Doe (in an advisory capacity)",
     ):
         assert anchored_actor_list_mentions(raw, synthetic, idx, "AAA") == ["Jane Doe"]
     assert anchored_actor_list_mentions(
@@ -554,6 +574,15 @@ def self_test() -> None:
         "Human Rights Watch is bound exactly; Jane Doe remains explicitly identity-deferred pending materialization."
     )
     assert failures(actor_bypass, synthetic, idx, []) == []
+
+    parenthesized_actor_bypass = {"references": [{
+        "kind": "actor-reference", "state": "AAA", "field": "candidate_parties", "source": "x.yml",
+        "raw": "Human Rights Watch / Jane Doe (in an advisory capacity)",
+        "status": "partial-deferred", "resolution_source": "reviewed-disposition", "resolved_ids": ["ORG-HRW"],
+        "disposition_reason": "Human Rights Watch is bound exactly; remaining actor context is deferred.",
+    }]}
+    found = failures(parenthesized_actor_bypass, synthetic, idx, [])
+    assert any(item.get("name") == "Jane Doe" for item in found)
 
     cue_bypass = {"references": [{
         "kind": "actor-reference", "state": "AAA", "field": "candidate_parties", "source": "x.yml",
