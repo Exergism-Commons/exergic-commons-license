@@ -17,6 +17,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
+import yaml
+
 from entity_identity_resolution import build_name_index, resolve_normalized, self_test as resolution_self_test
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,27 +79,33 @@ def clean_candidate(text: str) -> str:
     return re.sub(r"\s+", " ", text)
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str], int]:
+def parse_frontmatter(text: str) -> tuple[dict[str, object], int]:
+    """Parse YAML frontmatter without flattening block scalars into marker tokens."""
     match = FRONT_RE.match(text)
     if not match:
         return {}, 0
-    out: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        out[key.strip()] = value.strip().strip("\"'")
-    return out, match.end()
+    try:
+        loaded = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as exc:
+        raise ValueError(f"invalid State-dossier YAML frontmatter: {exc}") from exc
+    if loaded is None:
+        return {}, match.end()
+    if not isinstance(loaded, dict) or not all(isinstance(key, str) for key in loaded):
+        raise ValueError("State-dossier frontmatter must be a YAML mapping with string keys")
+    return dict(loaded), match.end()
 
 
-def canonical_state_dossiers() -> list[tuple[Path, dict[str, str], int]]:
-    dossiers: list[tuple[Path, dict[str, str], int]] = []
+def canonical_state_dossiers() -> list[tuple[Path, dict[str, object], int]]:
+    dossiers: list[tuple[Path, dict[str, object], int]] = []
     seen_iso: set[str] = set()
     for path in sorted(STATE_DIR.glob("*.md")):
         text = path.read_text(encoding="utf-8")
         front, body_offset = parse_frontmatter(text)
-        match = CANONICAL_STATE_ID_RE.fullmatch(front.get("id", ""))
-        iso = front.get("iso3", "")
+        entity_id = front.get("id")
+        iso = front.get("iso3")
+        if not isinstance(entity_id, str) or not isinstance(iso, str):
+            continue
+        match = CANONICAL_STATE_ID_RE.fullmatch(entity_id)
         if not match or iso != match.group(1) or path.stem != iso:
             continue
         if iso in seen_iso:
@@ -223,13 +231,13 @@ def extract_candidates(
     return out
 
 
-def frontmatter_identity_values(text: str, front: dict[str, str]) -> list[tuple[str, int, str]]:
-    """Return the two reviewed identity-bearing textual frontmatter fields with source lines."""
+def frontmatter_identity_values(text: str, front: dict[str, object]) -> list[tuple[str, int, str]]:
+    """Return identity-bearing textual frontmatter fields after YAML scalar decoding."""
     line_numbers: dict[str, int] = {}
     match = FRONT_RE.match(text)
     if match:
         for lineno, raw in enumerate(match.group(1).splitlines(), 2):
-            if ":" not in raw:
+            if not raw or raw[0].isspace() or ":" not in raw:
                 continue
             key = raw.split(":", 1)[0].strip()
             if key in FRONTMATTER_IDENTITY_FIELDS and key not in line_numbers:
@@ -237,8 +245,13 @@ def frontmatter_identity_values(text: str, front: dict[str, str]) -> list[tuple[
 
     rows: list[tuple[str, int, str]] = []
     for field in FRONTMATTER_IDENTITY_FIELDS:
-        value = front.get(field)
-        if isinstance(value, str) and value.strip():
+        if field not in front:
+            continue
+        value = front[field]
+        if not isinstance(value, str):
+            raise ValueError(f"frontmatter field {field!r} must be a textual YAML scalar")
+        value = value.strip()
+        if value:
             rows.append((field, line_numbers.get(field, 1), value))
     return rows
 
@@ -259,7 +272,7 @@ class Occurrence:
 
 def iter_occurrences(
     path: Path,
-    front: dict[str, str],
+    front: dict[str, object],
     body_offset: int,
     identity_index,
     identity_ids: set[str],
@@ -268,7 +281,10 @@ def iter_occurrences(
     body = text[body_offset:]
     line_offset = text[:body_offset].count("\n")
     state = front["iso3"]
-    outcome = front.get("provisional_outcome")
+    if not isinstance(state, str):
+        raise ValueError(f"canonical dossier {path} has non-textual iso3")
+    outcome_value = front.get("provisional_outcome")
+    outcome = outcome_value if isinstance(outcome_value, str) else None
     dossier = str(path.relative_to(ROOT))
 
     # These are the only frontmatter fields whose contract explicitly permits identity-bearing
@@ -314,7 +330,7 @@ def iter_occurrences(
 
 def audit() -> dict:
     dossiers = canonical_state_dossiers()
-    state_codes = {front["iso3"] for _, front, _ in dossiers}
+    state_codes = {front["iso3"] for _, front, _ in dossiers if isinstance(front.get("iso3"), str)}
     identity_index, identity_ids, entity_types = load_identity_index(state_codes)
     occurrences: list[Occurrence] = []
     for path, front, body_offset in dossiers:
@@ -456,8 +472,10 @@ def self_test() -> None:
         "---\n"
         "id: ECL-STATE-DNK\n"
         "iso3: DNK\n"
-        "provisional_scope: \"NCCIA project\"\n"
-        "adversarial_result: Operation Aurora remains in scope\n"
+        "provisional_scope: >\n"
+        "  NCCIA project\n"
+        "adversarial_result: |-\n"
+        "  Operation Aurora remains in scope\n"
         "issue: Human Rights Watch\n"
         "---\n"
         "# Denmark\n"
@@ -466,7 +484,7 @@ def self_test() -> None:
     assert front["iso3"] == "DNK" and offset > 0
     assert frontmatter_identity_values(sample, front) == [
         ("provisional_scope", 4, "NCCIA project"),
-        ("adversarial_result", 5, "Operation Aurora remains in scope"),
+        ("adversarial_result", 6, "Operation Aurora remains in scope"),
     ]
     empty_index = build_name_index([], state_codes={"DNK"}, normalizer=norm)
     scope_candidates = extract_candidates(front["provisional_scope"], empty_index, set(), "DNK")
@@ -476,6 +494,21 @@ def self_test() -> None:
         value == "Operation Aurora" and kind == "project-or-deployment"
         for value, kind, _ in result_candidates
     )
+    bad = (
+        "---\n"
+        "id: ECL-STATE-DNK\n"
+        "iso3: DNK\n"
+        "provisional_scope:\n"
+        "  - NCCIA project\n"
+        "---\n"
+    )
+    bad_front, _ = parse_frontmatter(bad)
+    try:
+        frontmatter_identity_values(bad, bad_front)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("non-textual identity-bearing frontmatter must fail closed")
     resolution_self_test()
     print("entity audit self-test: OK")
 
