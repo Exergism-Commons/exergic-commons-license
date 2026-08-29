@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject duplicate object keys in JSON surfaces used by the State entity audit."""
+"""Reject duplicate object keys in JSON surfaces used by repository audit tooling."""
 from __future__ import annotations
 
 import argparse
@@ -23,21 +23,11 @@ def strict_pairs(pairs):
 
 
 def checked_files() -> list[Path]:
+    # All entity records and every generated JSON artifact are executable audit input in
+    # practice. Check the whole surfaces instead of maintaining a manifest-name allowlist,
+    # so a newly introduced generated audit overlay cannot silently fall outside this gate.
     files = list((ROOT / "knowledge" / "entities").glob("*.json"))
-    generated = ROOT / "knowledge" / "generated"
-    patterns = (
-        "state-dossier-entity-scaleout-v*.json",
-        "state-dossier-prose-dispositions-v*.json",
-        "state-dossier-review-ratchet.json",
-        "entity-id-supersessions-v*.json",
-        "schedule-reference-dispositions-v*.json",
-        "schedule-residual-identity-dispositions-v*.json",
-        "schedule-residual-identity-source-pins-v*.json",
-        "schedule-project-cross-role-identity-coverage-v*.json",
-        "schedule-short-acronym-cluster-dispositions-v*.json",
-    )
-    for pattern in patterns:
-        files.extend(generated.glob(pattern))
+    files.extend((ROOT / "knowledge" / "generated").glob("*.json"))
     return sorted(set(files))
 
 
