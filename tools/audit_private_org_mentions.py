@@ -15,12 +15,12 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from audit_state_dossier_entities import frontmatter_identity_values, parse_frontmatter
 from entity_identity_resolution import build_name_index, resolve_normalized
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_DIR = ROOT / "dossiers" / "states"
 ENTITY_DIR = ROOT / "knowledge" / "entities"
-FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 STATE_ID_RE = re.compile(r"^ECL-STATE-([A-Z]{3})$")
 PROPER = r"[A-Z][A-Za-z0-9&.'’/-]{2,}(?:\s+[A-Z][A-Za-z0-9&.'’/-]{2,}){0,3}"
 
@@ -63,24 +63,15 @@ def norm(text: str) -> str:
     return " ".join(text.split())
 
 
-def frontmatter(text: str) -> tuple[dict[str, str], int]:
-    match = FRONT_RE.match(text)
-    if not match:
-        return {}, 0
-    data: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" in line:
-            key, value = line.split(":", 1)
-            data[key.strip()] = value.strip().strip("\"'")
-    return data, match.end()
-
-
 def canonical_dossiers() -> list[tuple[Path, str, int]]:
     rows: list[tuple[Path, str, int]] = []
     for path in sorted(STATE_DIR.glob("*.md")):
         text = path.read_text(encoding="utf-8")
-        front, offset = frontmatter(text)
-        match = STATE_ID_RE.fullmatch(front.get("id", ""))
+        front, offset = parse_frontmatter(text)
+        entity_id = front.get("id")
+        if not isinstance(entity_id, str):
+            continue
+        match = STATE_ID_RE.fullmatch(entity_id)
         if not match:
             continue
         iso = match.group(1)
@@ -237,8 +228,13 @@ def audit() -> dict:
     occurrences: list[dict] = []
     for path, iso, offset in dossiers:
         text = path.read_text(encoding="utf-8")
+        front, parsed_offset = parse_frontmatter(text)
+        if parsed_offset != offset:
+            raise ValueError(f"frontmatter offset drift while auditing {path}")
         line_offset = text[:offset].count("\n")
-        for rel_line, snippet, prose in rendered_prose_segments(text[offset:]):
+        dossier = str(path.relative_to(ROOT))
+
+        def record(prose: str, line: int, snippet: str) -> None:
             for name, method in extract_names(prose):
                 matches = resolve_normalized(known, state=iso, normalized=norm(name))
                 resolved = matches[0] if len(matches) == 1 else None
@@ -248,10 +244,19 @@ def audit() -> dict:
                     "normalized": norm(name),
                     "extraction": method,
                     "resolved_id": resolved,
-                    "dossier": str(path.relative_to(ROOT)),
-                    "line": line_offset + rel_line,
+                    "dossier": dossier,
+                    "line": line,
                     "snippet": snippet,
                 })
+
+        # The contract permits identity-bearing prose only in these two frontmatter fields.
+        # YAML decoding happens in the shared broad-audit parser, so folded/literal block
+        # scalars cannot turn a named vendor into an unaudited continuation line.
+        for field, line_no, raw in frontmatter_identity_values(text, front):
+            record(visible_prose(raw), line_no, f"{field}: {raw}"[:420])
+
+        for rel_line, snippet, prose in rendered_prose_segments(text[offset:]):
+            record(prose, line_offset + rel_line, snippet)
 
     groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in occurrences:
@@ -341,6 +346,22 @@ def self_test() -> None:
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
     assert any(name == "Example Technologies" for name, _ in names)
+    sample = (
+        "---\n"
+        "id: ECL-STATE-AAA\n"
+        "iso3: AAA\n"
+        "provisional_scope: >\n"
+        "  Cellebrite supplied software\n"
+        "adversarial_result: |-\n"
+        "  [Cellebrite](https://example.test) supplied software\n"
+        "---\n"
+        "# State\n"
+    )
+    front, offset = parse_frontmatter(sample)
+    assert offset > 0
+    front_rows = frontmatter_identity_values(sample, front)
+    assert [field for field, _, _ in front_rows] == ["provisional_scope", "adversarial_result"]
+    assert all(extract_names(visible_prose(raw)) == expected for _, _, raw in front_rows)
     assert norm("Cellebrite") == "cellebrite"
     local = build_name_index(
         [
