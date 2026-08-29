@@ -24,9 +24,6 @@ import check_schedule_named_identity_strictness as strict
 
 
 PAREN_COMPONENT_RE = re.compile(r"^(.+?)\s*\(([^()]*)\)(.*)$", re.UNICODE)
-# These separators are safe without repository context only after a completed
-# parenthesized component. A lowercase second capacity tail such as `), only where ...`
-# therefore stays attached to the first actor.
 POST_CAPACITY_SEPARATOR_RE = re.compile(
     r"(?<=\))\s*(?:and\b|&|,|—|–)\s+(?=[A-ZÀ-ÖØ-Þ\"'“‘\[\{*_`])",
     re.UNICODE,
@@ -38,7 +35,6 @@ TRAILING_PUNCTUATION = ".!?,:"
 def normalized_component(fragment: str) -> str:
     """Remove only terminal punctuation/wrappers that cannot belong to the actor name."""
     cleaned = fragment.strip()
-    # Accept either `...)”.` or `...).”`-style ordering without stripping semantic prose.
     for _ in range(2):
         cleaned = cleaned.rstrip()
         cleaned = cleaned.rstrip(TRAILING_PUNCTUATION)
@@ -56,10 +52,8 @@ def parenthesized_actor_component(fragment: str) -> str | None:
         return None
 
     suffix = match.group(3).strip()
-    # Quotes/Markdown/brackets may close the actor component immediately after `)`.
     suffix = suffix.lstrip(TRAILING_WRAPPERS).strip()
     if suffix:
-        # A second tail is allowed only through the same closed-world capacity grammar.
         if not suffix.startswith(","):
             return None
         second_tail = suffix[1:].strip()
@@ -123,7 +117,13 @@ def exact_person_actor_spans(
     identity_index,
     state: str | None,
 ) -> list[tuple[int, int]]:
-    """Return spans of exact current State-safe Person identities in actor text."""
+    """Return spans of exact current State-safe Person identities in actor text.
+
+    Match from the original Unicode surface rather than ``schedule.norm``: that normalizer is
+    intentionally ASCII-only and would corrupt names such as ``Esra Işık``. Word components
+    from the canonical name/alias are preserved and punctuation between them is flexible, so
+    initials, apostrophes and hyphenation remain equivalent without broad substring matching.
+    """
     spans: list[tuple[int, int]] = []
     for entity in entities:
         if entity.get("type") != "Person":
@@ -135,26 +135,16 @@ def exact_person_actor_spans(
         forms = entity.get("surface_forms")
         if not forms:
             values = [entity.get("name"), *(entity.get("aliases") or [])]
-            forms = [
-                {"text": value, "normalized": schedule.norm(value)}
-                for value in values
-                if isinstance(value, str) and value.strip()
-            ]
+            forms = [{"text": value} for value in values if isinstance(value, str) and value.strip()]
         for form in forms:
             text = form.get("text") or ""
             if not text:
                 continue
-            normalized = form.get("normalized") or schedule.norm(text)
-            tokens = normalized.split()
+            tokens = re.findall(r"[^\W_]+", text, re.UNICODE)
             if not tokens:
                 continue
-            if exact.looks_like_acronym_surface(text):
-                pattern = rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])"
-                flags = 0
-            else:
-                pattern = r"(?<![A-Za-z0-9])" + r"[^A-Za-z0-9]+".join(map(re.escape, tokens)) + r"(?![A-Za-z0-9])"
-                flags = re.I
-            spans.extend(match.span() for match in re.finditer(pattern, raw, flags))
+            pattern = r"(?<!\w)" + r"[\W_]+".join(map(re.escape, tokens)) + r"(?!\w)"
+            spans.extend(match.span() for match in re.finditer(pattern, raw, re.I | re.UNICODE))
     return sorted(set(spans))
 
 
@@ -219,39 +209,17 @@ def failures(report: dict, entities: list[dict], identity_index) -> list[dict]:
 
 
 def self_test() -> None:
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe (in an advisory capacity)"
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / JANE DOE (acting only where participation is established)."
-    ) == ["JANE DOE"]
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe (serving in an advisory capacity)!"
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        'Human Rights Watch / “Jane Doe (in an advisory capacity)”.'
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / **Jane Doe (in an advisory capacity)**"
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / [Jane Doe (in an advisory capacity)]"
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe (in an advisory capacity), only where participation is established"
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        'Human Rights Watch / “Jane Doe (in an advisory capacity)”, acting only where participation is established'
-    ) == ["Jane Doe"]
-    assert parenthesized_actor_mentions(
-        "Jane Doe (in an advisory capacity) and John Smith (serving only where participation is established)"
-    ) == ["Jane Doe", "John Smith"]
-    assert parenthesized_actor_mentions(
-        "Jane Doe (in an advisory capacity), John Smith (serving only where participation is established)"
-    ) == ["Jane Doe", "John Smith"]
-    assert parenthesized_actor_mentions(
-        "Jane Doe (in an advisory capacity) — John Smith (serving only where participation is established)"
-    ) == ["Jane Doe", "John Smith"]
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe (in an advisory capacity)") == ["Jane Doe"]
+    assert parenthesized_actor_mentions("Human Rights Watch / JANE DOE (acting only where participation is established).") == ["JANE DOE"]
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe (serving in an advisory capacity)!") == ["Jane Doe"]
+    assert parenthesized_actor_mentions('Human Rights Watch / “Jane Doe (in an advisory capacity)”.') == ["Jane Doe"]
+    assert parenthesized_actor_mentions("Human Rights Watch / **Jane Doe (in an advisory capacity)**") == ["Jane Doe"]
+    assert parenthesized_actor_mentions("Human Rights Watch / [Jane Doe (in an advisory capacity)]") == ["Jane Doe"]
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe (in an advisory capacity), only where participation is established") == ["Jane Doe"]
+    assert parenthesized_actor_mentions('Human Rights Watch / “Jane Doe (in an advisory capacity)”, acting only where participation is established') == ["Jane Doe"]
+    assert parenthesized_actor_mentions("Jane Doe (in an advisory capacity) and John Smith (serving only where participation is established)") == ["Jane Doe", "John Smith"]
+    assert parenthesized_actor_mentions("Jane Doe (in an advisory capacity), John Smith (serving only where participation is established)") == ["Jane Doe", "John Smith"]
+    assert parenthesized_actor_mentions("Jane Doe (in an advisory capacity) — John Smith (serving only where participation is established)") == ["Jane Doe", "John Smith"]
 
     anchored = "Human Rights Watch and Jane Doe (in an advisory capacity)."
     hrw_span = (0, len("Human Rights Watch"))
@@ -268,18 +236,10 @@ def self_test() -> None:
     esra_span = (0, len("Esra Işık"))
     assert [parenthesized_actor_component(part) for part in _anchored_segments(person_raw, [esra_span])] == ["Jane Doe"]
 
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe (unreviewed arbitrary prose)"
-    ) == []
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe (case note)."
-    ) == []
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe (in an advisory capacity), unrelated prose"
-    ) == []
-    assert parenthesized_actor_mentions(
-        "Human Rights Watch / Jane Doe-Smith (in an advisory capacity),"
-    ) == ["Jane Doe-Smith"]
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe (unreviewed arbitrary prose)") == []
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe (case note).") == []
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe (in an advisory capacity), unrelated prose") == []
+    assert parenthesized_actor_mentions("Human Rights Watch / Jane Doe-Smith (in an advisory capacity),") == ["Jane Doe-Smith"]
     print("Schedule parenthesized actor-capacity self-test: OK")
 
 
