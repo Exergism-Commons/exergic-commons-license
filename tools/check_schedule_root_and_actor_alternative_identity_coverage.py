@@ -19,6 +19,8 @@ import argparse
 import json
 import re
 
+import yaml
+
 import audit_schedule_reference_coverage as schedule
 import check_schedule_adversarial_identity_gaps as adversarial
 import check_schedule_exact_identity_completeness as exact
@@ -28,6 +30,10 @@ from entity_identity_resolution import build_name_index
 
 
 ALTERNATIVE_SEPARATOR_RE = re.compile(r"\s+(?:and\s*/\s*or|and-or|or)\s+", re.I)
+# Record-level ``dossier`` is ordinary schema metadata and remains excluded by the
+# adversarial scanner. At a multi-record document root there is no State-scoped record,
+# however, so a root ``dossier`` value must be inspected rather than skipped.
+DOCUMENT_ROOT_SKIP_FIELDS = frozenset(adversarial.SKIP_EXTRA_FIELDS - {"dossier"})
 
 
 def root_exact_identity_ids(raw: str, entities: list[dict]) -> list[str]:
@@ -65,12 +71,31 @@ def root_exact_identity_ids(raw: str, entities: list[dict]) -> list[str]:
     return sorted(matches)
 
 
+def document_root_rows() -> list[dict]:
+    """Re-scan multi-record roots without applying record-only ``dossier`` exclusion."""
+    rows: list[dict] = []
+    files = sorted(schedule.FREEZE_DIR.glob("*.yml")) + sorted(schedule.FREEZE_DIR.glob("*.yaml"))
+    for path in files:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or not isinstance(data.get("records"), list):
+            continue
+        source = str(path.relative_to(schedule.ROOT))
+        root = {key: value for key, value in data.items() if key != "records"}
+        rows.extend(adversarial.extra_rows_from_mapping(
+            root,
+            source=source,
+            state=None,
+            record_index=None,
+            skip_fields=set(DOCUMENT_ROOT_SKIP_FIELDS),
+            document_root=True,
+        ))
+    return rows
+
+
 def document_root_failures(entities: list[dict]) -> list[dict]:
     """Reject any identity-bearing multi-record document-root metadata."""
     found: list[dict] = []
-    for row in adversarial.extra_context_rows():
-        if not row.get("document_root"):
-            continue
+    for row in document_root_rows():
         raw = row.get("raw") or ""
         labels = adversarial.contextual_labels(row)
         exact_ids = root_exact_identity_ids(raw, entities)
@@ -187,11 +212,32 @@ def self_test() -> None:
     ]
     identity_index = build_name_index(raw_entities, state_codes={"AAA"}, normalizer=schedule.norm)
 
+    assert "dossier" in adversarial.SKIP_EXTRA_FIELDS
+    assert "dossier" not in DOCUMENT_ROOT_SKIP_FIELDS
+    root_dossier_rows = adversarial.extra_rows_from_mapping(
+        {"dossier": "Human Rights Watch"},
+        source="x.yml",
+        state=None,
+        record_index=None,
+        skip_fields=set(DOCUMENT_ROOT_SKIP_FIELDS),
+        document_root=True,
+    )
+    assert any(row.get("field") == "dossier" and row.get("raw") == "Human Rights Watch" for row in root_dossier_rows)
+    record_dossier_rows = adversarial.extra_rows_from_mapping(
+        {"dossier": "Human Rights Watch"},
+        source="x.yml",
+        state="AAA",
+        record_index=0,
+        skip_fields=adversarial.SKIP_EXTRA_FIELDS,
+        document_root=False,
+    )
+    assert record_dossier_rows == []
     assert root_exact_identity_ids("Source: Human Rights Watch", entities) == ["ORG-HRW"]
     assert root_exact_identity_ids("Source: Meta", entities) == ["ORG-META"]
     assert root_exact_identity_ids("Source: metadata only", entities) == []
     assert root_exact_identity_ids("Source: Example Domestic Court", entities) == ["AGENCY-AAA-COURT"]
     assert root_exact_identity_ids("ordinary neutral metadata", entities) == []
+    assert root_exact_identity_ids(root_dossier_rows[-1]["raw"], entities) == ["ORG-HRW"]
 
     assert actor_alternative_mentions("Human Rights Watch or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
     assert actor_alternative_mentions("Human Rights Watch and/or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
