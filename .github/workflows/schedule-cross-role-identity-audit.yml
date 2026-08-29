@@ -34,9 +34,12 @@ jobs:
           python tools/check_json_duplicate_keys.py --self-test
           python tools/check_schedule_project_cross_role_identity_coverage.py --self-test
           python tools/check_schedule_short_acronym_cluster_coverage.py --self-test
+          python tools/check_schedule_parenthesized_actor_capacity.py --self-test
       - name: Enforce JSON duplicate-key integrity
         run: python tools/check_json_duplicate_keys.py
       - name: Enforce project cross-role identity coverage
         run: python tools/check_schedule_project_cross_role_identity_coverage.py
       - name: Enforce short slash-acronym review coverage
         run: python tools/check_schedule_short_acronym_cluster_coverage.py
+      - name: Enforce parenthesized actor-capacity completeness
+        run: python tools/check_schedule_parenthesized_actor_capacity.py
