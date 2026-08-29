@@ -3,12 +3,12 @@
 
 This guard is activated either by a 2-3 character uppercase/alphanumeric member adjacent to
 ``/`` or by an all-long acronym cluster whose member is hidden behind balanced punctuation
-wrappers. Once activated, every connected uppercase/alphanumeric acronym-sized member in that
-cluster is audited. This catches mixed clusters such as ``NPM/IMIS`` and wrapped all-long
-clusters such as ``NAPOLCOM/(IMIS)`` without duplicating ordinary unwrapped all-long cluster
-coverage already provided by the adversarial residual-identity guard. Balanced punctuation
-wrappers around cluster members are ignored for slash adjacency, while alphanumeric/hyphen
-compound boundaries remain excluded.
+or lightweight Markdown wrappers. Once activated, every connected uppercase/alphanumeric
+acronym-sized member in that cluster is audited. This catches mixed clusters such as
+``NPM/IMIS`` and wrapped all-long clusters such as ``NAPOLCOM/(IMIS)`` without duplicating
+ordinary unwrapped all-long cluster coverage already provided by the adversarial residual-
+identity guard. Wrapper punctuation is ignored for slash adjacency, while alphanumeric/
+hyphen compound boundaries remain excluded.
 
 Current exact State-safe ABox identities need no overlay; otherwise each emitted surface must
 have an exact blob-pinned reviewed disposition of ``deferred`` or ``rejected``. Multi-record
@@ -41,11 +41,14 @@ WRAPPER_PAIRS = {
     "'": "'",
     "“": "”",
     "‘": "’",
+    "*": "*",
+    "_": "_",
+    "`": "`",
 }
 
 
 def _wrapped_span(raw: str, start: int, end: int) -> tuple[int, int]:
-    """Expand an acronym token across immediately balanced punctuation wrappers."""
+    """Expand an acronym token across immediately balanced punctuation/markup wrappers."""
     while True:
         left = start
         while left > 0 and raw[left - 1].isspace():
@@ -67,7 +70,7 @@ def slash_cluster_acronyms(raw: str) -> list[str]:
 
     Every eligible token must be a complete uppercase/alphanumeric surface, not a fragment of
     an alphanumeric or hyphenated compound. A slash can be separated from a token by whitespace
-    and balanced wrappers such as ``(NPM)``, ``[AB]`` or ``“IMIS”``.
+    and balanced wrappers such as ``(NPM)``, ``[AB]``, ``“IMIS”``, ``**IMIS**`` or `` `IMIS` ``.
 
     Ordinary all-long unwrapped clusters remain out of scope here so the adversarial residual
     checker remains their single owner. An all-long component is activated here only when it
@@ -321,6 +324,9 @@ def self_test() -> None:
     assert slash_cluster_acronyms("NAPOLCOM/(IMIS)") == ["NAPOLCOM", "IMIS"]
     assert slash_cluster_acronyms("NAPOLCOM/[IMIS]") == ["NAPOLCOM", "IMIS"]
     assert slash_cluster_acronyms("NAPOLCOM/“IMIS”") == ["NAPOLCOM", "IMIS"]
+    assert slash_cluster_acronyms("NAPOLCOM/**IMIS**") == ["NAPOLCOM", "IMIS"]
+    assert slash_cluster_acronyms("NAPOLCOM/`IMIS`") == ["NAPOLCOM", "IMIS"]
+    assert slash_cluster_acronyms("NAPOLCOM/_IMIS_") == ["NAPOLCOM", "IMIS"]
     assert slash_cluster_acronyms("(NAPOLCOM)/IMIS") == ["NAPOLCOM", "IMIS"]
     # A single wrapped long token next to lowercase prose is not promoted into cluster debt.
     assert slash_cluster_acronyms("(IMIS)/oversight") == []
