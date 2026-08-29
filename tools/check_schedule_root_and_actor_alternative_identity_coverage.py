@@ -27,7 +27,7 @@ import check_schedule_parenthesized_actor_capacity as parenthesized
 from entity_identity_resolution import build_name_index
 
 
-ALTERNATIVE_SEPARATOR_RE = re.compile(r"\s+(?:and\s*/\s*or|or)\s+", re.I)
+ALTERNATIVE_SEPARATOR_RE = re.compile(r"\s+(?:and\s*/\s*or|and-or|or)\s+", re.I)
 
 
 def root_exact_identity_ids(raw: str, entities: list[dict]) -> list[str]:
@@ -35,7 +35,8 @@ def root_exact_identity_ids(raw: str, entities: list[dict]) -> list[str]:
 
     A document root has no State, so jurisdiction filtering must not turn a domestic exact
     identity into an accepted root field. We only detect the surface here; we never resolve
-    it into a State-scoped role binding.
+    it into a State-scoped role binding. Every exact current non-acronym surface is eligible,
+    including short single-token names; normalized token boundaries prevent substring hits.
     """
     raw_norm = schedule.norm(raw)
     padded_raw = f" {raw_norm} "
@@ -58,7 +59,7 @@ def root_exact_identity_ids(raw: str, entities: list[dict]) -> list[str]:
                 if re.search(rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])", raw):
                     matches.add(entity_id)
                     break
-            elif len(alias) >= 6 and f" {alias} " in padded_raw:
+            elif f" {alias} " in padded_raw:
                 matches.add(entity_id)
                 break
     return sorted(matches)
@@ -175,6 +176,7 @@ def _entity(entity_id: str, entity_type: str, name: str) -> dict:
 def self_test() -> None:
     entities = [
         _entity("ORG-HRW", "Organization", "Human Rights Watch"),
+        _entity("ORG-META", "Organization", "Meta"),
         _entity("ORG-TRUTH-OR-RECON", "Organization", "Truth or Reconciliation Institute"),
         _entity("AGENCY-AAA-COURT", "Agency", "Example Domestic Court"),
         _entity("PERSON-ESRA", "Person", "Esra Işık"),
@@ -186,12 +188,15 @@ def self_test() -> None:
     identity_index = build_name_index(raw_entities, state_codes={"AAA"}, normalizer=schedule.norm)
 
     assert root_exact_identity_ids("Source: Human Rights Watch", entities) == ["ORG-HRW"]
+    assert root_exact_identity_ids("Source: Meta", entities) == ["ORG-META"]
+    assert root_exact_identity_ids("Source: metadata only", entities) == []
     assert root_exact_identity_ids("Source: Example Domestic Court", entities) == ["AGENCY-AAA-COURT"]
     assert root_exact_identity_ids("ordinary neutral metadata", entities) == []
 
     assert actor_alternative_mentions("Human Rights Watch or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
     assert actor_alternative_mentions("Human Rights Watch and/or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
     assert actor_alternative_mentions("Human Rights Watch and / or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
+    assert actor_alternative_mentions("Human Rights Watch and-or Jane Doe", entities, identity_index, "AAA") == ["Jane Doe"]
     assert actor_alternative_mentions(
         "Human Rights Watch or Jane Doe (in an advisory capacity).", entities, identity_index, "AAA"
     ) == ["Jane Doe"]
