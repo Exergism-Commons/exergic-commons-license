@@ -52,6 +52,7 @@ CAPACITY_LIST_SEPARATOR_RE = re.compile(
     re.I | re.X,
 )
 OPENING_IDENTITY_WRAPPERS = " \t\r\n\"'“‘([{*_`"
+LEADING_IDENTITY_DETERMINER_RE = re.compile(r"^(?:the|a|an)$", re.I)
 
 
 def _protected_identity_spans(
@@ -92,7 +93,10 @@ def _leading_protected_surface(
     candidates: list[tuple[int, int]] = []
     for start, end in spans:
         prefix = text[:start].strip(OPENING_IDENTITY_WRAPPERS)
-        if not prefix:
+        # Articles may introduce a named actor without becoming part of its identity surface.
+        # Keep this deliberately closed-world: arbitrary modifiers such as ``relevant`` or
+        # ``participating`` must not be silently discarded before an identity anchor.
+        if not prefix or LEADING_IDENTITY_DETERMINER_RE.fullmatch(prefix):
             candidates.append((start, end))
     if not candidates:
         return None
@@ -273,6 +277,8 @@ def self_test() -> None:
         _entity("ORG-ACME-INC", "Organization", "Acme, Inc."),
         _entity("ORG-SMITH-WESSON", "Organization", "Smith & Wesson"),
         _entity("INST-MOJHR", "Institution", "Ministry of Justice and Human Rights"),
+        _entity("INST-REGIONAL-COUNCIL", "Institution", "Regional Council"),
+        _entity("INST-INTERNATIONAL-COUNCIL", "Institution", "International Council"),
     ]
     raw_entities = [
         {"id": item["id"], "type": item["type"], "name": item["name"], "aliases": []}
@@ -332,7 +338,10 @@ def self_test() -> None:
         bound,
     ) == ["Jane Doe"]
 
-    control_bound = bound | {"ORG-ACME-INC", "ORG-SMITH-WESSON", "INST-MOJHR"}
+    control_bound = bound | {
+        "ORG-ACME-INC", "ORG-SMITH-WESSON", "INST-MOJHR",
+        "INST-REGIONAL-COUNCIL", "INST-INTERNATIONAL-COUNCIL",
+    }
     assert capacity_list_surfaces(
         "Human Rights Watch, acting with Smith & Wesson, Globex",
         entities,
@@ -354,6 +363,42 @@ def self_test() -> None:
         "AAA",
         control_bound,
     ) == ["Ministry of Justice and Human Rights", "Globex"]
+
+    # P1 regression: narrow articles before a protected leading identity do not make the
+    # entire capacity list opaque. The article is syntax, not part of the identity surface.
+    for raw, expected in [
+        (
+            "Human Rights Watch, acting with the Ministry of Justice and Human Rights & Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with The Ministry of Justice and Human Rights, Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with a Regional Council or Globex",
+            ["Regional Council", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with an International Council / Globex",
+            ["International Council", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with “the Ministry of Justice and Human Rights” & Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
+    ]:
+        assert capacity_list_surfaces(raw, entities, identity_index, "AAA", control_bound) == expected, raw
+
+    # Keep the prefix grammar closed-world: an arbitrary adjective cannot be discarded just
+    # because an exact identity starts later in the fragment.
+    assert _leading_protected_surface(
+        "relevant Ministry of Justice and Human Rights",
+        entities,
+        identity_index,
+        "AAA",
+        control_bound,
+    ) is None
 
     no_acme_entity = [item for item in entities if item["id"] != "ORG-ACME-INC"]
     raw_no_acme = [
