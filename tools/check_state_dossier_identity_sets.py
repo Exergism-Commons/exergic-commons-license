@@ -8,6 +8,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+from audit_state_dossier_entities import parse_frontmatter
+
 ROOT = Path(__file__).resolve().parents[1]
 DOSSIERS = ROOT / "dossiers" / "states"
 ENTITIES = ROOT / "knowledge" / "entities"
@@ -28,25 +30,33 @@ def norm(value: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
 
-def parse_frontmatter_text(text: str) -> dict[str, str]:
+def parse_frontmatter_text(text: str) -> dict[str, object]:
+    """Parse the YAML mapping structurally while preserving the top-level duplicate-key guard."""
     match = FRONT.match(text)
     if not match:
         return {}
-    result: dict[str, str] = {}
+
+    # The shared parser correctly handles folded/literal block scalars and other YAML syntax.
+    # Keep this check solely for duplicate *top-level* contract keys: indented scalar content is
+    # data, not a key, even when a continuation line contains a colon.
+    seen: set[str] = set()
     for line_no, line in enumerate(match.group(1).splitlines(), 2):
-        if ":" not in line:
+        if not line or line[0].isspace() or ":" not in line:
             continue
-        key, value = line.split(":", 1)
-        key = key.strip()
+        key = line.split(":", 1)[0].strip()
         if not key:
             continue
-        if key in result:
+        if key in seen:
             raise ValueError(f"duplicate frontmatter key {key!r} at line {line_no}")
-        result[key] = value.strip().strip("\"'")
-    return result
+        seen.add(key)
+
+    data, offset = parse_frontmatter(text)
+    if offset != match.end():
+        raise ValueError("State dossier frontmatter parser offset mismatch")
+    return data
 
 
-def frontmatter(path: Path) -> dict[str, str]:
+def frontmatter(path: Path) -> dict[str, object]:
     return parse_frontmatter_text(path.read_text(encoding="utf-8"))
 
 
@@ -58,8 +68,10 @@ def main() -> int:
         except ValueError as exc:
             print(f"invalid State dossier frontmatter in {path.relative_to(ROOT)}: {exc}")
             return 14
-        match = DOSSIER_ID.fullmatch(data.get("id", ""))
-        if not match or data.get("iso3") != match.group(1):
+        dossier_id = data.get("id")
+        iso_value = data.get("iso3")
+        match = DOSSIER_ID.fullmatch(dossier_id) if isinstance(dossier_id, str) else None
+        if not match or iso_value != match.group(1):
             continue
         iso = match.group(1)
         if path.stem != iso:
