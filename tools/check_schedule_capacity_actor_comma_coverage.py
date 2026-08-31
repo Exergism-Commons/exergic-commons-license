@@ -76,13 +76,12 @@ def _protected_identity_spans(
     filtered_heuristics: list[tuple[int, int]] = []
     for heuristic in heuristic_spans:
         # Exact identity boundaries are authoritative when a maximal-institution heuristic
-        # begins at the exact surface *or* only adds a narrow article/wrapper before it, then
-        # extends beyond the exact current surface. This covers both
-        # ``Ministry ... & Globex`` and ``The Ministry ... & Globex`` without allowing an
-        # arbitrary modifier to erase heuristic context.
+        # begins at the exact surface *or* only adds a narrow article/wrapper before it and
+        # contains the complete exact surface. This covers both overextension and the equal-end
+        # ``The Ministry ...`` case without allowing an arbitrary modifier to erase context.
         if any(
             heuristic[0] <= exact[0]
-            and heuristic[1] > exact[1]
+            and heuristic[1] >= exact[1]
             and _leading_identity_prefix_allowed(text[heuristic[0]:exact[0]])
             for exact in exact_spans
         ):
