@@ -18,6 +18,8 @@ ENTITIES = ROOT / "knowledge" / "entities"
 FRONT = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 DOSSIER_ID = re.compile(r"^ECL-STATE-([A-Z]{3})$")
 ENTITY_ID = re.compile(r"^STATE-([A-Z]{3})$")
+H1_RE = re.compile(r"^\s{0,3}#(?!#)\s+(.+?)\s*$")
+TRAILING_H1_ALIAS_RE = re.compile(r"(?:\s+\([^()\n]+\))+$")
 # State-dossier frontmatter is intentionally a flat, reviewed contract. Identity-bearing prose
 # belongs in the two explicit textual fields below or in the dossier body; a newly invented
 # frontmatter key must be reviewed and added here instead of becoming an unaudited side channel.
@@ -104,6 +106,36 @@ def frontmatter(path: Path) -> dict[str, object]:
     return parse_frontmatter_text(path.read_text(encoding="utf-8"))
 
 
+def canonical_h1_title(text: str, expected_entity: str) -> str:
+    """Require one canonical State H1 as the first body line and reject H1 side channels."""
+    front = FRONT.match(text)
+    if front is None:
+        raise ValueError("canonical State dossier is missing YAML frontmatter")
+    body = text[front.end():]
+    h1s: list[tuple[int, str]] = []
+    first_content_line: int | None = None
+    for line_no, raw in enumerate(body.splitlines(), 1):
+        if first_content_line is None and raw.strip():
+            first_content_line = line_no
+        match = H1_RE.fullmatch(raw)
+        if match:
+            h1s.append((line_no, match.group(1).strip()))
+    if len(h1s) != 1:
+        raise ValueError(f"canonical State dossier must contain exactly one H1; found {len(h1s)}")
+    line_no, title = h1s[0]
+    if first_content_line != line_no:
+        raise ValueError("canonical State H1 must be the first non-blank body line")
+
+    # A parenthesized State alias may decorate the canonical title (for example
+    # `North Korea (DPRK)`), but the title stem must still be the frontmatter State entity.
+    title_stem = TRAILING_H1_ALIAS_RE.sub("", title).strip()
+    if norm(title_stem) != norm(expected_entity):
+        raise ValueError(
+            f"canonical State H1 {title!r} does not match frontmatter entity {expected_entity!r}"
+        )
+    return title
+
+
 def self_test_frontmatter_parser() -> None:
     continuation = (
         "---\n"
@@ -131,13 +163,37 @@ def self_test_frontmatter_parser() -> None:
     else:
         raise AssertionError("quoted/unquoted duplicate YAML keys must fail closed")
 
+    canonical = (
+        "---\n"
+        "id: ECL-STATE-PRK\n"
+        "entity: North Korea\n"
+        "iso3: PRK\n"
+        "---\n"
+        "# North Korea (DPRK)\n\n"
+        "## 1. Current determination\n"
+    )
+    assert canonical_h1_title(canonical, "North Korea") == "North Korea (DPRK)"
+
+    for invalid in (
+        canonical + "\n# Project Aurora\n",
+        canonical.replace("# North Korea (DPRK)", "# Project Aurora"),
+        canonical.replace("# North Korea (DPRK)\n\n", "Preamble\n\n# North Korea (DPRK)\n\n"),
+    ):
+        try:
+            canonical_h1_title(invalid, "North Korea")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("noncanonical/additional State-dossier H1 must fail closed")
+
 
 def main() -> int:
     self_test_frontmatter_parser()
     dossier_by_iso: dict[str, str] = {}
     for path in sorted(DOSSIERS.glob("*.md")):
+        text = path.read_text(encoding="utf-8")
         try:
-            data = frontmatter(path)
+            data = parse_frontmatter_text(text)
         except ValueError as exc:
             print(f"invalid State dossier frontmatter in {path.relative_to(ROOT)}: {exc}")
             return 14
@@ -156,6 +212,15 @@ def main() -> int:
                 f"{unexpected_keys}"
             )
             return 15
+        entity_value = data.get("entity")
+        if not isinstance(entity_value, str) or not entity_value.strip():
+            print(f"canonical State dossier missing textual entity in {path.relative_to(ROOT)}")
+            return 16
+        try:
+            canonical_h1_title(text, entity_value)
+        except ValueError as exc:
+            print(f"invalid canonical State dossier H1 in {path.relative_to(ROOT)}: {exc}")
+            return 17
         if iso in dossier_by_iso:
             print(f"duplicate canonical dossier for {iso}: {dossier_by_iso[iso]} and {path}")
             return 2
