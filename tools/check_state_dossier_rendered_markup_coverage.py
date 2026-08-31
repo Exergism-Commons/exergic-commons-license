@@ -14,7 +14,10 @@ from entity_identity_resolution import build_name_index
 ROOT = base.ROOT
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 LOWER_HEADING_RE = re.compile(r"^#{2,6}\s+")
-REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\[[^\]\n]*\]")
+# YAML-decoded frontmatter and assembled soft-wrap prose may contain rendered line breaks
+# inside a reference-link label. Permit those line breaks and normalize the visible label
+# whitespace during substitution so the complete rendered identity remains auditable.
+REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\[[^\]]*\]")
 BRACKET_LABEL_RE = re.compile(r"(?<!!)\[([^\]\n]{2,120})\]")
 HTML_BREAK_TAG_RE = re.compile(
     r"</?(?:br|p|div|li|ul|ol|table|tr|td|th|blockquote|section|article|h[1-6])\b[^>\n]*>", re.I
@@ -36,7 +39,7 @@ def baseline_line(raw: str) -> str:
 
 def rendered_line(raw: str) -> str:
     line = baseline_line(raw)
-    line = REFERENCE_LINK_RE.sub(lambda match: match.group(1), line)
+    line = REFERENCE_LINK_RE.sub(lambda match: " ".join(match.group(1).split()), line)
     line = BRACKET_LABEL_RE.sub(lambda match: match.group(1), line)
     line = CODE_SPAN_RE.sub(lambda match: " ".join(match.group(2).split()), line)
     line = HTML_BREAK_TAG_RE.sub(" ", line)
@@ -222,7 +225,15 @@ def self_test() -> None:
     assert any(
         candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in multiline_multi_code
     ), multiline_multi_code
+    multiline_reference = rendered_only_candidates("National [Cyber\nCrime Investigation][nccia] Agency")
+    assert any(
+        candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in multiline_reference
+    ), multiline_reference
     assert rendered_line("National `Cyber\nCrime Investigation` Agency") == "National Cyber Crime Investigation Agency"
+    assert (
+        rendered_line("National [Cyber\nCrime Investigation][nccia] Agency")
+        == "National Cyber Crime Investigation Agency"
+    )
     assert rendered_only_candidates("Australian Human Rights Commission reported findings") == []
 
     index = build_name_index(
