@@ -132,6 +132,17 @@ def names_from_prose(prose: str) -> list[str]:
     return names
 
 
+def frontmatter_visible_prose(value: str) -> str:
+    """Render one YAML-decoded identity-bearing scalar like visible body prose.
+
+    A frontmatter scalar is one audited prose surface even when YAML literal/folded syntax
+    leaves decoded line breaks in it. Normalize those breaks to rendered whitespace first,
+    then reuse the body/vendor visible-prose renderer so emphasis and inline/reference links
+    cannot split a personal name before the strict name grammar sees it.
+    """
+    return rendered.visible_prose(" ".join(value.splitlines()))
+
+
 def audit() -> list[dict]:
     dossiers = base.canonical_state_dossiers()
     entities, _, identity_index = schedule.load_entities()
@@ -159,7 +170,13 @@ def audit() -> list[dict]:
         for field in FRONTMATTER_PERSON_KEYS:
             value = front.get(field)
             if isinstance(value, str) and value.strip():
-                inspect(state=state, source=source, location=f"frontmatter:{field}", prose=value, snippet=value)
+                inspect(
+                    state=state,
+                    source=source,
+                    location=f"frontmatter:{field}",
+                    prose=frontmatter_visible_prose(value),
+                    snippet=value,
+                )
 
         text = path.read_text(encoding="utf-8")
         line_offset = text[:body_offset].count("\n")
@@ -205,6 +222,15 @@ def self_test() -> None:
     assert names_from_prose("UPHOLD / NARROW S. The detention basis remains current") == []
     assert names_from_prose("the Human Rights Commission was established") == []
     assert names_from_prose("current evidence was reviewed") == []
+
+    front_bold = frontmatter_visible_prose("journalist **Jane Doe** remains detained")
+    assert front_bold == "journalist Jane Doe remains detained", front_bold
+    assert "Jane Doe" in names_from_prose(front_bold)
+    front_inline_link = frontmatter_visible_prose("journalist [Jane Doe](https://example.test/person) remains detained")
+    assert "Jane Doe" in names_from_prose(front_inline_link), front_inline_link
+    front_reference_link = frontmatter_visible_prose("journalist [Jane\nDoe][person] remains detained")
+    assert front_reference_link == "journalist Jane Doe remains detained", front_reference_link
+    assert "Jane Doe" in names_from_prose(front_reference_link)
     print("State dossier named-person coverage self-test: OK")
 
 
