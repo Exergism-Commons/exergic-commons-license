@@ -29,16 +29,10 @@ import check_schedule_named_identity_strictness as strict
 from entity_identity_resolution import build_name_index
 
 
-# Common continuations that are part of a name/corporate style rather than a new actor.
-# Lower-case prose never enters the split path in the first place.
 IDENTITY_CONTINUATION_WORDS = {
     "co", "company", "corp", "corporation", "inc", "incorporated", "llc", "llp",
     "ltd", "limited", "plc", "jr", "sr", "ii", "iii", "iv",
 }
-
-# One grammar for every actor-list separator family currently recognized by the Schedule
-# parser. The comma alternative absorbs an optional coordinator so Oxford forms such as
-# ``Acme, and Globex`` cannot leave a leading ``and`` attached to the next member.
 CAPACITY_LIST_SEPARATOR_RE = re.compile(
     r"""
     \s*
@@ -67,7 +61,6 @@ def _protected_identity_spans(
     state: str | None,
     bound_ids: set[str],
 ) -> list[tuple[int, int]]:
-    """Protect separators proven to belong to an exact or maximal institution surface."""
     return expression._merge_spans(
         expression.safe_actor_anchor_spans(text, entities, identity_index, state, bound_ids)
         + expression.heuristic_institution_spans(text)
@@ -81,13 +74,6 @@ def _leading_protected_surface(
     state: str | None,
     bound_ids: set[str],
 ) -> str | None:
-    """Return a complete protected identity when one begins the fragment.
-
-    This is important for names whose own spelling contains a separator, e.g. an exact
-    ``Smith & Wesson`` or ``Acme, Inc.`` surface, and for maximal institution names with
-    internal conjunctions. Protecting the separator is insufficient if the fallback leading
-    name parser would then truncate the same identity.
-    """
     spans = _protected_identity_spans(text, entities, identity_index, state, bound_ids)
     candidates: list[tuple[int, int]] = []
     for start, end in spans:
@@ -108,7 +94,6 @@ def _fragment_surfaces(
     state: str | None,
     bound_ids: set[str],
 ) -> list[str]:
-    """Return the complete leading actor surface carried by one capacity-list fragment."""
     protected = _leading_protected_surface(fragment, entities, identity_index, state, bound_ids)
     if protected:
         return [protected]
@@ -122,7 +107,6 @@ def _rhs_starts_identity(
     state: str | None,
     bound_ids: set[str],
 ) -> bool:
-    """Require a high-confidence actor-like start after a candidate separator."""
     match = expression.SINGLE_IDENTITY_RE.match(text.lstrip())
     if match:
         token = match.group(1)
@@ -138,13 +122,6 @@ def _capacity_list_fragments(
     state: str | None,
     bound_ids: set[str],
 ) -> list[str]:
-    """Split one relational capacity tail on protected actor-list separators.
-
-    Separator recognition is deliberately conditional rather than a blind ``re.split``:
-    separators inside exact/maximal identity spans are ignored, and every accepted split must
-    be locally supported by actor-like material on both sides. This gives all supported
-    separator spellings the same fail-closed semantics without turning legal prose into a list.
-    """
     protected = _protected_identity_spans(text, entities, identity_index, state, bound_ids)
     pieces: list[str] = []
     start = 0
@@ -175,11 +152,18 @@ def capacity_list_surfaces(
     state: str | None,
     bound_ids: set[str],
 ) -> list[str]:
-    """Return identities exposed by any supported list syntax inside capacity prose."""
     out: list[str] = []
     for start, end in expression.capacity_spans(raw):
         region = raw[start:end]
+        protected_region = _protected_identity_spans(
+            region, entities, identity_index, state, bound_ids
+        )
         for cue in expression.CAPACITY_IDENTITY_CUE_RE.finditer(region):
+            # A relation word such as ``and`` may itself occur inside a complete current or
+            # maximal institution identity. Treating that token as a fresh capacity cue would
+            # re-open the same separator-in-name bypass one layer earlier.
+            if expression._overlaps(cue.span(), protected_region):
+                continue
             tail = region[cue.end():]
             for fragment in _capacity_list_fragments(
                 tail, entities, identity_index, state, bound_ids
@@ -191,8 +175,6 @@ def capacity_list_surfaces(
     return out
 
 
-# Backward-compatible name for any local callers introduced with the original comma-only
-# guard. Semantics are intentionally widened to the complete protected capacity-list grammar.
 def capacity_comma_surfaces(
     raw: str,
     entities: list[dict],
@@ -289,9 +271,6 @@ def self_test() -> None:
     by_id = {item["id"]: item for item in entities}
     bound = {"ORG-HRW"}
 
-    # Every separator family recognized by the Schedule actor grammar is covered inside a
-    # relational capacity tail. These are deliberately table-driven so adding a separator to
-    # one branch without the others breaks the self-test instead of creating another bypass.
     separator_cases = [
         "Acme, Globex",
         "Acme, and Globex",
@@ -312,7 +291,6 @@ def self_test() -> None:
             "Acme", "Globex"
         ], actor_list
 
-    # Original comma P1 plus the ampersand follow-up: every neighbour remains independent.
     raw = "Human Rights Watch, acting with Acme, Globex & Umbra"
     assert capacity_list_surfaces(raw, entities, identity_index, "AAA", bound) == [
         "Acme", "Globex", "Umbra"
@@ -327,7 +305,6 @@ def self_test() -> None:
     problems = failures(report, entities, by_id, identity_index)
     assert [problem["identity_surface"] for problem in problems] == ["Umbra"]
 
-    # Mixed/N-way composition: no separator family can make a later member disappear.
     mixed = (
         "Human Rights Watch, acting with Acme, Globex & Umbra and/or Initech / "
         "Soylent; Vehement"
@@ -336,7 +313,6 @@ def self_test() -> None:
         "Acme", "Globex", "Umbra", "Initech", "Soylent", "Vehement"
     ]
 
-    # Ordinary lower-case capacity/prose tails do not become actor members.
     assert capacity_list_surfaces(
         "Human Rights Watch, acting with Jane Doe, in an advisory capacity",
         entities,
@@ -345,8 +321,6 @@ def self_test() -> None:
         bound,
     ) == ["Jane Doe"]
 
-    # Exact/maximal identity spans protect their own separators. The extraction path must also
-    # preserve the *complete* protected surface rather than truncating at the internal symbol.
     assert capacity_list_surfaces(
         "Human Rights Watch, acting with Smith & Wesson, Globex",
         entities,
@@ -369,8 +343,6 @@ def self_test() -> None:
         bound,
     ) == ["Ministry of Justice and Human Rights", "Globex"]
 
-    # A suffix-like continuation is never promoted as a fresh one-token actor when no exact
-    # protected identity proves that the comma belongs to a larger current surface.
     no_acme_entity = [item for item in entities if item["id"] != "ORG-ACME-INC"]
     raw_no_acme = [
         {"id": item["id"], "type": item["type"], "name": item["name"], "aliases": []}
