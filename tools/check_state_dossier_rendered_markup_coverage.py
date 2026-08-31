@@ -116,6 +116,40 @@ def audit() -> list[dict]:
         text = path.read_text(encoding="utf-8")
         line_offset = text[:body_offset].count("\n")
         state = front["iso3"]
+
+        def inspect_rendered_surface(raw: str, *, line: int, section: str, snippet: str) -> None:
+            rendered = rendered_line(raw)
+            for normalized, candidate, kind in rendered_only_candidates(raw):
+                resolved = base.resolve_name(identity_index, state, candidate)
+                disposition = dispositions.get((state, normalized))
+                if resolved is not None or disposition is not None:
+                    continue
+                if covered_by_visible_materialized_identity(
+                    identity_index, state=state, candidate=candidate, kind=kind, rendered=rendered
+                ):
+                    continue
+                failures.append({
+                    "state": state,
+                    "candidate": candidate,
+                    "normalized": normalized,
+                    "kind": kind,
+                    "dossier": str(path.relative_to(ROOT)),
+                    "line": line,
+                    "section": section,
+                    "snippet": snippet[:420],
+                })
+
+        # The same rendered-markup companion that protects body prose also protects the two
+        # contract-authorized identity-bearing frontmatter fields. YAML decoding happens first,
+        # so folded/literal scalars and inline markup cannot form a separate coverage bypass.
+        for field, line_no, raw in base.frontmatter_identity_values(text, front):
+            inspect_rendered_surface(
+                raw,
+                line=line_no,
+                section=f"frontmatter:{field}",
+                snippet=f"{field}: {raw}",
+            )
+
         section = "preamble"
         fence_marker: str | None = None
         for relative_line, raw in enumerate(text[body_offset:].splitlines(), 1):
@@ -135,32 +169,20 @@ def audit() -> list[dict]:
                 continue
             if not raw.strip():
                 continue
-            rendered = rendered_line(raw)
-            for normalized, candidate, kind in rendered_only_candidates(raw):
-                resolved = base.resolve_name(identity_index, state, candidate)
-                disposition = dispositions.get((state, normalized))
-                if resolved is not None or disposition is not None:
-                    continue
-                if covered_by_visible_materialized_identity(
-                    identity_index, state=state, candidate=candidate, kind=kind, rendered=rendered
-                ):
-                    continue
-                failures.append({
-                    "state": state,
-                    "candidate": candidate,
-                    "normalized": normalized,
-                    "kind": kind,
-                    "dossier": str(path.relative_to(ROOT)),
-                    "line": line_offset + relative_line,
-                    "section": section,
-                    "snippet": raw.strip()[:420],
-                })
+            inspect_rendered_surface(
+                raw,
+                line=line_offset + relative_line,
+                section=section,
+                snippet=raw.strip(),
+            )
     return failures
 
 
 def self_test() -> None:
     bold = rendered_only_candidates("Australian **Human Rights** Commission reported findings")
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in bold), bold
+    nccia = rendered_only_candidates("National **Cyber Crime Investigation** Agency")
+    assert any(candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in nccia), nccia
     html_split = rendered_only_candidates("Australian <strong>Human Rights</strong> Commission reported findings")
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in html_split), html_split
     code_span = rendered_only_candidates("Australian `Human Rights` Commission reported findings")
