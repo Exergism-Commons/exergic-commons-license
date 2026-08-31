@@ -50,5 +50,5 @@ jobs:
         run: python tools/check_schedule_root_and_actor_alternative_identity_coverage.py
       - name: Enforce fail-closed actor-expression completeness
         run: python tools/check_schedule_actor_expression_completeness.py
-      - name: Enforce comma-delimited capacity actor completeness
+      - name: Enforce protected capacity-list actor completeness
         run: python tools/check_schedule_capacity_actor_comma_coverage.py
