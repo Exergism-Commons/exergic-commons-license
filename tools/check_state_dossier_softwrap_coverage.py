@@ -14,21 +14,38 @@ ROOT = base.ROOT
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
 TABLE_RE = re.compile(r"^\s*\|.*\|\s*$")
+BOUNDARY = "\ue000"
+MULTILINE_INLINE_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\([^\)]+\)", re.S)
+MULTILINE_REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\[[^\]]*\]", re.S)
 
 
-def visible_line(raw: str) -> str:
+def source_line(raw: str) -> str:
     # A backslash immediately before a source newline is a CommonMark hard-break marker,
-    # not visible prose. Remove it before normalizing inline rendered markup.
-    line = re.sub(r"\\\s*$", "", raw)
-    line = markup.rendered_line(line)
-    # A code span can itself cross a soft line break, so a per-line normalizer may see an
-    # unmatched backtick run. The rendered code text remains visible; discard only the
-    # delimiter run so the cross-line name cannot hide behind it.
-    return re.sub(r"`+", "", line)
+    # not visible prose. Remove it while preserving inline markup until the complete prose
+    # block has been assembled; markup may itself span the source-line boundary.
+    return re.sub(r"\\\s*$", "", raw)
 
 
 def strip_quote(raw: str) -> str:
     return re.sub(r"^\s{0,3}(?:>\s*)+", "", raw)
+
+
+def render_prose_block(lines: list[str]) -> tuple[str, list[int]]:
+    """Render one assembled prose block while retaining source-line boundary positions.
+
+    A private-use sentinel is inserted between source lines before Markdown normalization.
+    This lets inline/reference links, emphasis and code spans be decoded across a soft break
+    while still proving that a discovered identity actually crosses an original line boundary.
+    """
+    assembled = BOUNDARY.join(lines)
+    assembled = MULTILINE_INLINE_LINK_RE.sub(lambda match: match.group(1), assembled)
+    assembled = MULTILINE_REFERENCE_LINK_RE.sub(lambda match: match.group(1), assembled)
+    rendered = markup.rendered_line(assembled)
+    # Defensive cleanup for unmatched delimiter runs; completed code spans are already rendered
+    # by markup.rendered_line(), including spans that cross the sentinel boundary.
+    rendered = re.sub(r"`+", "", rendered)
+    boundaries = [match.start() for match in re.finditer(re.escape(BOUNDARY), rendered)]
+    return rendered.replace(BOUNDARY, " "), boundaries
 
 
 def prose_blocks(body: str) -> list[dict]:
@@ -68,15 +85,16 @@ def prose_blocks(body: str) -> list[dict]:
         list_match = LIST_RE.match(raw)
         if list_match:
             flush()
+            value = source_line(strip_quote(raw[list_match.end():])).strip()
             current = {
                 "relative_line": line_no,
                 "section": section,
                 "raw_lines": [raw],
-                "lines": [visible_line(strip_quote(raw[list_match.end():])).strip()],
+                "lines": [value],
             }
             continue
 
-        value = visible_line(strip_quote(raw)).strip()
+        value = source_line(strip_quote(raw)).strip()
         if current is None:
             current = {"relative_line": line_no, "section": section, "raw_lines": [raw], "lines": [value]}
         else:
@@ -87,23 +105,13 @@ def prose_blocks(body: str) -> list[dict]:
 
 
 def cross_line_candidates(body: str) -> list[dict]:
-    """Extract TITLE_RE candidates whose match crosses one or more rendered line boundaries."""
+    """Extract TITLE_RE candidates whose rendered match crosses a source-line boundary."""
     found: list[dict] = []
     for block in prose_blocks(body):
         lines = [line for line in block["lines"] if line]
         if len(lines) < 2:
             continue
-        joined_parts: list[str] = []
-        boundaries: list[int] = []
-        length = 0
-        for index, line in enumerate(lines):
-            if index:
-                boundaries.append(length)
-                joined_parts.append(" ")
-                length += 1
-            joined_parts.append(line)
-            length += len(line)
-        joined = "".join(joined_parts)
+        joined, boundaries = render_prose_block(lines)
         for match in base.TITLE_RE.finditer(joined):
             if not any(match.start() <= boundary < match.end() for boundary in boundaries):
                 continue
@@ -165,6 +173,10 @@ def self_test() -> None:
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in html_split), html_split
     code_split = cross_line_candidates("Australian `Human\nRights` Commission reported findings.\n")
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in code_split), code_split
+    link_split = cross_line_candidates("National [Cyber\nCrime Investigation](https://e.test) Agency reported findings.\n")
+    assert any(row["candidate"] == "National Cyber Crime Investigation Agency" for row in link_split), link_split
+    reference_split = cross_line_candidates("National [Cyber\nCrime Investigation][nccia] Agency reported findings.\n")
+    assert any(row["candidate"] == "National Cyber Crime Investigation Agency" for row in reference_split), reference_split
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
     assert cross_line_candidates("## Australian Human\nRights Commission\n") == []
