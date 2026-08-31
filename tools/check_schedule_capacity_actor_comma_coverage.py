@@ -55,6 +55,12 @@ OPENING_IDENTITY_WRAPPERS = " \t\r\n\"'“‘([{*_`"
 LEADING_IDENTITY_DETERMINER_RE = re.compile(r"^(?:the|a|an)$", re.I)
 
 
+def _leading_identity_prefix_allowed(prefix: str) -> bool:
+    """Accept only wrappers/whitespace or one narrow article before a protected identity."""
+    cleaned = prefix.strip(OPENING_IDENTITY_WRAPPERS)
+    return not cleaned or bool(LEADING_IDENTITY_DETERMINER_RE.fullmatch(cleaned))
+
+
 def _protected_identity_spans(
     text: str,
     entities: list[dict],
@@ -70,11 +76,14 @@ def _protected_identity_spans(
     filtered_heuristics: list[tuple[int, int]] = []
     for heuristic in heuristic_spans:
         # Exact identity boundaries are authoritative when a maximal-institution heuristic
-        # starts at the same place but extends beyond the exact current surface. Without this
-        # precedence, ``Ministry of Justice and Human Rights & Globex`` can be heuristically
-        # protected through ``& Globex`` and hide the neighbouring actor.
+        # begins at the exact surface *or* only adds a narrow article/wrapper before it, then
+        # extends beyond the exact current surface. This covers both
+        # ``Ministry ... & Globex`` and ``The Ministry ... & Globex`` without allowing an
+        # arbitrary modifier to erase heuristic context.
         if any(
-            heuristic[0] == exact[0] and heuristic[1] > exact[1]
+            heuristic[0] <= exact[0]
+            and heuristic[1] > exact[1]
+            and _leading_identity_prefix_allowed(text[heuristic[0]:exact[0]])
             for exact in exact_spans
         ):
             continue
@@ -92,11 +101,10 @@ def _leading_protected_surface(
     spans = _protected_identity_spans(text, entities, identity_index, state, bound_ids)
     candidates: list[tuple[int, int]] = []
     for start, end in spans:
-        prefix = text[:start].strip(OPENING_IDENTITY_WRAPPERS)
         # Articles may introduce a named actor without becoming part of its identity surface.
         # Keep this deliberately closed-world: arbitrary modifiers such as ``relevant`` or
         # ``participating`` must not be silently discarded before an identity anchor.
-        if not prefix or LEADING_IDENTITY_DETERMINER_RE.fullmatch(prefix):
+        if _leading_identity_prefix_allowed(text[:start]):
             candidates.append((start, end))
     if not candidates:
         return None
