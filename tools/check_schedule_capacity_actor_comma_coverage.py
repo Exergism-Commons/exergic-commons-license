@@ -52,13 +52,17 @@ CAPACITY_LIST_SEPARATOR_RE = re.compile(
     re.I | re.X,
 )
 OPENING_IDENTITY_WRAPPERS = " \t\r\n\"'“‘([{*_`"
-LEADING_IDENTITY_DETERMINER_RE = re.compile(r"^(?:the|a|an)$", re.I)
+LEADING_IDENTITY_DETERMINERS = {"the", "a", "an"}
 
 
 def _leading_identity_prefix_allowed(prefix: str) -> bool:
-    """Accept only wrappers/whitespace or one narrow article before a protected identity."""
+    """Accept wrappers plus only the actor parser's closed-world contextual prefix words."""
     cleaned = prefix.strip(OPENING_IDENTITY_WRAPPERS)
-    return not cleaned or bool(LEADING_IDENTITY_DETERMINER_RE.fullmatch(cleaned))
+    if not cleaned:
+        return True
+    tokens = [token.casefold().rstrip(".") for token in cleaned.split()]
+    allowed = LEADING_IDENTITY_DETERMINERS | expression.SINGLE_CONTEXT_WORDS
+    return bool(tokens) and all(token in allowed for token in tokens)
 
 
 def _protected_identity_spans(
@@ -76,9 +80,9 @@ def _protected_identity_spans(
     filtered_heuristics: list[tuple[int, int]] = []
     for heuristic in heuristic_spans:
         # Exact identity boundaries are authoritative when a maximal-institution heuristic
-        # begins at the exact surface *or* only adds a narrow article/wrapper before it and
-        # contains the complete exact surface. This covers both overextension and the equal-end
-        # ``The Ministry ...`` case without allowing an arbitrary modifier to erase context.
+        # begins at the exact surface or only adds the same closed-world determiner/context
+        # prefixes already recognized by the actor-expression parser. That keeps contextual
+        # syntax from swallowing a neighbouring list member without accepting arbitrary prose.
         if any(
             heuristic[0] <= exact[0]
             and heuristic[1] >= exact[1]
@@ -100,9 +104,9 @@ def _leading_protected_surface(
     spans = _protected_identity_spans(text, entities, identity_index, state, bound_ids)
     candidates: list[tuple[int, int]] = []
     for start, end in spans:
-        # Articles may introduce a named actor without becoming part of its identity surface.
-        # Keep this deliberately closed-world: arbitrary modifiers such as ``relevant`` or
-        # ``participating`` must not be silently discarded before an identity anchor.
+        # Determiners/context words are syntax, not part of the protected identity surface.
+        # Reuse the actor-expression parser's closed-world vocabulary instead of accepting
+        # arbitrary modifiers before an exact identity anchor.
         if _leading_identity_prefix_allowed(text[:start]):
             candidates.append((start, end))
     if not candidates:
@@ -371,8 +375,9 @@ def self_test() -> None:
         control_bound,
     ) == ["Ministry of Justice and Human Rights", "Globex"]
 
-    # P1 regression: narrow articles before a protected leading identity do not make the
-    # entire capacity list opaque. The article is syntax, not part of the identity surface.
+    # P1 regressions: determiners and the actor parser's closed-world contextual modifiers
+    # before an exact leading identity do not make the entire capacity list opaque. Prefix
+    # words are syntax/context, not part of the identity surface.
     for raw, expected in [
         (
             "Human Rights Watch, acting with the Ministry of Justice and Human Rights & Globex",
@@ -394,13 +399,25 @@ def self_test() -> None:
             "Human Rights Watch, acting with “the Ministry of Justice and Human Rights” & Globex",
             ["Ministry of Justice and Human Rights", "Globex"],
         ),
+        (
+            "Human Rights Watch, acting with relevant Ministry of Justice and Human Rights & Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with the relevant Ministry of Justice and Human Rights & Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with participating Regional Council or Globex",
+            ["Regional Council", "Globex"],
+        ),
     ]:
         assert capacity_list_surfaces(raw, entities, identity_index, "AAA", control_bound) == expected, raw
 
-    # Keep the prefix grammar closed-world: an arbitrary adjective cannot be discarded just
-    # because an exact identity starts later in the fragment.
+    # Keep the prefix grammar closed-world: a modifier outside the actor parser's explicit
+    # context vocabulary cannot be silently discarded merely because an exact identity follows.
     assert _leading_protected_surface(
-        "relevant Ministry of Justice and Human Rights",
+        "former Ministry of Justice and Human Rights",
         entities,
         identity_index,
         "AAA",
