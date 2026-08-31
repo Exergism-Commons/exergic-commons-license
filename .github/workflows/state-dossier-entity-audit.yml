@@ -86,6 +86,7 @@ jobs:
           python tools/check_schedule_named_identity_strictness.py --self-test
           python tools/check_schedule_adversarial_identity_gaps.py --self-test
           python tools/check_schedule_actor_expression_completeness.py --self-test
+          python tools/check_schedule_capacity_actor_comma_coverage.py --self-test
           python tools/check_schedule_reference_field_coverage.py --self-test
           python tools/audit_private_org_mentions.py --self-test
 
@@ -119,6 +120,7 @@ jobs:
           python tools/check_schedule_named_identity_strictness.py
           python tools/check_schedule_adversarial_identity_gaps.py
           python tools/check_schedule_actor_expression_completeness.py
+          python tools/check_schedule_capacity_actor_comma_coverage.py
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
             --markdown build/private-org-mention-audit.md \
@@ -161,6 +163,7 @@ jobs:
           python tools/check_schedule_named_identity_strictness.py
           python tools/check_schedule_adversarial_identity_gaps.py
           python tools/check_schedule_actor_expression_completeness.py
+          python tools/check_schedule_capacity_actor_comma_coverage.py
           python tools/audit_private_org_mentions.py \
             --json build/private-org-mention-audit.json \
             --markdown build/private-org-mention-audit.md \
