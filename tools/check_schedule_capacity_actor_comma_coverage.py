@@ -61,10 +61,24 @@ def _protected_identity_spans(
     state: str | None,
     bound_ids: set[str],
 ) -> list[tuple[int, int]]:
-    return expression._merge_spans(
-        expression.safe_actor_anchor_spans(text, entities, identity_index, state, bound_ids)
-        + expression.heuristic_institution_spans(text)
+    """Protect exact/current identities first, then non-overextending heuristic institutions."""
+    exact_spans = expression.safe_actor_anchor_spans(
+        text, entities, identity_index, state, bound_ids
     )
+    heuristic_spans = expression.heuristic_institution_spans(text)
+    filtered_heuristics: list[tuple[int, int]] = []
+    for heuristic in heuristic_spans:
+        # Exact identity boundaries are authoritative when a maximal-institution heuristic
+        # starts at the same place but extends beyond the exact current surface. Without this
+        # precedence, ``Ministry of Justice and Human Rights & Globex`` can be heuristically
+        # protected through ``& Globex`` and hide the neighbouring actor.
+        if any(
+            heuristic[0] == exact[0] and heuristic[1] > exact[1]
+            for exact in exact_spans
+        ):
+            continue
+        filtered_heuristics.append(heuristic)
+    return expression._merge_spans(exact_spans + filtered_heuristics)
 
 
 def _leading_protected_surface(
@@ -159,9 +173,6 @@ def capacity_list_surfaces(
             region, entities, identity_index, state, bound_ids
         )
         for cue in expression.CAPACITY_IDENTITY_CUE_RE.finditer(region):
-            # A relation word such as ``and`` may itself occur inside a complete current or
-            # maximal institution identity. Treating that token as a fresh capacity cue would
-            # re-open the same separator-in-name bypass one layer earlier.
             if expression._overlaps(cue.span(), protected_region):
                 continue
             tail = region[cue.end():]
@@ -321,26 +332,27 @@ def self_test() -> None:
         bound,
     ) == ["Jane Doe"]
 
+    control_bound = bound | {"ORG-ACME-INC", "ORG-SMITH-WESSON", "INST-MOJHR"}
     assert capacity_list_surfaces(
         "Human Rights Watch, acting with Smith & Wesson, Globex",
         entities,
         identity_index,
         "AAA",
-        bound,
+        control_bound,
     ) == ["Smith & Wesson", "Globex"]
     assert capacity_list_surfaces(
         "Human Rights Watch, acting with Acme, Inc. and Globex",
         entities,
         identity_index,
         "AAA",
-        bound,
+        control_bound,
     ) == ["Acme, Inc", "Globex"]
     assert capacity_list_surfaces(
         "Human Rights Watch, acting with Ministry of Justice and Human Rights & Globex",
         entities,
         identity_index,
         "AAA",
-        bound,
+        control_bound,
     ) == ["Ministry of Justice and Human Rights", "Globex"]
 
     no_acme_entity = [item for item in entities if item["id"] != "ORG-ACME-INC"]
