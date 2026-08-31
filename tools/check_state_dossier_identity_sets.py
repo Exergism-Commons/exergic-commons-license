@@ -114,7 +114,7 @@ def self_test_frontmatter_parser() -> None:
         "---\n"
     )
     parsed = parse_frontmatter_text(continuation)
-    assert parsed["provisional_scope"] == "Human Rights Watch: reporting remains material\n"
+    assert parsed["provisional_scope"] == "Human Rights Watch: reporting remains material"
 
     semantic_duplicate = (
         "---\n"
