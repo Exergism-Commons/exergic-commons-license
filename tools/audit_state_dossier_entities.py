@@ -39,7 +39,7 @@ PROJECT_TERMS = {
 STOP_PHRASES = {
     "Current determination", "ECL criteria", "Evidence supporting", "Counter evidence",
     "Adversarial determination", "Review trigger", "Review triggers", "Procedural history",
-    "Restricted Project", "Restricted Projects", "State dossier", "State review",
+    "Restricted Project", "Restricted Projects", "Project", "State dossier", "State review",
     "Schedule boundary", "Governance record", "No current", "Ordinary State",
     "Human Rights", "International Law", "Current ECL", "Schedule translation",
     "State-wide", "State level", "State-level", "whole State", "State apparatus",
@@ -312,6 +312,10 @@ def iter_occurrences(
         candidate_surface = raw
         if heading:
             section = heading.group(1).strip()
+            # H1 is the canonical State title (for example `# North Korea (DPRK)`), so it is
+            # outside this non-State identity audit. Lower-level headings remain auditable prose.
+            if raw.startswith("# "):
+                continue
             candidate_surface = section
 
         for value, kind, resolved in extract_candidates(candidate_surface, identity_index, identity_ids, state):
@@ -466,6 +470,7 @@ def self_test() -> None:
     assert classify("Project Maven System") == "project-or-deployment"
     assert classify("ordinary prose") is None
     assert not plausible("ECL")
+    assert not plausible("Project")
     assert not plausible("../../reviews/2026/foo.md")
     assert not plausible("UPHOLD")
     assert plausible("OHCHR")
@@ -502,6 +507,8 @@ def self_test() -> None:
         value == "Project Aurora" and kind == "project-or-deployment"
         for value, kind, _ in heading_candidates
     )
+    state_heading = HEADING_RE.match("# North Korea (DPRK)")
+    assert state_heading and "# North Korea (DPRK)".startswith("# ")
     bad = (
         "---\n"
         "id: ECL-STATE-DNK\n"
