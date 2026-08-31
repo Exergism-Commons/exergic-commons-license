@@ -13,6 +13,7 @@ from entity_identity_resolution import build_name_index
 
 ROOT = base.ROOT
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+LOWER_HEADING_RE = re.compile(r"^#{2,6}\s+")
 REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]\n]+)\]\[[^\]\n]*\]")
 BRACKET_LABEL_RE = re.compile(r"(?<!!)\[([^\]\n]{2,120})\]")
 HTML_BREAK_TAG_RE = re.compile(
@@ -42,6 +43,13 @@ def rendered_line(raw: str) -> str:
     line = HTML_TAG_RE.sub("", line)
     line = EMPHASIS_RE.sub("", line)
     return html.unescape(line)
+
+
+def lower_heading_text(raw: str) -> str | None:
+    heading = base.HEADING_RE.match(raw)
+    if heading is None or LOWER_HEADING_RE.match(raw) is None:
+        return None
+    return heading.group(1).strip()
 
 
 def title_candidates(text: str) -> dict[str, tuple[str, str]]:
@@ -170,6 +178,14 @@ def audit() -> list[dict]:
             heading = base.HEADING_RE.match(raw)
             if heading:
                 section = heading.group(1).strip()
+                heading_text = lower_heading_text(raw)
+                if heading_text is not None:
+                    inspect_rendered_surface(
+                        heading_text,
+                        line=line_offset + relative_line,
+                        section=section,
+                        snippet=raw.strip(),
+                    )
                 continue
             if not raw.strip():
                 continue
@@ -187,6 +203,11 @@ def self_test() -> None:
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in bold), bold
     nccia = rendered_only_candidates("National **Cyber Crime Investigation** Agency")
     assert any(candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in nccia), nccia
+    heading_text = lower_heading_text("## National **Cyber Crime Investigation** Agency")
+    assert heading_text == "National **Cyber Crime Investigation** Agency", heading_text
+    heading_nccia = rendered_only_candidates(heading_text)
+    assert any(candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in heading_nccia), heading_nccia
+    assert lower_heading_text("# North Korea (DPRK)") is None
     html_split = rendered_only_candidates("Australian <strong>Human Rights</strong> Commission reported findings")
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in html_split), html_split
     code_span = rendered_only_candidates("Australian `Human Rights` Commission reported findings")
