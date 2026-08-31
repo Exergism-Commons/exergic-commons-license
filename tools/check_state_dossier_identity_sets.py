@@ -8,6 +8,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+import yaml
+
 from audit_state_dossier_entities import parse_frontmatter
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,33 +28,75 @@ ALLOWED_DOSSIER_FRONTMATTER_KEYS = {
 }
 
 
+class UniqueKeySafeLoader(yaml.SafeLoader):
+    """SafeLoader variant that rejects duplicate YAML mapping keys after decoding them."""
+
+
+def construct_unique_mapping(loader: UniqueKeySafeLoader, node: yaml.nodes.MappingNode, deep: bool = False):
+    """Construct a mapping without PyYAML's last-key-wins duplicate behavior."""
+    loader.flatten_mapping(node)
+    mapping: dict[object, object] = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        try:
+            duplicate = key in mapping
+        except TypeError as exc:
+            raise yaml.constructor.ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                "found an unhashable mapping key",
+                key_node.start_mark,
+            ) from exc
+        if duplicate:
+            raise yaml.constructor.ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                f"found duplicate key {key!r}",
+                key_node.start_mark,
+            )
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+UniqueKeySafeLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    construct_unique_mapping,
+)
+
+
 def norm(value: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
 
+def strict_frontmatter_mapping(source: str) -> dict[str, object]:
+    """Decode one YAML frontmatter mapping while rejecting semantic duplicate keys."""
+    try:
+        loaded = yaml.load(source, Loader=UniqueKeySafeLoader)
+    except yaml.YAMLError as exc:
+        raise ValueError(f"invalid State-dossier YAML frontmatter: {exc}") from exc
+    if loaded is None:
+        return {}
+    if not isinstance(loaded, dict) or not all(isinstance(key, str) for key in loaded):
+        raise ValueError("State-dossier frontmatter must be a YAML mapping with string keys")
+    return dict(loaded)
+
+
 def parse_frontmatter_text(text: str) -> dict[str, object]:
-    """Parse the YAML mapping structurally while preserving the top-level duplicate-key guard."""
+    """Parse the shared YAML mapping and reject duplicate keys by decoded YAML identity."""
     match = FRONT.match(text)
     if not match:
         return {}
 
-    # The shared parser correctly handles folded/literal block scalars and other YAML syntax.
-    # Keep this check solely for duplicate *top-level* contract keys: indented scalar content is
-    # data, not a key, even when a continuation line contains a colon.
-    seen: set[str] = set()
-    for line_no, line in enumerate(match.group(1).splitlines(), 2):
-        if not line or line[0].isspace() or ":" not in line:
-            continue
-        key = line.split(":", 1)[0].strip()
-        if not key:
-            continue
-        if key in seen:
-            raise ValueError(f"duplicate frontmatter key {key!r} at line {line_no}")
-        seen.add(key)
+    # Validate duplicate keys using decoded YAML values, not source spelling. Quoted and
+    # unquoted forms of the same key are therefore the same key and fail closed before the
+    # ordinary SafeLoader can apply its last-key-wins behavior.
+    strict_data = strict_frontmatter_mapping(match.group(1))
 
     data, offset = parse_frontmatter(text)
     if offset != match.end():
         raise ValueError("State dossier frontmatter parser offset mismatch")
+    if data != strict_data:
+        raise ValueError("strict/shared State dossier frontmatter parser disagreement")
     return data
 
 
@@ -60,7 +104,36 @@ def frontmatter(path: Path) -> dict[str, object]:
     return parse_frontmatter_text(path.read_text(encoding="utf-8"))
 
 
+def self_test_frontmatter_parser() -> None:
+    continuation = (
+        "---\n"
+        "id: ECL-STATE-AAA\n"
+        "iso3: AAA\n"
+        "provisional_scope: >\n"
+        "  Human Rights Watch: reporting remains material\n"
+        "---\n"
+    )
+    parsed = parse_frontmatter_text(continuation)
+    assert parsed["provisional_scope"] == "Human Rights Watch: reporting remains material\n"
+
+    semantic_duplicate = (
+        "---\n"
+        "id: ECL-STATE-AAA\n"
+        "iso3: AAA\n"
+        "provisional_scope: hidden identity\n"
+        "\"provisional_scope\": clean\n"
+        "---\n"
+    )
+    try:
+        parse_frontmatter_text(semantic_duplicate)
+    except ValueError as exc:
+        assert "duplicate key 'provisional_scope'" in str(exc)
+    else:
+        raise AssertionError("quoted/unquoted duplicate YAML keys must fail closed")
+
+
 def main() -> int:
+    self_test_frontmatter_parser()
     dossier_by_iso: dict[str, str] = {}
     for path in sorted(DOSSIERS.glob("*.md")):
         try:
