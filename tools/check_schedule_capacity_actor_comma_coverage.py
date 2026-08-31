@@ -11,8 +11,10 @@ accepted elsewhere by the Schedule actor parser: comma/Oxford-comma forms, ``and
 ``or``, ``and/or`` / ``and / or`` / ``and-or``, slash, and semicolon. A separator is active
 only when it lies outside an exact current actor span or maximal institution span, the left
 fragment already carries an actor-like surface, and the right fragment starts with a
-high-confidence identity surface. This keeps commas/conjunctions inside proven identity names
-opaque while preventing neighbouring capacity-list members from disappearing.
+high-confidence identity surface. Exact identity anchors remain structurally visible even
+when preceded by contextual prose outside the closed prefix vocabulary; unknown modifiers
+therefore cannot make later list members opaque, and they are not silently promoted into
+accepted capacity syntax.
 
 This is identity-completeness only. It creates no participation, control, operation, supply,
 membership, culpability, or governance semantics.
@@ -53,16 +55,30 @@ CAPACITY_LIST_SEPARATOR_RE = re.compile(
 )
 OPENING_IDENTITY_WRAPPERS = " \t\r\n\"'“‘([{*_`"
 LEADING_IDENTITY_DETERMINERS = {"the", "a", "an"}
+IDENTITY_SURFACE_STRIP = " \t\r\n,;:[]{}\"'“”‘’*_`."
 
 
 def _leading_identity_prefix_allowed(prefix: str) -> bool:
-    """Accept wrappers plus only the actor parser's closed-world contextual prefix words."""
+    """Recognize the closed-world prefix syntax, without making it an audit prerequisite."""
     cleaned = prefix.strip(OPENING_IDENTITY_WRAPPERS)
     if not cleaned:
         return True
     tokens = [token.casefold().rstrip(".") for token in cleaned.split()]
     allowed = LEADING_IDENTITY_DETERMINERS | expression.SINGLE_CONTEXT_WORDS
     return bool(tokens) and all(token in allowed for token in tokens)
+
+
+def _exact_identity_spans(
+    text: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+    bound_ids: set[str],
+) -> list[tuple[int, int]]:
+    """Return exact/current State-safe actor spans independent of contextual prefixes."""
+    return expression.safe_actor_anchor_spans(
+        text, entities, identity_index, state, bound_ids
+    )
 
 
 def _protected_identity_spans(
@@ -72,25 +88,26 @@ def _protected_identity_spans(
     state: str | None,
     bound_ids: set[str],
 ) -> list[tuple[int, int]]:
-    """Protect exact/current identities first, then non-overextending heuristic institutions."""
-    exact_spans = expression.safe_actor_anchor_spans(
-        text, entities, identity_index, state, bound_ids
-    )
+    """Protect exact identities first; never let a heuristic swallow a later list member."""
+    exact_spans = _exact_identity_spans(text, entities, identity_index, state, bound_ids)
     heuristic_spans = expression.heuristic_institution_spans(text)
     filtered_heuristics: list[tuple[int, int]] = []
     for heuristic in heuristic_spans:
-        # Exact identity boundaries are authoritative when a maximal-institution heuristic
-        # begins at the exact surface or only adds the same closed-world determiner/context
-        # prefixes already recognized by the actor-expression parser. That keeps contextual
-        # syntax from swallowing a neighbouring list member without accepting arbitrary prose.
-        if any(
-            heuristic[0] <= exact[0]
-            and heuristic[1] >= exact[1]
-            and _leading_identity_prefix_allowed(text[heuristic[0]:exact[0]])
-            for exact in exact_spans
-        ):
-            continue
-        filtered_heuristics.append(heuristic)
+        shadowed = False
+        for exact in exact_spans:
+            if not (heuristic[0] <= exact[0] and heuristic[1] >= exact[1]):
+                continue
+            prefix = text[heuristic[0]:exact[0]]
+            trailing = text[exact[1]:heuristic[1]]
+            # The exact boundary is authoritative for known prefix syntax. It is also
+            # authoritative whenever the heuristic would cross a capacity-list separator:
+            # an unknown adjective such as "competent" must never cause the heuristic span
+            # to swallow "& Globex" and thereby erase the trailing actor.
+            if _leading_identity_prefix_allowed(prefix) or CAPACITY_LIST_SEPARATOR_RE.search(trailing):
+                shadowed = True
+                break
+        if not shadowed:
+            filtered_heuristics.append(heuristic)
     return expression._merge_spans(exact_spans + filtered_heuristics)
 
 
@@ -104,16 +121,44 @@ def _leading_protected_surface(
     spans = _protected_identity_spans(text, entities, identity_index, state, bound_ids)
     candidates: list[tuple[int, int]] = []
     for start, end in spans:
-        # Determiners/context words are syntax, not part of the protected identity surface.
-        # Reuse the actor-expression parser's closed-world vocabulary instead of accepting
-        # arbitrary modifiers before an exact identity anchor.
+        # Known determiners/context words are syntax, not part of the identity surface.
         if _leading_identity_prefix_allowed(text[:start]):
             candidates.append((start, end))
     if not candidates:
         return None
     start, end = sorted(candidates, key=lambda item: (item[0], -(item[1] - item[0])))[0]
-    surface = text[start:end].strip(" \t\r\n,;:[]{}\"'“”‘’*_`.")
+    surface = text[start:end].strip(IDENTITY_SURFACE_STRIP)
     return surface or None
+
+
+def _exact_surfaces_preserving_prefix_debt(
+    text: str,
+    entities: list[dict],
+    identity_index,
+    state: str | None,
+    bound_ids: set[str],
+) -> list[str]:
+    """Keep exact anchors visible without silently accepting arbitrary leading modifiers.
+
+    Closed-world prefix syntax is handled by `_leading_protected_surface`. If that path does
+    not apply, exact identities still remain structural anchors for list segmentation. Any
+    actor-like material before the first exact anchor is independently retained as debt; only
+    non-identity contextual prose (for example ``competent``) is left uninterpreted.
+    """
+    exact_spans = sorted(_exact_identity_spans(text, entities, identity_index, state, bound_ids))
+    if not exact_spans:
+        return []
+    out: list[str] = []
+    first_start = exact_spans[0][0]
+    prefix = text[:first_start].strip(OPENING_IDENTITY_WRAPPERS)
+    if prefix:
+        for surface in expression._capacity_fragment_surfaces(prefix):
+            expression._add_unique(out, surface)
+    for start, end in exact_spans:
+        surface = text[start:end].strip(IDENTITY_SURFACE_STRIP)
+        if surface:
+            expression._add_unique(out, surface)
+    return out
 
 
 def _fragment_surfaces(
@@ -126,6 +171,11 @@ def _fragment_surfaces(
     protected = _leading_protected_surface(fragment, entities, identity_index, state, bound_ids)
     if protected:
         return [protected]
+    exact_surfaces = _exact_surfaces_preserving_prefix_debt(
+        fragment, entities, identity_index, state, bound_ids
+    )
+    if exact_surfaces:
+        return exact_surfaces
     return expression._capacity_fragment_surfaces(fragment)
 
 
@@ -375,9 +425,6 @@ def self_test() -> None:
         control_bound,
     ) == ["Ministry of Justice and Human Rights", "Globex"]
 
-    # P1 regressions: determiners and the actor parser's closed-world contextual modifiers
-    # before an exact leading identity do not make the entire capacity list opaque. Prefix
-    # words are syntax/context, not part of the identity surface.
     for raw, expected in [
         (
             "Human Rights Watch, acting with the Ministry of Justice and Human Rights & Globex",
@@ -411,18 +458,33 @@ def self_test() -> None:
             "Human Rights Watch, acting with participating Regional Council or Globex",
             ["Regional Council", "Globex"],
         ),
+        # Unknown modifiers are not added to the accepted prefix grammar; exact anchors are
+        # preserved structurally so the modifier cannot make the rest of the list opaque.
+        (
+            "Human Rights Watch, acting with competent Ministry of Justice and Human Rights & Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
+        (
+            "Human Rights Watch, acting with former Ministry of Justice and Human Rights or Globex",
+            ["Ministry of Justice and Human Rights", "Globex"],
+        ),
     ]:
         assert capacity_list_surfaces(raw, entities, identity_index, "AAA", control_bound) == expected, raw
 
-    # Keep the prefix grammar closed-world: a modifier outside the actor parser's explicit
-    # context vocabulary cannot be silently discarded merely because an exact identity follows.
-    assert _leading_protected_surface(
-        "former Ministry of Justice and Human Rights",
-        entities,
-        identity_index,
-        "AAA",
-        control_bound,
-    ) is None
+    # The vocabulary itself remains closed-world: unknown modifiers are not reclassified as
+    # accepted capacity syntax merely because an exact identity follows.
+    assert not _leading_identity_prefix_allowed("competent ")
+    assert not _leading_identity_prefix_allowed("former ")
+
+    # End-to-end P1 regression: binding HRW and the exact ministry cannot discharge Globex
+    # merely because an unknown contextual modifier precedes the ministry.
+    unknown_modifier_row = _row(
+        "Human Rights Watch, acting with competent Ministry of Justice and Human Rights & Globex",
+        reason="remaining context deferred",
+    )
+    unknown_modifier_row["resolved_ids"] = ["ORG-HRW", "INST-MOJHR"]
+    problems = failures({"references": [unknown_modifier_row]}, entities, by_id, identity_index)
+    assert [problem["identity_surface"] for problem in problems] == ["Globex"], problems
 
     no_acme_entity = [item for item in entities if item["id"] != "ORG-ACME-INC"]
     raw_no_acme = [
