@@ -20,7 +20,11 @@ HTML_BREAK_TAG_RE = re.compile(
 )
 HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
-CODE_SPAN_RE = re.compile(r"(`+)([^\n]*?)\1")
+# YAML-decoded frontmatter scalars may contain literal/folded line breaks inside a Markdown
+# code span. CommonMark renders those line endings as spaces, so allow them here and keep the
+# existing whitespace normalization in rendered_line(). Body fenced code remains excluded by
+# the audit loop and is not widened into identity-bearing prose.
+CODE_SPAN_RE = re.compile(r"(`+)(.*?)\1", re.S)
 LEADING_DISCOURSE_RE = re.compile(r"^(?:only\s+the\s+|only\s+|the\s+)", re.I)
 
 
@@ -189,6 +193,15 @@ def self_test() -> None:
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in code_span), code_span
     multi_code = rendered_only_candidates("Australian ``Human Rights`` Commission reported findings")
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in multi_code), multi_code
+    multiline_code = rendered_only_candidates("National `Cyber\nCrime Investigation` Agency")
+    assert any(
+        candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in multiline_code
+    ), multiline_code
+    multiline_multi_code = rendered_only_candidates("National ``Cyber\nCrime Investigation`` Agency")
+    assert any(
+        candidate == "National Cyber Crime Investigation Agency" for _, candidate, _ in multiline_multi_code
+    ), multiline_multi_code
+    assert rendered_line("National `Cyber\nCrime Investigation` Agency") == "National Cyber Crime Investigation Agency"
     assert rendered_only_candidates("Australian Human Rights Commission reported findings") == []
 
     index = build_name_index(
