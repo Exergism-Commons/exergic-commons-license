@@ -309,11 +309,12 @@ def iter_occurrences(
     for relative_lineno, raw in enumerate(body.splitlines(), 1):
         lineno = line_offset + relative_lineno
         heading = HEADING_RE.match(raw)
+        candidate_surface = raw
         if heading:
             section = heading.group(1).strip()
-            continue
+            candidate_surface = section
 
-        for value, kind, resolved in extract_candidates(raw, identity_index, identity_ids, state):
+        for value, kind, resolved in extract_candidates(candidate_surface, identity_index, identity_ids, state):
             yield Occurrence(
                 candidate=value,
                 normalized=norm(value),
@@ -493,6 +494,13 @@ def self_test() -> None:
     assert any(
         value == "Operation Aurora" and kind == "project-or-deployment"
         for value, kind, _ in result_candidates
+    )
+    heading = HEADING_RE.match("## Project Aurora")
+    assert heading
+    heading_candidates = extract_candidates(heading.group(1).strip(), empty_index, set(), "DNK")
+    assert any(
+        value == "Project Aurora" and kind == "project-or-deployment"
+        for value, kind, _ in heading_candidates
     )
     bad = (
         "---\n"
