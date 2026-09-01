@@ -60,6 +60,11 @@ PUNCTUATED_ACTOR_SUFFIX_RE = re.compile(
 PUNCTUATED_PROJECT_SUFFIX_RE = re.compile(
     rf"(?:,|[–—-])\s*{PUNCTUATED_PROJECT_SUFFIX}$"
 )
+# Frontmatter is YAML-decoded before this checker sees it, so an inline code span may contain
+# literal/folded line breaks. Match complete Markdown code spans independently of the broad
+# auditor's intentionally single-line INLINE_CODE_RE and normalize their rendered whitespace
+# before feeding them into the standalone-ampersand title grammar.
+INLINE_CODE_SPAN_RE = re.compile(r"(`+)(.*?)\1", re.S)
 
 
 def classify_ampersand_surface(text: str) -> str | None:
@@ -93,11 +98,12 @@ def ampersand_title_surfaces(prose: str) -> list[tuple[str, str]]:
 
 
 def inline_code_ampersand_titles(raw: str) -> list[tuple[str, str]]:
-    """Preserve the broad audit's explicit inline-code identity surface."""
+    """Preserve ampersand identities inside rendered Markdown inline-code spans."""
     out: list[tuple[str, str]] = []
     seen: set[tuple[str, str]] = set()
-    for match in base.INLINE_CODE_RE.finditer(raw):
-        for value, kind in ampersand_title_surfaces(match.group(1)):
+    for match in INLINE_CODE_SPAN_RE.finditer(raw):
+        code = " ".join(match.group(2).split())
+        for value, kind in ampersand_title_surfaces(code):
             marker = (base.norm(value), kind)
             if marker not in seen:
                 seen.add(marker)
@@ -244,6 +250,17 @@ def self_test() -> None:
     assert any(value == "Research & Development Agency" for value, _ in emphasized), emphasized
     code = inline_code_ampersand_titles("`Research & Development Agency` is named")
     assert any(value == "Research & Development Agency" for value, _ in code), code
+    multiline_code = inline_code_ampersand_titles("`Research &\nDevelopment Agency` is named")
+    assert any(value == "Research & Development Agency" for value, _ in multiline_code), multiline_code
+    double_tick_multiline_code = inline_code_ampersand_titles("``Research &\nDevelopment Agency`` is named")
+    assert any(
+        value == "Research & Development Agency" for value, _ in double_tick_multiline_code
+    ), double_tick_multiline_code
+    punctuated_multiline_code = inline_code_ampersand_titles("`Research &\nDevelopment, Inc.` is named")
+    assert any(
+        value in {"Research & Development, Inc.", "Research & Development, Inc"}
+        for value, _ in punctuated_multiline_code
+    ), punctuated_multiline_code
 
     punctuated = ampersand_title_surfaces("Research & Development, Inc. reported findings")
     assert any(value == "Research & Development, Inc" for value, _ in punctuated), punctuated
