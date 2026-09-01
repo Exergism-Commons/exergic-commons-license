@@ -41,7 +41,7 @@ REMEDIAL_TARGET_RE = re.compile(
     r"(?i)\b(?:withdrew charges against|granted bail to|dropped|dismissed|withdrew|freed|acquitted|cleared)\s+(?:the\s+)?"
 )
 NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’-]*|[A-Z]\.)"
-NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
+NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)\b"
 NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
 NAME_COORDINATOR = rf"(?i:{list_grammar.COORDINATOR_PATTERN})"
 NAME_SEPARATOR = rf"(?:\s*,\s*(?:{NAME_COORDINATOR}\s+)?|\s+{NAME_COORDINATOR}\s+)"
@@ -200,6 +200,17 @@ def self_test() -> None:
     assert names_from_prose("opposition leader Victoire Ingabire. UN reporting continued") == ["Victoire Ingabire"]
     assert names_from_prose("TRANSITIONAL-JUSTICE EXCLUSIONS. Current attributable abuse remains sufficient") == []
     assert "Jane Doe" in names_from_prose("journalist Jane Doe reported the detention")
+    assert names_from_prose("journalist Jane Doe allegedly reported the detention") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe described the detention") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe delayed reporting") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe damaged the record") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe dosed the patient") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe vanished") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe binned the draft") == ["Jane Doe"]
+    assert names_from_prose("journalist Jane Doe elsewhere reported") == ["Jane Doe"]
+    assert names_from_prose("journalist Juan de Silva reported the detention") == ["Juan de Silva"]
+    assert names_from_prose("journalist Ludwig van Beethoven reported the detention") == ["Ludwig van Beethoven"]
+    assert names_from_prose("journalist Ahmed al Masri reported the detention") == ["Ahmed al Masri"]
     assert "Jane Doe" in names_from_prose("authorities arrested Jane Doe after the protest")
     assert set(names_from_prose("authorities detained Jane Doe and John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe or John Roe after the protest")) == {"Jane Doe", "John Roe"}
