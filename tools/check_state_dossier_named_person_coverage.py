@@ -17,6 +17,7 @@ import audit_schedule_reference_coverage as schedule
 import audit_state_dossier_entities as base
 import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
+import identity_list_grammar as list_grammar
 
 
 ROLE = (
@@ -42,7 +43,7 @@ REMEDIAL_TARGET_RE = re.compile(
 NAME_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’-]*|[A-Z]\.)"
 NAME_PARTICLE = r"(?:de|del|da|dos|van|von|bin|binti|al|el)"
 NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
-NAME_COORDINATOR = r"(?i:and\s*/\s*or|and-or|and/or|and|or|&)"
+NAME_COORDINATOR = rf"(?i:{list_grammar.COORDINATOR_PATTERN})"
 NAME_SEPARATOR = rf"(?:\s*,\s*(?:{NAME_COORDINATOR}\s+)?|\s+{NAME_COORDINATOR}\s+)"
 NAME_SPLIT_RE = re.compile(rf"\s*,\s*(?:{NAME_COORDINATOR}\s+)?|\s+{NAME_COORDINATOR}\s+")
 NAME_LIST = rf"{NAME_PHRASE}(?:{NAME_SEPARATOR}{NAME_PHRASE}){{0,4}}"
@@ -205,13 +206,16 @@ def self_test() -> None:
     assert set(names_from_prose("authorities detained Jane Doe and/or John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe and / or John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe and-or John Roe after the protest")) == {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("authorities detained Jane Doe as well as John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe, or John Roe, Mary Major after the protest")) == {"Jane Doe", "John Roe", "Mary Major"}
+    assert set(names_from_prose("authorities detained Jane Doe as well as John Roe, and Mary Major after the protest")) == {"Jane Doe", "John Roe", "Mary Major"}
     assert "Jane Doe" in names_from_prose("Jane Doe was detained pending trial")
     assert "Jane Doe" in names_from_prose("Jane Doe remained incommunicado after transfer")
     assert "Jane Doe" in names_from_prose("Jane Doe remained unaccounted for after transfer")
     assert set(names_from_prose("Luis Pacheco and Héctor Chaclán remained imprisoned")) == {"Luis Pacheco", "Héctor Chaclán"}
     assert set(names_from_prose("Jane Doe or John Roe were detained")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("Jane Doe and/or John Roe remained imprisoned")) == {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("Jane Doe as well as John Roe remained imprisoned")) == {"Jane Doe", "John Roe"}
     assert names_from_prose("Defender Joaquín Elo Ayeto remained unaccounted for after transfer") == ["Joaquín Elo Ayeto"]
     assert "Jane Doe" in names_from_prose("Prime Minister Jane Doe announced the measure")
     assert "Jane Doe" in names_from_prose("Attorney General Jane Doe announced the measure")
