@@ -8,13 +8,13 @@ separators. That protection must not make an identity list *inside* the capacity
 This companion guard therefore inspects only relational capacity tails (for example
 ``acting with``) and applies one protected list grammar covering the same separator families
 accepted elsewhere by the Schedule actor parser: comma/Oxford-comma forms, ``and``, ``&``,
-``or``, ``and/or`` / ``and / or`` / ``and-or``, slash, and semicolon. A separator is active
-only when it lies outside an exact current actor span or maximal institution span, the left
-fragment already carries an actor-like surface, and the right fragment starts with a
-high-confidence identity surface. Exact identity anchors remain structurally visible even
-when preceded by contextual prose outside the closed prefix vocabulary; unknown modifiers
-therefore cannot make later list members opaque, and they are not silently promoted into
-accepted capacity syntax.
+``or``, ``and/or`` / ``and / or`` / ``and-or``, ``as well as``, slash, and semicolon. A
+separator is active only when it lies outside an exact current actor span or maximal
+institution span, the left fragment already carries an actor-like surface, and the right
+fragment starts with a high-confidence identity surface. Exact identity anchors remain
+structurally visible even when preceded by contextual prose outside the closed prefix
+vocabulary; unknown modifiers therefore cannot make later list members opaque, and they are
+not silently promoted into accepted capacity syntax.
 
 This is identity-completeness only. It creates no participation, control, operation, supply,
 membership, culpability, or governance semantics.
@@ -28,6 +28,7 @@ import re
 import audit_schedule_reference_coverage as schedule
 import check_schedule_actor_expression_completeness as expression
 import check_schedule_named_identity_strictness as strict
+import identity_list_grammar as list_grammar
 from entity_identity_resolution import build_name_index
 
 
@@ -36,15 +37,11 @@ IDENTITY_CONTINUATION_WORDS = {
     "ltd", "limited", "plc", "jr", "sr", "ii", "iii", "iv",
 }
 CAPACITY_LIST_SEPARATOR_RE = re.compile(
-    r"""
+    rf"""
     \s*
     (?:
-        ,\s*(?:(?:and\s*/\s*or|and-or|and/or|and|or|&)\s+)?
-      | \band\s*/\s*or\b
-      | \band-or\b
-      | \band/or\b
-      | \band\b
-      | \bor\b
+        ,\s*(?:(?:{list_grammar.COORDINATOR_PATTERN})\s+)?
+      | \b{list_grammar.WORD_COORDINATOR_PATTERN}\b
       | &
       | /
       | ;
@@ -360,6 +357,8 @@ def self_test() -> None:
         "Acme and/or Globex",
         "Acme and / or Globex",
         "Acme and-or Globex",
+        "Acme as well as Globex",
+        "Acme, as well as Globex",
         "Acme / Globex",
         "Acme; Globex",
     ]
@@ -368,6 +367,17 @@ def self_test() -> None:
         assert capacity_list_surfaces(raw, entities, identity_index, "AAA", bound) == [
             "Acme", "Globex"
         ], actor_list
+
+    reported_raw = "Human Rights Watch, acting together with Acme as well as Globex"
+    assert capacity_list_surfaces(reported_raw, entities, identity_index, "AAA", bound) == [
+        "Acme", "Globex"
+    ]
+    reported_row = _row(
+        reported_raw,
+        reason="Acme remains explicitly identity-deferred pending materialization.",
+    )
+    problems = failures({"references": [reported_row]}, entities, by_id, identity_index)
+    assert [problem["identity_surface"] for problem in problems] == ["Globex"], problems
 
     raw = "Human Rights Watch, acting with Acme, Globex & Umbra"
     assert capacity_list_surfaces(raw, entities, identity_index, "AAA", bound) == [
@@ -384,7 +394,7 @@ def self_test() -> None:
     assert [problem["identity_surface"] for problem in problems] == ["Umbra"]
 
     mixed = (
-        "Human Rights Watch, acting with Acme, Globex & Umbra and/or Initech / "
+        "Human Rights Watch, acting with Acme, Globex & Umbra as well as Initech / "
         "Soylent; Vehement"
     )
     assert capacity_list_surfaces(mixed, entities, identity_index, "AAA", bound) == [
