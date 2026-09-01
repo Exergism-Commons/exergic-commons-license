@@ -26,10 +26,52 @@ TITLE_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9.'’/-]*|[A-ZÀ-ÖØ-
 TITLE_CONNECTOR = r"(?:of|the|and|for|de|del|la|le|des|da|di|van|von)"
 TITLE_SIDE = rf"{TITLE_WORD}(?:\s+(?:{TITLE_CONNECTOR}|{TITLE_WORD})){{0,8}}"
 AMPERSAND = r"(?:&|＆)"
+
+# A comma/dash immediately before a closed-world legal/institutional suffix is part of the
+# identity surface, not sentence punctuation. Keep this deliberately narrower than arbitrary
+# title-case prose so ``Research & Development, Inc.`` is covered without turning every
+# post-comma phrase into a candidate.
+PUNCTUATED_ACTOR_SUFFIX = (
+    r"(?:Administration|Agency|Army|Authority|Bank|Brigade|Brigades|Bureau|Command|"
+    r"Commission|Committee|Council|Court|Department|Directorate|Division|Forces|Force|"
+    r"Group|Guard|Institute|Intelligence|Laboratories|Ministry|Network|Office|Police|"
+    r"Service|Services|Technologies|Technology|University|"
+    r"Ltd\.?|Limited|Inc\.?|Corp\.?|Corporation|Company|LLC|LLP|PLC|"
+    r"S\.A\.|S\.p\.A\.|GmbH|AG|SE|B\.V\.|N\.V\.|AD|ZRT|"
+    r"Pty(?:\.?\s+Ltd\.?)?|Pte(?:\.?\s+Ltd\.?)?)"
+)
+PUNCTUATED_PROJECT_SUFFIX = (
+    r"(?:Campaign|CCTV|Database|Deployment|Model|Operation|Platform|Program|Programme|"
+    r"Project|System|Systems|Tool|Tools|VSA)"
+)
+PUNCTUATED_SUFFIX = (
+    rf"(?:\s*(?:,|[–—-])\s*(?:{PUNCTUATED_ACTOR_SUFFIX}|{PUNCTUATED_PROJECT_SUFFIX}))?"
+)
+TITLE_MEMBER = rf"{TITLE_SIDE}{PUNCTUATED_SUFFIX}"
 AMPERSAND_TITLE_RE = re.compile(
-    rf"\b(?P<surface>{TITLE_SIDE}(?:\s+{AMPERSAND}\s+{TITLE_SIDE})+)\b"
+    rf"\b(?P<surface>{TITLE_MEMBER}(?:\s+{AMPERSAND}\s+{TITLE_MEMBER})+)"
+    rf"(?=$|[\s.,;:!?()\[\]{{}}\"'“”‘’])"
 )
 AMPERSAND_SPLIT_RE = re.compile(rf"\s+{AMPERSAND}\s+")
+LEADING_DETERMINER_RE = re.compile(r"^(?:the|a|an)\s+", re.I)
+PUNCTUATED_ACTOR_SUFFIX_RE = re.compile(
+    rf"(?:,|[–—-])\s*{PUNCTUATED_ACTOR_SUFFIX}$"
+)
+PUNCTUATED_PROJECT_SUFFIX_RE = re.compile(
+    rf"(?:,|[–—-])\s*{PUNCTUATED_PROJECT_SUFFIX}$"
+)
+
+
+def classify_ampersand_surface(text: str) -> str | None:
+    """Classify with the broad vocabulary plus closed punctuated legal suffixes."""
+    kind = base.classify(text)
+    if kind is not None:
+        return kind
+    if PUNCTUATED_PROJECT_SUFFIX_RE.search(text):
+        return "project-or-deployment"
+    if PUNCTUATED_ACTOR_SUFFIX_RE.search(text):
+        return "actor-or-institution"
+    return None
 
 
 def ampersand_title_surfaces(prose: str) -> list[tuple[str, str]]:
@@ -39,7 +81,7 @@ def ampersand_title_surfaces(prose: str) -> list[tuple[str, str]]:
     seen: set[tuple[str, str]] = set()
     for match in AMPERSAND_TITLE_RE.finditer(text):
         value = base.clean_candidate(match.group("surface"))
-        kind = base.classify(value)
+        kind = classify_ampersand_surface(value)
         if kind is None or not base.plausible(value):
             continue
         marker = (base.norm(value), kind)
@@ -67,19 +109,34 @@ def exact_id(index, state: str, value: str) -> str | None:
     return base.resolve_name(index, state, value)
 
 
+def canonical_review_surface(index, state: str, value: str) -> str:
+    """Treat a narrow prose article as syntax only when the literal identity is absent.
+
+    Literal exact resolution is deliberately attempted first. This preserves identities whose
+    actual reviewed name begins with ``The``, ``A`` or ``An``. Only when the literal surface is
+    not a current State-safe identity do we remove one leading determiner for review/resolution.
+    """
+    if exact_id(index, state, value) is not None:
+        return value
+    return LEADING_DETERMINER_RE.sub("", value, count=1)
+
+
 def uncovered_surface(index, state: str, value: str) -> tuple[list[str], list[str]] | None:
     """Return unresolved member diagnostics, or None when the complete surface is covered.
 
     Exact materialization of the complete ``A & B`` surface is authoritative. Otherwise the
     ampersand is accepted as a list separator only when *every* complete member independently
-    resolves to a current State-safe identity. This is intentionally stricter than guessing
-    from capitalization: if any member is not exact, the complete surface remains review debt
-    and cannot disappear behind the dossier-tree ratchet.
+    resolves to a current State-safe identity. Narrow leading articles are syntax only after
+    literal exact resolution has failed; the same rule is applied independently to list
+    members. This is intentionally stricter than guessing from capitalization: if any member
+    is not exact, the complete surface remains review debt and cannot disappear behind the
+    dossier-tree ratchet.
     """
+    value = canonical_review_surface(index, state, value)
     if exact_id(index, state, value) is not None:
         return None
     members = [base.clean_candidate(part) for part in AMPERSAND_SPLIT_RE.split(value)]
-    members = [member for member in members if member]
+    members = [canonical_review_surface(index, state, member) for member in members if member]
     if len(members) < 2:
         return (members, members)
     unresolved = [member for member in members if exact_id(index, state, member) is None]
@@ -110,7 +167,9 @@ def audit() -> list[dict]:
         candidates = ampersand_title_surfaces(prose)
         candidates += inline_code_ampersand_titles(raw)
         seen_local: set[tuple[str, str]] = set()
-        for value, kind in candidates:
+        for raw_value, raw_kind in candidates:
+            value = canonical_review_surface(identity_index, state, raw_value)
+            kind = classify_ampersand_surface(value) or raw_kind
             marker = (base.norm(value), kind)
             if marker in seen_local:
                 continue
@@ -185,12 +244,30 @@ def self_test() -> None:
     assert any(value == "Research & Development Agency" for value, _ in emphasized), emphasized
     code = inline_code_ampersand_titles("`Research & Development Agency` is named")
     assert any(value == "Research & Development Agency" for value, _ in code), code
+
+    punctuated = ampersand_title_surfaces("Research & Development, Inc. reported findings")
+    assert any(value == "Research & Development, Inc" for value, _ in punctuated), punctuated
+    punctuated_llc = ampersand_title_surfaces("Research & Development, LLC reported findings")
+    assert ("Research & Development, LLC", "actor-or-institution") in punctuated_llc, punctuated_llc
+    punctuated_institution = ampersand_title_surfaces("Research & Development — Agency reported findings")
+    assert (
+        "Research & Development — Agency",
+        "actor-or-institution",
+    ) in punctuated_institution, punctuated_institution
+    internal_suffix = ampersand_title_surfaces("Research & Development, Inc. & Project Aurora")
+    assert any(
+        value == "Research & Development, Inc. & Project Aurora" or value == "Research & Development, Inc & Project Aurora"
+        for value, _ in internal_suffix
+    ), internal_suffix
+
     assert ampersand_title_surfaces("Alpha & Beta") == []
     assert ampersand_title_surfaces("research & development agency") == []
 
     empty = build_name_index([], state_codes={"AAA"}, normalizer=base.norm)
     debt = uncovered_surface(empty, "AAA", "Research & Development Agency")
     assert debt == (["Research", "Development Agency"], ["Research", "Development Agency"]), debt
+    article_debt = uncovered_surface(empty, "AAA", "The Research & Development Agency")
+    assert article_debt == (["Research", "Development Agency"], ["Research", "Development Agency"]), article_debt
 
     exact_full = build_name_index(
         [
@@ -205,6 +282,41 @@ def self_test() -> None:
         normalizer=base.norm,
     )
     assert uncovered_surface(exact_full, "AAA", "Research & Development Agency") is None
+    assert uncovered_surface(exact_full, "AAA", "The Research & Development Agency") is None
+    assert uncovered_surface(exact_full, "AAA", "A Research & Development Agency") is None
+    assert canonical_review_surface(exact_full, "AAA", "The Research & Development Agency") == "Research & Development Agency"
+
+    genuine_article = build_name_index(
+        [
+            {
+                "id": "AGENCY-AAA-THE-RD",
+                "type": "Agency",
+                "name": "The Research & Development Agency",
+                "aliases": [],
+            }
+        ],
+        state_codes={"AAA"},
+        normalizer=base.norm,
+    )
+    assert canonical_review_surface(
+        genuine_article, "AAA", "The Research & Development Agency"
+    ) == "The Research & Development Agency"
+    assert uncovered_surface(genuine_article, "AAA", "The Research & Development Agency") is None
+
+    exact_corporate = build_name_index(
+        [
+            {
+                "id": "ORG-AAA-RD-INC",
+                "type": "Organization",
+                "name": "Research & Development, Inc.",
+                "aliases": [],
+            }
+        ],
+        state_codes={"AAA"},
+        normalizer=base.norm,
+    )
+    assert uncovered_surface(exact_corporate, "AAA", "Research & Development, Inc") is None
+    assert uncovered_surface(exact_corporate, "AAA", "The Research & Development, Inc") is None
 
     exact_list = build_name_index(
         [
@@ -215,6 +327,8 @@ def self_test() -> None:
         normalizer=base.norm,
     )
     assert uncovered_surface(exact_list, "AAA", "Agency Alpha & Project Aurora") is None
+    assert uncovered_surface(exact_list, "AAA", "The Agency Alpha & Project Aurora") is None
+    assert uncovered_surface(exact_list, "AAA", "Agency Alpha & the Project Aurora") is None
     partial_list = build_name_index(
         [{"id": "AGENCY-AAA-ALPHA", "type": "Agency", "name": "Agency Alpha", "aliases": []}],
         state_codes={"AAA"},
