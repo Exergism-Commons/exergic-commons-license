@@ -20,14 +20,31 @@ import check_schedule_named_identity_strictness as strict
 import identity_list_grammar as list_grammar
 
 
-ROLE = (
-    r"human[- ]rights defender|rights defender|peace activist|opposition leader|"
-    r"attorney general|public defender|prime minister|deputy minister|vice president|"
-    r"member of parliament|trade unionist|"
-    r"journalist|reporter|activist|lawyer|attorney|writer|blogger|defender|critic|dissident|"
-    r"politician|academic|researcher|student|unionist|cleric|pastor|imam|priest|doctor|physician|"
-    r"president|minister|governor|mayor|judge|justice|prosecutor|ombudsperson|commissioner|"
-    r"general|colonel|major|captain|senator|representative|secretary|mp"
+SINGULAR_ROLES = (
+    "human-rights defender", "human rights defender", "rights defender", "peace activist",
+    "opposition leader", "attorney general", "public defender", "prime minister",
+    "deputy minister", "vice president", "member of parliament", "trade unionist",
+    "journalist", "reporter", "activist", "lawyer", "attorney", "writer", "blogger",
+    "defender", "critic", "dissident", "politician", "academic", "researcher", "student",
+    "unionist", "cleric", "pastor", "imam", "priest", "doctor", "physician", "president",
+    "minister", "governor", "mayor", "judge", "justice", "prosecutor", "ombudsperson",
+    "commissioner", "general", "colonel", "major", "captain", "senator", "representative",
+    "secretary", "mp",
+)
+PLURAL_ROLES = (
+    "human-rights defenders", "human rights defenders", "rights defenders", "peace activists",
+    "opposition leaders", "attorneys general", "attorney generals", "public defenders",
+    "prime ministers", "deputy ministers", "vice presidents", "members of parliament",
+    "trade unionists", "journalists", "reporters", "activists", "lawyers", "attorneys",
+    "writers", "bloggers", "defenders", "critics", "dissidents", "politicians", "academics",
+    "researchers", "students", "unionists", "clerics", "pastors", "imams", "priests",
+    "doctors", "physicians", "presidents", "ministers", "governors", "mayors", "judges",
+    "justices", "prosecutors", "ombudspersons", "ombudspeople", "ombudsmen", "ombudswomen",
+    "commissioners", "generals", "colonels", "majors", "captains", "senators",
+    "representatives", "secretaries", "mps",
+)
+ROLE = "|".join(
+    sorted((re.escape(role) for role in (*SINGULAR_ROLES, *PLURAL_ROLES)), key=len, reverse=True)
 )
 ROLE_RE = re.compile(rf"(?i)\b(?:{ROLE})\s+")
 ACTION_OF_RE = re.compile(
@@ -211,6 +228,15 @@ def self_test() -> None:
     assert names_from_prose("journalist Juan de Silva reported the detention") == ["Juan de Silva"]
     assert names_from_prose("journalist Ludwig van Beethoven reported the detention") == ["Ludwig van Beethoven"]
     assert names_from_prose("journalist Ahmed al Masri reported the detention") == ["Ahmed al Masri"]
+
+    expected_pair = {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("authorities arrested journalists Jane Doe and John Roe after the protest")) == expected_pair
+    assert set(names_from_prose("detention of journalists Jane Doe and John Roe continued")) == expected_pair
+    assert set(names_from_prose("journalists Jane Doe and John Roe reported the detention")) == expected_pair
+    for role in PLURAL_ROLES:
+        found = set(names_from_prose(f"authorities arrested {role} Jane Doe and John Roe after the protest"))
+        assert found == expected_pair, (role, found)
+
     assert "Jane Doe" in names_from_prose("authorities arrested Jane Doe after the protest")
     assert set(names_from_prose("authorities detained Jane Doe and John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe or John Roe after the protest")) == {"Jane Doe", "John Roe"}
