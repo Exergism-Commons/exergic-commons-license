@@ -1,0 +1,41 @@
+name: State dossier ampersand title audit
+
+on:
+  pull_request:
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'tools/audit_state_dossier_entities.py'
+      - 'tools/audit_private_org_mentions.py'
+      - 'tools/entity_identity_resolution.py'
+      - 'tools/check_state_dossier_ampersand_title_coverage.py'
+      - '.github/workflows/state-dossier-ampersand-title-audit.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'tools/audit_state_dossier_entities.py'
+      - 'tools/audit_private_org_mentions.py'
+      - 'tools/entity_identity_resolution.py'
+      - 'tools/check_state_dossier_ampersand_title_coverage.py'
+      - '.github/workflows/state-dossier-ampersand-title-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install parser dependency
+        run: python -m pip install --disable-pip-version-check PyYAML
+      - name: Self-test standalone ampersand title grammar
+        run: python tools/check_state_dossier_ampersand_title_coverage.py --self-test
+      - name: Enforce standalone ampersand title completeness
+        run: python tools/check_state_dossier_ampersand_title_coverage.py
