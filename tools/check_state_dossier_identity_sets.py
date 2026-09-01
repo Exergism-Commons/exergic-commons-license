@@ -19,7 +19,7 @@ FRONT = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 DOSSIER_ID = re.compile(r"^ECL-STATE-([A-Z]{3})$")
 ENTITY_ID = re.compile(r"^STATE-([A-Z]{3})$")
 H1_RE = re.compile(r"^\s{0,3}#(?!#)\s+(.+?)\s*$")
-TRAILING_H1_ALIAS_RE = re.compile(r"(?:\s+\([^()\n]+\))+$")
+TRAILING_H1_ALIAS_RE = re.compile(r"\s+\(([^()\n]+)\)\s*$")
 # State-dossier frontmatter is intentionally a flat, reviewed contract. Identity-bearing prose
 # belongs in the two explicit textual fields below or in the dossier body; a newly invented
 # frontmatter key must be reviewed and added here instead of becoming an unaudited side channel.
@@ -106,8 +106,42 @@ def frontmatter(path: Path) -> dict[str, object]:
     return parse_frontmatter_text(path.read_text(encoding="utf-8"))
 
 
-def canonical_h1_title(text: str, expected_entity: str) -> str:
-    """Require one canonical State H1 as the first body line and reject H1 side channels."""
+def split_h1_title_aliases(title: str) -> tuple[str, list[str]]:
+    """Separate a canonical H1 stem from each trailing parenthesized decoration."""
+    stem = title.strip()
+    aliases: list[str] = []
+    while True:
+        match = TRAILING_H1_ALIAS_RE.search(stem)
+        if not match:
+            break
+        alias = match.group(1).strip()
+        if not alias:
+            raise ValueError("canonical State H1 contains an empty trailing alias")
+        aliases.append(alias)
+        stem = stem[:match.start()].rstrip()
+    aliases.reverse()
+    return stem, aliases
+
+
+def state_h1_aliases(iso: str) -> list[str]:
+    """Return the reviewed aliases on the corresponding State identity, if structurally usable."""
+    path = ENTITIES / f"STATE-{iso}.json"
+    if not path.is_file():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if data.get("type") != "State" or data.get("id") != f"STATE-{iso}":
+        return []
+    aliases = data.get("aliases")
+    if not isinstance(aliases, list) or not all(isinstance(item, str) and item.strip() for item in aliases):
+        return []
+    return list(aliases)
+
+
+def canonical_h1_title(text: str, expected_entity: str, allowed_aliases: list[str]) -> str:
+    """Require one canonical State H1 and validate every trailing decoration as a State alias."""
     front = FRONT.match(text)
     if front is None:
         raise ValueError("canonical State dossier is missing YAML frontmatter")
@@ -126,12 +160,18 @@ def canonical_h1_title(text: str, expected_entity: str) -> str:
     if first_content_line != line_no:
         raise ValueError("canonical State H1 must be the first non-blank body line")
 
-    # A parenthesized State alias may decorate the canonical title (for example
-    # `North Korea (DPRK)`), but the title stem must still be the frontmatter State entity.
-    title_stem = TRAILING_H1_ALIAS_RE.sub("", title).strip()
+    title_stem, trailing_aliases = split_h1_title_aliases(title)
     if norm(title_stem) != norm(expected_entity):
         raise ValueError(
             f"canonical State H1 {title!r} does not match frontmatter entity {expected_entity!r}"
+        )
+
+    allowed_normalized = {norm(alias) for alias in allowed_aliases if norm(alias)}
+    unknown_aliases = [alias for alias in trailing_aliases if norm(alias) not in allowed_normalized]
+    if unknown_aliases:
+        raise ValueError(
+            f"canonical State H1 {title!r} contains trailing alias(es) not present on the "
+            f"State identity: {unknown_aliases!r}"
         )
     return title
 
@@ -172,19 +212,24 @@ def self_test_frontmatter_parser() -> None:
         "# North Korea (DPRK)\n\n"
         "## 1. Current determination\n"
     )
-    assert canonical_h1_title(canonical, "North Korea") == "North Korea (DPRK)"
+    aliases = ["PRK", "DPRK", "Democratic People's Republic of Korea", "North Korea (DPRK)"]
+    assert canonical_h1_title(canonical, "North Korea", aliases) == "North Korea (DPRK)"
+    assert canonical_h1_title(canonical.replace(" (DPRK)", ""), "North Korea", aliases) == "North Korea"
 
-    for invalid in (
+    invalid_h1s = (
         canonical + "\n# Project Aurora\n",
         canonical.replace("# North Korea (DPRK)", "# Project Aurora"),
         canonical.replace("# North Korea (DPRK)\n\n", "Preamble\n\n# North Korea (DPRK)\n\n"),
-    ):
+        canonical.replace("# North Korea (DPRK)", "# North Korea (Project Aurora)"),
+        canonical.replace("# North Korea (DPRK)", "# North Korea (DPRK) (Project Aurora)"),
+    )
+    for invalid in invalid_h1s:
         try:
-            canonical_h1_title(invalid, "North Korea")
+            canonical_h1_title(invalid, "North Korea", aliases)
         except ValueError:
             pass
         else:
-            raise AssertionError("noncanonical/additional State-dossier H1 must fail closed")
+            raise AssertionError("noncanonical/additional/unreviewed State-dossier H1 alias must fail closed")
 
 
 def main() -> int:
@@ -217,7 +262,7 @@ def main() -> int:
             print(f"canonical State dossier missing textual entity in {path.relative_to(ROOT)}")
             return 16
         try:
-            canonical_h1_title(text, entity_value)
+            canonical_h1_title(text, entity_value, state_h1_aliases(iso))
         except ValueError as exc:
             print(f"invalid canonical State dossier H1 in {path.relative_to(ROOT)}: {exc}")
             return 17
