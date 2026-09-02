@@ -1,0 +1,61 @@
+name: State dossier review follow-up audit
+
+on:
+  pull_request:
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'tools/audit_private_org_mentions.py'
+      - 'tools/audit_schedule_reference_coverage.py'
+      - 'tools/audit_state_dossier_entities.py'
+      - 'tools/check_schedule_exact_identity_completeness.py'
+      - 'tools/check_state_dossier_named_person_coverage.py'
+      - 'tools/check_state_dossier_person_list_overflow_coverage.py'
+      - 'tools/check_state_dossier_ampersand_title_coverage.py'
+      - 'tools/check_state_dossier_render_boundary_ampersand_coverage.py'
+      - 'tools/check_state_dossier_rendered_markup_coverage.py'
+      - 'tools/check_state_dossier_softwrap_coverage.py'
+      - 'tools/entity_identity_resolution.py'
+      - 'tools/identity_list_grammar.py'
+      - '.github/workflows/state-dossier-review-followup-audit.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'tools/audit_private_org_mentions.py'
+      - 'tools/audit_schedule_reference_coverage.py'
+      - 'tools/audit_state_dossier_entities.py'
+      - 'tools/check_schedule_exact_identity_completeness.py'
+      - 'tools/check_state_dossier_named_person_coverage.py'
+      - 'tools/check_state_dossier_person_list_overflow_coverage.py'
+      - 'tools/check_state_dossier_ampersand_title_coverage.py'
+      - 'tools/check_state_dossier_render_boundary_ampersand_coverage.py'
+      - 'tools/check_state_dossier_rendered_markup_coverage.py'
+      - 'tools/check_state_dossier_softwrap_coverage.py'
+      - 'tools/entity_identity_resolution.py'
+      - 'tools/identity_list_grammar.py'
+      - '.github/workflows/state-dossier-review-followup-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install parser dependency
+        run: python -m pip install --disable-pip-version-check PyYAML
+      - name: Self-test review follow-up guards
+        run: |
+          python tools/check_state_dossier_render_boundary_ampersand_coverage.py --self-test
+          python tools/check_state_dossier_person_list_overflow_coverage.py --self-test
+      - name: Enforce review follow-up completeness
+        run: |
+          python tools/check_state_dossier_render_boundary_ampersand_coverage.py
+          python tools/check_state_dossier_person_list_overflow_coverage.py
