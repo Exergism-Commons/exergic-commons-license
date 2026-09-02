@@ -63,7 +63,10 @@ NAME_PHRASE = rf"{NAME_WORD}(?:\s+(?:{NAME_WORD}|{NAME_PARTICLE})){{1,7}}"
 NAME_COORDINATOR = rf"(?i:{list_grammar.COORDINATOR_PATTERN})"
 NAME_SEPARATOR = rf"(?:\s*,\s*(?:{NAME_COORDINATOR}\s+)?|\s+{NAME_COORDINATOR}\s+)"
 NAME_SPLIT_RE = re.compile(rf"\s*,\s*(?:{NAME_COORDINATOR}\s+)?|\s+{NAME_COORDINATOR}\s+")
-NAME_LIST = rf"{NAME_PHRASE}(?:{NAME_SEPARATOR}{NAME_PHRASE}){{0,4}}"
+# Lists are deliberately unbounded in member count. Each member remains tightly bounded by
+# NAME_PHRASE and every additional member must be introduced by the explicit list separator
+# grammar, so a sixth or later person cannot fall outside the high-confidence capture.
+NAME_LIST = rf"{NAME_PHRASE}(?:{NAME_SEPARATOR}{NAME_PHRASE})*"
 CUSTODY_STATE = (
     r"arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
     r"disappeared|released|pardoned|executed|killed|incommunicado|missing|unaccounted\s+for"
@@ -246,6 +249,22 @@ def self_test() -> None:
     assert set(names_from_prose("authorities detained Jane Doe as well as John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe, or John Roe, Mary Major after the protest")) == {"Jane Doe", "John Roe", "Mary Major"}
     assert set(names_from_prose("authorities detained Jane Doe as well as John Roe, and Mary Major after the protest")) == {"Jane Doe", "John Roe", "Mary Major"}
+
+    long_names = {"Jane Doe", "John Roe", "Mary Major", "Alice Brown", "Carlos Green", "Sarah White"}
+    assert set(names_from_prose(
+        "authorities detained Jane Doe, John Roe, Mary Major, Alice Brown, Carlos Green, Sarah White"
+    )) == long_names
+    assert set(names_from_prose(
+        "Jane Doe, John Roe, Mary Major, Alice Brown, Carlos Green, Sarah White were detained"
+    )) == long_names
+    assert set(names_from_prose(
+        "journalists Jane Doe, John Roe, Mary Major, Alice Brown, Carlos Green, Sarah White reported the detention"
+    )) == long_names
+    eight_names = long_names | {"Peter Black", "Laura Gold"}
+    assert set(names_from_prose(
+        "authorities detained Jane Doe, John Roe, Mary Major, Alice Brown, Carlos Green, Sarah White, Peter Black, Laura Gold"
+    )) == eight_names
+
     assert "Jane Doe" in names_from_prose("Jane Doe was detained pending trial")
     assert "Jane Doe" in names_from_prose("Jane Doe remained incommunicado after transfer")
     assert "Jane Doe" in names_from_prose("Jane Doe remained unaccounted for after transfer")
