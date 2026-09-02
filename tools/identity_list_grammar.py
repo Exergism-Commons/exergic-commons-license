@@ -8,5 +8,8 @@ identity-span protection, role semantics, and fail-closed review behavior.
 from __future__ import annotations
 
 
-WORD_COORDINATOR_PATTERN = r"(?:and\s*/\s*or|and-or|and/or|as\s+well\s+as|and|or)"
+# Keep this aligned with the repository's strong composite-connector semantics. In particular,
+# ``plus`` must behave like the other explicit identity-list coordinators so a trailing member
+# cannot disappear from State person or Schedule capacity-list completeness checks.
+WORD_COORDINATOR_PATTERN = r"(?:and\s*/\s*or|and-or|and/or|as\s+well\s+as|plus|and|or)"
 COORDINATOR_PATTERN = rf"(?:{WORD_COORDINATOR_PATTERN}|&)"
