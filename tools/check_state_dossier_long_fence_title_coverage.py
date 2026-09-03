@@ -5,8 +5,8 @@ Several title companions historically remembered only the fence marker character
 inside a longer fence could therefore close it early and make the real closer look like a new opener,
 hiding later visible identity prose. This independent guard tracks marker *and opening run length*
 and accepts a closer only when it uses the same marker, an equal-or-longer run, and closing-fence
-syntax. It then applies the existing rendered/CommonMark ampersand and ordinary title coverage rules
-to every visible post-fence line.
+syntax. It audits both individual visible lines and complete post-fence prose blocks so a title split
+across a soft wrap cannot disappear at the composition boundary.
 
 Identity coverage is neutral and creates no attribution, participation, control, operation, supply,
 membership, culpability, or governance semantics.
@@ -21,6 +21,7 @@ import audit_state_dossier_entities as base
 import check_state_dossier_ampersand_title_coverage as amp
 import check_state_dossier_commonmark_escape_coverage as commonmark
 import check_state_dossier_rendered_markup_coverage as markup
+import check_state_dossier_softwrap_coverage as softwrap
 import review_state_dossier_candidates as reviewed
 
 
@@ -37,6 +38,8 @@ def fence_transition(raw: str, state: tuple[str, int] | None) -> tuple[tuple[str
     tail = match.group("tail")
     marker = run[0]
     if state is None:
+        # A backtick info string may not itself contain a backtick. Such a line is ordinary prose,
+        # not an opener; tilde fences have no equivalent restriction here.
         if marker == "`" and "`" in tail:
             return None, False
         return (marker, len(run)), True
@@ -60,6 +63,27 @@ def visible_lines(body: str) -> list[tuple[int, str]]:
     return out
 
 
+def fence_safe_body(body: str) -> str:
+    """Blank fenced-code lines while preserving source line numbers for block assembly.
+
+    The existing soft-wrap renderer is useful after fences are removed, but its own historical
+    marker-only fence state cannot safely decide which lines are visible. This pre-pass therefore
+    makes that decision with the full-run grammar and replaces every opener/content/closer line by
+    an empty line. The remaining text can then be assembled with the established block renderer
+    without allowing a shorter internal run to invert visibility.
+    """
+    out: list[str] = []
+    state: tuple[str, int] | None = None
+    for raw in body.splitlines():
+        previous_state = state
+        state, fence_line = fence_transition(raw, state)
+        if fence_line or previous_state is not None or state is not None:
+            out.append("")
+        else:
+            out.append(raw)
+    return "\n".join(out)
+
+
 def audit() -> list[dict]:
     dossiers = base.canonical_state_dossiers()
     states = {
@@ -71,12 +95,9 @@ def audit() -> list[dict]:
     dispositions, _ = reviewed.load_dispositions()
     failures_by_key: dict[tuple[str, str, str, int, str], dict] = {}
 
-    def inspect(*, state: str, source: str, line: int, raw: str) -> None:
-        if not raw.strip() or raw.lstrip().startswith("# "):
-            return
-
-        rendered = commonmark.rendered_with_commonmark_escapes(raw)
-
+    def inspect_rendered(
+        *, state: str, source: str, line: int, rendered: str, snippet: str, scope: str
+    ) -> None:
         for normalized, (candidate, kind) in markup.title_candidates(rendered).items():
             if base.resolve_name(identity_index, state, candidate) is not None:
                 continue
@@ -90,7 +111,7 @@ def audit() -> list[dict]:
                 rendered=rendered,
             ):
                 continue
-            key = (state, normalized, source, line, "ordinary-title")
+            key = (state, normalized, source, line, f"ordinary-title:{scope}")
             failures_by_key[key] = {
                 "state": state,
                 "candidate": candidate,
@@ -99,7 +120,7 @@ def audit() -> list[dict]:
                 "reason": "visible title after Markdown fence lacks identity coverage",
                 "source": source,
                 "line": line,
-                "snippet": raw[:420],
+                "snippet": snippet[:420],
             }
 
         for raw_value, raw_kind in amp.ampersand_title_surfaces(rendered):
@@ -110,7 +131,7 @@ def audit() -> list[dict]:
             if uncovered is None:
                 continue
             members, unresolved = uncovered
-            key = (state, normalized, source, line, "ampersand-title")
+            key = (state, normalized, source, line, f"ampersand-title:{scope}")
             failures_by_key[key] = {
                 "state": state,
                 "candidate": value,
@@ -121,8 +142,20 @@ def audit() -> list[dict]:
                 "unresolved_members": unresolved,
                 "source": source,
                 "line": line,
-                "snippet": raw[:420],
+                "snippet": snippet[:420],
             }
+
+    def inspect_raw(*, state: str, source: str, line: int, raw: str, scope: str) -> None:
+        if not raw.strip() or raw.lstrip().startswith("# "):
+            return
+        inspect_rendered(
+            state=state,
+            source=source,
+            line=line,
+            rendered=commonmark.rendered_with_commonmark_escapes(raw),
+            snippet=raw,
+            scope=scope,
+        )
 
     for path, front, body_offset in dossiers:
         state = front.get("iso3")
@@ -131,12 +164,34 @@ def audit() -> list[dict]:
         source = str(path.relative_to(base.ROOT))
         text = path.read_text(encoding="utf-8")
         line_offset = text[:body_offset].count("\n")
-        for relative_line, raw in visible_lines(text[body_offset:]):
-            inspect(
+        body = text[body_offset:]
+
+        # Same-line/heading/table/list protection after the full-run visibility decision.
+        for relative_line, raw in visible_lines(body):
+            inspect_raw(
                 state=state,
                 source=source,
                 line=line_offset + relative_line,
                 raw=raw,
+                scope="line",
+            )
+
+        # Composition protection: blank the true fenced region with the full-run parser first,
+        # then let the established soft-wrap assembler join only actually visible prose. This
+        # catches e.g. `Research \\&` + `Development Agency` after a four-backtick fence whose
+        # contents include a literal three-backtick line.
+        safe_body = fence_safe_body(body)
+        for block in softwrap.prose_blocks(safe_body):
+            lines = [line for line in block["lines"] if line]
+            if not lines:
+                continue
+            raw_block = " ".join(lines)
+            inspect_raw(
+                state=state,
+                source=source,
+                line=line_offset + block["relative_line"],
+                raw=raw_block,
+                scope="block",
             )
 
     return [failures_by_key[key] for key in sorted(failures_by_key)]
@@ -170,6 +225,37 @@ def self_test() -> None:
 
     invalid = visible_lines("```bad`info\nResearch \\& Development Agency\n")
     assert invalid[0][0] == 1 and invalid[1][0] == 2, invalid
+
+    # Composition regression from review: the internal three-backtick run stays fenced; after the
+    # true four-backtick closer, a soft-wrapped escaped-ampersand identity must be reassembled.
+    wrapped = (
+        "````text\n"
+        "Research \\& Hidden Agency\n"
+        "```\n"
+        "still fenced\n"
+        "````\n"
+        "Research \\&\n"
+        "Development Agency reported findings.\n"
+    )
+    safe = fence_safe_body(wrapped)
+    blocks = softwrap.prose_blocks(safe)
+    rendered_blocks = [
+        commonmark.rendered_with_commonmark_escapes(" ".join(line for line in block["lines"] if line))
+        for block in blocks
+        if block["lines"]
+    ]
+    wrapped_surfaces = [
+        surface
+        for rendered_block in rendered_blocks
+        for surface in amp.ampersand_title_surfaces(rendered_block)
+    ]
+    assert ("Research & Development Agency", "actor-or-institution") in wrapped_surfaces, (
+        safe,
+        blocks,
+        rendered_blocks,
+        wrapped_surfaces,
+    )
+    assert not any("Hidden Agency" in value for value, _ in wrapped_surfaces), wrapped_surfaces
 
     print("State dossier long-fence title coverage self-test: OK")
 
