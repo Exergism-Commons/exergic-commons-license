@@ -32,7 +32,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install parser dependencies
-        run: python -m pip install -r tools/schedule-requirements.txt
+        run: python -m pip install -r tools/schedule-requirements.txt -r tools/commonmark-requirements.txt
 
       - name: Self-test latest State dossier review invariants
         run: |
