@@ -1,0 +1,45 @@
+name: State dossier review follow-up audit
+
+on:
+  pull_request:
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'tools/**'
+      - '.github/workflows/state-dossier-review-followup-audit.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'dossiers/states/**'
+      - 'knowledge/entities/**'
+      - 'tools/**'
+      - '.github/workflows/state-dossier-review-followup-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install parser dependencies
+        run: python -m pip install -r tools/schedule-requirements.txt
+
+      - name: Self-test latest State dossier review invariants
+        run: |
+          python tools/check_state_dossier_h1_state_binding.py --self-test
+          python tools/check_state_dossier_commonmark_escape_coverage.py --self-test
+          python tools/check_state_dossier_passive_appositive_person_coverage.py --self-test
+
+      - name: Enforce latest State dossier review invariants
+        run: |
+          python tools/check_state_dossier_h1_state_binding.py
+          python tools/check_state_dossier_commonmark_escape_coverage.py
+          python tools/check_state_dossier_passive_appositive_person_coverage.py
