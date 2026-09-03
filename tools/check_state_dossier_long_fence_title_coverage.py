@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Fail closed on State-dossier title identities hidden after long Markdown fences.
+"""Fail closed on State-dossier title identities hidden after Markdown fences.
 
-Several title companions historically remembered only the fence marker character. A shorter run
-inside a longer fence could therefore close it early and make the real closer look like a new opener,
-hiding later visible identity prose. This independent guard tracks marker *and opening run length*
-and accepts a closer only when it uses the same marker, an equal-or-longer run, and closing-fence
-syntax. It audits both individual visible lines and complete post-fence prose blocks so a title split
-across a soft wrap cannot disappear at the composition boundary.
+Several title companions historically carried independent fence state. This guard now delegates all
+fenced-code visibility to the same CommonMark parser used by Person and vendor coverage, then audits
+both individual visible lines and complete post-fence prose blocks so a title split across a soft
+wrap cannot disappear at the composition boundary.
 
 Identity coverage is neutral and creates no attribution, participation, control, operation, supply,
 membership, culpability, or governance semantics.
@@ -15,73 +13,36 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 
 import audit_state_dossier_entities as base
 import check_state_dossier_ampersand_title_coverage as amp
 import check_state_dossier_commonmark_escape_coverage as commonmark
 import check_state_dossier_rendered_markup_coverage as markup
 import check_state_dossier_softwrap_coverage as softwrap
+import commonmark_fences as fences
 import review_state_dossier_candidates as reviewed
 
 
-FENCE_RE = re.compile(r"^\s{0,3}(?P<run>`{3,}|~{3,})(?P<tail>.*)$")
-
-
-def fence_transition(raw: str, state: tuple[str, int] | None) -> tuple[tuple[str, int] | None, bool]:
-    """Advance a CommonMark fence state and report whether this is a fence-like line."""
-    match = FENCE_RE.match(raw)
-    if match is None:
-        return state, False
-
-    run = match.group("run")
-    tail = match.group("tail")
-    marker = run[0]
-    if state is None:
-        # A backtick info string may not itself contain a backtick. Such a line is ordinary prose,
-        # not an opener; tilde fences have no equivalent restriction here.
-        if marker == "`" and "`" in tail:
-            return None, False
-        return (marker, len(run)), True
-
-    open_marker, open_length = state
-    if marker == open_marker and len(run) >= open_length and not tail.strip():
-        return None, True
-    return state, True
+def fence_transition(
+    raw: str, state: fences.FenceState | None
+) -> tuple[fences.FenceState | None, bool]:
+    """Compatibility wrapper around the single shared CommonMark fence transition."""
+    return fences.fence_transition(raw, state)
 
 
 def visible_lines(body: str) -> list[tuple[int, str]]:
-    out: list[tuple[int, str]] = []
-    state: tuple[str, int] | None = None
-    for line_no, raw in enumerate(body.splitlines(), 1):
-        state, fence_line = fence_transition(raw, state)
-        if fence_line:
-            continue
-        if state is not None:
-            continue
-        out.append((line_no, raw))
-    return out
+    """Return lines visible outside fenced code using the shared parser."""
+    return fences.visible_lines(body)
 
 
 def fence_safe_body(body: str) -> str:
     """Blank fenced-code lines while preserving source line numbers for block assembly.
 
-    The existing soft-wrap renderer is useful after fences are removed, but its own historical
-    marker-only fence state cannot safely decide which lines are visible. This pre-pass therefore
-    makes that decision with the full-run grammar and replaces every opener/content/closer line by
-    an empty line. The remaining text can then be assembled with the established block renderer
-    without allowing a shorter internal run to invert visibility.
+    The existing soft-wrap renderer is useful after fences are removed, but its historical marker-
+    only fence state cannot safely decide which lines are visible. The shared parser makes that
+    decision once; the remaining text can then be assembled without reopening fence semantics.
     """
-    out: list[str] = []
-    state: tuple[str, int] | None = None
-    for raw in body.splitlines():
-        previous_state = state
-        state, fence_line = fence_transition(raw, state)
-        if fence_line or previous_state is not None or state is not None:
-            out.append("")
-        else:
-            out.append(raw)
-    return "\n".join(out)
+    return fences.blank_fenced_lines(body)
 
 
 def audit() -> list[dict]:
@@ -166,7 +127,7 @@ def audit() -> list[dict]:
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
 
-        # Same-line/heading/table/list protection after the full-run visibility decision.
+        # Same-line/heading/table/list protection after the shared visibility decision.
         for relative_line, raw in visible_lines(body):
             inspect_raw(
                 state=state,
@@ -176,10 +137,8 @@ def audit() -> list[dict]:
                 scope="line",
             )
 
-        # Composition protection: blank the true fenced region with the full-run parser first,
-        # then let the established soft-wrap assembler join only actually visible prose. This
-        # catches e.g. `Research \\&` + `Development Agency` after a four-backtick fence whose
-        # contents include a literal three-backtick line.
+        # Composition protection: blank the true fenced region with the shared parser first, then
+        # let the established soft-wrap assembler join only actually visible prose.
         safe_body = fence_safe_body(body)
         for block in softwrap.prose_blocks(safe_body):
             lines = [line for line in block["lines"] if line]
@@ -198,6 +157,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     body = (
         "````markdown\n"
         "Research \\& Hidden Agency\n"
@@ -211,7 +171,7 @@ def self_test() -> None:
     lines = visible_lines(body)
     assert lines == [(8, r"Research \& Development Agency")], lines
 
-    state: tuple[str, int] | None = None
+    state: fences.FenceState | None = None
     state, handled = fence_transition("````python", state)
     assert handled and state == ("`", 4), state
     state, handled = fence_transition("```", state)
@@ -225,6 +185,11 @@ def self_test() -> None:
 
     invalid = visible_lines("```bad`info\nResearch \\& Development Agency\n")
     assert invalid[0][0] == 1 and invalid[1][0] == 2, invalid
+
+    # The review finding is enforced through the shared parser: a tab-indented would-be opener
+    # cannot hide a later title surface.
+    tab_indented = visible_lines("\t```text\nResearch \\& Development Agency\n")
+    assert tab_indented[0][0] == 1 and tab_indented[1][0] == 2, tab_indented
 
     # Composition regression from review: the internal three-backtick run stays fenced; after the
     # true four-backtick closer, a soft-wrapped escaped-ampersand identity must be reassembled.
