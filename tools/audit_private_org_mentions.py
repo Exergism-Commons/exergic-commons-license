@@ -131,13 +131,15 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
 
     CommonMark soft and hard line breaks inside a paragraph are whitespace, so vendor/action
     phrases may span source lines. Structural block boundaries are not joined. Fenced code
-    is excluded consistently with the existing inline-code policy.
+    is excluded consistently with the existing inline-code policy. Fence closing follows the
+    opening marker and run length: a shorter run inside a longer fence remains code content.
     """
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
     raw_buffer: list[str] = []
     start_line: int | None = None
     fence_marker: str | None = None
+    fence_length = 0
 
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
@@ -154,12 +156,18 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
         stripped = raw.strip()
         fence = FENCE_RE.match(raw)
         if fence:
-            marker = fence.group(1)[0]
+            run = fence.group(1)
+            marker = run[0]
             if fence_marker is None:
                 flush()
                 fence_marker = marker
-            elif marker == fence_marker:
+                fence_length = len(run)
+                continue
+            if marker == fence_marker and len(run) >= fence_length and not raw[fence.end():].strip():
                 fence_marker = None
+                fence_length = 0
+            # A shorter same-marker run, a different marker, or a run with trailing content
+            # remains fenced code and must not be interpreted as prose or a new opener.
             continue
         if fence_marker is not None:
             continue
@@ -342,6 +350,23 @@ def self_test() -> None:
     assert not any(extract_names(segment[2]) for segment in separate_items)
     fenced = rendered_prose_segments("```text\nCellebrite supplied software\n```\n")
     assert fenced == []
+    long_fence = rendered_prose_segments(
+        "````text\n"
+        "Cellebrite supplied software\n"
+        "```\n"
+        "Cellebrite supplied software\n"
+        "````\n"
+        "Cellebrite supplied software\n"
+    )
+    assert len(long_fence) == 1 and extract_names(long_fence[0][2]) == expected
+    longer_close = rendered_prose_segments(
+        "````text\nCellebrite supplied software\n`````\nCellebrite supplied software\n"
+    )
+    assert len(longer_close) == 1 and extract_names(longer_close[0][2]) == expected
+    different_marker = rendered_prose_segments(
+        "````text\n~~~\nCellebrite supplied software\n````\nCellebrite supplied software\n"
+    )
+    assert len(different_marker) == 1 and extract_names(different_marker[0][2]) == expected
     assert extract_names("private contractor support was reported") == []
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
