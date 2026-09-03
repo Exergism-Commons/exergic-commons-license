@@ -76,7 +76,7 @@ def non_state_identity_index():
     return identity.build_name_index(
         non_state,
         state_codes=state_codes,
-        normalizer=identity.default_normalizer,
+        normalizer=schedule.norm,
     )
 
 
@@ -90,7 +90,7 @@ def exact_identity_values(value: object, state: str | None, name_index) -> list[
     if not isinstance(state, str):
         return matches
     for raw in values:
-        normalized = identity.default_normalizer(raw)
+        normalized = schedule.norm(raw)
         if not normalized:
             continue
         ids = identity.resolve_normalized(name_index, state=state, normalized=normalized)
@@ -276,12 +276,24 @@ def self_test() -> None:
     assert reference_value_failure("candidate_parties", ["Agency", 7]) is not None
     assert reference_value_failure("candidate_parties", {"name": "Agency"}) is not None
     synthetic_index = identity.build_name_index(
-        [{"id": "AGENCY-AAA-EXAMPLE", "name": "Example Agency", "aliases": ["EA"]}],
+        [
+            {"id": "AGENCY-AAA-EXAMPLE", "name": "Example Agency", "aliases": ["EA"]},
+            {"id": "PERSON-AAA-AHMAD", "type": "Person", "name": "أحمد منصور", "aliases": []},
+            {"id": "PERSON-AAA-WANG", "type": "Person", "name": "王小明", "aliases": []},
+        ],
         state_codes={"AAA"},
-        normalizer=identity.default_normalizer,
+        normalizer=schedule.norm,
     )
     assert exact_identity_values("Example Agency", "AAA", synthetic_index)
+    assert exact_identity_values("أحمد منصور", "AAA", synthetic_index) == [
+        {"value": "أحمد منصور", "resolved_ids": ["PERSON-AAA-AHMAD"]}
+    ]
+    assert exact_identity_values("王小明", "AAA", synthetic_index) == [
+        {"value": "王小明", "resolved_ids": ["PERSON-AAA-WANG"]}
+    ]
     assert exact_identity_values("Example Agency performed an action", "AAA", synthetic_index) == []
+    assert schedule.norm("أحمد منصور") != ""
+    assert schedule.norm("王小明") != ""
     nested = list(walk_dict_fields({"details": {"candidate_parties": ["Agency"]}}))
     assert any(path == ("details", "candidate_parties") for path, _ in nested)
     assert "MITIGA-DETENTION-APPARATUS" in registry_ids("registry/projects.yml")
