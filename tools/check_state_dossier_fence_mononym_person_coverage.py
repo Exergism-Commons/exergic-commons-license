@@ -45,6 +45,28 @@ STRONG_CASED_NAME_LIST = (
     rf"(?:{SEPARATOR}{STRONG_CASED_PERSON_MENTION})*"
 )
 
+# A one-token cased name needs a particularly strong lexical context. Reuse only unambiguous
+# singular human-role cues here; plural role nouns and adjective/rank-like tokens such as
+# ``general``/``major`` are deliberately excluded because ordinary prose can follow them with a
+# capitalized common noun ("Prosecutors Resolution", "general State collapse").
+MONONYM_ROLES = (
+    "human-rights defender", "human rights defender", "rights defender", "peace activist",
+    "opposition leader", "attorney general", "public defender", "prime minister",
+    "deputy minister", "vice president", "member of parliament", "trade unionist",
+    "journalist", "reporter", "activist", "lawyer", "attorney", "writer", "blogger",
+    "defender", "critic", "dissident", "politician", "academic", "researcher", "student",
+    "unionist", "cleric", "pastor", "imam", "priest", "doctor", "physician", "president",
+    "governor", "mayor", "judge", "justice", "prosecutor", "ombudsperson", "senator",
+)
+MONONYM_ROLE = "|".join(
+    sorted((re.escape(role) for role in MONONYM_ROLES), key=len, reverse=True)
+)
+MONONYM_ROLE_PREFIX_RE = re.compile(rf"(?i:\b(?:{MONONYM_ROLE})\s+)")
+MONONYM_NON_PERSON = {
+    "state", "resolution", "judgment", "judgement", "court", "government", "law",
+    "parliament", "police", "agency", "commission", "council", "project", "operation",
+}
+
 # CommonMark closing fences use the same marker character and at least the opening run length,
 # with no info string. Keep this stricter than the generic opener regex.
 CLOSING_FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})[ \t]*$")
@@ -84,7 +106,18 @@ def valid_strong_cased_name(value: str) -> bool:
         return False
     # Exclude a lone initial such as "A." while permitting cased mononyms such as Banksy/Łukasz.
     if len(semantic) == 1:
-        return sum(char.isalpha() for char in semantic[0]) >= 2
+        token = semantic[0].strip(".")
+        if sum(char.isalpha() for char in token) < 2:
+            return False
+        if token.isupper() or token.casefold() in MONONYM_NON_PERSON:
+            return False
+        # Precision-first mononym rule: plural-looking common/group nouns are far more common in
+        # custody prose than personal mononyms. Keep them out unless a future reviewed case adds
+        # a narrower positive grammar.
+        folded = token.casefold()
+        if folded.endswith("s") and not folded.endswith("ss"):
+            return False
+        return True
     return True
 
 
@@ -119,7 +152,7 @@ def strong_cased_names_from_prose(prose: str) -> list[str]:
             if value not in names:
                 names.append(value)
 
-    for match in unicode_guard.ROLE_PREFIX_RE.finditer(prose):
+    for match in MONONYM_ROLE_PREFIX_RE.finditer(prose):
         add_many(leading_strong_cased_names(prose[match.end():]))
 
     for regex in (
@@ -357,10 +390,17 @@ def self_test() -> None:
     ) == ["Jane Doe", "Banksy"]
     assert strong_cased_names_from_prose("Jane Doe was detained") == ["Jane Doe"]
 
-    # No strong context, a lone initial, and institutional class words remain outside mononym debt.
+    # No strong context, a lone initial, and institutional/common-noun surfaces remain outside debt.
     assert strong_cased_names_from_prose("Banksy exhibition opened") == []
     assert strong_cased_names_from_prose("activist A. was detained") == []
     assert strong_cased_names_from_prose("Project was detained") == []
+    assert strong_cased_names_from_prose("Prosecutors Resolution 310 sets standards") == []
+    assert strong_cased_names_from_prose("Hundreds were arrested") == []
+    assert strong_cased_names_from_prose("Christians remained detained") == []
+    assert strong_cased_names_from_prose("Palestinians were detained") == []
+    assert strong_cased_names_from_prose("general State collapse continued") == []
+    assert strong_cased_names_from_prose("Judgments were released") == []
+    assert strong_cased_names_from_prose("EXCLUSIONS were released") == []
 
     print("State dossier fenced-code and cased-mononym Person coverage self-test: OK")
 
