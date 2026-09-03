@@ -2,9 +2,9 @@
 """Fail closed on named people hidden by passive custody prose variants.
 
 The established State Person guards historically left auxiliary/adverb gaps across simple,
-perfect, progressive, remain/remains, and modal passive custody clauses. This independent companion
-covers the ordinary passive auxiliary families plus a deliberately closed, bounded adverb vocabulary,
-while reusing the broader closed Person name/list and bounded human-role appositive grammars.
+perfect, progressive, remain/remains, modal, and negated passive custody clauses. This independent
+companion covers the ordinary passive auxiliary families plus a deliberately closed, bounded modifier
+vocabulary, while reusing the broader closed Person name/list and bounded human-role appositive grammars.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
 operation, membership, or governance semantics.
@@ -23,13 +23,13 @@ import check_state_dossier_named_person_coverage as person
 import check_state_dossier_passive_appositive_person_coverage as appositive
 
 
-# Closed adverb vocabulary: enough for ordinary temporal/evidentiary/legal modifiers without
-# turning arbitrary lowercase prose into part of the passive grammar. At most three modifiers
-# may occur in either slot: before ``being/been/be`` and immediately before the custody state.
+# Closed modifier vocabulary: enough for ordinary temporal/evidentiary/legal/negation modifiers
+# without turning arbitrary lowercase prose into part of the passive grammar. At most three
+# modifiers may occur in either slot: before ``being/been/be`` and immediately before custody state.
 PASSIVE_ADVERB = (
     r"allegedly|arbitrarily|currently|reportedly|unlawfully|wrongfully|temporarily|briefly|"
     r"continuously|repeatedly|immediately|still|now|presently|subsequently|previously|"
-    r"formally|officially|effectively|forcibly|secretly"
+    r"formally|officially|effectively|forcibly|secretly|not|never"
 )
 ADVERB_SEQ = rf"(?:(?i:{PASSIVE_ADVERB})\s+){{0,3}}"
 
@@ -39,7 +39,7 @@ ADVERB_SEQ = rf"(?:(?i:{PASSIVE_ADVERB})\s+){{0,3}}"
 PASSIVE_MODAL = r"can|could|may|might|must|shall|should|will|would"
 
 # This companion owns the ordinary simple/progressive/perfect/remain/modal passive families so an
-# adverb or auxiliary variation cannot move the same identity bypass from one guard to another.
+# adverb, negation, or auxiliary variation cannot move the same identity bypass from one guard to another.
 PASSIVE_AUX = (
     rf"(?:"
     rf"(?i:is|are|was|were)\s+(?:{ADVERB_SEQ}(?i:being)\s+)?|"
@@ -125,13 +125,20 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
-    # Simple passive family, including the prior plural-present P1 and adverb insertion.
+    # Simple passive family, including the prior plural-present P1 and modifier insertion.
     assert names_from_plural_present_passive("Jane Doe and John Roe are detained") == [
         "Jane Doe", "John Roe"
     ]
     assert names_from_plural_present_passive("Jane Doe is arbitrarily detained") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe was reportedly imprisoned") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe and John Roe are currently detained") == [
+        "Jane Doe", "John Roe"
+    ]
+
+    # Negation is explicit closed-world syntax, including the reported simple-passive forms.
+    assert names_from_plural_present_passive("Jane Doe was not detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe was never detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe are not imprisoned") == [
         "Jane Doe", "John Roe"
     ]
 
@@ -144,12 +151,13 @@ def self_test() -> None:
         "Jane Doe", "John Roe"
     ]
 
-    # Progressive passive: adverbs are accepted both before ``being`` and before custody state.
+    # Progressive passive: modifiers are accepted both before ``being`` and before custody state.
     assert names_from_plural_present_passive("Jane Doe and John Roe are being detained") == [
         "Jane Doe", "John Roe"
     ]
     assert names_from_plural_present_passive("Jane Doe is being arbitrarily detained") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe is currently being detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe is not being detained") == ["Jane Doe"]
     assert names_from_plural_present_passive(
         "Jane Doe is currently being arbitrarily detained"
     ) == ["Jane Doe"]
@@ -157,8 +165,9 @@ def self_test() -> None:
         "Jane Doe and John Roe were reportedly being unlawfully detained"
     ) == ["Jane Doe", "John Roe"]
 
-    # Perfect passive is covered here as defense in depth, including adverb slots.
+    # Perfect passive is covered here as defense in depth, including negation and modifier slots.
     assert names_from_plural_present_passive("Jane Doe has been detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe has not been detained") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe has been arbitrarily detained") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe has reportedly been detained") == ["Jane Doe"]
     assert names_from_plural_present_passive(
@@ -168,6 +177,7 @@ def self_test() -> None:
     # Modal passive is deliberately restricted to the closed modal + ``be`` family.
     assert names_from_plural_present_passive("Jane Doe will be detained") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe may be detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe may not be detained") == ["Jane Doe"]
     assert names_from_plural_present_passive("Jane Doe and John Roe could be imprisoned") == [
         "Jane Doe", "John Roe"
     ]
@@ -183,7 +193,7 @@ def self_test() -> None:
         "Ali ibn Abi Talib and Jane Doe had reportedly been detained"
     ) == ["Ali ibn Abi Talib", "Jane Doe"]
 
-    # Bounded role appositives compose with simple, progressive, perfect, modal and adverbial forms.
+    # Bounded role appositives compose with simple, progressive, perfect, modal and negated forms.
     assert names_from_plural_present_passive(
         "Jane Doe and John Roe (journalists) are arbitrarily detained"
     ) == ["Jane Doe", "John Roe"]
@@ -191,10 +201,10 @@ def self_test() -> None:
         "Jane Doe and John Roe, journalists, are currently being imprisoned"
     ) == ["Jane Doe", "John Roe"]
     assert names_from_plural_present_passive(
-        "Jane Doe, a journalist, has reportedly been arbitrarily detained"
+        "Jane Doe, a journalist, has not been detained"
     ) == ["Jane Doe"]
     assert names_from_plural_present_passive(
-        "Jane Doe and John Roe (journalists) may be detained"
+        "Jane Doe and John Roe (journalists) may not be detained"
     ) == ["Jane Doe", "John Roe"]
 
     # Closed-world/bounded controls: unknown prose and excessive modifier chains do not widen.
