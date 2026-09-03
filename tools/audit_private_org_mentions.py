@@ -51,7 +51,10 @@ HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 URL_RE = re.compile(r"https?://\S+")
 INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 MARKDOWN_EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+# A backtick fence is not a CommonMark opener when its info string contains a backtick. Tilde
+# fences do not have that restriction. Keeping the rule in the shared renderer protects every
+# consumer rather than requiring each downstream audit to rediscover the same visibility edge.
+FENCE_RE = re.compile(r"^\s{0,3}((?:`{3,}(?![^\n]*`)|~{3,}))")
 HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
 LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
 TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?\s*$")
@@ -350,6 +353,14 @@ def self_test() -> None:
     assert not any(extract_names(segment[2]) for segment in separate_items)
     fenced = rendered_prose_segments("```text\nCellebrite supplied software\n```\n")
     assert fenced == []
+    invalid_backtick_info = rendered_prose_segments(
+        "```bad`info\nCellebrite supplied software\n"
+    )
+    assert any(extract_names(segment[2]) == expected for segment in invalid_backtick_info), invalid_backtick_info
+    tilde_backtick_info = rendered_prose_segments(
+        "~~~bad`info\nCellebrite supplied software\n~~~\n"
+    )
+    assert tilde_backtick_info == []
     long_fence = rendered_prose_segments(
         "````text\n"
         "Cellebrite supplied software\n"
