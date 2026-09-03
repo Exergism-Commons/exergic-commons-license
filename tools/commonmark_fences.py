@@ -24,7 +24,11 @@ FenceState: TypeAlias = tuple[str, int]
 
 # CommonMark permits up to three *spaces* of indentation before a fenced-code marker. Using \s
 # here is incorrect because a leading tab advances to an indented-code column and is not a fence.
-FENCE_RE = re.compile(r"^(?P<indent> {0,3})(?P<run>`{3,}|~{3,})(?P<tail>.*)$")
+# Group 1 deliberately remains the marker run for compatibility with the older shared renderer.
+# The backtick alternative also rejects backticks in its info string at match time so consumers
+# that only need opener recognition cannot accidentally reintroduce that CommonMark edge.
+FENCE_RE = re.compile(r"^ {0,3}(?P<run>(?:`{3,}(?![^\n]*`)|~{3,}))(?P<tail>.*)$")
+CLOSING_FENCE_RE = re.compile(r"^ {0,3}(?P<run>`{3,}|~{3,})[ \t]*$")
 CLOSING_TAIL_RE = re.compile(r"[ \t]*$")
 
 
@@ -45,8 +49,6 @@ def fence_transition(raw: str, state: FenceState | None) -> tuple[FenceState | N
     marker = run[0]
 
     if state is None:
-        if marker == "`" and "`" in tail:
-            return None, False
         return (marker, len(run)), True
 
     open_marker, open_length = state
@@ -123,9 +125,12 @@ def self_test() -> None:
     assert visible_lines(tab_close) == [(6, "visible")]
     assert visible_lines("```text\nhidden\n   ```\nvisible") == [(4, "visible")]
 
-    # Only ASCII space/tab is legal after a closer; arbitrary trailing text stays fenced content.
+    # Only ASCII space/tab is legal after a closer; arbitrary or Unicode trailing whitespace does
+    # not get silently normalized into a valid closer by ``str.strip()``.
     trailing = "```text\nhidden\n``` trailing\nstill hidden\n```\nvisible"
     assert visible_lines(trailing) == [(6, "visible")]
+    unicode_tail = "```text\nhidden\n```\u00a0\nstill hidden\n```\nvisible"
+    assert visible_lines(unicode_tail) == [(6, "visible")]
 
     safe = blank_fenced_lines("````\nhidden\n```\n````\nvisible")
     assert safe.splitlines() == ["", "", "", "", "visible"]
