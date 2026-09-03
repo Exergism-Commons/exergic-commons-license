@@ -4,8 +4,10 @@
 This companion closes the active ``modal + be + -ing`` family (for example
 ``authorities will be detaining Jane Doe``) without weakening passive parsing. It reuses the
 closed modal/adverb/action vocabularies and the Unicode/honorific/uncased name parser already
-reviewed elsewhere. Identity coverage is neutral and creates no attribution, participation,
-culpability, control, operation, membership, or governance semantics.
+reviewed elsewhere. Body prose is routed through the full-run fence-safe Person segmenter so the
+modal grammar composes with four-or-more-backtick fenced code. Identity coverage is neutral and
+creates no attribution, participation, culpability, control, operation, membership, or governance
+semantics.
 """
 from __future__ import annotations
 
@@ -16,6 +18,7 @@ import re
 import audit_schedule_reference_coverage as schedule
 import audit_state_dossier_entities as base
 import check_schedule_exact_identity_completeness as exact
+import check_state_dossier_fence_mononym_person_coverage as fence_guard
 import check_state_dossier_named_person_coverage as person
 import check_state_dossier_plural_present_passive_person_coverage as passive
 import check_state_dossier_unicode_held_person_coverage as unicode_people
@@ -89,7 +92,9 @@ def audit() -> list[dict]:
 
         text = path.read_text(encoding="utf-8")
         line_offset = text[:body_offset].count("\n")
-        for rel_line, snippet, prose in person.person_rendered_prose_segments(text[body_offset:]):
+        # Do not reuse the historical marker-only segmenter here. The fence companion tracks the
+        # complete opening run, so a literal ``` inside a ```` fence cannot hide later modal prose.
+        for rel_line, snippet, prose in fence_guard.fence_safe_person_segments(text[body_offset:]):
             inspect(
                 state=state,
                 source=source,
@@ -112,6 +117,24 @@ def self_test() -> None:
     ) == ["Łukasz Żak"]
     assert names_from_modal_active_progressive("authorities will be detaining أحمد منصور") == ["أحمد منصور"]
     assert names_from_modal_active_progressive("authorities may be detaining 王小明") == ["王小明"]
+
+    # Composition regression: the shorter run is literal fenced content, not the closer. The
+    # later modal-progressive prose must remain visible after the true four-backtick closer.
+    fenced = (
+        "````text\n"
+        "authorities will be detaining Hidden Person\n"
+        "```\n"
+        "still fenced\n"
+        "````\n"
+        "authorities will be detaining Jane Doe\n"
+    )
+    segments = fence_guard.fence_safe_person_segments(fenced)
+    modal_names = [
+        name
+        for _, _, prose in segments
+        for name in names_from_modal_active_progressive(prose)
+    ]
+    assert modal_names == ["Jane Doe"], (segments, modal_names)
 
     # Keep the action family closed; modal progressive prose is not generic person discovery.
     assert names_from_modal_active_progressive("authorities will be interviewing Jane Doe") == []
