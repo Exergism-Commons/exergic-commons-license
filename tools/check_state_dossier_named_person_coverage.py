@@ -17,6 +17,7 @@ import audit_schedule_reference_coverage as schedule
 import audit_state_dossier_entities as base
 import check_schedule_exact_identity_completeness as exact
 import check_schedule_named_identity_strictness as strict
+import commonmark_fences as fences
 import identity_list_grammar as list_grammar
 
 
@@ -183,14 +184,14 @@ def person_rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
 
     This mirrors the repository's established paragraph/list/heading segmentation but uses
     ``person_visible_prose`` at the assembled-block boundary. A code span crossing a source
-    soft-wrap therefore remains visible, while fenced-code blocks stay excluded exactly as
-    before.
+    soft-wrap therefore remains visible, while actual fenced-code token ranges are excluded by
+    the shared CommonMark block parser rather than a local marker state machine.
     """
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
     raw_buffer: list[str] = []
     start_line: int | None = None
-    fence_marker: str | None = None
+    hidden_lines = fences.fenced_line_numbers(body)
 
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
@@ -210,16 +211,8 @@ def person_rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
 
     for line_no, raw in enumerate(body.splitlines(), 1):
         stripped = raw.strip()
-        fence = rendered.FENCE_RE.match(raw)
-        if fence:
-            marker = fence.group(1)[0]
-            if fence_marker is None:
-                flush()
-                fence_marker = marker
-            elif marker == fence_marker:
-                fence_marker = None
-            continue
-        if fence_marker is not None:
+        if line_no in hidden_lines:
+            flush()
             continue
         if not stripped:
             flush()
@@ -409,6 +402,10 @@ def self_test() -> None:
     assert "Jane Doe" in names_from_prose(body_double_code[0][2]), body_double_code
     fenced = person_rendered_prose_segments("```text\njournalist Jane Doe remains detained\n```")
     assert fenced == [], fenced
+    raw_html = person_rendered_prose_segments(
+        "<pre>\n```text\nliteral HTML content\n</pre>\njournalist Jane Doe remains detained\n"
+    )
+    assert any("Jane Doe" in names_from_prose(prose) for _, _, prose in raw_html), raw_html
     print("State dossier named-person coverage self-test: OK")
 
 
