@@ -2,10 +2,9 @@
 """Fail closed on fenced-code parser drift and cased mononyms in strong Person contexts.
 
 This companion is deliberately independent from the historical State-dossier Person segmenter.
-It (1) tracks the full CommonMark fenced-code marker and opening run length so a shorter fence
-inside a longer fence cannot hide all later prose, and (2) permits one-token cased personal names
-only inside the same explicit human-role/legal/custody contexts already used by the reviewed
-Unicode Person guard.
+It (1) consumes the shared CommonMark fenced-code visibility state so Markdown edge semantics cannot
+drift between identity audits, and (2) permits one-token cased personal names only inside the same
+explicit human-role/legal/custody contexts already used by the reviewed Unicode Person guard.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
 operation, membership, or governance semantics.
@@ -26,6 +25,7 @@ import check_state_dossier_passive_appositive_person_coverage as appositive
 import check_state_dossier_plural_present_passive_person_coverage as passive
 import check_state_dossier_simple_present_active_person_coverage as simple_present
 import check_state_dossier_unicode_held_person_coverage as unicode_guard
+import commonmark_fences as fences
 import identity_list_grammar as list_grammar
 
 
@@ -66,10 +66,6 @@ MONONYM_NON_PERSON = {
     "state", "resolution", "judgment", "judgement", "court", "government", "law",
     "parliament", "police", "agency", "commission", "council", "project", "operation",
 }
-
-# CommonMark closing fences use the same marker character and at least the opening run length,
-# with no info string. Keep this stricter than the generic opener regex.
-CLOSING_FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})[ \t]*$")
 
 STRONG_PASSIVE_RE = re.compile(
     rf"\b(?P<names>{STRONG_CASED_NAME_LIST})\s+"
@@ -185,13 +181,12 @@ def strong_cased_names_from_prose(prose: str) -> list[str]:
 
 
 def fence_safe_person_segments(body: str) -> list[tuple[int, str, str]]:
-    """Render Person-bearing prose while obeying full CommonMark fenced-code run lengths."""
+    """Render Person-bearing prose using the shared CommonMark fenced-code state machine."""
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
     raw_buffer: list[str] = []
     start_line: int | None = None
-    fence_marker: str | None = None
-    fence_length = 0
+    fence_state: fences.FenceState | None = None
 
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
@@ -211,27 +206,14 @@ def fence_safe_person_segments(body: str) -> list[tuple[int, str, str]]:
 
     for line_no, raw in enumerate(body.splitlines(), 1):
         stripped = raw.strip()
-
-        if fence_marker is not None:
-            close = CLOSING_FENCE_RE.match(raw)
-            if close:
-                run = close.group(1)
-                if run[0] == fence_marker and len(run) >= fence_length:
-                    fence_marker = None
-                    fence_length = 0
-            continue
-
-        opener = rendered.FENCE_RE.match(raw)
-        if opener:
-            run = opener.group(1)
-            tail = raw[opener.end():]
-            # CommonMark forbids a backtick inside a backtick fence's info string. Such a line is
-            # ordinary visible prose, not an opener. Tilde fences do not have this restriction.
-            if run[0] != "`" or "`" not in tail:
+        previous_state = fence_state
+        fence_state, fence_line = fences.fence_transition(raw, fence_state)
+        if fence_line:
+            if previous_state is None and fence_state is not None:
                 flush()
-                fence_marker = run[0]
-                fence_length = len(run)
-                continue
+            continue
+        if previous_state is not None or fence_state is not None:
+            continue
 
         if not stripped:
             flush()
@@ -347,6 +329,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     # Exact fenced-code P1: a shorter same-marker run does not close a longer opening fence.
     body = (
         "````text\n"
@@ -369,6 +352,16 @@ def self_test() -> None:
         "authorities will be detaining Jane Doe" in prose
         for _, _, prose in invalid_backtick_info
     ), invalid_backtick_info
+
+    # Tab-indented fence-like lines are indented code, not fenced-code openers. They must never
+    # suppress later unindented Person prose.
+    tab_indented = fence_safe_person_segments(
+        "\t```text\nauthorities will be detaining Jane Doe\n"
+    )
+    assert any(
+        "authorities will be detaining Jane Doe" in prose
+        for _, _, prose in tab_indented
+    ), tab_indented
 
     # Ordinary backtick info strings and tilde info strings remain valid openers; the backtick
     # restriction applies only to backtick fences.
