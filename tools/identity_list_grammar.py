@@ -9,8 +9,8 @@ from __future__ import annotations
 
 
 # Keep this aligned with the repository's strong composite-connector semantics. In particular,
-# ``plus`` and ``together with`` must behave like the other explicit identity-list coordinators
-# so a trailing member cannot disappear from State person or Schedule capacity-list completeness
-# checks.
-WORD_COORDINATOR_PATTERN = r"(?:and\s*/\s*or|and-or|and/or|as\s+well\s+as|together\s+with|plus|and|or)"
+# ``plus``, ``together with``, and ``alongside`` must behave like the other explicit
+# identity-list coordinators so a trailing member cannot disappear from State person or
+# Schedule capacity-list completeness checks.
+WORD_COORDINATOR_PATTERN = r"(?:and\s*/\s*or|and-or|and/or|as\s+well\s+as|together\s+with|alongside|plus|and|or)"
 COORDINATOR_PATTERN = rf"(?:{WORD_COORDINATOR_PATTERN}|&)"
