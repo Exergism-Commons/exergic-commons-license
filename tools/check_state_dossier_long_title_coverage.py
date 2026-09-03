@@ -129,7 +129,10 @@ def audit() -> list[dict]:
         # Reconstruct soft-wrapped title runs before checking the ceiling as a second line of
         # defense. Fenced code and canonical H1 handling remain owned by the shared block parser.
         for block in softwrap.prose_blocks(body):
-            rendered_block = softwrap.render_prose_block(block)
+            lines = [line for line in block["lines"] if line]
+            if not lines:
+                continue
+            rendered_block, _ = softwrap.render_prose_block(lines)
             inspect(
                 state=state,
                 source=source,
