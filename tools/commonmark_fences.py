@@ -7,26 +7,35 @@ with other block constructs (notably raw HTML, indented code and block container
 accurate fence grammar can be wrong in context.
 
 This module asks markdown-it-py's CommonMark parser which source ranges are actual ``fence`` tokens,
-then exposes only the two operations the audits need: visible source lines and a line-preserving body
-with true fenced-code regions blanked. It does not render Markdown or infer identity semantics.
+then exposes only the operations the audits need. The dependency is loaded lazily so modules that
+reuse unrelated prose helpers do not acquire a parser dependency merely by importing them.
 """
 from __future__ import annotations
 
 import argparse
+from typing import Any
 
-from markdown_it import MarkdownIt
+
+_PARSER: Any | None = None
 
 
-# HTML parsing must be enabled for CommonMark block precedence to be represented faithfully. In
-# particular, fence-looking lines inside raw HTML blocks such as <pre> are literal HTML content and
-# cannot open a Markdown fence that hides later dossier prose.
-PARSER = MarkdownIt("commonmark", {"html": True})
+def parser() -> Any:
+    """Return the shared CommonMark parser, importing markdown-it only on first use."""
+    global _PARSER
+    if _PARSER is None:
+        from markdown_it import MarkdownIt
+
+        # HTML parsing must be enabled for CommonMark block precedence to be represented faithfully.
+        # In particular, fence-looking lines inside raw HTML blocks such as <pre> are literal HTML
+        # content and cannot open a Markdown fence that hides later dossier prose.
+        _PARSER = MarkdownIt("commonmark", {"html": True})
+    return _PARSER
 
 
 def fenced_line_numbers(body: str) -> set[int]:
     """Return 1-based source line numbers belonging to actual CommonMark fence tokens."""
     hidden: set[int] = set()
-    for token in PARSER.parse(body):
+    for token in parser().parse(body):
         if token.type != "fence" or token.map is None:
             continue
         start, end = token.map
@@ -128,9 +137,9 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--self-test", action="store_true")
-    args = parser.parse_args()
+    parser_arg = argparse.ArgumentParser()
+    parser_arg.add_argument("--self-test", action="store_true")
+    args = parser_arg.parse_args()
     if args.self_test:
         self_test()
     return 0
