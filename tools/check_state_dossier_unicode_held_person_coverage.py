@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Fail closed on Unicode Person names and passive ``held in custody`` clauses.
+"""Fail closed on Unicode, honorific-bearing, active-progressive and held-custody Person mentions.
 
 This companion is deliberately independent from the historical Latin-1 ``NAME_WORD`` in the
 primary State named-person audit. It derives Unicode uppercase/titlecase code points from the
-Unicode database, accepts Unicode letters in the remainder of name tokens, and reuses only the
-closed legal/custody, role, list-coordinator and appositive contexts that already make Person
-mentions high-confidence.
+Unicode database, accepts Unicode letters in the remainder of name tokens, strips only a closed
+set of common honorifics, and reuses the closed legal/custody, role, list-coordinator and bounded
+appositive contexts that already make Person mentions high-confidence.
 
-It also covers the narrow passive construction ``held in custody|detention`` (including
-simple, progressive, perfect and bounded-adverb passive auxiliaries) without treating generic
-``held`` prose such as ``held accountable`` as custody evidence.
+It additionally covers narrowly bounded active-progressive custody verbs (``are detaining`` etc.)
+and passive ``held in custody|detention`` clauses without treating generic progressive or ``held``
+prose as custody evidence.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
 operation, membership, or governance semantics.
@@ -56,9 +56,20 @@ PARTICLE_WORDS = {
 }
 PARTICLE = rf"(?:{'|'.join(sorted(map(re.escape, PARTICLE_WORDS), key=len, reverse=True))})\b"
 UNICODE_NAME_PHRASE = rf"{UNICODE_NAME_WORD}(?:\s+(?:{UNICODE_NAME_WORD}|{PARTICLE})){{1,11}}"
+
+# Honorifics are syntax, not part of the canonical Person surface. Keep this deliberately closed,
+# token-bounded and capped at two consecutive titles so ordinary title-cased prose cannot be
+# discarded arbitrarily. Dotted and undotted spellings are both common in dossiers.
+HONORIFIC_WORD = (
+    r"Mr|Mrs|Ms|Miss|Dr|Prof|Professor|Rev|Revd|Fr|Sir|Dame|Judge|Justice|Hon|Honorable"
+)
+HONORIFIC_PREFIX = rf"(?:(?i:{HONORIFIC_WORD})\.?\s+){{0,2}}"
+HONORIFIC_STRIP_RE = re.compile(rf"^(?:(?i:{HONORIFIC_WORD})\.?\s+){{1,2}}")
+UNICODE_PERSON_MENTION = rf"{HONORIFIC_PREFIX}{UNICODE_NAME_PHRASE}"
+
 COORDINATOR = rf"(?i:{list_grammar.COORDINATOR_PATTERN})"
 SEPARATOR = rf"(?:\s*,\s*(?:{COORDINATOR}\s+)?|\s+{COORDINATOR}\s+)"
-UNICODE_NAME_LIST = rf"{UNICODE_NAME_PHRASE}(?:{SEPARATOR}{UNICODE_NAME_PHRASE})*"
+UNICODE_NAME_LIST = rf"{UNICODE_PERSON_MENTION}(?:{SEPARATOR}{UNICODE_PERSON_MENTION})*"
 SPLIT_RE = re.compile(rf"\s*,\s*(?:{COORDINATOR}\s+)?|\s+{COORDINATOR}\s+")
 
 ROLE_PREFIX_RE = re.compile(rf"(?i:\b(?:{person.ROLE})\s+)")
@@ -68,7 +79,18 @@ ACTIVE_PREFIX_RE = re.compile(
     rf"(?:(?i:(?:{person.ROLE}))(?:/(?i:(?:{person.ROLE})))?\s+)?"
 )
 
-# Use the already-hardened auxiliary/adverb grammar, but own Unicode names independently.
+# Active progressive is owned explicitly rather than weakening passive grammar. Accept the four
+# ordinary auxiliaries plus the same bounded adverb sequence already reviewed for passive clauses.
+ACTIVE_PROGRESSIVE_VERB = (
+    r"arresting|detaining|prosecuting|convicting|sentencing|imprisoning|incarcerating|"
+    r"abducting|releasing|pardoning|executing|killing|freeing|acquitting|clearing"
+)
+ACTIVE_PROGRESSIVE_PREFIX_RE = re.compile(
+    rf"\b(?i:is|are|was|were)\s+{passive.ADVERB_SEQ}(?i:{ACTIVE_PROGRESSIVE_VERB})\s+"
+    rf"(?:(?i:(?:{person.ROLE}))(?:/(?i:(?:{person.ROLE})))?\s+)?"
+)
+
+# Use the already-hardened auxiliary/adverb grammar, but own Unicode/honorific names independently.
 PASSIVE_RE = re.compile(
     rf"\b(?P<names>{UNICODE_NAME_LIST})\s+{passive.PASSIVE_AUX}{passive.ADVERB_SEQ}"
     rf"(?i:{person.CUSTODY_STATE})\b"
@@ -91,8 +113,12 @@ HELD_PASSIVE_APPOSITIVE_RE = re.compile(
 )
 
 
+def strip_honorifics(value: str) -> str:
+    return HONORIFIC_STRIP_RE.sub("", value.strip(), count=1)
+
+
 def valid_unicode_name(value: str) -> bool:
-    value = person.clean_candidate(value) or ""
+    value = person.clean_candidate(strip_honorifics(value)) or ""
     if not value or value.casefold() in person.LOCAL_STOP:
         return False
     if set(value.replace("-", " ").split()) & person.NON_PERSON_TERMS:
@@ -107,7 +133,7 @@ def valid_unicode_name(value: str) -> bool:
 def split_names(value: str) -> list[str]:
     out: list[str] = []
     for raw in SPLIT_RE.split(value):
-        candidate = person.clean_candidate(raw)
+        candidate = person.clean_candidate(strip_honorifics(raw))
         if candidate and valid_unicode_name(candidate) and candidate not in out:
             out.append(candidate)
     return out
@@ -134,14 +160,15 @@ def unicode_and_held_names_from_prose(prose: str) -> list[str]:
             if value not in names:
                 names.append(value)
 
-    # Explicit human roles and legal/remedial cues provide a left boundary for Unicode names.
+    # Explicit human roles and legal/remedial cues provide a left boundary for Unicode/honorific names.
     for match in ROLE_PREFIX_RE.finditer(prose):
         add_many(leading_names(prose[match.end():]))
     for regex in (person.ACTION_OF_RE, person.ACTION_TARGET_RE, person.CASE_OF_RE, person.REMEDIAL_TARGET_RE):
         for match in regex.finditer(prose):
             add_many(leading_names(prose[match.end():]))
-    for match in ACTIVE_PREFIX_RE.finditer(prose):
-        add_many(leading_names(prose[match.end():]))
+    for regex in (ACTIVE_PREFIX_RE, ACTIVE_PROGRESSIVE_PREFIX_RE):
+        for match in regex.finditer(prose):
+            add_many(leading_names(prose[match.end():]))
 
     # Passive custody provides a right boundary; cover plain/appositive and held-in-context forms.
     for regex in (
@@ -173,7 +200,7 @@ def audit() -> list[dict]:
                     "state": state,
                     "name": name,
                     "normalized": schedule.norm(name),
-                    "reason": "Unicode/held-custody high-confidence person mention lacks a State-safe Person identity",
+                    "reason": "Unicode/honorific/progressive/held high-confidence person mention lacks a State-safe Person identity",
                     "occurrences": [],
                 },
             )
@@ -228,6 +255,27 @@ def self_test() -> None:
         "Łukasz Żak (a journalist) was reportedly detained"
     ) == ["Łukasz Żak"]
 
+    # Active progressive custody family, including bounded adverbs and Unicode/list forms.
+    assert unicode_and_held_names_from_prose("authorities are detaining Jane Doe") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose("authorities were arresting Jane Doe") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose(
+        "authorities are currently detaining Jane Doe and John Roe"
+    ) == ["Jane Doe", "John Roe"]
+    assert unicode_and_held_names_from_prose(
+        "authorities were reportedly prosecuting Łukasz Żak"
+    ) == ["Łukasz Żak"]
+
+    # Closed honorific syntax is stripped before enforcing the complete canonical name, and composes
+    # with direct action, action-of, passive, Unicode and lists.
+    assert unicode_and_held_names_from_prose("authorities detained Dr. Jane Doe") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose("the arrest of Ms. Jane Doe") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose("authorities arrested Prof. Łukasz Żak") == ["Łukasz Żak"]
+    assert unicode_and_held_names_from_prose("Dr. Jane Doe was detained") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose(
+        "Dr. Jane Doe and Ms. John Roe were detained"
+    ) == ["Jane Doe", "John Roe"]
+    assert unicode_and_held_names_from_prose("authorities detained Captain Jane Doe") == []
+
     # Exact held-in-custody P1 family: simple, progressive, perfect, adverbial and appositive.
     assert unicode_and_held_names_from_prose("Jane Doe is being held in custody") == ["Jane Doe"]
     assert unicode_and_held_names_from_prose("Jane Doe was held in detention") == ["Jane Doe"]
@@ -247,10 +295,14 @@ def self_test() -> None:
     assert unicode_and_held_names_from_prose("Jane Doe held a meeting") == []
     assert unicode_and_held_names_from_prose("The event was held in detention hall") == []
 
+    # Unknown progressive verbs/honorifics remain outside the closed high-confidence grammar.
+    assert unicode_and_held_names_from_prose("authorities are interviewing Jane Doe") == []
+    assert unicode_and_held_names_from_prose("authorities detained Captain Jane Doe") == []
+
     # Lowercase prose after a role/name remains a boundary, not part of the name.
     assert unicode_and_held_names_from_prose("journalist Łukasz Żak allegedly reported the detention") == ["Łukasz Żak"]
 
-    print("State dossier Unicode/held-custody Person coverage self-test: OK")
+    print("State dossier Unicode/honorific/progressive/held Person coverage self-test: OK")
 
 
 def main() -> int:
@@ -262,11 +314,11 @@ def main() -> int:
         return 0
     failures = audit()
     if failures:
-        print("UNMATERIALIZED_STATE_DOSSIER_UNICODE_OR_HELD_PEOPLE=" + json.dumps(
+        print("UNMATERIALIZED_STATE_DOSSIER_UNICODE_OR_CUSTODY_PEOPLE=" + json.dumps(
             failures, ensure_ascii=False, sort_keys=True
         ))
         return 2
-    print("State dossier Unicode/held-custody Person completeness: OK")
+    print("State dossier Unicode/honorific/progressive/held Person completeness: OK")
     return 0
 
 
