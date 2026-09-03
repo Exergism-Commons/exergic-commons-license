@@ -52,10 +52,6 @@ HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 URL_RE = re.compile(r"https?://\S+")
 INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 MARKDOWN_EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
-# Compatibility aliases for older guards. Fence recognition/state transitions live in one shared
-# parser so Person, vendor and title audits cannot silently disagree on CommonMark visibility.
-FENCE_RE = fences.FENCE_RE
-CLOSING_FENCE_RE = fences.CLOSING_FENCE_RE
 HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
 LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
 TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?\s*$")
@@ -134,15 +130,15 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
     """Return paragraph-like rendered prose segments with 1-based source line numbers.
 
     CommonMark soft and hard line breaks inside a paragraph are whitespace, so vendor/action
-    phrases may span source lines. Structural block boundaries are not joined. Fenced code
-    is excluded consistently with the existing inline-code policy. All fenced-code visibility
-    decisions delegate to ``commonmark_fences`` rather than carrying a local state machine.
+    phrases may span source lines. Structural block boundaries are not joined. Actual CommonMark
+    fenced-code token ranges are excluded consistently with the inline-code policy. Fence/block
+    precedence is decided once by the shared standards parser, never by a local state machine.
     """
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
     raw_buffer: list[str] = []
     start_line: int | None = None
-    fence_state: fences.FenceState | None = None
+    hidden_lines = fences.fenced_line_numbers(body)
 
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
@@ -157,13 +153,8 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
 
     for line_no, raw in enumerate(body.splitlines(), 1):
         stripped = raw.strip()
-        previous_state = fence_state
-        fence_state, fence_line = fences.fence_transition(raw, fence_state)
-        if fence_line:
-            if previous_state is None and fence_state is not None:
-                flush()
-            continue
-        if previous_state is not None or fence_state is not None:
+        if line_no in hidden_lines:
+            flush()
             continue
         if not stripped:
             flush()
@@ -374,6 +365,10 @@ def self_test() -> None:
         "\t```text\nCellebrite supplied software\n"
     )
     assert any(extract_names(segment[2]) == expected for segment in tab_opener), tab_opener
+    raw_html = rendered_prose_segments(
+        "<pre>\n```text\nliteral HTML content\n</pre>\nCellebrite supplied software\n"
+    )
+    assert any(extract_names(segment[2]) == expected for segment in raw_html), raw_html
     assert extract_names("private contractor support was reported") == []
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
