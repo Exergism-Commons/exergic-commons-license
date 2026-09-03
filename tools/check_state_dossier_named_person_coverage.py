@@ -80,6 +80,10 @@ ACTIVE_ACTION_RE = re.compile(
     rf"(?:(?i:(?:{ROLE}))(?:/(?i:(?:{ROLE})))?\s+)?(?P<names>{NAME_LIST})"
 )
 FRONTMATTER_PERSON_KEYS = {"provisional_scope", "adversarial_result"}
+# Inline code is visible prose, unlike fenced code. Keep the complete contents of arbitrary
+# backtick spans, including YAML-decoded/source-soft-wrapped line breaks, before the generic
+# vendor renderer applies its historical inline-code suppression policy.
+INLINE_CODE_VISIBLE_RE = re.compile(r"(`+)(.*?)\1", re.S)
 LOCAL_STOP = {
     "current evidence", "current reporting", "the evidence", "the dossier", "the state",
     "the government", "this review", "the review", "the law", "the court", "the regime",
@@ -155,15 +159,102 @@ def names_from_prose(prose: str) -> list[str]:
     return names
 
 
+def person_visible_prose(value: str) -> str:
+    """Render one audited person-bearing prose surface while preserving inline-code text."""
+    normalized = " ".join(value.splitlines())
+    normalized = INLINE_CODE_VISIBLE_RE.sub(
+        lambda match: " ".join(match.group(2).split()), normalized
+    )
+    return rendered.visible_prose(normalized)
+
+
 def frontmatter_visible_prose(value: str) -> str:
     """Render one YAML-decoded identity-bearing scalar like visible body prose.
 
     A frontmatter scalar is one audited prose surface even when YAML literal/folded syntax
-    leaves decoded line breaks in it. Normalize those breaks to rendered whitespace first,
-    then reuse the body/vendor visible-prose renderer so emphasis and inline/reference links
-    cannot split a personal name before the strict name grammar sees it.
+    leaves decoded line breaks in it. Inline code is rendered as its visible contents before
+    the shared prose normalizer handles links, emphasis, HTML and entities.
     """
-    return rendered.visible_prose(" ".join(value.splitlines()))
+    return person_visible_prose(value)
+
+
+def person_rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
+    """Render dossier body prose for Person discovery without making fenced code auditable.
+
+    This mirrors the repository's established paragraph/list/heading segmentation but uses
+    ``person_visible_prose`` at the assembled-block boundary. A code span crossing a source
+    soft-wrap therefore remains visible, while fenced-code blocks stay excluded exactly as
+    before.
+    """
+    result: list[tuple[int, str, str]] = []
+    buffer: list[str] = []
+    raw_buffer: list[str] = []
+    start_line: int | None = None
+    fence_marker: str | None = None
+
+    def flush() -> None:
+        nonlocal buffer, raw_buffer, start_line
+        if buffer and start_line is not None:
+            parts = [rendered.rendered_line_fragment(part) for part in buffer]
+            assembled = " ".join(part for part in parts if part)
+            prose = person_visible_prose(assembled)
+            if prose.strip():
+                result.append((
+                    start_line,
+                    " ".join(part.strip() for part in raw_buffer)[:420],
+                    prose,
+                ))
+        buffer = []
+        raw_buffer = []
+        start_line = None
+
+    for line_no, raw in enumerate(body.splitlines(), 1):
+        stripped = raw.strip()
+        fence = rendered.FENCE_RE.match(raw)
+        if fence:
+            marker = fence.group(1)[0]
+            if fence_marker is None:
+                flush()
+                fence_marker = marker
+            elif marker == fence_marker:
+                fence_marker = None
+            continue
+        if fence_marker is not None:
+            continue
+        if not stripped:
+            flush()
+            continue
+        if rendered.HEADING_RE.match(raw):
+            flush()
+            heading = rendered.HEADING_RE.sub("", raw, count=1)
+            prose = person_visible_prose(heading)
+            if prose.strip():
+                result.append((line_no, raw.strip()[:420], prose))
+            continue
+        if rendered.TABLE_SEPARATOR_RE.match(raw) or (
+            stripped.startswith("|") and stripped.endswith("|")
+        ):
+            flush()
+            if not rendered.TABLE_SEPARATOR_RE.match(raw):
+                prose = person_visible_prose(raw)
+                if prose.strip():
+                    result.append((line_no, raw.strip()[:420], prose))
+            continue
+        list_match = rendered.LIST_RE.match(raw)
+        if list_match:
+            flush()
+            start_line = line_no
+            content = raw[list_match.end():]
+            buffer.append(content)
+            raw_buffer.append(raw)
+            continue
+        quote = re.sub(r"^\s{0,3}(?:>\s*)+", "", raw)
+        if start_line is None:
+            start_line = line_no
+        buffer.append(quote)
+        raw_buffer.append(raw)
+    flush()
+    return result
 
 
 def audit() -> list[dict]:
@@ -203,7 +294,7 @@ def audit() -> list[dict]:
 
         text = path.read_text(encoding="utf-8")
         line_offset = text[:body_offset].count("\n")
-        for rel_line, snippet, prose in rendered.rendered_prose_segments(text[body_offset:]):
+        for rel_line, snippet, prose in person_rendered_prose_segments(text[body_offset:]):
             inspect(
                 state=state, source=source, location=f"line:{line_offset + rel_line}",
                 prose=prose, snippet=snippet,
@@ -247,6 +338,8 @@ def self_test() -> None:
     assert set(names_from_prose("authorities detained Jane Doe and / or John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe and-or John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe as well as John Roe after the protest")) == {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("authorities detained Jane Doe together with John Roe after the protest")) == {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("authorities detained Jane Doe alongside John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe, or John Roe, Mary Major after the protest")) == {"Jane Doe", "John Roe", "Mary Major"}
     assert set(names_from_prose("authorities detained Jane Doe as well as John Roe, and Mary Major after the protest")) == {"Jane Doe", "John Roe", "Mary Major"}
 
@@ -272,6 +365,8 @@ def self_test() -> None:
     assert set(names_from_prose("Jane Doe or John Roe were detained")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("Jane Doe and/or John Roe remained imprisoned")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("Jane Doe as well as John Roe remained imprisoned")) == {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("Jane Doe together with John Roe remained imprisoned")) == {"Jane Doe", "John Roe"}
+    assert set(names_from_prose("Jane Doe alongside John Roe remained imprisoned")) == {"Jane Doe", "John Roe"}
     assert names_from_prose("Defender Joaquín Elo Ayeto remained unaccounted for after transfer") == ["Joaquín Elo Ayeto"]
     assert "Jane Doe" in names_from_prose("Prime Minister Jane Doe announced the measure")
     assert "Jane Doe" in names_from_prose("Attorney General Jane Doe announced the measure")
@@ -300,6 +395,20 @@ def self_test() -> None:
     front_reference_link = frontmatter_visible_prose("journalist [Jane\nDoe][person] remains detained")
     assert front_reference_link == "journalist Jane Doe remains detained", front_reference_link
     assert "Jane Doe" in names_from_prose(front_reference_link)
+    front_inline_code = frontmatter_visible_prose("journalist `Jane\nDoe` remains detained")
+    assert front_inline_code == "journalist Jane Doe remains detained", front_inline_code
+    assert "Jane Doe" in names_from_prose(front_inline_code)
+    front_double_code = frontmatter_visible_prose("journalist ``Jane\nDoe`` remains detained")
+    assert front_double_code == "journalist Jane Doe remains detained", front_double_code
+    assert "Jane Doe" in names_from_prose(front_double_code)
+
+    body_code = person_rendered_prose_segments("journalist `Jane\nDoe` remains detained")
+    assert len(body_code) == 1, body_code
+    assert "Jane Doe" in names_from_prose(body_code[0][2]), body_code
+    body_double_code = person_rendered_prose_segments("journalist ``Jane\nDoe`` remains detained")
+    assert "Jane Doe" in names_from_prose(body_double_code[0][2]), body_double_code
+    fenced = person_rendered_prose_segments("```text\njournalist Jane Doe remains detained\n```")
+    assert fenced == [], fenced
     print("State dossier named-person coverage self-test: OK")
 
 
