@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import json
 import re
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -61,9 +62,24 @@ SCOPE_ROLE_IDENTITY_RE = re.compile(
 
 
 def norm(text: str) -> str:
-    text = text.lower().replace("’", "'")
-    text = re.sub(r"[^a-z0-9]+", " ", text)
-    return " ".join(text.split())
+    """Normalize identity text without erasing non-ASCII writing systems.
+
+    NFKC makes compatibility spellings comparable, casefold gives Unicode-aware case
+    normalization, combining marks are ignored rather than turned into token boundaries,
+    and every other non-alphanumeric character remains a separator as in the historical
+    ASCII-only normalizer. Arabic, Han and other uncased scripts therefore retain their
+    letters and can participate in the same State-scoped exact-name index.
+    """
+    text = unicodedata.normalize("NFKC", text).casefold().replace("’", "'")
+    out: list[str] = []
+    for char in text:
+        if char.isalnum():
+            out.append(char)
+        elif unicodedata.category(char).startswith("M"):
+            continue
+        else:
+            out.append(" ")
+    return " ".join("".join(out).split())
 
 
 def git_blob_sha1(content: bytes) -> str:
@@ -469,6 +485,10 @@ def self_test() -> None:
     assert identity_head("Zambia Police Service, only in qualifying cases") == "Zambia Police Service"
     assert identity_head("NISA only where evidence exists") == "NISA"
     assert git_blob_sha1(b"") == "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    assert norm("أحمد منصور") == "أحمد منصور"
+    assert norm("王小明") == "王小明"
+    assert norm("İdris Baluken") == "idris baluken"
+    assert norm("Jane-Doe") == "jane doe"
     sample = [{
         "source": "x.yml", "state": "ABC", "field": "candidate_parties",
         "match_prefix": "Named Agency", "disposition": "deferred", "resolved_ids": [],
@@ -499,6 +519,14 @@ def self_test() -> None:
             "id": "ORG-GLOBAL", "type": "Organization", "aliases": ["global source"],
             "surface_forms": [{"text": "Global Source", "normalized": "global source", "acronym": False}],
         },
+        {
+            "id": "PERSON-AAA-AHMAD-MANSOUR", "type": "Person", "aliases": [norm("أحمد منصور")],
+            "surface_forms": [{"text": "أحمد منصور", "normalized": norm("أحمد منصور"), "acronym": False}],
+        },
+        {
+            "id": "PERSON-AAA-WANG-XIAOMING", "type": "Person", "aliases": [norm("王小明")],
+            "surface_forms": [{"text": "王小明", "normalized": norm("王小明"), "acronym": False}],
+        },
     ]
     raw = [
         {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "name": "National Police", "aliases": []},
@@ -506,11 +534,16 @@ def self_test() -> None:
         {"id": "AGENCY-AAA-FACA", "type": "Agency", "name": "Central Armed Forces", "aliases": ["FACA"]},
         {"id": "AGENCY-AAA-MEDIA-COMMISSION", "type": "Agency", "name": "Media Commission", "aliases": []},
         {"id": "ORG-GLOBAL", "type": "Organization", "name": "Global Source", "aliases": []},
+        {"id": "PERSON-AAA-AHMAD-MANSOUR", "type": "Person", "name": "أحمد منصور", "aliases": []},
+        {"id": "PERSON-AAA-WANG-XIAOMING", "type": "Person", "name": "王小明", "aliases": []},
     ]
     idx = build_name_index(raw, state_codes={"AAA", "BBB"}, normalizer=norm)
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-NATIONAL-POLICE"]
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "CCC") == []
     assert heuristic_resolve("Global Source", synthetic, idx, "actor", "AAA") == ["ORG-GLOBAL"]
+    assert heuristic_resolve("أحمد منصور", synthetic, idx, "actor", "AAA") == ["PERSON-AAA-AHMAD-MANSOUR"]
+    assert heuristic_resolve("王小明", synthetic, idx, "actor", "AAA") == ["PERSON-AAA-WANG-XIAOMING"]
+    assert heuristic_resolve("أحمد منصور", synthetic, idx, "actor", "BBB") == []
     assert embedded_identity_matches("incident documented by FACA", synthetic, idx, "identity", "AAA") == ["AGENCY-AAA-FACA"]
     assert not embedded_identity_matches("incident documented by faca", synthetic, idx, "identity", "AAA")
     assert scope_identity_signal("the incident documented by FACA", synthetic, idx, "AAA")
