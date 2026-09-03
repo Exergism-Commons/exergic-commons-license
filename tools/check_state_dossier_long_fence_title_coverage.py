@@ -82,6 +82,14 @@ def audit() -> list[dict]:
                 continue
             if dispositions.get((state, normalized)) is not None:
                 continue
+            if markup.covered_by_visible_materialized_identity(
+                identity_index,
+                state=state,
+                candidate=candidate,
+                kind=kind,
+                rendered=rendered,
+            ):
+                continue
             key = (state, normalized, source, line, "ordinary-title")
             failures_by_key[key] = {
                 "state": state,
