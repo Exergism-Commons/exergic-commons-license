@@ -15,6 +15,7 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import commonmark_fences as fences
 from audit_state_dossier_entities import frontmatter_identity_values, parse_frontmatter
 from entity_identity_resolution import build_name_index, resolve_normalized
 
@@ -51,10 +52,10 @@ HTML_TAG_RE = re.compile(r"<[^>\n]+>")
 URL_RE = re.compile(r"https?://\S+")
 INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 MARKDOWN_EMPHASIS_RE = re.compile(r"(?<!\\)(?:\*{1,3}|_{1,3}|~{2})")
-# A backtick fence is not a CommonMark opener when its info string contains a backtick. Tilde
-# fences do not have that restriction. Keeping the rule in the shared renderer protects every
-# consumer rather than requiring each downstream audit to rediscover the same visibility edge.
-FENCE_RE = re.compile(r"^\s{0,3}((?:`{3,}(?![^\n]*`)|~{3,}))")
+# Compatibility aliases for older guards. Fence recognition/state transitions live in one shared
+# parser so Person, vendor and title audits cannot silently disagree on CommonMark visibility.
+FENCE_RE = fences.FENCE_RE
+CLOSING_FENCE_RE = fences.CLOSING_FENCE_RE
 HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
 LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
 TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?\s*$")
@@ -134,15 +135,14 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
 
     CommonMark soft and hard line breaks inside a paragraph are whitespace, so vendor/action
     phrases may span source lines. Structural block boundaries are not joined. Fenced code
-    is excluded consistently with the existing inline-code policy. Fence closing follows the
-    opening marker and run length: a shorter run inside a longer fence remains code content.
+    is excluded consistently with the existing inline-code policy. All fenced-code visibility
+    decisions delegate to ``commonmark_fences`` rather than carrying a local state machine.
     """
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
     raw_buffer: list[str] = []
     start_line: int | None = None
-    fence_marker: str | None = None
-    fence_length = 0
+    fence_state: fences.FenceState | None = None
 
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
@@ -157,22 +157,13 @@ def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
 
     for line_no, raw in enumerate(body.splitlines(), 1):
         stripped = raw.strip()
-        fence = FENCE_RE.match(raw)
-        if fence:
-            run = fence.group(1)
-            marker = run[0]
-            if fence_marker is None:
+        previous_state = fence_state
+        fence_state, fence_line = fences.fence_transition(raw, fence_state)
+        if fence_line:
+            if previous_state is None and fence_state is not None:
                 flush()
-                fence_marker = marker
-                fence_length = len(run)
-                continue
-            if marker == fence_marker and len(run) >= fence_length and not raw[fence.end():].strip():
-                fence_marker = None
-                fence_length = 0
-            # A shorter same-marker run, a different marker, or a run with trailing content
-            # remains fenced code and must not be interpreted as prose or a new opener.
             continue
-        if fence_marker is not None:
+        if previous_state is not None or fence_state is not None:
             continue
         if not stripped:
             flush()
@@ -335,6 +326,7 @@ def write_markdown(report: dict, path: Path) -> None:
 
 
 def self_test() -> None:
+    fences.self_test()
     expected = [("Cellebrite", "direct-supplier-action")]
     assert extract_names("Cellebrite halted product use in Serbia") == expected
     assert extract_names(visible_prose("[Cellebrite](https://example.test) supplied software")) == expected
@@ -378,6 +370,10 @@ def self_test() -> None:
         "````text\n~~~\nCellebrite supplied software\n````\nCellebrite supplied software\n"
     )
     assert len(different_marker) == 1 and extract_names(different_marker[0][2]) == expected
+    tab_opener = rendered_prose_segments(
+        "\t```text\nCellebrite supplied software\n"
+    )
+    assert any(extract_names(segment[2]) == expected for segment in tab_opener), tab_opener
     assert extract_names("private contractor support was reported") == []
     assert extract_names("UN HRC Working Group reported a technology issue") == []
     names = extract_names("Example Technologies supplied software")
