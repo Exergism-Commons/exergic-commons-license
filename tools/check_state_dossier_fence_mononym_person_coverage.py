@@ -223,11 +223,15 @@ def fence_safe_person_segments(body: str) -> list[tuple[int, str, str]]:
 
         opener = rendered.FENCE_RE.match(raw)
         if opener:
-            flush()
             run = opener.group(1)
-            fence_marker = run[0]
-            fence_length = len(run)
-            continue
+            tail = raw[opener.end():]
+            # CommonMark forbids a backtick inside a backtick fence's info string. Such a line is
+            # ordinary visible prose, not an opener. Tilde fences do not have this restriction.
+            if run[0] != "`" or "`" not in tail:
+                flush()
+                fence_marker = run[0]
+                fence_length = len(run)
+                continue
 
         if not stripped:
             flush()
@@ -355,6 +359,25 @@ def self_test() -> None:
     segments = fence_safe_person_segments(body)
     assert all("Hidden Person" not in prose for _, _, prose in segments), segments
     assert any("Jane Doe" in names_from_safe_prose(prose) for _, _, prose in segments), segments
+
+    # Backtick-bearing info strings are invalid CommonMark openers and must remain visible prose.
+    # Most importantly, they must not hide a later modal-progressive Person sentence.
+    invalid_backtick_info = fence_safe_person_segments(
+        "```bad`info\nauthorities will be detaining Jane Doe\n"
+    )
+    assert any(
+        "authorities will be detaining Jane Doe" in prose
+        for _, _, prose in invalid_backtick_info
+    ), invalid_backtick_info
+
+    # Ordinary backtick info strings and tilde info strings remain valid openers; the backtick
+    # restriction applies only to backtick fences.
+    assert fence_safe_person_segments(
+        "```python\nJane Doe was detained\n```"
+    ) == []
+    assert fence_safe_person_segments(
+        "~~~bad`info\nJane Doe was detained\n~~~"
+    ) == []
 
     # Equal or longer same-marker closers work; a different marker cannot close the fence.
     longer_close = fence_safe_person_segments(
