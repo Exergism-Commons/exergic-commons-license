@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Fail closed on named people hidden by plural present passive custody prose.
+"""Fail closed on named people hidden by plural-present or progressive passive custody prose.
 
-The established simple-passive, appositive, and expanded-particle Person guards historically
-omit the auxiliary ``are``. This independent companion covers the exact plural-present family
-without trusting those auxiliary lists, while reusing the broader closed Person name/list
-and bounded human-role appositive grammars.
+The established simple-passive, appositive, expanded-particle, and perfect-passive Person
+guards historically leave gaps around ``are`` and the progressive passive family
+``is/are/was/were being``. This independent companion covers those constructions without
+trusting the auxiliary lists that caused the bypass, while reusing the broader closed Person
+name/list and bounded human-role appositive grammars.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
 operation, membership, or governance semantics.
@@ -23,12 +24,15 @@ import check_state_dossier_named_person_coverage as person
 import check_state_dossier_passive_appositive_person_coverage as appositive
 
 
+# Keep direct plural-present ``are`` for the prior P1, and cover the complete ordinary
+# progressive-passive family so the fix does not merely move the bypass between number/tense.
+PASSIVE_AUX = r"(?i:is\s+being|are\s+being|was\s+being|were\s+being|are)"
 PLURAL_PRESENT_PASSIVE_RE = re.compile(
-    rf"\b(?P<names>{expanded.NAME_LIST})\s+(?i:are)\s+(?i:{person.CUSTODY_STATE})\b"
+    rf"\b(?P<names>{expanded.NAME_LIST})\s+{PASSIVE_AUX}\s+(?i:{person.CUSTODY_STATE})\b"
 )
 PLURAL_PRESENT_PASSIVE_APPOSITIVE_RE = re.compile(
     rf"\b(?P<names>{expanded.NAME_LIST})\s*{appositive.APPOSITIVE}\s*"
-    rf"(?i:are)\s+(?i:{person.CUSTODY_STATE})\b"
+    rf"{PASSIVE_AUX}\s+(?i:{person.CUSTODY_STATE})\b"
 )
 
 
@@ -60,7 +64,10 @@ def audit() -> list[dict]:
                     "state": state,
                     "name": name,
                     "normalized": schedule.norm(name),
-                    "reason": "plural present passive custody prose names an unmaterialized person",
+                    "reason": (
+                        "plural-present/progressive passive custody prose names an "
+                        "unmaterialized person"
+                    ),
                     "occurrences": [],
                 },
             )
@@ -100,6 +107,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    # Prior direct plural-present P1 remains closed.
     assert names_from_plural_present_passive("Jane Doe and John Roe are detained") == [
         "Jane Doe", "John Roe"
     ]
@@ -110,29 +118,45 @@ def self_test() -> None:
         "Jane Doe", "John Roe"
     ]
 
+    # Current Codex P1 plus the complete ordinary progressive-passive tense/number family.
+    assert names_from_plural_present_passive("Jane Doe and John Roe are being detained") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive("Jane Doe is being detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe was being imprisoned") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe were being detained") == [
+        "Jane Doe", "John Roe"
+    ]
+
     # The guard uses the expanded name grammar, so common particle sequences remain complete.
     assert names_from_plural_present_passive(
-        "Ursula von der Leyen and John le Carré are detained"
+        "Ursula von der Leyen and John le Carré are being detained"
     ) == ["Ursula von der Leyen", "John le Carré"]
     assert names_from_plural_present_passive(
-        "Ali ibn Abi Talib and Jane Doe are detained"
+        "Ali ibn Abi Talib and Jane Doe were being detained"
     ) == ["Ali ibn Abi Talib", "Jane Doe"]
 
-    # Bounded role appositives are covered in the same plural-present construction.
+    # Bounded role appositives are covered in direct and progressive constructions.
     assert names_from_plural_present_passive(
         "Jane Doe and John Roe (journalists) are detained"
     ) == ["Jane Doe", "John Roe"]
     assert names_from_plural_present_passive(
-        "Jane Doe and John Roe, journalists, are imprisoned"
+        "Jane Doe and John Roe, journalists, are being imprisoned"
     ) == ["Jane Doe", "John Roe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe, a journalist, was being detained"
+    ) == ["Jane Doe"]
 
-    # Other auxiliary families remain owned by their established guards.
+    # Other passive auxiliary families remain owned by their established guards.
     assert names_from_plural_present_passive("Jane Doe is detained") == []
     assert names_from_plural_present_passive("Jane Doe and John Roe were detained") == []
     assert names_from_plural_present_passive("Jane Doe and John Roe have been detained") == []
-    assert names_from_plural_present_passive("authorities are detaining Jane Doe") == []
 
-    print("State dossier plural-present-passive Person coverage self-test: OK")
+    # Active progressive prose must not be mistaken for passive identity debt.
+    assert names_from_plural_present_passive("authorities are detaining Jane Doe") == []
+    assert names_from_plural_present_passive("authorities were detaining Jane Doe") == []
+
+    print("State dossier plural-present/progressive-passive Person coverage self-test: OK")
 
 
 def main() -> int:
@@ -144,11 +168,11 @@ def main() -> int:
         return 0
     failures = audit()
     if failures:
-        print("UNMATERIALIZED_STATE_DOSSIER_PLURAL_PRESENT_PASSIVE_PEOPLE=" + json.dumps(
+        print("UNMATERIALIZED_STATE_DOSSIER_PLURAL_OR_PROGRESSIVE_PASSIVE_PEOPLE=" + json.dumps(
             failures, ensure_ascii=False, sort_keys=True
         ))
         return 2
-    print("State dossier plural-present-passive Person completeness: OK")
+    print("State dossier plural-present/progressive-passive Person completeness: OK")
     return 0
 
 
