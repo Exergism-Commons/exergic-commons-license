@@ -3,8 +3,8 @@
 
 The established passive Person grammar covers participial/adjectival states such as ``detained``
 and a separate guard covers ``held in custody|detention``. This independent companion owns the
-ordinary noun predicates ``in custody`` and ``in detention`` after the already reviewed passive
-auxiliary family, including ``remains in detention`` and modal/perfect variants.
+ordinary noun predicates ``in custody``, ``in detention`` and ``under arrest`` after the already
+reviewed passive auxiliary family, including remain/modal/perfect variants.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
 operation, membership, or governance semantics.
@@ -25,7 +25,7 @@ import check_state_dossier_plural_present_passive_person_coverage as passive
 import check_state_dossier_unicode_held_person_coverage as unicode_guard
 
 
-NOUN_CUSTODY_PREDICATE = r"(?i:in\s+(?:custody|detention))"
+NOUN_CUSTODY_PREDICATE = r"(?i:(?:in\s+(?:custody|detention)|under\s+arrest))"
 
 CASED_RE = re.compile(
     rf"\b(?P<names>{strong.STRONG_CASED_NAME_LIST})\s+"
@@ -120,30 +120,35 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
-    # Exact reported noun-form custody predicates.
+    # Exact noun-form custody predicates.
     assert noun_custody_names_from_prose("Jane Doe remains in detention") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Jane Doe remains in custody") == ["Jane Doe"]
+    assert noun_custody_names_from_prose("Jane Doe remains under arrest") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Jane Doe and John Roe remain in detention") == [
         "Jane Doe", "John Roe"
     ]
 
-    # The same narrow predicate composes with the reviewed passive auxiliary/adverb grammar.
+    # The same narrow predicates compose with the reviewed passive auxiliary/adverb grammar.
     assert noun_custody_names_from_prose("Jane Doe is in custody") == ["Jane Doe"]
+    assert noun_custody_names_from_prose("Jane Doe is under arrest") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Jane Doe was reportedly in detention") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Jane Doe has been in custody") == ["Jane Doe"]
+    assert noun_custody_names_from_prose("Jane Doe has been under arrest") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Jane Doe may be in detention") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Jane Doe may not be in custody") == ["Jane Doe"]
+    assert noun_custody_names_from_prose("Jane Doe may be under arrest") == ["Jane Doe"]
 
     # Bounded appositives, cased mononyms and Unicode/uncased names remain covered.
     assert noun_custody_names_from_prose("Jane Doe, a journalist, remains in detention") == ["Jane Doe"]
     assert noun_custody_names_from_prose("Banksy remains in custody") == ["Banksy"]
-    assert noun_custody_names_from_prose("Łukasz Żak remains in detention") == ["Łukasz Żak"]
+    assert noun_custody_names_from_prose("Łukasz Żak remains under arrest") == ["Łukasz Żak"]
     assert noun_custody_names_from_prose("أحمد منصور remains in custody") == ["أحمد منصور"]
     assert noun_custody_names_from_prose("王小明 remains in detention") == ["王小明"]
 
-    # Precision controls: no generic ``in ...`` state and no active possession/event sense.
+    # Precision controls: no generic ``in ...``/``under ...`` state and no active event sense.
     assert noun_custody_names_from_prose("Jane Doe remains in office") == []
     assert noun_custody_names_from_prose("Jane Doe remains in court") == []
+    assert noun_custody_names_from_prose("Jane Doe remains under review") == []
     assert noun_custody_names_from_prose("Jane Doe held a meeting in detention") == []
     print("State dossier noun-form custody Person coverage self-test: OK")
 
