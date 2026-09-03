@@ -2,34 +2,96 @@
 """Fail closed when the broad State title grammar reaches its historical token ceiling.
 
 The baseline ``TITLE_RE`` historically admitted one leading title word plus at most eight
-continuations. This companion does not replace broad discovery. Instead it detects the exact
-failure mode: a baseline match that consumes all nine allowed tokens and is immediately
-followed by more title-shaped identity text. It reconstructs the complete maximal title run
-and requires the full surface to be materialized or explicitly reviewed.
+continuations. This companion detects exactly that failure mode: a full nine-token baseline
+match followed immediately by more title-shaped identity text. The complete maximal surface
+must either resolve to a current State-safe identity or carry an exact State/source/blob-pinned
+review disposition.
 
-This keeps ordinary short-title behavior unchanged while making the historical ceiling
-fail-closed. Identity coverage is neutral and creates no attribution, participation, control,
-operation, supply, culpability, membership, or governance semantics.
+Identity coverage is neutral and creates no attribution, participation, control, operation,
+supply, culpability, membership, hierarchy, or governance semantics.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 
 import audit_state_dossier_entities as base
 import check_state_dossier_rendered_markup_coverage as markup
 import check_state_dossier_softwrap_coverage as softwrap
-import review_state_dossier_candidates as reviewed
 
 
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+REVIEW_PATH = base.ROOT / "knowledge/generated/state-dossier-long-title-dispositions-v1.json"
 TITLE_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9&.'’/-]*|[A-ZÀ-ÖØ-Þ]{2,})"
-# Include common identity-internal prepositions/coordinators. In particular ``or`` is needed
-# for reviewed institutional names such as ``... Cruel Inhuman or Degrading Treatment ...``.
-TITLE_CONNECTOR = r"(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)"
+# Lowercase connectors are token-bounded so ``de`` cannot consume the prefix of ``described``.
+# ``or`` is required for complete institutional names such as ``... Cruel Inhuman or Degrading ...``.
+TITLE_CONNECTOR = r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
 TITLE_TOKEN = rf"(?:{TITLE_CONNECTOR}|{TITLE_WORD})"
 OVERFLOW_RE = re.compile(rf"(?P<tail>(?:\s+{TITLE_TOKEN})+)")
+DISTINCT_COORDINATION_RE = re.compile(r"\band\s+the\s+", re.I)
+
+
+def strict_json(path):
+    def object_pairs(pairs):
+        out = {}
+        for key, value in pairs:
+            if key in out:
+                raise ValueError(f"duplicate JSON key {key!r} in {path.relative_to(base.ROOT)}")
+            out[key] = value
+        return out
+
+    return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=object_pairs)
+
+
+def git_blob_sha(path) -> str:
+    data = path.read_bytes()
+    header = f"blob {len(data)}\0".encode("ascii")
+    return hashlib.sha1(header + data).hexdigest()
+
+
+def load_reviews() -> dict[tuple[str, str, str], dict]:
+    data = strict_json(REVIEW_PATH)
+    assert data.get("version") == 1, data.get("version")
+    assert set(data.get("allowedStatuses") or []) == {"deferred", "rejected"}
+    assert data.get("sourceAudit") == "tools/check_state_dossier_long_title_coverage.py"
+    reviews: dict[tuple[str, str, str], dict] = {}
+    for row in data.get("dispositions") or []:
+        state = row.get("state")
+        candidate = row.get("candidate")
+        normalized = row.get("normalized")
+        status = row.get("status")
+        reason = row.get("reason")
+        source = row.get("source")
+        source_blob = row.get("source_blob")
+        assert isinstance(state, str) and re.fullmatch(r"[A-Z]{3}", state), row
+        assert isinstance(candidate, str) and candidate.strip(), row
+        assert isinstance(normalized, str) and normalized == base.norm(candidate), row
+        assert status in {"deferred", "rejected"}, row
+        assert isinstance(reason, str) and reason.strip(), row
+        assert isinstance(source, str) and source == f"dossiers/states/{state}.md", row
+        source_path = base.ROOT / source
+        assert source_path.is_file(), row
+        assert isinstance(source_blob, str) and re.fullmatch(r"[0-9a-f]{40}", source_blob), row
+        assert git_blob_sha(source_path) == source_blob, (
+            f"stale long-title review source pin for {state} {candidate!r}: "
+            f"expected {source_blob}, current {git_blob_sha(source_path)}"
+        )
+        key = (state, normalized, source)
+        assert key not in reviews, f"duplicate long-title disposition key: {key}"
+        reviews[key] = row
+    return reviews
+
+
+def distinct_concept_coordination(value: str) -> bool:
+    """Do not merge ``<classified identity> and the <unclassified concept>`` into one identity."""
+    for match in DISTINCT_COORDINATION_RE.finditer(value):
+        left = base.clean_candidate(value[:match.start()])
+        right = base.clean_candidate(value[match.end():])
+        if left and right and base.classify(left) is not None and base.classify(right) is None:
+            return True
+    return False
 
 
 def overflow_title_surfaces(text: str) -> list[tuple[str, str]]:
@@ -45,6 +107,8 @@ def overflow_title_surfaces(text: str) -> list[tuple[str, str]]:
         if continuation is None:
             continue
         full = base.clean_candidate(baseline + continuation.group("tail"))
+        if distinct_concept_coordination(full):
+            continue
         kind = base.classify(full)
         if kind is None or not base.plausible(full):
             continue
@@ -64,7 +128,8 @@ def audit() -> list[dict]:
         if isinstance(front.get("iso3"), str)
     }
     identity_index, _, _ = base.load_identity_index(states)
-    dispositions, _ = reviewed.load_dispositions()
+    reviews = load_reviews()
+    consumed: set[tuple[str, str, str]] = set()
     failures_by_key: dict[tuple[str, str, str, str], dict] = {}
 
     def inspect(*, state: str, source: str, location: str, rendered: str, snippet: str) -> None:
@@ -72,7 +137,9 @@ def audit() -> list[dict]:
             normalized = base.norm(candidate)
             if base.resolve_name(identity_index, state, candidate) is not None:
                 continue
-            if dispositions.get((state, normalized)) is not None:
+            review_key = (state, normalized, source)
+            if review_key in reviews:
+                consumed.add(review_key)
                 continue
             key = (state, normalized, source, location)
             failures_by_key[key] = {
@@ -80,7 +147,7 @@ def audit() -> list[dict]:
                 "candidate": candidate,
                 "normalized": normalized,
                 "kind": kind,
-                "reason": "title surface continues beyond the baseline nine-token ceiling",
+                "reason": "title surface continues beyond the baseline nine-token ceiling without exact materialization or pinned review",
                 "source": source,
                 "location": location,
                 "snippet": snippet[:420],
@@ -141,6 +208,21 @@ def audit() -> list[dict]:
                 snippet=" / ".join(line.strip() for line in block["raw_lines"]),
             )
 
+    for key, review in reviews.items():
+        if key in consumed:
+            continue
+        state, normalized, source = key
+        failures_by_key[(state, normalized, source, "stale-review")] = {
+            "state": state,
+            "candidate": review["candidate"],
+            "normalized": normalized,
+            "kind": "review-integrity",
+            "reason": "stale long-title disposition no longer corresponds to a detected overflow surface",
+            "source": source,
+            "location": "review-manifest",
+            "snippet": review["reason"][:420],
+        }
+
     return [failures_by_key[key] for key in sorted(failures_by_key)]
 
 
@@ -158,6 +240,18 @@ def self_test() -> None:
 
     short = overflow_title_surfaces("National Human Rights Commission reported findings")
     assert short == [], short
+
+    # Lowercase connector spellings are whole tokens, never prefixes of ordinary prose.
+    described = overflow_title_surfaces(
+        "Council of Europe's Department for the Execution of Judgments described the problem"
+    )
+    assert described == [], described
+
+    # A classified institution coordinated with an unclassified legal/policy concept is not one identity.
+    coordinated = overflow_title_surfaces(
+        "Justice Ministry and the National Charter for Peace and Reconciliation"
+    )
+    assert coordinated == [], coordinated
 
     # Punctuation terminates the run; a new sentence must never be glued to the identity.
     separated = overflow_title_surfaces(
