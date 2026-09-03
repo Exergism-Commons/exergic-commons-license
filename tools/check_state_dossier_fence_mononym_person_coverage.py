@@ -2,9 +2,9 @@
 """Fail closed on fenced-code parser drift and cased mononyms in strong Person contexts.
 
 This companion is deliberately independent from the historical State-dossier Person segmenter.
-It (1) consumes the shared CommonMark fenced-code visibility state so Markdown edge semantics cannot
-drift between identity audits, and (2) permits one-token cased personal names only inside the same
-explicit human-role/legal/custody contexts already used by the reviewed Unicode Person guard.
+It (1) consumes shared CommonMark parser-derived fenced-code visibility so Markdown block semantics
+cannot drift between identity audits, and (2) permits one-token cased personal names only inside the
+same explicit human-role/legal/custody contexts already used by the reviewed Unicode Person guard.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
 operation, membership, or governance semantics.
@@ -181,12 +181,12 @@ def strong_cased_names_from_prose(prose: str) -> list[str]:
 
 
 def fence_safe_person_segments(body: str) -> list[tuple[int, str, str]]:
-    """Render Person-bearing prose using the shared CommonMark fenced-code state machine."""
+    """Render Person-bearing prose using parser-derived CommonMark fence-token ranges."""
     result: list[tuple[int, str, str]] = []
     buffer: list[str] = []
     raw_buffer: list[str] = []
     start_line: int | None = None
-    fence_state: fences.FenceState | None = None
+    hidden_lines = fences.fenced_line_numbers(body)
 
     def flush() -> None:
         nonlocal buffer, raw_buffer, start_line
@@ -206,13 +206,8 @@ def fence_safe_person_segments(body: str) -> list[tuple[int, str, str]]:
 
     for line_no, raw in enumerate(body.splitlines(), 1):
         stripped = raw.strip()
-        previous_state = fence_state
-        fence_state, fence_line = fences.fence_transition(raw, fence_state)
-        if fence_line:
-            if previous_state is None and fence_state is not None:
-                flush()
-            continue
-        if previous_state is not None or fence_state is not None:
+        if line_no in hidden_lines:
+            flush()
             continue
 
         if not stripped:
@@ -362,6 +357,17 @@ def self_test() -> None:
         "authorities will be detaining Jane Doe" in prose
         for _, _, prose in tab_indented
     ), tab_indented
+
+    # Raw HTML block precedence is a CommonMark parser decision. The backticks inside <pre> are
+    # literal HTML content and cannot hide a later modal-progressive Person sentence.
+    raw_html = fence_safe_person_segments(
+        "<pre>\n```text\nliteral HTML content\n</pre>\n"
+        "authorities will be detaining Jane Doe\n"
+    )
+    assert any(
+        "authorities will be detaining Jane Doe" in prose
+        for _, _, prose in raw_html
+    ), raw_html
 
     # Ordinary backtick info strings and tilde info strings remain valid openers; the backtick
     # restriction applies only to backtick fences.
