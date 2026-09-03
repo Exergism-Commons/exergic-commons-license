@@ -7,6 +7,8 @@ on:
       - 'knowledge/entities/**'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/audit_private_org_mentions.py'
+      - 'tools/commonmark_fences.py'
+      - 'tools/commonmark-requirements.txt'
       - 'tools/entity_identity_resolution.py'
       - 'tools/check_state_dossier_ampersand_title_coverage.py'
       - 'tools/check_state_dossier_render_boundary_ampersand_coverage.py'
@@ -21,6 +23,8 @@ on:
       - 'knowledge/entities/**'
       - 'tools/audit_state_dossier_entities.py'
       - 'tools/audit_private_org_mentions.py'
+      - 'tools/commonmark_fences.py'
+      - 'tools/commonmark-requirements.txt'
       - 'tools/entity_identity_resolution.py'
       - 'tools/check_state_dossier_ampersand_title_coverage.py'
       - 'tools/check_state_dossier_render_boundary_ampersand_coverage.py'
@@ -39,8 +43,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Install parser dependency
-        run: python -m pip install --disable-pip-version-check PyYAML
+      - name: Install parser dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML -r tools/commonmark-requirements.txt
       - name: Self-test standalone ampersand title grammar
         run: python tools/check_state_dossier_ampersand_title_coverage.py --self-test
       - name: Self-test rendered-boundary ampersand coverage
