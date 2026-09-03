@@ -7,15 +7,6 @@
   "allowedStatuses": ["deferred", "rejected"],
   "dispositions": [
     {
-      "state": "MDA",
-      "candidate": "Council of Europe's Department for the Execution of Judgments",
-      "normalized": "council of europe s department for the execution of judgments",
-      "status": "deferred",
-      "reason": "The complete institutional surface is identity-like and materially named, but the current ABox has no exact reviewed identity for this Council of Europe department. Preserve explicit identity debt rather than infer a new node or silently accept the historical nine-token truncation.",
-      "source": "dossiers/states/MDA.md",
-      "source_blob": "ac8ed81b974adfb6bd5b501111552bf9db3ceed0"
-    },
-    {
       "state": "PHL",
       "candidate": "Station Drug Enforcement Unit of Manila Police District's Malate Police Station",
       "normalized": "station drug enforcement unit of manila police district s malate police station",
