@@ -23,24 +23,17 @@ import commonmark_fences as fences
 import review_state_dossier_candidates as reviewed
 
 
-def fence_transition(
-    raw: str, state: fences.FenceState | None
-) -> tuple[fences.FenceState | None, bool]:
-    """Compatibility wrapper around the single shared CommonMark fence transition."""
-    return fences.fence_transition(raw, state)
-
-
 def visible_lines(body: str) -> list[tuple[int, str]]:
-    """Return lines visible outside fenced code using the shared parser."""
+    """Return lines visible outside true CommonMark fenced-code tokens."""
     return fences.visible_lines(body)
 
 
 def fence_safe_body(body: str) -> str:
     """Blank fenced-code lines while preserving source line numbers for block assembly.
 
-    The existing soft-wrap renderer is useful after fences are removed, but its historical marker-
-    only fence state cannot safely decide which lines are visible. The shared parser makes that
-    decision once; the remaining text can then be assembled without reopening fence semantics.
+    The existing soft-wrap renderer is useful after fences are removed, but it must not decide
+    Markdown block precedence itself. The shared CommonMark parser decides the actual fence-token
+    ranges once; the remaining text can then be assembled without reopening fence semantics.
     """
     return fences.blank_fenced_lines(body)
 
@@ -127,7 +120,7 @@ def audit() -> list[dict]:
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
 
-        # Same-line/heading/table/list protection after the shared visibility decision.
+        # Same-line/heading/table/list protection after the parser-derived visibility decision.
         for relative_line, raw in visible_lines(body):
             inspect_raw(
                 state=state,
@@ -137,8 +130,8 @@ def audit() -> list[dict]:
                 scope="line",
             )
 
-        # Composition protection: blank the true fenced region with the shared parser first, then
-        # let the established soft-wrap assembler join only actually visible prose.
+        # Composition protection: blank true fence-token ranges first, then let the established
+        # soft-wrap assembler join only actually visible prose.
         safe_body = fence_safe_body(body)
         for block in softwrap.prose_blocks(safe_body):
             lines = [line for line in block["lines"] if line]
@@ -171,14 +164,6 @@ def self_test() -> None:
     lines = visible_lines(body)
     assert lines == [(8, r"Research \& Development Agency")], lines
 
-    state: fences.FenceState | None = None
-    state, handled = fence_transition("````python", state)
-    assert handled and state == ("`", 4), state
-    state, handled = fence_transition("```", state)
-    assert handled and state == ("`", 4), state
-    state, handled = fence_transition("`````", state)
-    assert handled and state is None, state
-
     visible = commonmark.rendered_with_commonmark_escapes(lines[0][1])
     candidates = amp.ampersand_title_surfaces(visible)
     assert ("Research & Development Agency", "actor-or-institution") in candidates, candidates
@@ -186,10 +171,16 @@ def self_test() -> None:
     invalid = visible_lines("```bad`info\nResearch \\& Development Agency\n")
     assert invalid[0][0] == 1 and invalid[1][0] == 2, invalid
 
-    # The review finding is enforced through the shared parser: a tab-indented would-be opener
-    # cannot hide a later title surface.
+    # Tab-indented fence-looking text is indented code, so it cannot hide a later title surface.
     tab_indented = visible_lines("\t```text\nResearch \\& Development Agency\n")
     assert tab_indented[0][0] == 1 and tab_indented[1][0] == 2, tab_indented
+
+    # Raw HTML block precedence is delegated to CommonMark. A fence-looking line inside <pre> is
+    # literal HTML content and the title after </pre> must remain visible.
+    raw_html = visible_lines(
+        "<pre>\n```text\nliteral HTML content\n</pre>\nResearch \\& Development Agency\n"
+    )
+    assert raw_html[-1] == (5, r"Research \& Development Agency"), raw_html
 
     # Composition regression from review: the internal three-backtick run stays fenced; after the
     # true four-backtick closer, a soft-wrapped escaped-ampersand identity must be reassembled.
