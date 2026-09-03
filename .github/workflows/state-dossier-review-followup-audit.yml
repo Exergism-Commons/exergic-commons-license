@@ -37,9 +37,13 @@ jobs:
           python tools/check_state_dossier_h1_state_binding.py --self-test
           python tools/check_state_dossier_commonmark_escape_coverage.py --self-test
           python tools/check_state_dossier_passive_appositive_person_coverage.py --self-test
+          python tools/check_state_dossier_long_title_coverage.py --self-test
+          python tools/check_state_dossier_multiword_name_particle_coverage.py --self-test
 
       - name: Enforce latest State dossier review invariants
         run: |
           python tools/check_state_dossier_h1_state_binding.py
           python tools/check_state_dossier_commonmark_escape_coverage.py
           python tools/check_state_dossier_passive_appositive_person_coverage.py
+          python tools/check_state_dossier_long_title_coverage.py
+          python tools/check_state_dossier_multiword_name_particle_coverage.py
