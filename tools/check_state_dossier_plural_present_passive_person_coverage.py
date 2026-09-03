@@ -2,8 +2,8 @@
 """Fail closed on named people hidden by passive custody prose variants.
 
 The established State Person guards historically left auxiliary/adverb gaps across simple,
-perfect, and progressive passive custody clauses. This independent companion covers the
-ordinary passive auxiliary families plus a deliberately closed, bounded adverb vocabulary,
+perfect, progressive, remain/remains, and modal passive custody clauses. This independent companion
+covers the ordinary passive auxiliary families plus a deliberately closed, bounded adverb vocabulary,
 while reusing the broader closed Person name/list and bounded human-role appositive grammars.
 
 Identity coverage is neutral and creates no attribution, participation, culpability, control,
@@ -25,7 +25,7 @@ import check_state_dossier_passive_appositive_person_coverage as appositive
 
 # Closed adverb vocabulary: enough for ordinary temporal/evidentiary/legal modifiers without
 # turning arbitrary lowercase prose into part of the passive grammar. At most three modifiers
-# may occur in either slot: before ``being/been`` and immediately before the custody state.
+# may occur in either slot: before ``being/been/be`` and immediately before the custody state.
 PASSIVE_ADVERB = (
     r"allegedly|arbitrarily|currently|reportedly|unlawfully|wrongfully|temporarily|briefly|"
     r"continuously|repeatedly|immediately|still|now|presently|subsequently|previously|"
@@ -33,13 +33,19 @@ PASSIVE_ADVERB = (
 )
 ADVERB_SEQ = rf"(?:(?i:{PASSIVE_ADVERB})\s+){{0,3}}"
 
-# This companion now owns the ordinary simple/progressive/perfect passive families so an adverb
-# cannot move the same identity bypass from one auxiliary-specific guard to another.
+# Closed modal vocabulary: only ordinary English modal auxiliaries that can introduce a passive
+# ``be <custody-state>`` clause. Keeping the set explicit prevents arbitrary future-tense prose from
+# becoming Person debt while covering common legal/status statements such as ``may be detained``.
+PASSIVE_MODAL = r"can|could|may|might|must|shall|should|will|would"
+
+# This companion owns the ordinary simple/progressive/perfect/remain/modal passive families so an
+# adverb or auxiliary variation cannot move the same identity bypass from one guard to another.
 PASSIVE_AUX = (
     rf"(?:"
     rf"(?i:is|are|was|were)\s+(?:{ADVERB_SEQ}(?i:being)\s+)?|"
     rf"(?i:has|have|had)\s+{ADVERB_SEQ}(?i:been)\s+|"
-    rf"(?i:remains|remained)\s+"
+    rf"(?i:remain|remains|remained)\s+|"
+    rf"(?i:{PASSIVE_MODAL})\s+{ADVERB_SEQ}(?i:be)\s+"
     rf")"
 )
 PASSIVE_RE = re.compile(
@@ -129,6 +135,15 @@ def self_test() -> None:
         "Jane Doe", "John Roe"
     ]
 
+    # Remain-family status clauses include singular and plural present plus past.
+    assert names_from_plural_present_passive("Jane Doe remains detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe remain detained") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive("Jane Doe and John Roe remained imprisoned") == [
+        "Jane Doe", "John Roe"
+    ]
+
     # Progressive passive: adverbs are accepted both before ``being`` and before custody state.
     assert names_from_plural_present_passive("Jane Doe and John Roe are being detained") == [
         "Jane Doe", "John Roe"
@@ -150,6 +165,16 @@ def self_test() -> None:
         "Jane Doe and John Roe have reportedly been arbitrarily detained"
     ) == ["Jane Doe", "John Roe"]
 
+    # Modal passive is deliberately restricted to the closed modal + ``be`` family.
+    assert names_from_plural_present_passive("Jane Doe will be detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe may be detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe could be imprisoned") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive(
+        "Jane Doe should reportedly be arbitrarily detained"
+    ) == ["Jane Doe"]
+
     # The expanded name grammar keeps common particle sequences complete.
     assert names_from_plural_present_passive(
         "Ursula von der Leyen and John le Carré are currently being detained"
@@ -158,7 +183,7 @@ def self_test() -> None:
         "Ali ibn Abi Talib and Jane Doe had reportedly been detained"
     ) == ["Ali ibn Abi Talib", "Jane Doe"]
 
-    # Bounded role appositives compose with simple, progressive, perfect, and adverbial forms.
+    # Bounded role appositives compose with simple, progressive, perfect, modal and adverbial forms.
     assert names_from_plural_present_passive(
         "Jane Doe and John Roe (journalists) are arbitrarily detained"
     ) == ["Jane Doe", "John Roe"]
@@ -168,12 +193,17 @@ def self_test() -> None:
     assert names_from_plural_present_passive(
         "Jane Doe, a journalist, has reportedly been arbitrarily detained"
     ) == ["Jane Doe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe and John Roe (journalists) may be detained"
+    ) == ["Jane Doe", "John Roe"]
 
     # Closed-world/bounded controls: unknown prose and excessive modifier chains do not widen.
     assert names_from_plural_present_passive("Jane Doe is conspicuously detained") == []
     assert names_from_plural_present_passive(
         "Jane Doe is currently reportedly allegedly secretly being detained"
     ) == []
+    assert names_from_plural_present_passive("Jane Doe plans to be detained") == []
+    assert names_from_plural_present_passive("Jane Doe hopes to be released") == []
 
     # Active progressive prose must not be mistaken for passive identity debt.
     assert names_from_plural_present_passive("authorities are detaining Jane Doe") == []
