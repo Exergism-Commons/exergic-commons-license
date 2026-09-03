@@ -47,8 +47,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Schedule parser dependency
-        run: python -m pip install -r tools/schedule-requirements.txt
+      - name: Install audit parser dependencies
+        run: python -m pip install -r tools/schedule-requirements.txt -r tools/commonmark-requirements.txt
 
       - name: Reject duplicate structured-data keys
         run: |
