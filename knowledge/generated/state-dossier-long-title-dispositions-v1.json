@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "date": "2026-09-03",
+  "purpose": "Exact review overlay for identity surfaces exposed only when a State-dossier title continues beyond the historical nine-token baseline ceiling.",
+  "sourceAudit": "tools/check_state_dossier_long_title_coverage.py",
+  "keyRule": "Each row is keyed by exact State, normalized complete surface, and source dossier and is blob-pinned to prevent source drift.",
+  "allowedStatuses": ["deferred", "rejected"],
+  "dispositions": [
+    {
+      "state": "MDA",
+      "candidate": "Council of Europe's Department for the Execution of Judgments",
+      "normalized": "council of europe s department for the execution of judgments",
+      "status": "deferred",
+      "reason": "The complete institutional surface is identity-like and materially named, but the current ABox has no exact reviewed identity for this Council of Europe department. Preserve explicit identity debt rather than infer a new node or silently accept the historical nine-token truncation.",
+      "source": "dossiers/states/MDA.md",
+      "source_blob": "ac8ed81b974adfb6bd5b501111552bf9db3ceed0"
+    },
+    {
+      "state": "PHL",
+      "candidate": "Station Drug Enforcement Unit of Manila Police District's Malate Police Station",
+      "normalized": "station drug enforcement unit of manila police district s malate police station",
+      "status": "deferred",
+      "reason": "The complete surface denotes a nested police-unit/station identity chain, but current ABox granularity does not establish one exact node for the whole phrase. Preserve explicit identity debt without inferring participation, culpability, hierarchy, or a new institutional identity.",
+      "source": "dossiers/states/PHL.md",
+      "source_blob": "75340464037ac4fd303f9beb55ee19ea68815db0"
+    }
+  ],
+  "nonInference": [
+    "A deferred long-title surface is unresolved identity debt only.",
+    "No disposition creates attribution, participation, control, operation, supply, culpability, membership, hierarchy, or governance semantics.",
+    "Rejected rows, if added later, classify extractor composition only and do not alter dossier determinations."
+  ]
+}
