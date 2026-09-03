@@ -41,6 +41,8 @@ jobs:
           python tools/check_state_dossier_passive_appositive_person_coverage.py --self-test
           python tools/check_state_dossier_long_title_coverage.py --self-test
           python tools/check_state_dossier_multiword_name_particle_coverage.py --self-test
+          python tools/check_state_dossier_perfect_passive_person_coverage.py --self-test
+          python tools/check_state_dossier_long_title_comma_coverage.py --self-test
 
       - name: Enforce latest State dossier review invariants
         run: |
@@ -49,3 +51,5 @@ jobs:
           python tools/check_state_dossier_passive_appositive_person_coverage.py
           python tools/check_state_dossier_long_title_coverage.py
           python tools/check_state_dossier_multiword_name_particle_coverage.py
+          python tools/check_state_dossier_perfect_passive_person_coverage.py
+          python tools/check_state_dossier_long_title_comma_coverage.py
