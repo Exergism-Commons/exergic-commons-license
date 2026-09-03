@@ -39,6 +39,7 @@ TITLE_SEPARATOR = r"(?:\s+|,\s+)"
 LONG_COMMA_TITLE_RE = re.compile(
     rf"\b(?P<title>{TITLE_WORD}(?:{TITLE_SEPARATOR}{TITLE_TOKEN}){{9,}})"
 )
+TERMINAL_CLASS_TERMS = base.ORG_TERMS | base.PROJECT_TERMS
 
 
 def comma_long_title_surfaces(text: str) -> list[tuple[str, str]]:
@@ -52,6 +53,12 @@ def comma_long_title_surfaces(text: str) -> list[tuple[str, str]]:
         candidate = base.clean_candidate(raw)
         # Ten or more lexical/title tokens are required independently of punctuation.
         if len(re.findall(TITLE_TOKEN, candidate)) < 10:
+            continue
+        # A complete reconstructed identity must end on its class-bearing token. This prevents
+        # a hard sentence boundary from turning the pre-boundary fragment into review debt merely
+        # because an earlier token happened to contain e.g. ``Commission``.
+        terminal = candidate.rsplit(maxsplit=1)[-1].strip(".,")
+        if terminal not in TERMINAL_CLASS_TERMS:
             continue
         kind = base.classify(candidate)
         if kind is None or not base.plausible(candidate):
@@ -166,7 +173,8 @@ def self_test() -> None:
     # Ordinary short comma-bearing names do not enter this long-title guard.
     assert comma_long_title_surfaces("Research, Development Agency") == []
 
-    # Sentence-ending punctuation remains a hard boundary and cannot glue title fragments.
+    # Sentence-ending punctuation remains a hard boundary and cannot glue title fragments or
+    # turn the class word occurring earlier in the phrase into a truncated complete identity.
     for punctuation in (".", ";", ":", "?", "!"):
         separated = comma_long_title_surfaces(
             "National Commission for the Prevention of Torture and Other Cruel, "
