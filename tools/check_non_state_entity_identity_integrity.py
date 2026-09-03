@@ -8,6 +8,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
+import audit_schedule_reference_coverage as schedule
 import entity_identity_resolution as identity
 
 ROOT = identity.ROOT
@@ -69,7 +70,7 @@ def validate() -> list[dict]:
         if aliases is not None:
             if not isinstance(aliases, list) or not all(isinstance(item, str) and item.strip() for item in aliases):
                 failures.append({"file": rel, "id": entity_id, "reason": "aliases, when present, must be a list of non-empty strings"})
-            elif len({identity.default_normalizer(item) for item in aliases}) != len(aliases):
+            elif len({schedule.norm(item) for item in aliases}) != len(aliases):
                 failures.append({"file": rel, "id": entity_id, "reason": "duplicate normalized aliases within identity"})
 
         dossier = data.get("dossier")
@@ -93,6 +94,10 @@ def self_test() -> None:
     assert ID_RE.fullmatch("AGENCY-AAA-EXAMPLE")
     assert not ID_RE.fullmatch("agency-aaa-example")
     assert inside((DOSSIER_ROOT / "states" / "AAA.md").resolve(), DOSSIER_ROOT)
+    assert schedule.norm("منظمة ألف") != ""
+    assert schedule.norm("王小明") != ""
+    assert len({schedule.norm(item) for item in ["منظمة ألف", "منظمة باء"]}) == 2
+    assert len({schedule.norm(item) for item in ["منظمة ألف", "منظمة ألف"]}) == 1
     print("non-State entity identity integrity self-test: OK")
 
 
