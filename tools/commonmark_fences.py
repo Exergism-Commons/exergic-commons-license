@@ -1,91 +1,56 @@
 #!/usr/bin/env python3
 """Shared CommonMark fenced-code visibility semantics for State dossier audits.
 
-This module is intentionally small and parser-only. Identity auditors should not carry their own
-fence regex/state machine: doing so lets visibility semantics drift between Person, vendor and title
-coverage. The functions here model only the CommonMark fenced-code properties the audits need:
+Fence visibility is intentionally delegated to a standards-conformant CommonMark block parser.
+Identity auditors must not carry their own regex/state machine: fenced-code recognition interacts
+with other block constructs (notably raw HTML, indented code and block containers), so even a locally
+accurate fence grammar can be wrong in context.
 
-- an opener is indented by at most three literal spaces (a leading tab is indented code, not a fence),
-- the opening run is at least three backticks or tildes,
-- a backtick fence info string may not contain a backtick,
-- a closer uses the same marker with a run at least as long as the opener,
-- a closer may contain only ASCII spaces/tabs after the marker run.
-
-The module does not render Markdown or infer any identity semantics.
+This module asks markdown-it-py's CommonMark parser which source ranges are actual ``fence`` tokens,
+then exposes only the two operations the audits need: visible source lines and a line-preserving body
+with true fenced-code regions blanked. It does not render Markdown or infer identity semantics.
 """
 from __future__ import annotations
 
 import argparse
-import re
-from typing import TypeAlias
+
+from markdown_it import MarkdownIt
 
 
-FenceState: TypeAlias = tuple[str, int]
-
-# CommonMark permits up to three *spaces* of indentation before a fenced-code marker. Using \s
-# here is incorrect because a leading tab advances to an indented-code column and is not a fence.
-# Group 1 deliberately remains the marker run for compatibility with the older shared renderer.
-# The backtick alternative also rejects backticks in its info string at match time so consumers
-# that only need opener recognition cannot accidentally reintroduce that CommonMark edge.
-FENCE_RE = re.compile(r"^ {0,3}(?P<run>(?:`{3,}(?![^\n]*`)|~{3,}))(?P<tail>.*)$")
-CLOSING_FENCE_RE = re.compile(r"^ {0,3}(?P<run>`{3,}|~{3,})[ \t]*$")
-CLOSING_TAIL_RE = re.compile(r"[ \t]*$")
+# HTML parsing must be enabled for CommonMark block precedence to be represented faithfully. In
+# particular, fence-looking lines inside raw HTML blocks such as <pre> are literal HTML content and
+# cannot open a Markdown fence that hides later dossier prose.
+PARSER = MarkdownIt("commonmark", {"html": True})
 
 
-def fence_transition(raw: str, state: FenceState | None) -> tuple[FenceState | None, bool]:
-    """Advance fenced-code state and report whether ``raw`` is fence syntax/content boundary.
-
-    ``handled`` is true for a valid opener and for any fence-shaped line while already inside a
-    fence. Consumers should still use the returned state to suppress ordinary content inside an
-    open fence. An invalid would-be opener (for example tab-indented or a backtick-bearing backtick
-    info string) returns ``handled=False`` and therefore remains visible prose.
-    """
-    match = FENCE_RE.match(raw)
-    if match is None:
-        return state, False
-
-    run = match.group("run")
-    tail = match.group("tail")
-    marker = run[0]
-
-    if state is None:
-        return (marker, len(run)), True
-
-    open_marker, open_length = state
-    if (
-        marker == open_marker
-        and len(run) >= open_length
-        and CLOSING_TAIL_RE.fullmatch(tail) is not None
-    ):
-        return None, True
-    return state, True
+def fenced_line_numbers(body: str) -> set[int]:
+    """Return 1-based source line numbers belonging to actual CommonMark fence tokens."""
+    hidden: set[int] = set()
+    for token in PARSER.parse(body):
+        if token.type != "fence" or token.map is None:
+            continue
+        start, end = token.map
+        hidden.update(range(start + 1, end + 1))
+    return hidden
 
 
 def visible_lines(body: str) -> list[tuple[int, str]]:
-    """Return 1-based source lines that are outside valid fenced-code blocks."""
-    out: list[tuple[int, str]] = []
-    state: FenceState | None = None
-    for line_no, raw in enumerate(body.splitlines(), 1):
-        previous_state = state
-        state, handled = fence_transition(raw, state)
-        if handled or previous_state is not None or state is not None:
-            continue
-        out.append((line_no, raw))
-    return out
+    """Return 1-based source lines outside actual CommonMark fenced-code blocks."""
+    hidden = fenced_line_numbers(body)
+    return [
+        (line_no, raw)
+        for line_no, raw in enumerate(body.splitlines(), 1)
+        if line_no not in hidden
+    ]
 
 
 def blank_fenced_lines(body: str) -> str:
-    """Blank valid fenced-code regions while preserving source line count."""
-    out: list[str] = []
-    state: FenceState | None = None
-    for raw in body.splitlines():
-        previous_state = state
-        state, handled = fence_transition(raw, state)
-        if handled or previous_state is not None or state is not None:
-            out.append("")
-        else:
-            out.append(raw)
-    return "\n".join(out)
+    """Blank true fenced-code regions while preserving source line count."""
+    hidden = fenced_line_numbers(body)
+    return "\n".join(
+        "" if line_no in hidden else raw
+        for line_no, raw in enumerate(body.splitlines(), 1)
+    )
 
 
 def self_test() -> None:
@@ -100,7 +65,7 @@ def self_test() -> None:
     )
     assert visible_lines(body) == [(6, "visible")]
 
-    # Marker family and trailing closer syntax are part of the same shared transition.
+    # Marker family and trailing closer syntax remain CommonMark parser decisions.
     mixed = "~~~~text\n```\n~~~~ trailing\n~~~~\nvisible"
     assert visible_lines(mixed) == [(5, "visible")]
 
@@ -109,12 +74,10 @@ def self_test() -> None:
     assert visible_lines(invalid_info) == [(1, "```bad`info"), (2, "visible")]
     assert visible_lines("~~~bad`info\nhidden\n~~~") == []
 
-    # The review finding: tabs are not part of the up-to-three-space opener indentation.
+    # Tabs and four-space indentation produce indented code, not a fenced-code opener.
     for prefix in ("\t", " \t", "  \t", "   \t"):
         candidate = f"{prefix}```text\nvisible"
         assert visible_lines(candidate) == [(1, f"{prefix}```text"), (2, "visible")]
-
-    # Zero through three literal spaces are valid; four spaces are indented code, not a fence.
     for spaces in range(4):
         assert visible_lines(" " * spaces + "```text\nhidden\n```") == []
     four_space = "    ```text\nvisible"
@@ -125,16 +88,43 @@ def self_test() -> None:
     assert visible_lines(tab_close) == [(6, "visible")]
     assert visible_lines("```text\nhidden\n   ```\nvisible") == [(4, "visible")]
 
-    # Only ASCII space/tab is legal after a closer; arbitrary or Unicode trailing whitespace does
-    # not get silently normalized into a valid closer by ``str.strip()``.
+    # Arbitrary or Unicode trailing content does not silently become a valid closer.
     trailing = "```text\nhidden\n``` trailing\nstill hidden\n```\nvisible"
     assert visible_lines(trailing) == [(6, "visible")]
     unicode_tail = "```text\nhidden\n```\u00a0\nstill hidden\n```\nvisible"
     assert visible_lines(unicode_tail) == [(6, "visible")]
 
+    # Review regression: raw HTML block precedence is resolved by CommonMark itself. The backticks
+    # are literal <pre> content; the later Person/title prose remains visible and no fence exists.
+    raw_html = (
+        "<pre>\n"
+        "```text\n"
+        "literal HTML content\n"
+        "</pre>\n"
+        "authorities will be detaining Jane Doe\n"
+        "Research \\& Development Agency reported findings.\n"
+    )
+    assert fenced_line_numbers(raw_html) == set()
+    raw_html_visible = visible_lines(raw_html)
+    assert raw_html_visible[-2:] == [
+        (5, "authorities will be detaining Jane Doe"),
+        (6, r"Research \& Development Agency reported findings."),
+    ]
+
+    # Cover additional raw-block families so this remains a block-parser contract rather than a
+    # one-tag exception. Fence-looking text inside these blocks likewise cannot create a fence.
+    for raw_block in (
+        "<script>\n```text\n</script>\nvisible",
+        "<style>\n```text\n</style>\nvisible",
+        "<!--\n```text\n-->\nvisible",
+    ):
+        assert fenced_line_numbers(raw_block) == set(), raw_block
+        assert visible_lines(raw_block)[-1][1] == "visible", raw_block
+
+    # Real fences are still blanked line-for-line for downstream soft-wrap assembly.
     safe = blank_fenced_lines("````\nhidden\n```\n````\nvisible")
     assert safe.splitlines() == ["", "", "", "", "visible"]
-    print("Shared CommonMark fenced-code semantics self-test: OK")
+    print("Shared CommonMark fenced-code visibility self-test: OK")
 
 
 def main() -> int:
