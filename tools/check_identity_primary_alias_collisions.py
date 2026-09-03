@@ -6,7 +6,13 @@ import argparse
 import json
 from collections import defaultdict
 
+import audit_schedule_reference_coverage as schedule
 import entity_identity_resolution as identity
+
+
+def collision_normalizer(value: str) -> str:
+    """Use exactly the resolver's Unicode-aware normalization for collision keys."""
+    return schedule.norm(value)
 
 
 def indexed_names() -> tuple[dict[tuple[str, str], list[dict]], dict[str, list[dict]]]:
@@ -22,13 +28,13 @@ def indexed_names() -> tuple[dict[tuple[str, str], list[dict]], dict[str, list[d
         scope = identity.infer_domestic_state(entity_id, state_codes) or "GLOBAL"
         values: list[tuple[str, str]] = []
         primary = entity.get("name")
-        if isinstance(primary, str) and identity.default_normalizer(primary):
+        if isinstance(primary, str) and collision_normalizer(primary):
             values.append(("primary", primary))
         for alias in entity.get("aliases") or []:
-            if isinstance(alias, str) and identity.default_normalizer(alias):
+            if isinstance(alias, str) and collision_normalizer(alias):
                 values.append(("alias", alias))
         for kind, text in values:
-            normalized = identity.default_normalizer(text)
+            normalized = collision_normalizer(text)
             row = {"id": entity_id, "scope": scope, "kind": kind, "text": text}
             by_scope[(scope, normalized)].append(row)
             by_name[normalized].append(row)
@@ -83,10 +89,10 @@ def state_global_non_state_shadows() -> list[dict]:
             continue
         values: list[tuple[str, str]] = []
         name = entity.get("name")
-        if isinstance(name, str) and identity.default_normalizer(name):
+        if isinstance(name, str) and collision_normalizer(name):
             values.append(("primary", name))
         for alias in entity.get("aliases") or []:
-            if isinstance(alias, str) and identity.default_normalizer(alias):
+            if isinstance(alias, str) and collision_normalizer(alias):
                 values.append(("alias", alias))
         if entity.get("type") == "State":
             target = state_rows
@@ -95,7 +101,7 @@ def state_global_non_state_shadows() -> list[dict]:
                 continue
             target = global_non_state_rows
         for kind, text in values:
-            target[identity.default_normalizer(text)].append({"id": entity_id, "kind": kind, "text": text})
+            target[collision_normalizer(text)].append({"id": entity_id, "kind": kind, "text": text})
 
     failures: list[dict] = []
     for normalized in sorted(set(state_rows) & set(global_non_state_rows)):
@@ -119,6 +125,19 @@ def self_test() -> None:
     ]
     assert any(row["scope"] == "GLOBAL" for row in shadow_sample)
     assert any(row["scope"] != "GLOBAL" for row in shadow_sample)
+
+    # Collision keys must be identical to the Unicode-aware resolver keys. In particular,
+    # names from uncased scripts must never collapse to the empty string and disappear from
+    # global/domestic shadow detection.
+    assert collision_normalizer("منظمة") == schedule.norm("منظمة") == "منظمة"
+    assert collision_normalizer("王小明") == schedule.norm("王小明") == "王小明"
+    assert collision_normalizer("İdris Baluken") == schedule.norm("İdris Baluken")
+    assert collision_normalizer("ＡＢＣ") == schedule.norm("ＡＢＣ") == "abc"
+    unicode_shadow = [
+        {"id": "ORG-GLOBAL", "scope": "GLOBAL", "text": "منظمة"},
+        {"id": "AGENCY-AAA-LOCAL", "scope": "AAA", "text": "منظمة"},
+    ]
+    assert collision_normalizer(unicode_shadow[0]["text"]) == collision_normalizer(unicode_shadow[1]["text"]) != ""
     print("identity collision/shadow self-test: OK")
 
 
