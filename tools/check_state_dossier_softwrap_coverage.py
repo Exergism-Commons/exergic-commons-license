@@ -48,18 +48,19 @@ def render_prose_block(lines: list[str]) -> tuple[str, list[int]]:
     return rendered.replace(BOUNDARY, " "), boundaries
 
 
-def prose_blocks(body: str) -> list[dict]:
+def prose_blocks(body: str, *, hidden_lines: set[int] | None = None) -> list[dict]:
     """Build visible paragraph/list-item blocks while preserving source-line boundaries.
 
-    Fenced-code visibility is authoritative from the shared CommonMark block parser. This
-    assembler deliberately does not recognize fence markers itself: once parser-derived token
-    ranges say a source line is visible, a fence-looking line in raw HTML or another block context
-    cannot reopen a conflicting legacy state machine and hide subsequent prose.
+    ``hidden_lines`` is the authoritative set of 1-based fenced-code source lines when a caller has
+    already parsed the CommonMark block structure. If omitted, this function derives that set once
+    through the shared CommonMark parser. The assembler itself never recognizes fence marker syntax,
+    so parser-visible backticks inside raw HTML cannot open a conflicting downstream fence state.
     """
     blocks: list[dict] = []
     section = "preamble"
     current: dict | None = None
-    hidden_lines = fences.fenced_line_numbers(body)
+    if hidden_lines is None:
+        hidden_lines = fences.fenced_line_numbers(body)
 
     def flush() -> None:
         nonlocal current
@@ -182,7 +183,7 @@ def self_test() -> None:
 
     # Parser-composition regression: a fence-looking line inside raw HTML is visible CommonMark
     # content and must never switch this assembler into a second, legacy fence state. The visible
-    # title after the raw HTML block therefore remains part of the same auditable soft-wrap stream.
+    # title after the raw HTML block therefore remains part of the auditable soft-wrap stream.
     raw_html_fence = (
         "<pre>\n"
         "```text\n"
@@ -190,16 +191,19 @@ def self_test() -> None:
         "Research \\&\n"
         "Development Agency\n"
     )
-    raw_blocks = prose_blocks(raw_html_fence)
+    parser_hidden = fences.fenced_line_numbers(raw_html_fence)
+    assert parser_hidden == set(), parser_hidden
+    raw_blocks = prose_blocks(raw_html_fence, hidden_lines=parser_hidden)
     assert any(
         r"Research \&" in block["lines"] and "Development Agency" in block["lines"]
         for block in raw_blocks
     ), raw_blocks
 
-    # A true CommonMark fence is still excluded before paragraph assembly.
-    true_fence = prose_blocks(
-        "```text\nHidden Agency\n```\nAustralian Human\nRights Commission\n"
-    )
+    # A true CommonMark fence is still excluded when its parser-derived ranges are supplied rather
+    # than reinterpreted by the assembler.
+    true_fence_body = "```text\nHidden Agency\n```\nAustralian Human\nRights Commission\n"
+    true_hidden = fences.fenced_line_numbers(true_fence_body)
+    true_fence = prose_blocks(true_fence_body, hidden_lines=true_hidden)
     assert all("Hidden Agency" not in line for block in true_fence for line in block["lines"]), true_fence
     assert any(
         block["lines"] == ["Australian Human", "Rights Commission"]
