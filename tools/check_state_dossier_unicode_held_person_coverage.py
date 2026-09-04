@@ -120,7 +120,7 @@ SPLIT_RE = re.compile(rf"\s*,\s*(?:{COORDINATOR}\s+)?|\s+{COORDINATOR}\s+")
 
 ROLE_PREFIX_RE = re.compile(rf"(?i:\b(?:{person.ROLE})\s+)")
 ACTIVE_PREFIX_RE = re.compile(
-    rf"(?i:\b(?:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|"
+    rf"(?i:\b(?:arrested|detained|charged|prosecuted|convicted|sentenced|imprisoned|incarcerated|"
     rf"abducted|released|pardoned|executed|killed|freed|acquitted|cleared)\s+)"
     rf"(?:(?i:(?:{person.ROLE}))(?:/(?i:(?:{person.ROLE})))?\s+)?"
 )
@@ -129,7 +129,7 @@ ACTIVE_PREFIX_RE = re.compile(
 # ordinary simple-progressive auxiliaries and perfect-progressive ``has|have|had been`` family,
 # with the same closed/bounded adverb sequence already reviewed for passive clauses.
 ACTIVE_PROGRESSIVE_VERB = (
-    r"arresting|detaining|prosecuting|convicting|sentencing|imprisoning|incarcerating|"
+    r"arresting|detaining|charging|prosecuting|convicting|sentencing|imprisoning|incarcerating|"
     r"abducting|releasing|pardoning|executing|killing|freeing|acquitting|clearing"
 )
 ACTIVE_PROGRESSIVE_AUX = (
@@ -370,20 +370,28 @@ def self_test() -> None:
     assert unicode_and_held_names_from_prose(
         "journalists Łukasz Żak and İdris Baluken were detained"
     ) == ["Łukasz Żak", "İdris Baluken"]
+    assert unicode_and_held_names_from_prose("authorities charged Łukasz Żak") == ["Łukasz Żak"]
     assert unicode_and_held_names_from_prose("authorities detained Łukasz Żak") == ["Łukasz Żak"]
     assert unicode_and_held_names_from_prose(
         "Łukasz Żak (a journalist) was reportedly detained"
     ) == ["Łukasz Żak"]
 
-    # Active progressive custody family, including bounded adverbs, perfect progressives and lists.
+    # Active progressive custody/legal family, including bounded adverbs, perfect progressives and lists.
+    assert unicode_and_held_names_from_prose("authorities are charging Jane Doe") == ["Jane Doe"]
     assert unicode_and_held_names_from_prose("authorities are detaining Jane Doe") == ["Jane Doe"]
     assert unicode_and_held_names_from_prose("authorities were arresting Jane Doe") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose(
+        "authorities are currently charging Dr. Jane Doe"
+    ) == ["Jane Doe"]
     assert unicode_and_held_names_from_prose(
         "authorities are currently detaining Jane Doe and John Roe"
     ) == ["Jane Doe", "John Roe"]
     assert unicode_and_held_names_from_prose(
         "authorities were reportedly prosecuting Łukasz Żak"
     ) == ["Łukasz Żak"]
+    assert unicode_and_held_names_from_prose(
+        "authorities have been charging Jane Doe"
+    ) == ["Jane Doe"]
     assert unicode_and_held_names_from_prose(
         "authorities have been detaining Jane Doe"
     ) == ["Jane Doe"]
@@ -397,8 +405,16 @@ def self_test() -> None:
         "authorities have been detaining أحمد منصور"
     ) == ["أحمد منصور"]
 
+    # Charged passive semantics reuse the shared custody-state pattern across auxiliaries, Unicode,
+    # honorifics and uncased scripts rather than introducing a charge-specific passive checker.
+    assert unicode_and_held_names_from_prose("Jane Doe was charged") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose("Dr. Jane Doe is being charged") == ["Jane Doe"]
+    assert unicode_and_held_names_from_prose("Łukasz Żak has been charged") == ["Łukasz Żak"]
+    assert unicode_and_held_names_from_prose("أحمد منصور was charged") == ["أحمد منصور"]
+
     # Closed honorific syntax is stripped before enforcing the complete canonical name, and composes
     # with direct action, action-of, passive, Unicode and lists.
+    assert unicode_and_held_names_from_prose("authorities charged Dr. Jane Doe") == ["Jane Doe"]
     assert unicode_and_held_names_from_prose("authorities detained Dr. Jane Doe") == ["Jane Doe"]
     assert unicode_and_held_names_from_prose("the arrest of Ms. Jane Doe") == ["Jane Doe"]
     assert unicode_and_held_names_from_prose("authorities arrested Prof. Łukasz Żak") == ["Łukasz Żak"]
