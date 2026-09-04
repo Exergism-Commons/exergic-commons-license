@@ -29,6 +29,7 @@ import check_state_dossier_unicode_held_person_coverage as unicode_guard
 ACTIVE_PRESENT_VERB = (
     r"arrest|arrests|"
     r"detain|detains|"
+    r"charge|charges|"
     r"prosecute|prosecutes|"
     r"convict|convicts|"
     r"sentence|sentences|"
@@ -125,6 +126,8 @@ def self_test() -> None:
     # Exact Codex examples: both base and third-person-singular finite forms are owned here.
     assert simple_present_active_names_from_prose("authorities detain Jane Doe") == ["Jane Doe"]
     assert simple_present_active_names_from_prose("police arrest Jane Doe") == ["Jane Doe"]
+    assert simple_present_active_names_from_prose("prosecutors charge Jane Doe") == ["Jane Doe"]
+    assert simple_present_active_names_from_prose("the prosecutor charges Jane Doe") == ["Jane Doe"]
     assert simple_present_active_names_from_prose("the government prosecutes Jane Doe") == ["Jane Doe"]
     assert simple_present_active_names_from_prose("the court sentences Jane Doe") == ["Jane Doe"]
 
@@ -136,6 +139,7 @@ def self_test() -> None:
     assert simple_present_active_names_from_prose(
         "authorities arrest journalists Jane Doe and John Roe"
     ) == ["Jane Doe", "John Roe"]
+    assert simple_present_active_names_from_prose("authorities charge Dr. Jane Doe") == ["Jane Doe"]
     assert simple_present_active_names_from_prose("authorities detain Dr. Jane Doe") == ["Jane Doe"]
     assert simple_present_active_names_from_prose("authorities detain Łukasz Żak") == ["Łukasz Żak"]
     assert simple_present_active_names_from_prose("authorities detain أحمد منصور") == ["أحمد منصور"]
