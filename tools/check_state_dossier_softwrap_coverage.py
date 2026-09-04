@@ -8,10 +8,10 @@ import re
 
 import audit_state_dossier_entities as base
 import check_state_dossier_rendered_markup_coverage as markup
+import commonmark_fences as fences
 import review_state_dossier_candidates as reviewed
 
 ROOT = base.ROOT
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 LIST_RE = re.compile(r"^\s{0,3}(?:[-+*]|\d+[.)])\s+")
 TABLE_RE = re.compile(r"^\s*\|.*\|\s*$")
 BOUNDARY = "\ue000"
@@ -49,11 +49,17 @@ def render_prose_block(lines: list[str]) -> tuple[str, list[int]]:
 
 
 def prose_blocks(body: str) -> list[dict]:
-    """Build paragraph/list-item blocks while preserving every source-line boundary."""
+    """Build visible paragraph/list-item blocks while preserving source-line boundaries.
+
+    Fenced-code visibility is authoritative from the shared CommonMark block parser. This
+    assembler deliberately does not recognize fence markers itself: once parser-derived token
+    ranges say a source line is visible, a fence-looking line in raw HTML or another block context
+    cannot reopen a conflicting legacy state machine and hide subsequent prose.
+    """
     blocks: list[dict] = []
     section = "preamble"
-    fence_marker: str | None = None
     current: dict | None = None
+    hidden_lines = fences.fenced_line_numbers(body)
 
     def flush() -> None:
         nonlocal current
@@ -62,16 +68,8 @@ def prose_blocks(body: str) -> list[dict]:
         current = None
 
     for line_no, raw in enumerate(body.splitlines(), 1):
-        fence = FENCE_RE.match(raw)
-        if fence:
-            marker = fence.group(1)[0]
-            if fence_marker is None:
-                flush()
-                fence_marker = marker
-            elif marker == fence_marker:
-                fence_marker = None
-            continue
-        if fence_marker is not None:
+        if line_no in hidden_lines:
+            flush()
             continue
         heading = base.HEADING_RE.match(raw)
         if heading:
@@ -161,6 +159,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     rows = cross_line_candidates("Australian Human\nRights Commission reported findings.\n")
     assert any(row["candidate"] == "Australian Human Rights Commission" for row in rows), rows
     hard = cross_line_candidates("Australian Human\\\nRights Commission reported findings.\n")
@@ -180,6 +179,33 @@ def self_test() -> None:
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
     assert cross_line_candidates("## Australian Human\nRights Commission\n") == []
+
+    # Parser-composition regression: a fence-looking line inside raw HTML is visible CommonMark
+    # content and must never switch this assembler into a second, legacy fence state. The visible
+    # title after the raw HTML block therefore remains part of the same auditable soft-wrap stream.
+    raw_html_fence = (
+        "<pre>\n"
+        "```text\n"
+        "</pre>\n"
+        "Research \\&\n"
+        "Development Agency\n"
+    )
+    raw_blocks = prose_blocks(raw_html_fence)
+    assert any(
+        r"Research \&" in block["lines"] and "Development Agency" in block["lines"]
+        for block in raw_blocks
+    ), raw_blocks
+
+    # A true CommonMark fence is still excluded before paragraph assembly.
+    true_fence = prose_blocks(
+        "```text\nHidden Agency\n```\nAustralian Human\nRights Commission\n"
+    )
+    assert all("Hidden Agency" not in line for block in true_fence for line in block["lines"]), true_fence
+    assert any(
+        block["lines"] == ["Australian Human", "Rights Commission"]
+        for block in true_fence
+    ), true_fence
+
     print("State dossier soft/hard-wrap + inline-markup coverage self-test: OK")
 
 
