@@ -3,8 +3,8 @@
 
 Several title companions historically carried independent fence state. This guard now delegates all
 fenced-code visibility to the same CommonMark parser used by Person and vendor coverage, then audits
-both individual visible lines and complete post-fence prose blocks so a title split across a soft
-wrap cannot disappear at the composition boundary.
+both individual visible lines and complete visible prose blocks so a title split across a soft wrap
+cannot disappear at the composition boundary.
 
 Identity coverage is neutral and creates no attribution, participation, control, operation, supply,
 membership, culpability, or governance semantics.
@@ -23,19 +23,15 @@ import commonmark_fences as fences
 import review_state_dossier_candidates as reviewed
 
 
-def visible_lines(body: str) -> list[tuple[int, str]]:
-    """Return lines visible outside true CommonMark fenced-code tokens."""
-    return fences.visible_lines(body)
-
-
-def fence_safe_body(body: str) -> str:
-    """Blank fenced-code lines while preserving source line numbers for block assembly.
-
-    The existing soft-wrap renderer is useful after fences are removed, but it must not decide
-    Markdown block precedence itself. The shared CommonMark parser decides the actual fence-token
-    ranges once; the remaining text can then be assembled without reopening fence semantics.
-    """
-    return fences.blank_fenced_lines(body)
+def visible_lines(body: str, *, hidden_lines: set[int] | None = None) -> list[tuple[int, str]]:
+    """Return source lines outside the authoritative CommonMark fence-token ranges."""
+    if hidden_lines is None:
+        hidden_lines = fences.fenced_line_numbers(body)
+    return [
+        (line_no, raw)
+        for line_no, raw in enumerate(body.splitlines(), 1)
+        if line_no not in hidden_lines
+    ]
 
 
 def audit() -> list[dict]:
@@ -120,8 +116,12 @@ def audit() -> list[dict]:
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
 
+        # Parse block visibility once. Every downstream path consumes this exact set and may not
+        # reinterpret fence-looking syntax independently.
+        hidden_lines = fences.fenced_line_numbers(body)
+
         # Same-line/heading/table/list protection after the parser-derived visibility decision.
-        for relative_line, raw in visible_lines(body):
+        for relative_line, raw in visible_lines(body, hidden_lines=hidden_lines):
             inspect_raw(
                 state=state,
                 source=source,
@@ -130,10 +130,9 @@ def audit() -> list[dict]:
                 scope="line",
             )
 
-        # Composition protection: blank true fence-token ranges first, then let the established
-        # soft-wrap assembler join only actually visible prose.
-        safe_body = fence_safe_body(body)
-        for block in softwrap.prose_blocks(safe_body):
+        # Composition protection: pass the parser-derived fence ranges directly into the soft-wrap
+        # assembler. The assembler joins paragraph/list text but does not recognize fence syntax.
+        for block in softwrap.prose_blocks(body, hidden_lines=hidden_lines):
             lines = [line for line in block["lines"] if line]
             if not lines:
                 continue
@@ -161,29 +160,38 @@ def self_test() -> None:
         "`````\n"
         "Research \\& Development Agency\n"
     )
-    lines = visible_lines(body)
+    hidden = fences.fenced_line_numbers(body)
+    lines = visible_lines(body, hidden_lines=hidden)
     assert lines == [(8, r"Research \& Development Agency")], lines
 
     visible = commonmark.rendered_with_commonmark_escapes(lines[0][1])
     candidates = amp.ampersand_title_surfaces(visible)
     assert ("Research & Development Agency", "actor-or-institution") in candidates, candidates
 
-    invalid = visible_lines("```bad`info\nResearch \\& Development Agency\n")
+    invalid_body = "```bad`info\nResearch \\& Development Agency\n"
+    invalid = visible_lines(
+        invalid_body, hidden_lines=fences.fenced_line_numbers(invalid_body)
+    )
     assert invalid[0][0] == 1 and invalid[1][0] == 2, invalid
 
     # Tab-indented fence-looking text is indented code, so it cannot hide a later title surface.
-    tab_indented = visible_lines("\t```text\nResearch \\& Development Agency\n")
+    tab_body = "\t```text\nResearch \\& Development Agency\n"
+    tab_indented = visible_lines(tab_body, hidden_lines=fences.fenced_line_numbers(tab_body))
     assert tab_indented[0][0] == 1 and tab_indented[1][0] == 2, tab_indented
 
     # Raw HTML block precedence is delegated to CommonMark. A fence-looking line inside <pre> is
     # literal HTML content and the title after </pre> must remain visible.
-    raw_html = visible_lines(
+    raw_html_body = (
         "<pre>\n```text\nliteral HTML content\n</pre>\nResearch \\& Development Agency\n"
     )
+    raw_html_hidden = fences.fenced_line_numbers(raw_html_body)
+    assert raw_html_hidden == set(), raw_html_hidden
+    raw_html = visible_lines(raw_html_body, hidden_lines=raw_html_hidden)
     assert raw_html[-1] == (5, r"Research \& Development Agency"), raw_html
 
-    # Composition regression from review: the internal three-backtick run stays fenced; after the
-    # true four-backtick closer, a soft-wrapped escaped-ampersand identity must be reassembled.
+    # Prior composition regression: an internal three-backtick run stays fenced; after the true
+    # four-backtick closer, a soft-wrapped escaped-ampersand identity is reassembled from the exact
+    # same parser-derived visibility set.
     wrapped = (
         "````text\n"
         "Research \\& Hidden Agency\n"
@@ -193,8 +201,8 @@ def self_test() -> None:
         "Research \\&\n"
         "Development Agency reported findings.\n"
     )
-    safe = fence_safe_body(wrapped)
-    blocks = softwrap.prose_blocks(safe)
+    wrapped_hidden = fences.fenced_line_numbers(wrapped)
+    blocks = softwrap.prose_blocks(wrapped, hidden_lines=wrapped_hidden)
     rendered_blocks = [
         commonmark.rendered_with_commonmark_escapes(" ".join(line for line in block["lines"] if line))
         for block in blocks
@@ -206,12 +214,45 @@ def self_test() -> None:
         for surface in amp.ampersand_title_surfaces(rendered_block)
     ]
     assert ("Research & Development Agency", "actor-or-institution") in wrapped_surfaces, (
-        safe,
+        wrapped_hidden,
         blocks,
         rendered_blocks,
         wrapped_surfaces,
     )
     assert not any("Hidden Agency" in value for value, _ in wrapped_surfaces), wrapped_surfaces
+
+    # Exact latest review composition: CommonMark reports no fence inside raw <pre>, and that exact
+    # parser decision is passed into the assembler without any second fence interpretation. The
+    # title split across the two following source lines must therefore be reconstructed completely.
+    raw_html_wrapped = (
+        "<pre>\n"
+        "```text\n"
+        "</pre>\n"
+        "Research \\&\n"
+        "Development Agency\n"
+    )
+    raw_html_wrapped_hidden = fences.fenced_line_numbers(raw_html_wrapped)
+    assert raw_html_wrapped_hidden == set(), raw_html_wrapped_hidden
+    raw_html_blocks = softwrap.prose_blocks(
+        raw_html_wrapped, hidden_lines=raw_html_wrapped_hidden
+    )
+    raw_html_rendered = [
+        commonmark.rendered_with_commonmark_escapes(
+            " ".join(line for line in block["lines"] if line)
+        )
+        for block in raw_html_blocks
+        if block["lines"]
+    ]
+    raw_html_surfaces = [
+        surface
+        for rendered_block in raw_html_rendered
+        for surface in amp.ampersand_title_surfaces(rendered_block)
+    ]
+    assert ("Research & Development Agency", "actor-or-institution") in raw_html_surfaces, (
+        raw_html_blocks,
+        raw_html_rendered,
+        raw_html_surfaces,
+    )
 
     print("State dossier long-fence title coverage self-test: OK")
 
