@@ -49,7 +49,7 @@ ROLE = "|".join(
 )
 ROLE_RE = re.compile(rf"(?i)\b(?:{ROLE})\s+")
 ACTION_OF_RE = re.compile(
-    rf"(?i)\b(?:arrest|detention|prosecution|conviction|sentencing|sentence|trial|imprisonment|"
+    rf"(?i)\b(?:arrest|detention|charge|prosecution|conviction|sentencing|sentence|trial|imprisonment|"
     rf"incarceration|abduction|disappearance|release|pardon|clemency|killing|execution)\s+of\s+"
     rf"(?:(?:{ROLE})(?:/(?:{ROLE}))?\s+)?"
 )
@@ -69,14 +69,14 @@ NAME_SPLIT_RE = re.compile(rf"\s*,\s*(?:{NAME_COORDINATOR}\s+)?|\s+{NAME_COORDIN
 # grammar, so a sixth or later person cannot fall outside the high-confidence capture.
 NAME_LIST = rf"{NAME_PHRASE}(?:{NAME_SEPARATOR}{NAME_PHRASE})*"
 CUSTODY_STATE = (
-    r"arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
+    r"arrested|detained|charged|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
     r"disappeared|released|pardoned|executed|killed|incommunicado|missing|unaccounted\s+for"
 )
 PASSIVE_ACTION_RE = re.compile(
     rf"\b(?P<names>{NAME_LIST})\s+(?i:was|were|is|remains|remain|remained)\s+(?i:{CUSTODY_STATE})\b"
 )
 ACTIVE_ACTION_RE = re.compile(
-    rf"\b(?i:arrested|detained|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
+    rf"\b(?i:arrested|detained|charged|prosecuted|convicted|sentenced|imprisoned|incarcerated|abducted|"
     rf"released|pardoned|executed|killed|freed|acquitted|cleared)\s+"
     rf"(?:(?i:(?:{ROLE}))(?:/(?i:(?:{ROLE})))?\s+)?(?P<names>{NAME_LIST})"
 )
@@ -325,6 +325,9 @@ def self_test() -> None:
         assert found == expected_pair, (role, found)
 
     assert "Jane Doe" in names_from_prose("authorities arrested Jane Doe after the protest")
+    assert "Jane Doe" in names_from_prose("authorities charged Jane Doe after the protest")
+    assert "Jane Doe" in names_from_prose("Jane Doe was charged")
+    assert "Jane Doe" in names_from_prose("the charge of Jane Doe remains under review")
     assert set(names_from_prose("authorities detained Jane Doe and John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe or John Roe after the protest")) == {"Jane Doe", "John Roe"}
     assert set(names_from_prose("authorities detained Jane Doe and/or John Roe after the protest")) == {"Jane Doe", "John Roe"}
