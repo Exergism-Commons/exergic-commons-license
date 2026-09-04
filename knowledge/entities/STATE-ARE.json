@@ -6,7 +6,8 @@
   "name": "United Arab Emirates",
   "iso3": "ARE",
   "aliases": [
-    "ARE"
+    "ARE",
+    "UAE"
   ],
   "dossier": "../../dossiers/states/ARE.md",
   "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/185",

@@ -1,0 +1,194 @@
+name: State dossier entity audit
+
+on:
+  push:
+    paths:
+      - 'dossiers/**'
+      - 'knowledge/entities/**'
+      - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
+      - 'knowledge/generated/state-dossier-review-ratchet.json'
+      - 'knowledge/generated/entity-id-supersessions-*.json'
+      - 'knowledge/generated/schedule-reference-dispositions-*.json'
+      - 'knowledge/generated/schedule-residual-identity-*.json'
+      - 'registry/schedule-state-s-freezes/**'
+      - 'registry/projects.yml'
+      - 'registry/organizations.yml'
+      - 'spec/ENTITY-SCALEOUT.md'
+      - 'tools/**'
+      - '.github/workflows/state-dossier-entity-audit.yml'
+  pull_request:
+    paths:
+      - 'dossiers/**'
+      - 'knowledge/entities/**'
+      - 'knowledge/generated/state-dossier-entity-scaleout-*.json'
+      - 'knowledge/generated/state-dossier-prose-dispositions-*.json'
+      - 'knowledge/generated/state-dossier-review-ratchet.json'
+      - 'knowledge/generated/entity-id-supersessions-*.json'
+      - 'knowledge/generated/schedule-reference-dispositions-*.json'
+      - 'knowledge/generated/schedule-residual-identity-*.json'
+      - 'registry/schedule-state-s-freezes/**'
+      - 'registry/projects.yml'
+      - 'registry/organizations.yml'
+      - 'spec/ENTITY-SCALEOUT.md'
+      - 'tools/**'
+      - '.github/workflows/state-dossier-entity-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install audit parser dependencies
+        run: python -m pip install -r tools/schedule-requirements.txt -r tools/commonmark-requirements.txt
+
+      - name: Reject duplicate structured-data keys
+        run: |
+          python tools/check_json_duplicate_keys.py --self-test
+          python tools/check_schedule_yaml_duplicate_keys.py --self-test
+          python tools/check_json_duplicate_keys.py
+          python tools/check_schedule_yaml_duplicate_keys.py
+
+      - name: Require zero-backlog review ratchet
+        run: |
+          python tools/check_state_dossier_ratchet_integrity.py --self-test
+          python tools/check_state_dossier_ratchet_integrity.py
+
+      - name: Require exact State dossier/identity parity
+        run: python tools/check_state_dossier_identity_sets.py
+
+      - name: Validate reviewed identity-only promotions
+        run: python tools/test_entity_scaleout.py
+
+      - name: Self-test discovery and review semantics
+        run: |
+          python tools/entity_identity_resolution.py
+          python tools/check_identity_primary_alias_collisions.py --self-test
+          python tools/check_non_state_entity_identity_integrity.py --self-test
+          python tools/audit_state_dossier_entities.py --self-test
+          python tools/review_state_dossier_candidates.py --self-test
+          python tools/check_state_dossier_softwrap_coverage.py --self-test
+          python tools/check_state_dossier_rendered_markup_coverage.py --self-test
+          python tools/check_state_dossier_named_person_coverage.py --self-test
+          python tools/audit_schedule_reference_coverage.py --self-test
+          python tools/check_schedule_disposition_manifest_integrity.py --self-test
+          python tools/check_schedule_residual_identity_dispositions.py --self-test
+          python tools/check_schedule_reference_resolution_safety.py --self-test
+          python tools/check_schedule_exact_identity_completeness.py --self-test
+          python tools/check_schedule_named_identity_strictness.py --self-test
+          python tools/check_schedule_adversarial_identity_gaps.py --self-test
+          python tools/check_schedule_actor_expression_completeness.py --self-test
+          python tools/check_schedule_capacity_actor_comma_coverage.py --self-test
+          python tools/check_schedule_reference_field_coverage.py --self-test
+          python tools/audit_private_org_mentions.py --self-test
+
+      - name: Generate full-corpus audits and reject unknown high-confidence references
+        run: |
+          mkdir -p build
+          python tools/check_identity_primary_alias_collisions.py
+          python tools/check_non_state_entity_identity_integrity.py
+          python tools/audit_state_dossier_entities.py \
+            --json build/state-dossier-entity-audit.json \
+            --markdown build/state-dossier-entity-audit.md \
+            --fail-if-empty
+          python tools/review_state_dossier_candidates.py \
+            --audit build/state-dossier-entity-audit.json \
+            --json build/state-dossier-candidate-review.json \
+            --markdown build/state-dossier-candidate-review.md \
+            --fail-on-stale-disposition \
+            --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
+          python tools/check_state_dossier_softwrap_coverage.py
+          python tools/check_state_dossier_rendered_markup_coverage.py
+          python tools/check_state_dossier_named_person_coverage.py
+          python tools/check_schedule_disposition_manifest_integrity.py
+          python tools/check_schedule_residual_identity_dispositions.py
+          python tools/check_schedule_reference_field_coverage.py
+          python tools/audit_schedule_reference_coverage.py \
+            --json build/schedule-reference-coverage.json \
+            --markdown build/schedule-reference-coverage.md \
+            --fail-on-unresolved-curated
+          python tools/check_schedule_reference_resolution_safety.py
+          python tools/check_schedule_exact_identity_completeness.py
+          python tools/check_schedule_named_identity_strictness.py
+          python tools/check_schedule_adversarial_identity_gaps.py
+          python tools/check_schedule_actor_expression_completeness.py
+          python tools/check_schedule_capacity_actor_comma_coverage.py
+          python tools/audit_private_org_mentions.py \
+            --json build/private-org-mention-audit.json \
+            --markdown build/private-org-mention-audit.md \
+            --fail-on-unresolved-private
+
+      - name: Prove deterministic output
+        run: |
+          cp build/state-dossier-entity-audit.json build/state-dossier-entity-audit.first.json
+          cp build/state-dossier-entity-audit.md build/state-dossier-entity-audit.first.md
+          cp build/state-dossier-candidate-review.json build/state-dossier-candidate-review.first.json
+          cp build/state-dossier-candidate-review.md build/state-dossier-candidate-review.first.md
+          cp build/schedule-reference-coverage.json build/schedule-reference-coverage.first.json
+          cp build/schedule-reference-coverage.md build/schedule-reference-coverage.first.md
+          cp build/private-org-mention-audit.json build/private-org-mention-audit.first.json
+          cp build/private-org-mention-audit.md build/private-org-mention-audit.first.md
+          python tools/check_identity_primary_alias_collisions.py
+          python tools/check_non_state_entity_identity_integrity.py
+          python tools/audit_state_dossier_entities.py \
+            --json build/state-dossier-entity-audit.json \
+            --markdown build/state-dossier-entity-audit.md \
+            --fail-if-empty
+          python tools/review_state_dossier_candidates.py \
+            --audit build/state-dossier-entity-audit.json \
+            --json build/state-dossier-candidate-review.json \
+            --markdown build/state-dossier-candidate-review.md \
+            --fail-on-stale-disposition \
+            --ratchet-config knowledge/generated/state-dossier-review-ratchet.json
+          python tools/check_state_dossier_softwrap_coverage.py
+          python tools/check_state_dossier_rendered_markup_coverage.py
+          python tools/check_state_dossier_named_person_coverage.py
+          python tools/check_schedule_disposition_manifest_integrity.py
+          python tools/check_schedule_residual_identity_dispositions.py
+          python tools/check_schedule_reference_field_coverage.py
+          python tools/audit_schedule_reference_coverage.py \
+            --json build/schedule-reference-coverage.json \
+            --markdown build/schedule-reference-coverage.md \
+            --fail-on-unresolved-curated
+          python tools/check_schedule_reference_resolution_safety.py
+          python tools/check_schedule_exact_identity_completeness.py
+          python tools/check_schedule_named_identity_strictness.py
+          python tools/check_schedule_adversarial_identity_gaps.py
+          python tools/check_schedule_actor_expression_completeness.py
+          python tools/check_schedule_capacity_actor_comma_coverage.py
+          python tools/audit_private_org_mentions.py \
+            --json build/private-org-mention-audit.json \
+            --markdown build/private-org-mention-audit.md \
+            --fail-on-unresolved-private
+          cmp build/state-dossier-entity-audit.first.json build/state-dossier-entity-audit.json
+          cmp build/state-dossier-entity-audit.first.md build/state-dossier-entity-audit.md
+          cmp build/state-dossier-candidate-review.first.json build/state-dossier-candidate-review.json
+          cmp build/state-dossier-candidate-review.first.md build/state-dossier-candidate-review.md
+          cmp build/schedule-reference-coverage.first.json build/schedule-reference-coverage.json
+          cmp build/schedule-reference-coverage.first.md build/schedule-reference-coverage.md
+          cmp build/private-org-mention-audit.first.json build/private-org-mention-audit.json
+          cmp build/private-org-mention-audit.first.md build/private-org-mention-audit.md
+
+      - name: Upload audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: state-dossier-entity-audit
+          path: |
+            build/state-dossier-entity-audit.json
+            build/state-dossier-entity-audit.md
+            build/state-dossier-candidate-review.json
+            build/state-dossier-candidate-review.md
+            build/schedule-reference-coverage.json
+            build/schedule-reference-coverage.md
+            build/private-org-mention-audit.json
+            build/private-org-mention-audit.md
+          if-no-files-found: error

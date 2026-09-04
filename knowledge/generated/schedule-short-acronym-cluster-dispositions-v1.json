@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "date": "2026-08-28",
+  "purpose": "Reviewed dispositions for short 2–3 character uppercase surfaces adjacent to slash syntax in Schedule freeze text.",
+  "semantics": {
+    "deferred": "The exact short slash surface may denote an identity but remains unmaterialized; this records representation debt only.",
+    "rejected": "The exact parser surface was reviewed as a non-identity abbreviation/context token and must not be promoted merely because it is slash-adjacent.",
+    "non_inference": "Neither disposition creates participation, operation, control, membership, supply, culpability, evidence or governance semantics.",
+    "source_binding": "Every reviewed source is pinned to its exact Git blob."
+  },
+  "source_blobs": {
+    "registry/schedule-state-s-freezes/batch-01-identity.yml": "2bfb8e63ffbe297a4268cfd189e6537dabd79c79",
+    "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml": "11d5be928437b65f5f2cb886df967b57eb51a396",
+    "registry/schedule-state-s-freezes/promoted-ready-03a.yml": "d51324e4e4e2961293f0cf11608de8d58a8a2500",
+    "registry/schedule-state-s-freezes/batch-15b-bgd-freeze.yml": "bcdff544c0dab8fab8784000465ea92e13de57e1",
+    "registry/schedule-state-s-freezes/batch-21a-mda-freeze.yml": "7a2e8dd70e3634edcf1c1b9fd12d704cd9ff7846",
+    "registry/schedule-state-s-freezes/batch-21c-ukr-freeze.yml": "a1497bcb87f828761c4499d2f3ac02a34966404d"
+  },
+  "entries": [
+    {
+      "source": "registry/schedule-state-s-freezes/batch-01-identity.yml",
+      "state": "MLT",
+      "field": "candidate_parties",
+      "record_index": 2,
+      "raw": "Armed Forces of Malta, including Rescue Coordination Centre Malta and relevant maritime/SAR units, only in a specifically evidenced maritime non-assistance, pushback or transfer operation independently satisfying ECL §5.6",
+      "identity_surface": "SAR",
+      "disposition": "rejected",
+      "reason": "SAR is the generic search-and-rescue functional abbreviation in this actor locator, not a separately enumerated identity."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml",
+      "state": "LKA",
+      "field": "candidate_projects",
+      "record_index": 1,
+      "raw": "actual PTA/counterterrorism detention, investigation or surveillance of protected journalism, memorialisation or defender activity where the specific use independently satisfies ECL §5",
+      "identity_surface": "PTA",
+      "disposition": "rejected",
+      "reason": "PTA abbreviates the Prevention of Terrorism Act in this project-class text; it is a statute label, not an Actor/Institution identity."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml",
+      "state": "LKA",
+      "field": "capacity_limit",
+      "record_index": 1,
+      "raw": "actual coercive PTA/counterterrorism use; not the statute, CTID or counterterrorism work generally",
+      "identity_surface": "PTA",
+      "disposition": "rejected",
+      "reason": "PTA again denotes the Prevention of Terrorism Act statutory shorthand, not a separately enumerable identity."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml",
+      "state": "LKA",
+      "field": "exclusions.[1]",
+      "record_index": 1,
+      "raw": "Human Rights Commission of Sri Lanka / NPM",
+      "identity_surface": "NPM",
+      "disposition": "deferred",
+      "reason": "NPM is an identity-like oversight/mechanism surface in excluded remedial context; no exact separate current ABox boundary is established, so representation remains deferred."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-02-statutory-agency.yml",
+      "state": "LKA",
+      "field": "residual_unfrozen_scope.[1]",
+      "record_index": 1,
+      "raw": "security/intelligence harassment outside an attributable CTID/PTA project",
+      "identity_surface": "PTA",
+      "disposition": "rejected",
+      "reason": "PTA is the statutory abbreviation inside a project-class qualifier and is not a distinct identity."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/promoted-ready-03a.yml",
+      "state": "NGA",
+      "field": "exclusions.[0]",
+      "record_index": 2,
+      "raw": "National Human Rights Commission/NPM",
+      "identity_surface": "NPM",
+      "disposition": "deferred",
+      "reason": "NPM is an exact short slash-adjacent identity-like surface in excluded oversight/remediation context; no stable ABox identity is materialized, so representation remains explicitly deferred without entering positive Schedule scope."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-15b-bgd-freeze.yml",
+      "state": "BGD",
+      "field": "residual_scope",
+      "record_index": 0,
+      "raw": "other media, cyber/ICT and political-association enforcement remains governance-only until separately frozen",
+      "identity_surface": "ICT",
+      "disposition": "rejected",
+      "reason": "ICT is the generic information-and-communications-technology domain abbreviation in this residual scope, not a distinct identity."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-21a-mda-freeze.yml",
+      "state": "MDA",
+      "field": "exclusions.[2]",
+      "record_index": 0,
+      "raw": "rehabilitation, health care, legal defence, Ombudsman/NPM, inspection and independent remediation activity",
+      "identity_surface": "NPM",
+      "disposition": "deferred",
+      "reason": "NPM is an identity-like preventive/oversight mechanism surface in excluded remedial context; no exact separate current ABox identity is established."
+    },
+    {
+      "source": "registry/schedule-state-s-freezes/batch-21c-ukr-freeze.yml",
+      "state": "UKR",
+      "field": "exclusions.[3]",
+      "record_index": 0,
+      "raw": "State Bureau of Investigation, Darnytsia Specialized Defense Prosecutor, courts, defence counsel, Ombudsman/NPM and other accountability or remedial functions",
+      "identity_surface": "NPM",
+      "disposition": "deferred",
+      "reason": "NPM is an identity-like preventive/oversight mechanism surface in excluded accountability context; representation is deferred rather than inferred as a distinct participating identity."
+    }
+  ]
+}

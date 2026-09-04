@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""Fail closed on named people hidden by passive custody prose variants.
+
+The established State Person guards historically left auxiliary/adverb gaps across simple,
+perfect, progressive, remain/remains, modal, and negated passive custody clauses. This independent
+companion covers the ordinary passive auxiliary families plus a deliberately closed, bounded modifier
+vocabulary, while reusing the broader closed Person name/list and bounded human-role appositive grammars.
+
+Identity coverage is neutral and creates no attribution, participation, culpability, control,
+operation, membership, or governance semantics.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+
+import audit_schedule_reference_coverage as schedule
+import audit_state_dossier_entities as base
+import check_schedule_exact_identity_completeness as exact
+import check_state_dossier_multiword_name_particle_coverage as expanded
+import check_state_dossier_named_person_coverage as person
+import check_state_dossier_passive_appositive_person_coverage as appositive
+
+
+# Closed modifier vocabulary: enough for ordinary temporal/evidentiary/legal/negation modifiers
+# without turning arbitrary lowercase prose into part of the passive grammar. At most three
+# modifiers may occur in either slot: before ``being/been/be`` and immediately before custody state.
+PASSIVE_ADVERB = (
+    r"allegedly|arbitrarily|currently|reportedly|unlawfully|wrongfully|temporarily|briefly|"
+    r"continuously|repeatedly|immediately|still|now|presently|subsequently|previously|"
+    r"formally|officially|effectively|forcibly|secretly|not|never"
+)
+ADVERB_SEQ = rf"(?:(?i:{PASSIVE_ADVERB})\s+){{0,3}}"
+
+# Closed modal vocabulary: only ordinary English modal auxiliaries that can introduce a passive
+# ``be <custody-state>`` clause. Keeping the set explicit prevents arbitrary future-tense prose from
+# becoming Person debt while covering common legal/status statements such as ``may be detained``.
+PASSIVE_MODAL = r"can|could|may|might|must|shall|should|will|would"
+
+# This companion owns the ordinary simple/progressive/perfect/remain/modal passive families so an
+# adverb, negation, or auxiliary variation cannot move the same identity bypass from one guard to another.
+PASSIVE_AUX = (
+    rf"(?:"
+    rf"(?i:is|are|was|were)\s+(?:{ADVERB_SEQ}(?i:being)\s+)?|"
+    rf"(?i:has|have|had)\s+{ADVERB_SEQ}(?i:been)\s+|"
+    rf"(?i:remain|remains|remained)\s+|"
+    rf"(?i:{PASSIVE_MODAL})\s+{ADVERB_SEQ}(?i:be)\s+"
+    rf")"
+)
+PASSIVE_RE = re.compile(
+    rf"\b(?P<names>{expanded.NAME_LIST})\s+{PASSIVE_AUX}{ADVERB_SEQ}(?i:{person.CUSTODY_STATE})\b"
+)
+PASSIVE_APPOSITIVE_RE = re.compile(
+    rf"\b(?P<names>{expanded.NAME_LIST})\s*{appositive.APPOSITIVE}\s*"
+    rf"{PASSIVE_AUX}{ADVERB_SEQ}(?i:{person.CUSTODY_STATE})\b"
+)
+
+
+def names_from_plural_present_passive(prose: str) -> list[str]:
+    names: list[str] = []
+    for regex in (PASSIVE_RE, PASSIVE_APPOSITIVE_RE):
+        for match in regex.finditer(prose):
+            for candidate in expanded.split_names(match.group("names")):
+                if candidate not in names:
+                    names.append(candidate)
+    return names
+
+
+def audit() -> list[dict]:
+    dossiers = base.canonical_state_dossiers()
+    entities, _, identity_index = schedule.load_entities()
+    failures_by_key: dict[tuple[str, str], dict] = {}
+
+    def inspect(*, state: str, source: str, location: str, prose: str, snippet: str) -> None:
+        for name in names_from_plural_present_passive(prose):
+            if exact.materialized_person_ids_for_mention(name, entities, identity_index, state):
+                continue
+            if exact.materialized_non_person_ids_for_mention(name, entities, identity_index, state):
+                continue
+            key = (state, schedule.norm(name))
+            row = failures_by_key.setdefault(
+                key,
+                {
+                    "state": state,
+                    "name": name,
+                    "normalized": schedule.norm(name),
+                    "reason": "passive custody prose names an unmaterialized person",
+                    "occurrences": [],
+                },
+            )
+            row["occurrences"].append(
+                {"source": source, "location": location, "snippet": snippet[:420]}
+            )
+
+    for path, front, body_offset in dossiers:
+        state = front.get("iso3")
+        if not isinstance(state, str):
+            continue
+        source = str(path.relative_to(base.ROOT))
+
+        for field in person.FRONTMATTER_PERSON_KEYS:
+            value = front.get(field)
+            if isinstance(value, str) and value.strip():
+                inspect(
+                    state=state,
+                    source=source,
+                    location=f"frontmatter:{field}",
+                    prose=person.frontmatter_visible_prose(value),
+                    snippet=value,
+                )
+
+        text = path.read_text(encoding="utf-8")
+        line_offset = text[:body_offset].count("\n")
+        for rel_line, snippet, prose in person.person_rendered_prose_segments(text[body_offset:]):
+            inspect(
+                state=state,
+                source=source,
+                location=f"line:{line_offset + rel_line}",
+                prose=prose,
+                snippet=snippet,
+            )
+
+    return [failures_by_key[key] for key in sorted(failures_by_key)]
+
+
+def self_test() -> None:
+    # Simple passive family, including the prior plural-present P1 and modifier insertion.
+    assert names_from_plural_present_passive("Jane Doe and John Roe are detained") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive("Jane Doe is arbitrarily detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe was reportedly imprisoned") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe are currently detained") == [
+        "Jane Doe", "John Roe"
+    ]
+
+    # Negation is explicit closed-world syntax, including the reported simple-passive forms.
+    assert names_from_plural_present_passive("Jane Doe was not detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe was never detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe are not imprisoned") == [
+        "Jane Doe", "John Roe"
+    ]
+
+    # Remain-family status clauses include singular and plural present plus past.
+    assert names_from_plural_present_passive("Jane Doe remains detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe remain detained") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive("Jane Doe and John Roe remained imprisoned") == [
+        "Jane Doe", "John Roe"
+    ]
+
+    # Progressive passive: modifiers are accepted both before ``being`` and before custody state.
+    assert names_from_plural_present_passive("Jane Doe and John Roe are being detained") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive("Jane Doe is being arbitrarily detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe is currently being detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe is not being detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe is currently being arbitrarily detained"
+    ) == ["Jane Doe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe and John Roe were reportedly being unlawfully detained"
+    ) == ["Jane Doe", "John Roe"]
+
+    # Perfect passive is covered here as defense in depth, including negation and modifier slots.
+    assert names_from_plural_present_passive("Jane Doe has been detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe has not been detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe has been arbitrarily detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe has reportedly been detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe and John Roe have reportedly been arbitrarily detained"
+    ) == ["Jane Doe", "John Roe"]
+
+    # Modal passive is deliberately restricted to the closed modal + ``be`` family.
+    assert names_from_plural_present_passive("Jane Doe will be detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe may be detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe may not be detained") == ["Jane Doe"]
+    assert names_from_plural_present_passive("Jane Doe and John Roe could be imprisoned") == [
+        "Jane Doe", "John Roe"
+    ]
+    assert names_from_plural_present_passive(
+        "Jane Doe should reportedly be arbitrarily detained"
+    ) == ["Jane Doe"]
+
+    # The expanded name grammar keeps common particle sequences complete.
+    assert names_from_plural_present_passive(
+        "Ursula von der Leyen and John le Carré are currently being detained"
+    ) == ["Ursula von der Leyen", "John le Carré"]
+    assert names_from_plural_present_passive(
+        "Ali ibn Abi Talib and Jane Doe had reportedly been detained"
+    ) == ["Ali ibn Abi Talib", "Jane Doe"]
+
+    # Bounded role appositives compose with simple, progressive, perfect, modal and negated forms.
+    assert names_from_plural_present_passive(
+        "Jane Doe and John Roe (journalists) are arbitrarily detained"
+    ) == ["Jane Doe", "John Roe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe and John Roe, journalists, are currently being imprisoned"
+    ) == ["Jane Doe", "John Roe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe, a journalist, has not been detained"
+    ) == ["Jane Doe"]
+    assert names_from_plural_present_passive(
+        "Jane Doe and John Roe (journalists) may not be detained"
+    ) == ["Jane Doe", "John Roe"]
+
+    # Closed-world/bounded controls: unknown prose and excessive modifier chains do not widen.
+    assert names_from_plural_present_passive("Jane Doe is conspicuously detained") == []
+    assert names_from_plural_present_passive(
+        "Jane Doe is currently reportedly allegedly secretly being detained"
+    ) == []
+    assert names_from_plural_present_passive("Jane Doe plans to be detained") == []
+    assert names_from_plural_present_passive("Jane Doe hopes to be released") == []
+
+    # Active progressive prose must not be mistaken for passive identity debt.
+    assert names_from_plural_present_passive("authorities are detaining Jane Doe") == []
+    assert names_from_plural_present_passive("authorities were currently detaining Jane Doe") == []
+
+    print("State dossier adverb-aware passive Person coverage self-test: OK")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+    if args.self_test:
+        self_test()
+        return 0
+    failures = audit()
+    if failures:
+        print("UNMATERIALIZED_STATE_DOSSIER_PASSIVE_PEOPLE=" + json.dumps(
+            failures, ensure_ascii=False, sort_keys=True
+        ))
+        return 2
+    print("State dossier adverb-aware passive Person completeness: OK")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
