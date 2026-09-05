@@ -1,0 +1,45 @@
+name: Materialize ECL v0.2 semantic normalization
+
+on:
+  push:
+    branches:
+      - semantic-normalization-v0.2
+    paths:
+      - 'tools/migrate_semantic_namespace_v02.py'
+      - '.github/workflows/materialize-semantic-normalization-v02.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: semantic-normalization-v0.2
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Migrate active semantic sources
+        run: python tools/migrate_semantic_namespace_v02.py
+
+      - name: Commit transformed sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'semantic sources already normalized'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Materialize ECL v0.2 semantic namespace migration'
+          git push origin HEAD:semantic-normalization-v0.2
