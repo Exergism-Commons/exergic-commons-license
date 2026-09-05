@@ -3,8 +3,9 @@
 
 This script is intentionally scoped to active machine-readable/code surfaces.
 Historical releases, archived material, generated snapshots and immutable bundle
-artifacts are excluded. It is idempotent and may be rerun during the v0.2
-migration branch until the active source tree is clean.
+artifacts are excluded. GitHub workflows are migrated explicitly outside this
+materializer because GitHub App tokens cannot rewrite workflow files. The script
+is idempotent and may be rerun during the v0.2 migration branch.
 """
 
 from __future__ import annotations
@@ -20,9 +21,11 @@ GOVERNANCE_NAMESPACE = "https://id.exergism.org/governance#"
 EXERGISM_NAMESPACE = "https://id.exergism.org/exergism#"
 ECL_NAMESPACE = "https://id.exergism.org/ecl#"
 
-# Immutable/history-like surfaces are deliberately outside the migration.
+# Immutable/history-like surfaces and workflows are deliberately outside the
+# automated rewrite. Workflow edits are performed explicitly through GitHub.
 EXCLUDED_PARTS = {
     ".git",
+    ".github",
     "archive",
     "releases",
     "versions",
@@ -118,8 +121,6 @@ def ensure_python_namespaces(text: str) -> str:
 
 
 def migrate_text(path: Path, text: str) -> str:
-    relative = path.relative_to(ROOT).as_posix()
-
     # Active full IRIs now use the persistent HTTP namespace.
     text = text.replace(OLD_ECL_NAMESPACE, ECL_NAMESPACE)
 
@@ -139,9 +140,6 @@ def migrate_text(path: Path, text: str) -> str:
         text = text.replace(f"ecl:{symbol}", f"ex:{symbol}")
         text = text.replace(f"ECL.{symbol}", f"EX.{symbol}")
 
-    # JSON Schema enum values and ordinary JSON strings use the same compact
-    # variables. Their ecl: identities above have therefore become ex: values.
-
     if path.suffix == ".ttl":
         if "ec:" in text:
             text = ensure_turtle_prefix(text, "ec", COMMONS_NAMESPACE)
@@ -153,21 +151,7 @@ def migrate_text(path: Path, text: str) -> str:
         if "ex:" in text:
             text = ensure_sparql_prefix(text, "ex", EXERGISM_NAMESPACE)
     elif path.suffix == ".py":
-        # Most semantic tests declare ECL locally. Extend those declarations
-        # only when the transformed file actually needs the shared namespaces.
         text = ensure_python_namespaces(text)
-
-    # Builder-specific compact-IRI canonicalization is not RDF prefix parsing;
-    # it must return the adopted absolute ECL namespace.
-    if relative == "tools/build_knowledge_graph.py":
-        text = text.replace(
-            'return "https://id.exergism.org/ecl#" + value.removeprefix("ecl:")',
-            'return "https://id.exergism.org/ecl#" + value.removeprefix("ecl:")',
-        )
-        text = text.replace(
-            'if value.startswith("ex:"):\n        return value',
-            'if value.startswith("ex:"):\n        return "https://id.exergism.org/exergism#" + value.removeprefix("ex:")',
-        )
 
     return text
 
