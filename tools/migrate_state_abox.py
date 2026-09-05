@@ -66,7 +66,7 @@ def load_dossiers(root:Path, require_195:bool=True)->list[Dossier]:
     return out
 
 def projection(d:Dossier)->dict[str,Any]:
-    return {"@context":"../../ontology/ecl-context.jsonld","iri":f"ecl:STATE-{d.iso3}","id":f"STATE-{d.iso3}","type":"State","name":d.entity,"iso3":d.iso3,"dossier":f"../../dossiers/states/{d.iso3}.md","publicReviewIssue":f"https://github.com/Papishushi/exergic-commons-license/issues/{d.issue}","lastSubstantiveReview":d.last_reviewed}
+    return {"@context":"../../ontology/ecl-context.jsonld","iri":f"ex:STATE-{d.iso3}","id":f"STATE-{d.iso3}","type":"State","name":d.entity,"iso3":d.iso3,"dossier":f"../../dossiers/states/{d.iso3}.md","publicReviewIssue":f"https://github.com/Papishushi/exergic-commons-license/issues/{d.issue}","lastSubstantiveReview":d.last_reviewed}
 
 def phash(r:dict[str,Any])->str:
     raw=json.dumps({k:r.get(k) for k in OWNED},sort_keys=True,ensure_ascii=False,separators=(",",":"))

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MKD",
+  "iri": "ex:STATE-MKD",
   "id": "STATE-MKD",
   "type": "State",
   "name": "North Macedonia",

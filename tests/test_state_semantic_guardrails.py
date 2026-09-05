@@ -8,8 +8,10 @@ from rdflib import Graph, Namespace, RDF, URIRef
 from rdflib.namespace import OWL
 
 ROOT = Path(__file__).resolve().parents[1]
-ECL = Namespace("urn:ecl:")
+ECL = Namespace("https://id.exergism.org/ecl#")
 
+EX = Namespace("https://id.exergism.org/exergism#")
+EC = Namespace("https://id.exergism.org/commons#")
 BUILD_SPEC = importlib.util.spec_from_file_location("build_knowledge_graph", ROOT / "tools" / "build_knowledge_graph.py")
 BUILD = importlib.util.module_from_spec(BUILD_SPEC)
 assert BUILD_SPEC and BUILD_SPEC.loader
@@ -28,14 +30,14 @@ class StateSemanticGuardrailTests(unittest.TestCase):
         cls.tbox = Graph().parse(ROOT / "ontology" / "ecl.owl.ttl", format="turtle")
 
     def test_all_195_jsonld_state_records_parse_as_rdf(self):
-        states = set(self.abox.subjects(RDF.type, ECL.State))
+        states = set(self.abox.subjects(RDF.type, EX.State))
         self.assertEqual(len(self.state_files), 195)
         self.assertEqual(len(states), 195)
 
     def test_each_state_has_exactly_one_iso_and_mapping(self):
-        for state in self.abox.subjects(RDF.type, ECL.State):
+        for state in self.abox.subjects(RDF.type, EX.State):
             iso = list(self.abox.objects(state, ECL.iso3))
-            ids = list(self.abox.objects(state, ECL.stableId))
+            ids = list(self.abox.objects(state, EC.stableId))
             dossiers = list(self.abox.objects(state, ECL.dossier))
             issues = list(self.abox.objects(state, ECL.publicReviewIssue))
             self.assertEqual(len(iso), 1, state)
@@ -43,7 +45,7 @@ class StateSemanticGuardrailTests(unittest.TestCase):
             self.assertEqual(len(dossiers), 1, state)
             self.assertEqual(len(issues), 1, state)
             code = str(iso[0])
-            self.assertEqual(str(state), f"urn:ecl:STATE-{code}")
+            self.assertEqual(str(state), f"https://id.exergism.org/ecl#STATE-{code}")
             self.assertEqual(str(ids[0]), f"STATE-{code}")
             self.assertTrue(str(dossiers[0]).endswith(f"/{code}.md"))
             self.assertTrue(str(issues[0]).startswith("https://github.com/Papishushi/exergic-commons-license/issues/"))
@@ -53,9 +55,9 @@ class StateSemanticGuardrailTests(unittest.TestCase):
             "currentgovernance", "governancestatus", "governanceoutcome",
             "restrictionstatus", "restrictedstatus", "tier", "provisionaloutcome", "outcome",
         )
-        outcomes = {ECL.OutcomeR, ECL.OutcomeS, ECL.OutcomeU, ECL.OutcomeN}
+        outcomes = {EX.OutcomeR, EX.OutcomeS, EX.OutcomeU, EX.OutcomeN}
         outcomes.update(self.tbox.subjects(RDF.type, ECL.GovernanceOutcome))
-        for state in self.abox.subjects(RDF.type, ECL.State):
+        for state in self.abox.subjects(RDF.type, EX.State):
             for predicate, value in self.abox.predicate_objects(state):
                 normalized = str(predicate).lower().replace("-", "").replace("_", "")
                 self.assertFalse(normalized.endswith(forbidden_suffixes), (state, predicate))
@@ -84,9 +86,9 @@ class StateSemanticGuardrailTests(unittest.TestCase):
         for name in relation_names:
             predicate = ECL[name]
             for subject, obj in self.abox.subject_objects(predicate):
-                if isinstance(obj, URIRef) and str(obj).startswith("urn:ecl:"):
+                if isinstance(obj, URIRef) and str(obj).startswith("https://id.exergism.org/ecl#"):
                     self.assertTrue(
-                        any(self.abox.objects(obj, ECL.stableId)),
+                        any(self.abox.objects(obj, EC.stableId)),
                         (subject, predicate, obj),
                     )
 

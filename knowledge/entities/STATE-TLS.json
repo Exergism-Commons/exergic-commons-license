@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-TLS",
+  "iri": "ex:STATE-TLS",
   "id": "STATE-TLS",
   "type": "State",
   "name": "Timor-Leste",

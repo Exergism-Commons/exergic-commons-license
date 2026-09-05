@@ -1,19 +1,21 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?child ?parent ?reason WHERE {
   ?child ecl:partOf ?parent .
   {
     FILTER NOT EXISTS {
-      ?child ecl:stableId ?childId ; a ?childType .
-      VALUES ?childType { ecl:State ecl:Organization ecl:Person ecl:Agency ecl:Institution }
+      ?child ec:stableId ?childId ; a ?childType .
+      VALUES ?childType { ex:State ec:Organization ec:Person ex:Agency ecl:Institution }
     }
     BIND("invalid-or-unresolved-child-actor" AS ?reason)
   }
   UNION
   {
     FILTER NOT EXISTS {
-      ?parent ecl:stableId ?parentId ; a ?parentType .
-      VALUES ?parentType { ecl:State ecl:Organization ecl:Person ecl:Agency ecl:Institution }
+      ?parent ec:stableId ?parentId ; a ?parentType .
+      VALUES ?parentType { ex:State ec:Organization ec:Person ex:Agency ecl:Institution }
     }
     BIND("invalid-or-unresolved-parent-actor" AS ?reason)
   }

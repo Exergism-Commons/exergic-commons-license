@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BRN",
+  "iri": "ex:STATE-BRN",
   "id": "STATE-BRN",
   "type": "State",
   "name": "Brunei",

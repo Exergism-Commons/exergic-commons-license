@@ -1,10 +1,12 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?claim
 WHERE {
-  ?claim a ecl:Claim ; ecl:status "accepted" .
+  ?claim a ex:Claim ; ec:status "accepted" .
   FILTER NOT EXISTS {
     ?claim ecl:evidenceFor ?evidence .
-    ?evidence a ecl:EvidenceItem ; ecl:stableId ?evidenceId .
+    ?evidence a ecl:EvidenceItem ; ec:stableId ?evidenceId .
   }
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ecl:schema:channel",
+  "$id": "https://id.exergism.org/ecl#schema:channel",
   "title": "ECL mutable channel pointer",
   "type": "object",
   "required": ["schema_version", "channel", "operative", "license", "schedule", "bundle"],

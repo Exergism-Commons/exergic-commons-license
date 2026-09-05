@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ecl:schema:bundle",
+  "$id": "https://id.exergism.org/ecl#schema:bundle",
   "title": "Immutable ECL Bundle manifest",
   "type": "object",
   "required": ["schema_version", "bundle", "operative", "license", "schedule"],

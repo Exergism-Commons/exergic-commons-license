@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-TON",
+  "iri": "ex:STATE-TON",
   "id": "STATE-TON",
   "type": "State",
   "name": "Tonga",

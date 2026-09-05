@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-ALIADA-GROUP-INC",
+  "iri": "ex:ORG-ALIADA-GROUP-INC",
   "id": "ORG-ALIADA-GROUP-INC",
   "type": "Organization",
   "name": "Aliada Group Inc.",

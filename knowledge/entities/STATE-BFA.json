@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BFA",
+  "iri": "ex:STATE-BFA",
   "id": "STATE-BFA",
   "type": "State",
   "name": "Burkina Faso",

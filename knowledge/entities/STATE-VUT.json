@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-VUT",
+  "iri": "ex:STATE-VUT",
   "id": "STATE-VUT",
   "type": "State",
   "name": "Vanuatu",

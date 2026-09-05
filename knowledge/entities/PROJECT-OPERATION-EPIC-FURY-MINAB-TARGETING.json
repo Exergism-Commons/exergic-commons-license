@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
+  "iri": "ex:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
   "id": "PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING",
   "type": "Project",
   "name": "Operation Epic Fury — Minab school targeting chain",

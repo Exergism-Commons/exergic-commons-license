@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-KIR",
+  "iri": "ex:STATE-KIR",
   "id": "STATE-KIR",
   "type": "State",
   "name": "Kiribati",

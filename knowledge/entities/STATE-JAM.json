@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-JAM",
+  "iri": "ex:STATE-JAM",
   "id": "STATE-JAM",
   "type": "State",
   "name": "Jamaica",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
+  "iri": "ex:PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
   "id": "PROJECT-DNK-UD-ATP-FRAUD-PROFILING",
   "type": "Project",
   "name": "Udbetaling Danmark / ATP automated fraud-risk profiling systems",

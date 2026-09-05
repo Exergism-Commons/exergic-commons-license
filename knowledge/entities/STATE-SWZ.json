@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SWZ",
+  "iri": "ex:STATE-SWZ",
   "id": "STATE-SWZ",
   "type": "State",
   "name": "Eswatini",

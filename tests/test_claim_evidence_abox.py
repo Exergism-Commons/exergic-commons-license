@@ -9,8 +9,10 @@ from pyshacl import validate as shacl_validate
 from rdflib import Graph, Literal, Namespace, RDF, URIRef
 
 ROOT = Path(__file__).resolve().parents[1]
-ECL = Namespace("urn:ecl:")
+ECL = Namespace("https://id.exergism.org/ecl#")
 
+EX = Namespace("https://id.exergism.org/exergism#")
+EC = Namespace("https://id.exergism.org/commons#")
 BUILD_SPEC = importlib.util.spec_from_file_location(
     "build_knowledge_graph", ROOT / "tools" / "build_knowledge_graph.py"
 )
@@ -75,25 +77,25 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
             self.assertEqual(errors, [], (path, [e.message for e in errors]))
 
     def test_pilot_individuals_exist_as_first_class_rdf_nodes(self):
-        claims = set(self.graph.subjects(RDF.type, ECL.Claim))
+        claims = set(self.graph.subjects(RDF.type, EX.Claim))
         evidence = set(self.graph.subjects(RDF.type, ECL.EvidenceItem))
         self.assertTrue(EXPECTED_CLAIMS <= claims)
         self.assertTrue(EXPECTED_EVIDENCE <= evidence)
 
     def test_accepted_claims_have_resolving_supporting_evidence(self):
-        for claim in self.graph.subjects(RDF.type, ECL.Claim):
-            statuses = {str(value) for value in self.graph.objects(claim, ECL.status)}
+        for claim in self.graph.subjects(RDF.type, EX.Claim):
+            statuses = {str(value) for value in self.graph.objects(claim, EC.status)}
             if "accepted" not in statuses:
                 continue
             supporting = list(self.graph.objects(claim, ECL.evidenceFor))
             self.assertTrue(supporting, claim)
             for evidence in supporting:
                 self.assertIn((evidence, RDF.type, ECL.EvidenceItem), self.graph)
-                self.assertTrue(any(self.graph.objects(evidence, ECL.stableId)), evidence)
+                self.assertTrue(any(self.graph.objects(evidence, EC.stableId)), evidence)
 
     def test_lby_broad_operation_claim_preserves_live_dispute(self):
         claim = ECL["CLAIM-LBY-OPERATES-MITIGA-DETENTION"]
-        self.assertEqual({str(v) for v in self.graph.objects(claim, ECL.status)}, {"disputed"})
+        self.assertEqual({str(v) for v in self.graph.objects(claim, EC.status)}, {"disputed"})
         self.assertEqual({str(v) for v in self.graph.objects(claim, ECL.claimConfidence)}, {"disputed"})
         self.assertTrue(list(self.graph.objects(claim, ECL.evidenceFor)))
         self.assertTrue(list(self.graph.objects(claim, ECL.evidenceAgainst)))
@@ -105,14 +107,14 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
         self.assertEqual({str(v) for v in self.graph.objects(external, ECL.evidenceGrade)}, {"E3"})
 
     def test_claim_internal_subjects_objects_and_evidence_links_resolve(self):
-        for claim in self.graph.subjects(RDF.type, ECL.Claim):
+        for claim in self.graph.subjects(RDF.type, EX.Claim):
             for predicate in (ECL.subject, ECL.object):
                 for target in self.graph.objects(claim, predicate):
-                    if isinstance(target, URIRef) and str(target).startswith("urn:ecl:"):
-                        self.assertTrue(any(self.graph.objects(target, ECL.stableId)), (claim, target))
+                    if isinstance(target, URIRef) and str(target).startswith("https://id.exergism.org/ecl#"):
+                        self.assertTrue(any(self.graph.objects(target, EC.stableId)), (claim, target))
             for predicate in (ECL.evidenceFor, ECL.evidenceAgainst):
                 for evidence in self.graph.objects(claim, predicate):
-                    self.assertTrue(any(self.graph.objects(evidence, ECL.stableId)), (claim, evidence))
+                    self.assertTrue(any(self.graph.objects(evidence, EC.stableId)), (claim, evidence))
 
     def test_claims_do_not_assert_governance_outcome_predicates(self):
         forbidden_contains = (
@@ -123,7 +125,7 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
             "restrictedstatus",
             "provisionaloutcome",
         )
-        for claim in self.graph.subjects(RDF.type, ECL.Claim):
+        for claim in self.graph.subjects(RDF.type, EX.Claim):
             for predicate in self.graph.objects(claim, ECL.predicate):
                 local_name = str(predicate).rsplit(":", 1)[-1].rsplit("/", 1)[-1].rsplit("#", 1)[-1]
                 normalized = local_name.lower().replace("-", "").replace("_", "")
@@ -139,10 +141,10 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
         subject = ECL["STATE-TEST"]
         for suffix, target in (("A", ECL["PROJECT-A"]), ("B", ECL["PROJECT-B"])):
             claim = ECL[f"CLAIM-TEST-TRACKS-{suffix}"]
-            graph.add((claim, RDF.type, ECL.Claim))
+            graph.add((claim, RDF.type, EX.Claim))
             graph.add((claim, ECL.subject, subject))
             graph.add((claim, ECL.predicate, ECL.tracks))
-            graph.add((claim, ECL.status, Literal("accepted")))
+            graph.add((claim, EC.status, Literal("accepted")))
             graph.add((claim, ECL.object, target))
         rows = list(graph.query(self.integrity_query("conflicting-accepted-claims.rq")))
         self.assertEqual(rows, [])
@@ -153,10 +155,10 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
         values = (Literal(1), Literal("1"))
         for index, value in enumerate(values):
             claim = ECL[f"CLAIM-TEST-STATUS-{index}"]
-            graph.add((claim, RDF.type, ECL.Claim))
+            graph.add((claim, RDF.type, EX.Claim))
             graph.add((claim, ECL.subject, subject))
-            graph.add((claim, ECL.predicate, ECL.status))
-            graph.add((claim, ECL.status, Literal("accepted")))
+            graph.add((claim, ECL.predicate, EC.status))
+            graph.add((claim, EC.status, Literal("accepted")))
             graph.add((claim, ECL.literalValue, value))
         rows = list(graph.query(self.integrity_query("conflicting-accepted-claims.rq")))
         self.assertEqual(len(rows), 1)
@@ -167,20 +169,20 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
             (ECL["governance__status"], ECL["governance-status-code"])
         ):
             claim = ECL[f"CLAIM-BAD-GOVERNANCE-{index}"]
-            graph.add((claim, RDF.type, ECL.Claim))
+            graph.add((claim, RDF.type, EX.Claim))
             graph.add((claim, ECL.predicate, predicate))
         rows = list(graph.query(self.integrity_query("claim-governance-separation.rq")))
         self.assertEqual(len(rows), 2)
 
         data = Graph()
         claim = ECL["CLAIM-BAD-GOVERNANCE-SHACL"]
-        data.add((claim, RDF.type, ECL.Claim))
-        data.add((claim, ECL.stableId, Literal("CLAIM-BAD-GOVERNANCE-SHACL")))
+        data.add((claim, RDF.type, EX.Claim))
+        data.add((claim, EC.stableId, Literal("CLAIM-BAD-GOVERNANCE-SHACL")))
         data.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))
         data.add((claim, ECL.predicate, ECL["governance__status"]))
         data.add((claim, ECL.literalValue, Literal("x")))
-        data.add((claim, ECL.status, Literal("rejected")))
-        data.add((claim, ECL.provenance, Literal("adversarial test")))
+        data.add((claim, EC.status, Literal("rejected")))
+        data.add((claim, EC.provenance, Literal("adversarial test")))
         conforms, _, report = shacl_validate(
             data,
             shacl_graph=self.shapes,
@@ -193,26 +195,26 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
         graph = Graph()
         claim = ECL["CLAIM-TEST-SUPERSESSION"]
         evidence_target = ECL["EVIDENCE-REAL-TARGET"]
-        graph.add((claim, RDF.type, ECL.Claim))
-        graph.add((claim, ECL.stableId, Literal("CLAIM-TEST-SUPERSESSION")))
+        graph.add((claim, RDF.type, EX.Claim))
+        graph.add((claim, EC.stableId, Literal("CLAIM-TEST-SUPERSESSION")))
         graph.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))
-        graph.add((claim, ECL.predicate, ECL.status))
+        graph.add((claim, ECL.predicate, EC.status))
         graph.add((claim, ECL.literalValue, Literal("x")))
-        graph.add((claim, ECL.status, Literal("rejected")))
-        graph.add((claim, ECL.provenance, Literal("adversarial test")))
-        graph.add((claim, ECL.supersedes, evidence_target))
+        graph.add((claim, EC.status, Literal("rejected")))
+        graph.add((claim, EC.provenance, Literal("adversarial test")))
+        graph.add((claim, EC.supersedes, evidence_target))
 
         graph.add((evidence_target, RDF.type, ECL.EvidenceItem))
-        graph.add((evidence_target, ECL.stableId, Literal("EVIDENCE-REAL-TARGET")))
+        graph.add((evidence_target, EC.stableId, Literal("EVIDENCE-REAL-TARGET")))
         graph.add((evidence_target, ECL.sourceLocator, Literal("https://example.invalid/evidence")))
-        graph.add((evidence_target, ECL.provenance, Literal("adversarial test")))
+        graph.add((evidence_target, EC.provenance, Literal("adversarial test")))
 
         evidence = ECL["EVIDENCE-TEST-SUPERSESSION"]
         graph.add((evidence, RDF.type, ECL.EvidenceItem))
-        graph.add((evidence, ECL.stableId, Literal("EVIDENCE-TEST-SUPERSESSION")))
+        graph.add((evidence, EC.stableId, Literal("EVIDENCE-TEST-SUPERSESSION")))
         graph.add((evidence, ECL.sourceLocator, Literal("https://example.invalid/evidence-2")))
-        graph.add((evidence, ECL.provenance, Literal("adversarial test")))
-        graph.add((evidence, ECL.supersedes, ECL["EVIDENCE-MISSING"]))
+        graph.add((evidence, EC.provenance, Literal("adversarial test")))
+        graph.add((evidence, EC.supersedes, ECL["EVIDENCE-MISSING"]))
 
         rows = list(graph.query(self.integrity_query("dangling-supersedes.rq")))
         self.assertEqual(len(rows), 2)
@@ -252,7 +254,7 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "a.json").write_text(
-                json.dumps({"@context": {}, "iri": "ecl:A", "id": "DUPLICATE-ID"}),
+                json.dumps({"@context": {}, "iri": "ex:A", "id": "DUPLICATE-ID"}),
                 encoding="utf-8",
             )
             (root / "b.json").write_text(

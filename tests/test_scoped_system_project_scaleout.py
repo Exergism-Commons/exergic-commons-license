@@ -89,7 +89,7 @@ class ScopedSystemProjectScaleoutTests(unittest.TestCase):
                     self.assertIn(item["object"], self.entities)
                     self.assertNotIn("literalValue", record)
                 else:
-                    self.assertEqual(item["predicate"], "ecl:status")
+                    self.assertEqual(item["predicate"], "ec:status")
                     self.assertNotIn("object", record)
                     self.assertEqual(record["literalValue"], item["literalValue"])
 
@@ -102,7 +102,7 @@ class ScopedSystemProjectScaleoutTests(unittest.TestCase):
             / "claims"
             / "CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED.json"
         )
-        self.assertEqual(claim["predicate"], "ecl:status")
+        self.assertEqual(claim["predicate"], "ec:status")
         self.assertEqual(claim["literalValue"], "judicially-blocked-not-authorized")
         self.assertEqual(claim["claimConfidence"], "established")
         self.assertEqual(claim["asOf"], "2026-01-30")

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-LBY",
+  "iri": "ex:STATE-LBY",
   "id": "STATE-LBY",
   "type": "State",
   "name": "Libya",
@@ -13,6 +13,6 @@
   "lastSubstantiveReview": "2026-08-11",
   "reviewClass": "manual",
   "trackedObjects": [
-    "ecl:PROJECT-MITIGA-DETENTION"
+    "ex:PROJECT-MITIGA-DETENTION"
   ]
 }

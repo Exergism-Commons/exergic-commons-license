@@ -1,8 +1,9 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?claim ?predicate ?object
 WHERE {
-  ?claim a ecl:Claim ; ecl:predicate ?predicate .
+  ?claim a ex:Claim ; ecl:predicate ?predicate .
   OPTIONAL { ?claim ecl:object ?object . }
 
   # Normalize the semantic predicate IRI/path instead of only the final local

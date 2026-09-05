@@ -19,35 +19,35 @@ class RunSparqlChecksTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "input.nq"
             path.write_text(
-                '<urn:ecl:CLAIM-X> <urn:ecl:status> "accepted" <urn:ecl:graph:claims> .\n',
+                '<https://id.exergism.org/ecl#CLAIM-X> <https://id.exergism.org/ecl#status> "accepted" <https://id.exergism.org/ecl#graph:claims> .\n',
                 encoding="utf-8",
             )
 
             graph = MODULE.load_query_graph(path)
             rows = list(
                 graph.query(
-                    "SELECT ?claim WHERE { ?claim <urn:ecl:status> \"accepted\" . }"
+                    "SELECT ?claim WHERE { ?claim <https://id.exergism.org/ecl#status> \"accepted\" . }"
                 )
             )
 
-            self.assertEqual([row.claim for row in rows], [URIRef("urn:ecl:CLAIM-X")])
+            self.assertEqual([row.claim for row in rows], [URIRef("https://id.exergism.org/ecl#CLAIM-X")])
 
     def test_trig_named_graphs_are_visible_to_integrity_queries(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "input.trig"
             path.write_text(
-                "<urn:ecl:graph:claims> { <urn:ecl:CLAIM-X> <urn:ecl:status> \"accepted\" . }\n",
+                "<https://id.exergism.org/ecl#graph:claims> { <https://id.exergism.org/ecl#CLAIM-X> <https://id.exergism.org/ecl#status> \"accepted\" . }\n",
                 encoding="utf-8",
             )
 
             graph = MODULE.load_query_graph(path)
             rows = list(
                 graph.query(
-                    "SELECT ?claim WHERE { ?claim <urn:ecl:status> \"accepted\" . }"
+                    "SELECT ?claim WHERE { ?claim <https://id.exergism.org/ecl#status> \"accepted\" . }"
                 )
             )
 
-            self.assertEqual([row.claim for row in rows], [URIRef("urn:ecl:CLAIM-X")])
+            self.assertEqual([row.claim for row in rows], [URIRef("https://id.exergism.org/ecl#CLAIM-X")])
 
 
 if __name__ == "__main__":

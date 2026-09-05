@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-NRU",
+  "iri": "ex:STATE-NRU",
   "id": "STATE-NRU",
   "type": "State",
   "name": "Nauru",

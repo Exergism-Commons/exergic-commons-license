@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-CAF",
+  "iri": "ex:STATE-CAF",
   "id": "STATE-CAF",
   "type": "State",
   "name": "Central African Republic",

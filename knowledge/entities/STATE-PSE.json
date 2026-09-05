@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-PSE",
+  "iri": "ex:STATE-PSE",
   "id": "STATE-PSE",
   "type": "State",
   "name": "Palestine",

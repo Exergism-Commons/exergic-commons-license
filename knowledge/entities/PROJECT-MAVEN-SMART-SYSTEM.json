@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-MAVEN-SMART-SYSTEM",
+  "iri": "ex:PROJECT-MAVEN-SMART-SYSTEM",
   "id": "PROJECT-MAVEN-SMART-SYSTEM",
   "type": "Project",
   "name": "Maven Smart System",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BRB",
+  "iri": "ex:STATE-BRB",
   "id": "STATE-BRB",
   "type": "State",
   "name": "Barbados",

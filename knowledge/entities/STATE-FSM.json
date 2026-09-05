@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-FSM",
+  "iri": "ex:STATE-FSM",
   "id": "STATE-FSM",
   "type": "State",
   "name": "Micronesia",

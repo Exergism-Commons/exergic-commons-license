@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SGP",
+  "iri": "ex:STATE-SGP",
   "id": "STATE-SGP",
   "type": "State",
   "name": "Singapore",

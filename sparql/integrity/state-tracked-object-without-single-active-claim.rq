@@ -1,15 +1,17 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?state ?project (COUNT(?claim) AS ?activeClaimCount) WHERE {
-  ?state a ecl:State ;
+  ?state a ex:State ;
          ecl:tracks ?project .
 
   OPTIONAL {
-    ?claim a ecl:Claim ;
+    ?claim a ex:Claim ;
            ecl:subject ?state ;
            ecl:predicate ecl:tracks ;
            ecl:object ?project ;
-           ecl:status ?claimStatus .
+           ec:status ?claimStatus .
     FILTER (?claimStatus IN ("candidate", "accepted", "disputed"))
   }
 }

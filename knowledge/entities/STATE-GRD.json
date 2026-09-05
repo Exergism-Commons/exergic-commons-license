@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-GRD",
+  "iri": "ex:STATE-GRD",
   "id": "STATE-GRD",
   "type": "State",
   "name": "Grenada",
