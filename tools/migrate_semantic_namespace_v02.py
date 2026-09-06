@@ -135,10 +135,12 @@ def migrate_text(path: Path, text: str) -> str:
     text = text.replace("ecl:GovernanceDecision", "ecl:ECLGovernanceDecision")
     text = text.replace("ECL.GovernanceDecision", "ECL.ECLGovernanceDecision")
 
-    # Formal exergic variables are canonical in Exergism.
+    # Formal Exergism *vocabulary* terms are canonical in Exergism. Do not move
+    # ABox instance identifiers merely because their local IDs contain letters
+    # like P/A/C/R; that would silently transfer dataset identity ownership.
     for symbol in FORMAL_VARIABLES:
-        text = text.replace(f"ecl:{symbol}", f"ex:{symbol}")
-        text = text.replace(f"ECL.{symbol}", f"EX.{symbol}")
+        text = re.sub(rf"(?<![A-Za-z0-9_-])ecl:{re.escape(symbol)}(?![A-Za-z0-9_-])", f"ex:{symbol}", text)
+        text = re.sub(rf"(?<![A-Za-z0-9_])ECL\.{re.escape(symbol)}(?![A-Za-z0-9_])", f"EX.{symbol}", text)
 
     if path.suffix == ".ttl":
         if "ec:" in text:
