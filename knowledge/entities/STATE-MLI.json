@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MLI",
+  "iri": "ex:STATE-MLI",
   "id": "STATE-MLI",
   "type": "State",
   "name": "Mali",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-ATG",
+  "iri": "ex:STATE-ATG",
   "id": "STATE-ATG",
   "type": "State",
   "name": "Antigua and Barbuda",

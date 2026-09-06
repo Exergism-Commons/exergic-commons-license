@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-COM",
+  "iri": "ex:STATE-COM",
   "id": "STATE-COM",
   "type": "State",
   "name": "Comoros",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-DOM",
+  "iri": "ex:STATE-DOM",
   "id": "STATE-DOM",
   "type": "State",
   "name": "Dominican Republic",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-CUB",
+  "iri": "ex:STATE-CUB",
   "id": "STATE-CUB",
   "type": "State",
   "name": "Cuba",

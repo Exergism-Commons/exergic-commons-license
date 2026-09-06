@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-CANDIRU",
+  "iri": "ex:ORG-CANDIRU",
   "id": "ORG-CANDIRU",
   "type": "Organization",
   "name": "Candiru",

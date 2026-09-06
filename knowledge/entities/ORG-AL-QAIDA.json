@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-AL-QAIDA",
+  "iri": "ex:ORG-AL-QAIDA",
   "id": "ORG-AL-QAIDA",
   "type": "Organization",
   "name": "Al-Qaida",

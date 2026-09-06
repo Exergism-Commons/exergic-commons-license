@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-GTM",
+  "iri": "ex:STATE-GTM",
   "id": "STATE-GTM",
   "type": "State",
   "name": "Guatemala",

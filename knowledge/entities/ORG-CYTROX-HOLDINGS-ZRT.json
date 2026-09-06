@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-CYTROX-HOLDINGS-ZRT",
+  "iri": "ex:ORG-CYTROX-HOLDINGS-ZRT",
   "id": "ORG-CYTROX-HOLDINGS-ZRT",
   "type": "Organization",
   "name": "Cytrox Holdings ZRT",

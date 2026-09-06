@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MHL",
+  "iri": "ex:STATE-MHL",
   "id": "STATE-MHL",
   "type": "State",
   "name": "Marshall Islands",

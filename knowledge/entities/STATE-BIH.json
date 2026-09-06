@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BIH",
+  "iri": "ex:STATE-BIH",
   "id": "STATE-BIH",
   "type": "State",
   "name": "Bosnia and Herzegovina",

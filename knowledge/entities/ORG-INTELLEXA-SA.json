@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-INTELLEXA-SA",
+  "iri": "ex:ORG-INTELLEXA-SA",
   "id": "ORG-INTELLEXA-SA",
   "type": "Organization",
   "name": "Intellexa S.A.",

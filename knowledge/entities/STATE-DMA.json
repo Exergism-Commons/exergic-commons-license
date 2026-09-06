@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-DMA",
+  "iri": "ex:STATE-DMA",
   "id": "STATE-DMA",
   "type": "State",
   "name": "Dominica",

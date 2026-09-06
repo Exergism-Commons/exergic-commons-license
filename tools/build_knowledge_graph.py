@@ -17,7 +17,7 @@ from rdflib.compare import to_canonical_graph
 
 def _canonical_source_iri(value: str) -> str:
     if value.startswith("ecl:"):
-        return "urn:ecl:" + value.removeprefix("ecl:")
+        return "https://id.exergism.org/ecl#" + value.removeprefix("ecl:")
     return value
 
 

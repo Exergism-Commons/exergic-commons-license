@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-TUV",
+  "iri": "ex:STATE-TUV",
   "id": "STATE-TUV",
   "type": "State",
   "name": "Tuvalu",

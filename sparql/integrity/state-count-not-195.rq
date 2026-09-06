@@ -1,9 +1,10 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?count WHERE {
   {
     SELECT (COUNT(DISTINCT ?state) AS ?count) WHERE {
-      ?state a ecl:State .
+      ?state a ex:State .
     }
   }
   FILTER (?count != 195)

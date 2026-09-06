@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-PLW",
+  "iri": "ex:STATE-PLW",
   "id": "STATE-PLW",
   "type": "State",
   "name": "Palau",

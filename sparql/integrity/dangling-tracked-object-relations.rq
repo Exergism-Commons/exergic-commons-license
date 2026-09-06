@@ -1,4 +1,5 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?subject ?predicate ?object WHERE {
   VALUES ?predicate {
@@ -15,6 +16,6 @@ SELECT ?subject ?predicate ?object WHERE {
     ecl:reviews
   }
   ?subject ?predicate ?object .
-  FILTER (STRSTARTS(STR(?object), "urn:ecl:"))
-  FILTER NOT EXISTS { ?object ecl:stableId ?stableId . }
+  FILTER (STRSTARTS(STR(?object), "https://id.exergism.org/ecl#"))
+  FILTER NOT EXISTS { ?object ec:stableId ?stableId . }
 }

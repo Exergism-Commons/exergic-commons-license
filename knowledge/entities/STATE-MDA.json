@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MDA",
+  "iri": "ex:STATE-MDA",
   "id": "STATE-MDA",
   "type": "State",
   "name": "Moldova",

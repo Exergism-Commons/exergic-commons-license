@@ -1,10 +1,10 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:CLAIM-NLD-PROBATION-RISK-TOOLS-RESPONSIBLE-USE-NOT-DEMONSTRATED",
+  "iri": "ex:CLAIM-NLD-PROBATION-RISK-TOOLS-RESPONSIBLE-USE-NOT-DEMONSTRATED",
   "id": "CLAIM-NLD-PROBATION-RISK-TOOLS-RESPONSIBLE-USE-NOT-DEMONSTRATED",
   "type": "Claim",
-  "subject": "ecl:PROJECT-NLD-PROBATION-RISK-TOOLS",
-  "predicate": "ecl:status",
+  "subject": "ex:PROJECT-NLD-PROBATION-RISK-TOOLS",
+  "predicate": "ec:status",
   "literalValue": "responsible-use-not-demonstrated",
   "status": "accepted",
   "claimConfidence": "established",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-HRV",
+  "iri": "ex:STATE-HRV",
   "id": "STATE-HRV",
   "type": "State",
   "name": "Croatia",

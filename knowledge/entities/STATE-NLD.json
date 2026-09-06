@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-NLD",
+  "iri": "ex:STATE-NLD",
   "id": "STATE-NLD",
   "type": "State",
   "name": "Netherlands",
@@ -16,7 +16,7 @@
   "reviewClass": "active",
   "reviewReason": "Narrow algorithmic finding is remediation-sensitive and the formal pilot is uncertainty-sensitive.",
   "trackedObjects": [
-    "ecl:PROJECT-NLD-PROBATION-RISK-TOOLS"
+    "ex:PROJECT-NLD-PROBATION-RISK-TOOLS"
   ],
   "monitorIds": []
 }

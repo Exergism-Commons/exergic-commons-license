@@ -1,13 +1,15 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?state ?id ?iso ?dossier WHERE {
-  ?state a ecl:State ;
-         ecl:stableId ?id ;
+  ?state a ex:State ;
+         ec:stableId ?id ;
          ecl:iso3 ?iso ;
          ecl:dossier ?dossier .
   FILTER (
     STR(?id) != CONCAT("STATE-", STR(?iso)) ||
-    STR(?state) != CONCAT("urn:ecl:STATE-", STR(?iso)) ||
+    STR(?state) != CONCAT("https://id.exergism.org/ecl#STATE-", STR(?iso)) ||
     !STRENDS(STR(?dossier), CONCAT("/", STR(?iso), ".md"))
   )
 }

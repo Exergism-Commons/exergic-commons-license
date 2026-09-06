@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-GNQ",
+  "iri": "ex:STATE-GNQ",
   "id": "STATE-GNQ",
   "type": "State",
   "name": "Equatorial Guinea",

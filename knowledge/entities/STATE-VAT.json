@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-VAT",
+  "iri": "ex:STATE-VAT",
   "id": "STATE-VAT",
   "type": "State",
   "name": "Holy See",

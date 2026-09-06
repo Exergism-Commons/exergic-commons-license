@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-PRT",
+  "iri": "ex:STATE-PRT",
   "id": "STATE-PRT",
   "type": "State",
   "name": "Portugal",

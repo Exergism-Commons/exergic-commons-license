@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MDV",
+  "iri": "ex:STATE-MDV",
   "id": "STATE-MDV",
   "type": "State",
   "name": "Maldives",

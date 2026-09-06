@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-SAF",
+  "iri": "ex:ORG-SAF",
   "id": "ORG-SAF",
   "type": "Organization",
   "name": "Sudanese Armed Forces (SAF)",

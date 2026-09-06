@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-NSO-GROUP",
+  "iri": "ex:ORG-NSO-GROUP",
   "id": "ORG-NSO-GROUP",
   "type": "Organization",
   "name": "NSO Group",

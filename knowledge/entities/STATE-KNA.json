@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-KNA",
+  "iri": "ex:STATE-KNA",
   "id": "STATE-KNA",
   "type": "State",
   "name": "Saint Kitts and Nevis",

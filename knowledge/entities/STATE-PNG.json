@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-PNG",
+  "iri": "ex:STATE-PNG",
   "id": "STATE-PNG",
   "type": "State",
   "name": "Papua New Guinea",

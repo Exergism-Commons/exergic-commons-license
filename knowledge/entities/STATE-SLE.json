@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SLE",
+  "iri": "ex:STATE-SLE",
   "id": "STATE-SLE",
   "type": "State",
   "name": "Sierra Leone",

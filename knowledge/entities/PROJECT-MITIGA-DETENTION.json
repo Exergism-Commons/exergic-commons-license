@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-MITIGA-DETENTION",
+  "iri": "ex:PROJECT-MITIGA-DETENTION",
   "id": "PROJECT-MITIGA-DETENTION",
   "type": "Project",
   "name": "Mitiga Prison / SDF-RADA detention apparatus",

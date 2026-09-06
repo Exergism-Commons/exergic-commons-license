@@ -1,7 +1,8 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?entry
 WHERE {
-  ?entry a ecl:ScheduleEntry .
+  ?entry a ex:ScheduleEntry .
   FILTER NOT EXISTS { ?entry ecl:basedOnDecision ?decision . }
 }

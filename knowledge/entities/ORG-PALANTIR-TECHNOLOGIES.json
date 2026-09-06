@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-PALANTIR-TECHNOLOGIES",
+  "iri": "ex:ORG-PALANTIR-TECHNOLOGIES",
   "id": "ORG-PALANTIR-TECHNOLOGIES",
   "type": "Organization",
   "name": "Palantir Technologies Inc.",

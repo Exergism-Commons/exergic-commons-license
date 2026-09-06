@@ -1,4 +1,6 @@
-@prefix ecl: <urn:ecl:> .
+@prefix ec: <https://id.exergism.org/commons#> .
+@prefix ex: <https://id.exergism.org/exergism#> .
+@prefix ecl: <https://id.exergism.org/ecl#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -7,9 +9,9 @@
 # not create licensing restrictions and deliberately avoid score-to-tier rules.
 
 ecl:TrackedObjectShape a sh:NodeShape ;
-    sh:targetClass ecl:State, ecl:Organization, ecl:Person, ecl:Agency, ecl:Institution, ecl:Project, ecl:Deployment ;
+    sh:targetClass ex:State, ec:Organization, ec:Person, ex:Agency, ecl:Institution, ex:Project, ecl:Deployment ;
     sh:property [
-        sh:path ecl:stableId ;
+        sh:path ec:stableId ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:datatype xsd:string ;
@@ -33,10 +35,10 @@ ecl:TrackedObjectShape a sh:NodeShape ;
 # State identity/provenance is deliberately narrower than governance. A State
 # actor must identify the dossier and public review surface, but may not carry a
 # GovernanceOutcome or a governance/tier/restriction-status-like predicate.
-ecl:StateShape a sh:NodeShape ;
-    sh:targetClass ecl:State ;
+ex:StateShape a sh:NodeShape ;
+    sh:targetClass ex:State ;
     sh:property [
-        sh:path ecl:stableId ;
+        sh:path ec:stableId ;
         sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
         sh:pattern "^STATE-[A-Z]{3}$"
     ] ;
@@ -59,7 +61,7 @@ ecl:StateShape a sh:NodeShape ;
         sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date
     ] ;
     sh:property [
-        sh:path ecl:reviewDue ;
+        sh:path ec:reviewDue ;
         sh:maxCount 1 ; sh:datatype xsd:date
     ] ;
     sh:property [
@@ -71,11 +73,11 @@ ecl:StateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Non-manual State review classes require an explicit reviewDue date." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
               $this ecl:reviewClass ?class .
               FILTER (?class != "manual")
-              FILTER NOT EXISTS { $this ecl:reviewDue ?due }
+              FILTER NOT EXISTS { $this ec:reviewDue ?due }
             }
         """
     ] ;
@@ -83,12 +85,12 @@ ecl:StateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "State stableId, IRI, ISO3 and dossier path must describe the same ISO3." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:stableId ?id ; ecl:iso3 ?iso ; ecl:dossier ?dossier .
+              $this ec:stableId ?id ; ecl:iso3 ?iso ; ecl:dossier ?dossier .
               FILTER (
                 STR(?id) != CONCAT("STATE-", STR(?iso)) ||
-                STR($this) != CONCAT("urn:ecl:STATE-", STR(?iso)) ||
+                STR($this) != CONCAT("https://id.exergism.org/ecl#STATE-", STR(?iso)) ||
                 !STRENDS(STR(?dossier), CONCAT("/", STR(?iso), ".md"))
               )
             }
@@ -98,7 +100,7 @@ ecl:StateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Governance/tier/restriction status must never live directly on a State identity actor." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?p WHERE {
               $this ?p ?value .
               BIND(LCASE(STR(?p)) AS ?predicateText)
@@ -106,7 +108,7 @@ ecl:StateShape a sh:NodeShape ;
               BIND(REPLACE(?semanticPart, "[^a-z0-9]+", "") AS ?normalizedSemantic)
               FILTER (
                 ?p = ecl:outcome ||
-                ?p = ecl:status ||
+                ?p = ec:status ||
                 CONTAINS(?normalizedSemantic, "currentgovernance") ||
                 CONTAINS(?normalizedSemantic, "governancestatus") ||
                 CONTAINS(?normalizedSemantic, "governanceoutcome") ||
@@ -122,7 +124,7 @@ ecl:StateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "A State relationship must never point directly to a GovernanceOutcome." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?p ?value WHERE {
               $this ?p ?value .
               ?value a ecl:GovernanceOutcome .
@@ -130,9 +132,9 @@ ecl:StateShape a sh:NodeShape ;
         """
     ] .
 
-ecl:ReviewClockShape a sh:NodeShape ;
-    sh:targetSubjectsOf ecl:reviewDue ;
-    sh:property [ sh:path ecl:reviewDue ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+ex:ReviewClockShape a sh:NodeShape ;
+    sh:targetSubjectsOf ec:reviewDue ;
+    sh:property [ sh:path ec:reviewDue ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:lastSubstantiveReview ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [
         sh:path ecl:reviewClass ;
@@ -144,18 +146,18 @@ ecl:ReviewClockShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "reviewDue must not predate lastSubstantiveReview." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:reviewDue ?due ; ecl:lastSubstantiveReview ?last .
+              $this ec:reviewDue ?due ; ecl:lastSubstantiveReview ?last .
               FILTER (?due < ?last)
             }
         """
     ] .
 
-ecl:ClaimShape a sh:NodeShape ;
-    sh:targetClass ecl:Claim ;
+ex:ClaimShape a sh:NodeShape ;
+    sh:targetClass ex:Claim ;
     sh:property [
-        sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
         sh:pattern "^CLAIM-[A-Z0-9-]+$"
     ] ;
     sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
@@ -167,7 +169,7 @@ ecl:ClaimShape a sh:NodeShape ;
           sh:property [ sh:path ecl:object ; sh:maxCount 0 ] ]
     ) ;
     sh:property [
-        sh:path ecl:status ;
+        sh:path ec:status ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:in ( "candidate" "accepted" "disputed" "rejected" "superseded" )
@@ -183,16 +185,16 @@ ecl:ClaimShape a sh:NodeShape ;
     sh:property [ sh:path ecl:validTo ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:evidenceFor ; sh:class ecl:EvidenceItem ] ;
     sh:property [ sh:path ecl:evidenceAgainst ; sh:class ecl:EvidenceItem ] ;
-    sh:property [ sh:path ecl:supersedes ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class ecl:Claim ] ;
-    sh:property [ sh:path ecl:provenance ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
+    sh:property [ sh:path ec:supersedes ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class ex:Claim ] ;
+    sh:property [ sh:path ec:provenance ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "Claim stableId and IRI must identify the same Claim." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:stableId ?id .
-              FILTER (STR($this) != CONCAT("urn:ecl:", STR(?id)))
+              $this ec:stableId ?id .
+              FILTER (STR($this) != CONCAT("https://id.exergism.org/ecl#", STR(?id)))
             }
         """
     ] ;
@@ -200,9 +202,9 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Active candidate/accepted/disputed Claims require an evidence link." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:status ?status .
+              $this ec:status ?status .
               FILTER (?status IN ("candidate", "accepted", "disputed"))
               FILTER NOT EXISTS { $this ecl:evidenceFor ?support }
               FILTER NOT EXISTS { $this ecl:evidenceAgainst ?contrary }
@@ -213,12 +215,12 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Accepted Claims require an existing supporting EvidenceItem identity." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:status "accepted" .
+              $this ec:status "accepted" .
               FILTER NOT EXISTS {
                 $this ecl:evidenceFor ?evidence .
-                ?evidence a ecl:EvidenceItem ; ecl:stableId ?evidenceId .
+                ?evidence a ecl:EvidenceItem ; ec:stableId ?evidenceId .
               }
             }
         """
@@ -227,12 +229,12 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Claim evidence links must resolve to EvidenceItem identities." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?evidence WHERE {
               { $this ecl:evidenceFor ?evidence }
               UNION
               { $this ecl:evidenceAgainst ?evidence }
-              FILTER NOT EXISTS { ?evidence ecl:stableId ?evidenceId }
+              FILTER NOT EXISTS { ?evidence ec:stableId ?evidenceId }
             }
         """
     ] ;
@@ -240,11 +242,11 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Claim supersedes must resolve to a Claim identity." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?target WHERE {
-              $this ecl:supersedes ?target .
+              $this ec:supersedes ?target .
               FILTER NOT EXISTS {
-                ?target a ecl:Claim ; ecl:stableId ?targetId .
+                ?target a ex:Claim ; ec:stableId ?targetId .
               }
             }
         """
@@ -253,15 +255,15 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Internal Claim subjects and IRI objects must resolve to ABox identities." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?target WHERE {
               {
                 $this ecl:subject ?target .
               } UNION {
                 $this ecl:object ?target .
               }
-              FILTER (STRSTARTS(STR(?target), "urn:ecl:"))
-              FILTER NOT EXISTS { ?target ecl:stableId ?targetId }
+              FILTER (STRSTARTS(STR(?target), "https://id.exergism.org/ecl#"))
+              FILTER NOT EXISTS { ?target ec:stableId ?targetId }
             }
         """
     ] ;
@@ -269,7 +271,7 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Claim validity interval is inverted." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
               $this ecl:validFrom ?from ; ecl:validTo ?to .
               FILTER (?to < ?from)
@@ -280,7 +282,7 @@ ecl:ClaimShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "Claim nodes may not encode governance/tier/restriction outcomes as their asserted predicate or object." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?predicate ?object WHERE {
               $this ecl:predicate ?predicate .
               OPTIONAL { $this ecl:object ?object }
@@ -305,11 +307,11 @@ ecl:ClaimShape a sh:NodeShape ;
 ecl:EvidenceItemShape a sh:NodeShape ;
     sh:targetClass ecl:EvidenceItem ;
     sh:property [
-        sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
         sh:pattern "^EVIDENCE-[A-Z0-9-]+$"
     ] ;
     sh:property [ sh:path ecl:sourceLocator ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
-    sh:property [ sh:path ecl:provenance ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
+    sh:property [ sh:path ec:provenance ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
     sh:property [
         sh:path ecl:evidenceGrade ;
         sh:maxCount 1 ;
@@ -317,15 +319,15 @@ ecl:EvidenceItemShape a sh:NodeShape ;
     ] ;
     sh:property [ sh:path ecl:publicationDate ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:retrievedAt ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
-    sh:property [ sh:path ecl:supersedes ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class ecl:EvidenceItem ] ;
+    sh:property [ sh:path ec:supersedes ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class ecl:EvidenceItem ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "EvidenceItem stableId and IRI must identify the same EvidenceItem." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:stableId ?id .
-              FILTER (STR($this) != CONCAT("urn:ecl:", STR(?id)))
+              $this ec:stableId ?id .
+              FILTER (STR($this) != CONCAT("https://id.exergism.org/ecl#", STR(?id)))
             }
         """
     ] ;
@@ -333,31 +335,31 @@ ecl:EvidenceItemShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "EvidenceItem supersedes must resolve to an EvidenceItem identity." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this ?target WHERE {
-              $this ecl:supersedes ?target .
+              $this ec:supersedes ?target .
               FILTER NOT EXISTS {
-                ?target a ecl:EvidenceItem ; ecl:stableId ?targetId .
+                ?target a ecl:EvidenceItem ; ec:stableId ?targetId .
               }
             }
         """
     ] .
 
-ecl:AssessmentShape a sh:NodeShape ;
+ex:AssessmentShape a sh:NodeShape ;
     sh:targetClass ecl:ExergicAssessment ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] .
 
-ecl:GovernanceDecisionShape a sh:NodeShape ;
-    sh:targetClass ecl:GovernanceDecision ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+ecl:ECLGovernanceDecisionShape a sh:NodeShape ;
+    sh:targetClass ecl:ECLGovernanceDecision ;
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path ecl:outcome ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:GovernanceOutcome ] ;
-    sh:property [ sh:path ecl:rationale ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] .
+    sh:property [ sh:path ec:rationale ; sh:minCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] .
 
-ecl:UpdateCaseShape a sh:NodeShape ;
-    sh:targetClass ecl:UpdateCase ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+ex:UpdateCaseShape a sh:NodeShape ;
+    sh:targetClass ex:UpdateCase ;
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path ecl:fingerprint ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [
@@ -373,70 +375,70 @@ ecl:UpdateCaseShape a sh:NodeShape ;
 
 ecl:KnowledgeSnapshotShape a sh:NodeShape ;
     sh:targetClass ecl:KnowledgeSnapshot ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:gitCommit ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{40}$" ] ;
     sh:property [ sh:path ecl:aboxSourceSha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
     sh:property [ sh:path ecl:ontologySha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
     sh:property [ sh:path ecl:evidenceCutoff ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
     sh:property [ sh:path ecl:createdAt ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] .
 
-ecl:LicenseReleaseShape a sh:NodeShape ;
-    sh:targetClass ecl:LicenseRelease ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+ex:LicenseReleaseShape a sh:NodeShape ;
+    sh:targetClass ex:LicenseRelease ;
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:releaseVersion ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:artifactPath ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
-    sh:property [ sh:path ecl:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] .
+    sh:property [ sh:path ec:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] .
 
-ecl:ScheduleReleaseShape a sh:NodeShape ;
-    sh:targetClass ecl:ScheduleRelease ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+ex:ScheduleReleaseShape a sh:NodeShape ;
+    sh:targetClass ex:ScheduleRelease ;
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:releaseVersion ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:property [ sh:path ecl:artifactPath ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
-    sh:property [ sh:path ecl:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ec:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
     sh:property [ sh:path ecl:capturesKnowledge ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:KnowledgeSnapshot ] .
 
 ecl:ECLBundleShape a sh:NodeShape ;
     sh:targetClass ecl:ECLBundle ;
-    sh:property [ sh:path ecl:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
-    sh:property [ sh:path ecl:usesLicenseRelease ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:LicenseRelease ] ;
-    sh:property [ sh:path ecl:usesScheduleRelease ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ecl:ScheduleRelease ] ;
-    sh:property [ sh:path ecl:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
-    sh:property [ sh:path ecl:operative ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:boolean ] .
+    sh:property [ sh:path ec:stableId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path ecl:usesLicenseRelease ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ex:LicenseRelease ] ;
+    sh:property [ sh:path ecl:usesScheduleRelease ; sh:minCount 1 ; sh:maxCount 1 ; sh:class ex:ScheduleRelease ] ;
+    sh:property [ sh:path ec:sha256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ec:operative ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:boolean ] .
 
 # Global stable-ID uniqueness. This is a repository invariant, not an OWL
 # identity axiom, so an accidental duplicate fails CI rather than silently
 # merging two real-world entities.
-ecl:StableIdUniquenessShape a sh:NodeShape ;
-    sh:targetSubjectsOf ecl:stableId ;
+ex:StableIdUniquenessShape a sh:NodeShape ;
+    sh:targetSubjectsOf ec:stableId ;
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "ecl:stableId must be globally unique." ;
+        sh:message "ec:stableId must be globally unique." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
-              $this ecl:stableId ?id .
-              ?other ecl:stableId ?id .
+              $this ec:stableId ?id .
+              ?other ec:stableId ?id .
               FILTER (?other != $this)
             }
         """
     ] .
 
 # State-specific uniqueness is structural repository validity, not OWL identity.
-ecl:StateMappingUniquenessShape a sh:NodeShape ;
-    sh:targetClass ecl:State ;
+ex:StateMappingUniquenessShape a sh:NodeShape ;
+    sh:targetClass ex:State ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "State ISO3 and dossier mappings must be one-to-one among State actors." ;
         sh:select """
-            PREFIX ecl: <urn:ecl:>
+            PREFIX ecl: <https://id.exergism.org/ecl#>
             SELECT $this WHERE {
               {
                 $this ecl:iso3 ?v .
-                ?other a ecl:State ; ecl:iso3 ?v .
+                ?other a ex:State ; ecl:iso3 ?v .
                 FILTER (?other != $this)
               } UNION {
                 $this ecl:dossier ?v .
-                ?other a ecl:State ; ecl:dossier ?v .
+                ?other a ex:State ; ecl:dossier ?v .
                 FILTER (?other != $this)
               }
             }

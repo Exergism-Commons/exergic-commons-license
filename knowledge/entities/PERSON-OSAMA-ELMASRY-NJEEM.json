@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PERSON-OSAMA-ELMASRY-NJEEM",
+  "iri": "ex:PERSON-OSAMA-ELMASRY-NJEEM",
   "id": "PERSON-OSAMA-ELMASRY-NJEEM",
   "type": "Person",
   "name": "Osama Elmasry Njeem",

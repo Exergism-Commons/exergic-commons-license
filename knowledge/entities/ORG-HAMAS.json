@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-HAMAS",
+  "iri": "ex:ORG-HAMAS",
   "id": "ORG-HAMAS",
   "type": "Organization",
   "name": "Hamas",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-PAN",
+  "iri": "ex:STATE-PAN",
   "id": "STATE-PAN",
   "type": "State",
   "name": "Panama",

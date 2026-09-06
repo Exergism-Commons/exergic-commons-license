@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-INTELLEXA-PREDATOR-NETWORK",
+  "iri": "ex:ORG-INTELLEXA-PREDATOR-NETWORK",
   "id": "ORG-INTELLEXA-PREDATOR-NETWORK",
   "type": "Organization",
   "name": "Intellexa / Predator commercial spyware network",

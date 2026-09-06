@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-USA",
+  "iri": "ex:STATE-USA",
   "id": "STATE-USA",
   "type": "State",
   "name": "United States",
@@ -16,9 +16,9 @@
   "reviewClass": "active",
   "reviewReason": "Scoped live detention/targeting/security findings and counter-institution-sensitive attribution require current-status review.",
   "trackedObjects": [
-    "ecl:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
-    "ecl:PROJECT-MAVEN-SMART-SYSTEM",
-    "ecl:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING"
+    "ex:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+    "ex:PROJECT-MAVEN-SMART-SYSTEM",
+    "ex:PROJECT-OPERATION-EPIC-FURY-MINAB-TARGETING"
   ],
   "monitorIds": []
 }

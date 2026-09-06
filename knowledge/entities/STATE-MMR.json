@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MMR",
+  "iri": "ex:STATE-MMR",
   "id": "STATE-MMR",
   "type": "State",
   "name": "Myanmar",

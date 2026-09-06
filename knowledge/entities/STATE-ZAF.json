@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-ZAF",
+  "iri": "ex:STATE-ZAF",
   "id": "STATE-ZAF",
   "type": "State",
   "name": "South Africa",

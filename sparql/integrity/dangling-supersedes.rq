@@ -1,18 +1,20 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?record ?target
 WHERE {
   {
-    ?record a ecl:Claim ; ecl:supersedes ?target .
+    ?record a ex:Claim ; ec:supersedes ?target .
     FILTER NOT EXISTS {
-      ?target a ecl:Claim ; ecl:stableId ?targetId .
+      ?target a ex:Claim ; ec:stableId ?targetId .
     }
   }
   UNION
   {
-    ?record a ecl:EvidenceItem ; ecl:supersedes ?target .
+    ?record a ecl:EvidenceItem ; ec:supersedes ?target .
     FILTER NOT EXISTS {
-      ?target a ecl:EvidenceItem ; ecl:stableId ?targetId .
+      ?target a ecl:EvidenceItem ; ec:stableId ?targetId .
     }
   }
 }

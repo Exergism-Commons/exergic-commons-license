@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-GEO",
+  "iri": "ex:STATE-GEO",
   "id": "STATE-GEO",
   "type": "State",
   "name": "Georgia",
