@@ -24,7 +24,9 @@ import check_state_dossier_softwrap_coverage as softwrap
 
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 REVIEW_PATH = base.ROOT / "knowledge/generated/state-dossier-long-title-dispositions-v1.json"
-TITLE_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9&.'’/-]*|[A-ZÀ-ÖØ-Þ]{2,})"
+# Keep token semantics identical to the broad extractor: Unicode Lu/Lt/Lo starts and
+# Unicode mark continuation are owned centrally by audit_state_dossier_entities.
+TITLE_WORD = base.TITLE_WORD_PATTERN
 # Lowercase connectors are token-bounded so ``de`` cannot consume the prefix of ``described``.
 # ``or`` is required for complete institutional names such as ``... Cruel Inhuman or Degrading ...``.
 TITLE_CONNECTOR = r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
@@ -245,6 +247,14 @@ def self_test() -> None:
     long_project = "National Program for the Protection of Human Rights and Civil Liberties Project"
     project_found = overflow_title_surfaces(long_project)
     assert (long_project, "project-or-deployment") in project_found, project_found
+
+    unicode_tail = "National Commission for Human Rights and Public Security Police Žandarmerija"
+    unicode_tail_found = overflow_title_surfaces(unicode_tail)
+    assert (unicode_tail, "actor-or-institution") in unicode_tail_found, unicode_tail_found
+
+    decomposed_tail = "National Commission for Human Rights and Public Security Police E\u0301quipe"
+    decomposed_tail_found = overflow_title_surfaces(decomposed_tail)
+    assert (decomposed_tail, "actor-or-institution") in decomposed_tail_found, decomposed_tail_found
 
     short = overflow_title_surfaces("National Human Rights Commission reported findings")
     assert short == [], short
