@@ -83,8 +83,12 @@ def _unicode_category_class(*categories: str) -> str:
     ) + "]"
 
 
-UNICODE_UPPER_TITLE_START = _unicode_category_class("Lu", "Lt")
-TITLE_WORD_PATTERN = rf"{UNICODE_UPPER_TITLE_START}(?:[^\W_]|[&.'’/-])*"
+# One shared Unicode title-token contract is exported for every title companion. Cased scripts
+# may start on Lu/Lt and scripts without case on Lo; combining marks are continuation-only so
+# decomposed spellings remain intact without allowing marks to manufacture a new title start.
+UNICODE_TITLE_START = _unicode_category_class("Lu", "Lt", "Lo")
+UNICODE_TITLE_MARK = _unicode_category_class("Mn", "Mc", "Me")
+TITLE_WORD_PATTERN = rf"{UNICODE_TITLE_START}(?:[^\W_]|{UNICODE_TITLE_MARK}|[&.'’/-])*"
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
@@ -514,15 +518,24 @@ def self_test() -> None:
     empty_index = build_name_index([], state_codes={"DNK"}, normalizer=norm)
     for unicode_title in (
         "École Nationale de Police",
+        "E\u0301cole Nationale de Police",
         "Łódź Metropolitan Police",
         "İstanbul Security Directorate",
         "Česká Národní Police",
+        "東京 Metropolitan Police",
+        "وزارة الداخلية Agency",
+        "कुमार Agency",
     ):
         title_candidates = extract_candidates(unicode_title, empty_index, set(), "DNK")
         assert any(
             value == unicode_title and kind == "actor-or-institution"
             for value, kind, _ in title_candidates
         ), unicode_title
+    nfc = extract_candidates("École Nationale de Police", empty_index, set(), "DNK")
+    nfd = extract_candidates("E\u0301cole Nationale de Police", empty_index, set(), "DNK")
+    assert {norm(value) for value, kind, _ in nfc if kind == "actor-or-institution"} == {
+        norm(value) for value, kind, _ in nfd if kind == "actor-or-institution"
+    }
 
     cole_index = build_name_index(
         [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
