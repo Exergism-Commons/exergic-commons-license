@@ -24,9 +24,13 @@ import check_state_dossier_softwrap_coverage as softwrap
 
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 REVIEW_PATH = base.ROOT / "knowledge/generated/state-dossier-long-title-dispositions-v1.json"
-# Keep token semantics identical to the broad extractor: Unicode Lu/Lt/Lo starts and
-# Unicode mark continuation are owned centrally by audit_state_dossier_entities.
-TITLE_WORD = base.TITLE_WORD_PATTERN
+# Reuse the shared Unicode start/mark contract without importing the broad extractor's ordinary
+# internal-period allowance: in an overflow tail a sentence-ending period is a structural
+# boundary. Dotted acronyms remain supported explicitly.
+TITLE_WORD = (
+    rf"(?:{base.UNICODE_TITLE_START}(?:[^\W_]|{base.UNICODE_TITLE_MARK}|[&'’/-])*"
+    r"|(?:[A-Z]\.){2,})"
+)
 # Lowercase connectors are token-bounded so ``de`` cannot consume the prefix of ``described``.
 # ``or`` is required for complete institutional names such as ``... Cruel Inhuman or Degrading ...``.
 TITLE_CONNECTOR = r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
@@ -271,11 +275,15 @@ def self_test() -> None:
     )
     assert coordinated == [], coordinated
 
-    # Punctuation terminates the run; a new sentence must never be glued to the identity.
-    separated = overflow_title_surfaces(
-        "National Commission for the Prevention of Torture and Other. Degrading Treatment Agency"
-    )
-    assert separated == [], separated
+    # Sentence punctuation must terminate both the baseline and any continuation tail. The second
+    # regression places the period after the historical nine-token boundary so OVERFLOW_RE itself
+    # is responsible for refusing the cross-sentence glue.
+    for separated_text in (
+        "National Commission for the Prevention of Torture and Other. Degrading Treatment Agency",
+        "National Commission for the Prevention of Torture and Other Cruel. Inhuman Degrading Treatment Agency",
+    ):
+        separated = overflow_title_surfaces(separated_text)
+        assert separated == [], (separated_text, separated)
 
     print("State dossier long-title coverage self-test: OK")
 
