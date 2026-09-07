@@ -22,13 +22,8 @@ import check_state_dossier_softwrap_coverage as softwrap
 
 
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
-TITLE_WORD = (
-    r"(?:"
-    r"[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9&'’/-]*"
-    r"|(?:[A-Z]\.){2,}"
-    r"|[A-ZÀ-ÖØ-Þ]{2,}"
-    r")"
-)
+# This companion deliberately owns comma boundaries, but not Unicode token semantics.
+TITLE_WORD = base.TITLE_WORD_PATTERN
 TITLE_CONNECTOR = (
     r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
 )
@@ -169,6 +164,18 @@ def self_test() -> None:
     )
     early_found = comma_long_title_surfaces(early_comma)
     assert (early_comma, "actor-or-institution") in early_found, early_found
+
+    unicode_comma = (
+        "National Commission for Human Rights, Public Security Police and Civil Žandarmerija Agency"
+    )
+    unicode_comma_found = comma_long_title_surfaces(unicode_comma)
+    assert (unicode_comma, "actor-or-institution") in unicode_comma_found, unicode_comma_found
+
+    decomposed_comma = (
+        "National Commission for Human Rights, Public Security Police and Civil E\u0301quipe Agency"
+    )
+    decomposed_comma_found = comma_long_title_surfaces(decomposed_comma)
+    assert (decomposed_comma, "actor-or-institution") in decomposed_comma_found, decomposed_comma_found
 
     # Ordinary short comma-bearing names do not enter this long-title guard.
     assert comma_long_title_surfaces("Research, Development Agency") == []
