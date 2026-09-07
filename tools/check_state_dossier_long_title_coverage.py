@@ -275,15 +275,21 @@ def self_test() -> None:
     )
     assert coordinated == [], coordinated
 
-    # Sentence punctuation must terminate both the baseline and any continuation tail. The second
-    # regression places the period after the historical nine-token boundary so OVERFLOW_RE itself
-    # is responsible for refusing the cross-sentence glue.
-    for separated_text in (
-        "National Commission for the Prevention of Torture and Other. Degrading Treatment Agency",
-        "National Commission for the Prevention of Torture and Other Cruel. Inhuman Degrading Treatment Agency",
-    ):
-        separated = overflow_title_surfaces(separated_text)
-        assert separated == [], (separated_text, separated)
+    # A period ending the nine-token baseline suppresses overflow entirely.
+    baseline_period = overflow_title_surfaces(
+        "National Commission for the Prevention of Torture and Other. Degrading Treatment Agency"
+    )
+    assert baseline_period == [], baseline_period
+
+    # A period in the continuation may leave a legitimate title-shaped prefix before the period,
+    # but no emitted candidate may contain material from both sides of that sentence boundary.
+    tail_period_text = (
+        "National Commission for the Prevention of Torture and Other Cruel. "
+        "Inhuman Degrading Treatment Agency"
+    )
+    tail_period = overflow_title_surfaces(tail_period_text)
+    assert tail_period, tail_period
+    assert all("Inhuman" not in value and "." not in value for value, _ in tail_period), tail_period
 
     print("State dossier long-title coverage self-test: OK")
 
