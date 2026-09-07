@@ -8,11 +8,11 @@ import json
 import re
 
 import audit_state_dossier_entities as base
+import commonmark_fences as fences
 import review_state_dossier_candidates as reviewed
 from entity_identity_resolution import build_name_index
 
 ROOT = base.ROOT
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 LOWER_HEADING_RE = re.compile(r"^#{2,6}\s+")
 # YAML-decoded frontmatter and assembled soft-wrap prose may contain rendered line breaks
 # inside a reference-link label. Permit those line breaks and normalize the visible label
@@ -169,17 +169,14 @@ def audit() -> list[dict]:
             )
 
         section = "preamble"
-        fence_marker: str | None = None
-        for relative_line, raw in enumerate(text[body_offset:].splitlines(), 1):
-            fence = FENCE_RE.match(raw)
-            if fence:
-                marker = fence.group(1)[0]
-                if fence_marker is None:
-                    fence_marker = marker
-                elif marker == fence_marker:
-                    fence_marker = None
-                continue
-            if fence_marker is not None:
+        body = text[body_offset:]
+        # Fence visibility is a CommonMark block-grammar decision. Never reinterpret it with
+        # Python `\s` or a local marker state: NBSP-prefixed backticks are visible prose, while
+        # real fences (including their interaction with raw HTML/indentation) come only from the
+        # shared parser and source-line model validator.
+        hidden_lines = fences.fenced_line_numbers(body)
+        for relative_line, raw in enumerate(body.splitlines(), 1):
+            if relative_line in hidden_lines:
                 continue
             heading = base.HEADING_RE.match(raw)
             if heading:
@@ -205,6 +202,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     bold = rendered_only_candidates("Australian **Human Rights** Commission reported findings")
     assert any(candidate == "Australian Human Rights Commission" for _, candidate, _ in bold), bold
     nccia = rendered_only_candidates("National **Cyber Crime Investigation** Agency")
@@ -244,6 +242,22 @@ def self_test() -> None:
     dotted_markup = rendered_only_candidates("Acme Inc. R**ights Agency**")
     assert any(candidate == "Acme Inc. Rights Agency" for _, candidate, _ in dotted_markup), dotted_markup
     assert any(candidate == "Rights Agency" for _, candidate, _ in dotted_markup), dotted_markup
+
+    # Adversarial composition: Python `\s` used to treat NBSP + backticks as a fence and `lstrip()`
+    # could then turn NBSP + `#` into a pseudo-H1 in a companion. CommonMark sees both as prose.
+    # This guard must keep the second line visible and recover the markup-only complete identity.
+    pseudo_structure = (
+        "\u00a0```text\n"
+        "\u00a0# Australian **Human Rights** Commission\n"
+    )
+    assert fences.fenced_line_numbers(pseudo_structure) == set()
+    pseudo_line = pseudo_structure.splitlines()[1]
+    assert base.HEADING_RE.match(pseudo_line) is None
+    pseudo_candidates = rendered_only_candidates(pseudo_line)
+    assert any(
+        candidate == "Australian Human Rights Commission"
+        for _, candidate, _ in pseudo_candidates
+    ), pseudo_candidates
 
     index = build_name_index(
         [
