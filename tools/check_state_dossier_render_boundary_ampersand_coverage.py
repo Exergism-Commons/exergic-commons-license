@@ -14,15 +14,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 
 import audit_state_dossier_entities as base
 import check_state_dossier_ampersand_title_coverage as amp
 import check_state_dossier_rendered_markup_coverage as markup
 import check_state_dossier_softwrap_coverage as softwrap
-
-
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+import commonmark_fences as fences
 
 
 def rendered_ampersand_surfaces(raw: str) -> list[tuple[str, str]]:
@@ -83,25 +80,18 @@ def audit() -> list[dict]:
 
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
+        hidden_lines = fences.fenced_line_numbers(body)
 
-        # Scan every non-fenced source line after complete inline rendering. This closes the
-        # same-line boundary class (e.g. ``Research & `Development Agency```), including
-        # headings, table cells and list items.
-        fence_marker: str | None = None
+        # Scan every parser-visible source line after complete inline rendering. Fence visibility
+        # is owned exclusively by CommonMark: Unicode whitespace, raw HTML, indentation and fence
+        # run semantics must never be reinterpreted by a local regex/state machine.
         for rel_line, raw in enumerate(body.splitlines(), 1):
-            fence = FENCE_RE.match(raw)
-            if fence:
-                marker = fence.group(1)[0]
-                if fence_marker is None:
-                    fence_marker = marker
-                elif marker == fence_marker:
-                    fence_marker = None
+            if rel_line in hidden_lines or not raw.strip():
                 continue
-            if fence_marker is not None or not raw.strip():
-                continue
-            if raw.lstrip().startswith("# "):
+            if raw.startswith("# "):
                 # The canonical H1 is structurally constrained by the State identity parity
-                # checker and is outside this explicitly non-State identity guard.
+                # checker and is outside this explicitly non-State identity guard. Do not use
+                # lstrip(): NBSP-prefixed '# ...' is CommonMark-visible prose, not an ATX H1.
                 continue
             inspect(
                 state=state,
@@ -112,8 +102,9 @@ def audit() -> list[dict]:
             )
 
         # Then render complete paragraph/list blocks so code spans, links or emphasis crossing
-        # source-line boundaries cannot split an ampersand identity either.
-        for block in softwrap.prose_blocks(body):
+        # source-line boundaries cannot split an ampersand identity either. Reuse the exact same
+        # parser-derived hidden set to avoid any second structural interpretation.
+        for block in softwrap.prose_blocks(body, hidden_lines=hidden_lines):
             lines = [line for line in block["lines"] if line]
             if not lines:
                 continue
@@ -131,6 +122,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     same_line = rendered_ampersand_surfaces("Research & `Development Agency`")
     assert ("Research & Development Agency", "actor-or-institution") in same_line, same_line
 
@@ -154,6 +146,16 @@ def self_test() -> None:
     # guard rather than regress the already-fixed whole-code-span case.
     whole_code = rendered_ampersand_surfaces("`Research & Development Agency` is named")
     assert ("Research & Development Agency", "actor-or-institution") in whole_code, whole_code
+
+    # Python \s/lstrip used to invent both a fence and an H1 from these lines. CommonMark treats
+    # them as visible paragraph text, so the identity must remain reconstructable after rendering.
+    pseudo_structure = "\u00a0```text\n\u00a0# Research & `Development Agency`\n"
+    hidden = fences.fenced_line_numbers(pseudo_structure)
+    assert hidden == set(), hidden
+    visible = pseudo_structure.splitlines()[1]
+    assert not visible.startswith("# ")
+    pseudo = rendered_ampersand_surfaces(visible)
+    assert ("Research & Development Agency", "actor-or-institution") in pseudo, pseudo
 
     print("State dossier rendered-boundary ampersand coverage self-test: OK")
 
