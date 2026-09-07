@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
+import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -19,6 +21,7 @@ from typing import Iterable
 
 import yaml
 
+from audit_schedule_reference_coverage import norm
 from entity_identity_resolution import build_name_index, resolve_normalized, self_test as resolution_self_test
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,13 +55,44 @@ ACRONYM_STOP = {
 }
 FRONTMATTER_IDENTITY_FIELDS = ("provisional_scope", "adversarial_result")
 
+
+def _unicode_category_class(*categories: str) -> str:
+    """Build a compact regex class from Python's current Unicode category table."""
+    wanted = set(categories)
+    ranges: list[tuple[int, int]] = []
+    start: int | None = None
+    previous: int | None = None
+    for codepoint in range(sys.maxunicode + 1):
+        if unicodedata.category(chr(codepoint)) not in wanted:
+            if start is not None and previous is not None:
+                ranges.append((start, previous))
+                start = previous = None
+            continue
+        if start is None:
+            start = previous = codepoint
+        elif previous is not None and codepoint == previous + 1:
+            previous = codepoint
+        else:
+            ranges.append((start, previous if previous is not None else start))
+            start = previous = codepoint
+    if start is not None and previous is not None:
+        ranges.append((start, previous))
+    return "[" + "".join(
+        chr(first) if first == last else f"{chr(first)}-{chr(last)}"
+        for first, last in ranges
+    ) + "]"
+
+
+UNICODE_UPPER_TITLE_START = _unicode_category_class("Lu", "Lt")
+TITLE_WORD_PATTERN = rf"{UNICODE_UPPER_TITLE_START}(?:[^\W_]|[&.'’/-])*"
+
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 INLINE_CODE_RE = re.compile(r"`([^`\n]{2,120})`")
 QUOTED_RE = re.compile(r"[\"“]([^\"”\n]{2,120})[\"”]")
 TITLE_RE = re.compile(
-    r"\b(?:[A-Z][A-Za-z0-9&.'’/-]*|[A-Z]{2,})"
-    r"(?:\s+(?:of|the|and|for|de|del|la|le|des|[A-Z][A-Za-z0-9&.'’/-]*|[A-Z]{2,})){0,8}\b"
+    rf"(?<!\w){TITLE_WORD_PATTERN}"
+    rf"(?:\s+(?:of|the|and|for|de|del|la|le|des|{TITLE_WORD_PATTERN})){{0,8}}(?!\w)"
 )
 ACRONYM_RE = re.compile(r"\b[A-Z][A-Z0-9-]{2,14}\b")
 URL_RE = re.compile(r"https?://\S+")
@@ -66,12 +100,6 @@ MD_LINK_RE = re.compile(r"\[([^\]]+)\]\([^\)]+\)")
 CANONICAL_STATE_ID_RE = re.compile(r"^ECL-STATE-([A-Z]{3})$")
 ENTITY_ID_RE = re.compile(r"(?:ORG|AGENCY|PERSON|PROJECT|DEPLOYMENT|INSTITUTION)-[A-Z0-9-]+$")
 PATHISH_RE = re.compile(r"(?:^\.?\.?/|[/\\]|\.(?:md|yml|yaml|json|ttl|rq|py)$)", re.I)
-
-
-def norm(text: str) -> str:
-    text = text.lower().replace("’", "'")
-    text = re.sub(r"[^a-z0-9]+", " ", text)
-    return " ".join(text.split())
 
 
 def clean_candidate(text: str) -> str:
@@ -174,7 +202,11 @@ def plausible(text: str) -> bool:
 def looks_named_opaque(text: str) -> bool:
     if not plausible(text) or len(text.split()) > 8:
         return False
-    return bool(re.search(r"[A-Z]", text)) and not text.lower().startswith((
+    has_upper_or_title = any(
+        char.isupper() or unicodedata.category(char) == "Lt"
+        for char in text
+    )
+    return has_upper_or_title and not text.casefold().startswith((
         "last_", "asof", "review_", "provisional_", "evidence_", "state-",
     ))
 
@@ -466,6 +498,10 @@ def write_markdown(report: dict, path: Path, limit: int = 300) -> None:
 
 def self_test() -> None:
     assert norm("Udbetaling Danmark / ATP") == "udbetaling danmark atp"
+    assert norm("École Agency") == "école agency"
+    assert norm("Cole Agency") == "cole agency"
+    assert norm("École Agency") != norm("Cole Agency")
+    assert norm("Ｅ́cole Agency") == norm("École Agency")
     assert classify("National Police Service") == "actor-or-institution"
     assert classify("Project Maven System") == "project-or-deployment"
     assert classify("ordinary prose") is None
@@ -474,6 +510,34 @@ def self_test() -> None:
     assert not plausible("../../reviews/2026/foo.md")
     assert not plausible("UPHOLD")
     assert plausible("OHCHR")
+
+    empty_index = build_name_index([], state_codes={"DNK"}, normalizer=norm)
+    for unicode_title in (
+        "École Nationale de Police",
+        "Łódź Metropolitan Police",
+        "İstanbul Security Directorate",
+        "Česká Národní Police",
+    ):
+        title_candidates = extract_candidates(unicode_title, empty_index, set(), "DNK")
+        assert any(
+            value == unicode_title and kind == "actor-or-institution"
+            for value, kind, _ in title_candidates
+        ), unicode_title
+
+    cole_index = build_name_index(
+        [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
+        state_codes={"DNK"},
+        normalizer=norm,
+    )
+    assert resolve_name(cole_index, "DNK", "Cole Agency") == "AGENCY-DNK-COLE"
+    assert resolve_name(cole_index, "DNK", "École Agency") is None
+    ecole_index = build_name_index(
+        [{"id": "AGENCY-DNK-ECOLE", "type": "Agency", "name": "École Agency", "aliases": []}],
+        state_codes={"DNK"},
+        normalizer=norm,
+    )
+    assert resolve_name(ecole_index, "DNK", "ÉCOLE AGENCY") == "AGENCY-DNK-ECOLE"
+
     sample = (
         "---\n"
         "id: ECL-STATE-DNK\n"
@@ -492,7 +556,6 @@ def self_test() -> None:
         ("provisional_scope", 4, "NCCIA project"),
         ("adversarial_result", 6, "Operation Aurora remains in scope"),
     ]
-    empty_index = build_name_index([], state_codes={"DNK"}, normalizer=norm)
     scope_candidates = extract_candidates(front["provisional_scope"], empty_index, set(), "DNK")
     result_candidates = extract_candidates(front["adversarial_result"], empty_index, set(), "DNK")
     assert any(value == "NCCIA" and kind == "acronym-review" for value, kind, _ in scope_candidates)
