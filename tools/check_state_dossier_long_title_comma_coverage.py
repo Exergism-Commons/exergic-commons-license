@@ -22,8 +22,13 @@ import check_state_dossier_softwrap_coverage as softwrap
 
 
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
-# This companion deliberately owns comma boundaries, but not Unicode token semantics.
-TITLE_WORD = base.TITLE_WORD_PATTERN
+# This companion deliberately owns comma/sentence boundaries while reusing the base Unicode
+# start/mark classes. Preserve the historical rule that a normal title word cannot absorb a
+# period; only an explicit dotted acronym form may contain one.
+TITLE_WORD = (
+    rf"(?:{base.UNICODE_TITLE_START}(?:[^\W_]|{base.UNICODE_TITLE_MARK}|[&'’/-])*"
+    r"|(?:[A-Z]\.){2,})"
+)
 TITLE_CONNECTOR = (
     r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
 )
