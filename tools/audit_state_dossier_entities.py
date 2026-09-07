@@ -232,7 +232,11 @@ def extract_candidates(
     """Apply the broad body-prose candidate extractor to one textual surface."""
     line = URL_RE.sub("", text)
     line = MD_LINK_RE.sub(lambda match: match.group(1), line)
-    if not line.strip() or line.lstrip().startswith("#"):
+    # Body heading structure is decided by iter_occurrences() from the source syntax and the
+    # canonical H1 invariant. Do not apply Python lstrip() here: Unicode whitespace such as NBSP
+    # is visible prose under CommonMark and must not turn `NBSP + # Project Aurora` into a skipped
+    # pseudo-heading. Frontmatter textual surfaces likewise remain auditable when they contain `#`.
+    if not line.strip():
         return []
 
     extracted: list[tuple[str, str, str | None]] = []
@@ -536,6 +540,14 @@ def self_test() -> None:
     assert {norm(value) for value, kind, _ in nfc if kind == "actor-or-institution"} == {
         norm(value) for value, kind, _ in nfd if kind == "actor-or-institution"
     }
+
+    # Python lstrip() must never manufacture Markdown structure. NBSP is visible CommonMark prose,
+    # so a pseudo-heading containing a project remains a complete review candidate.
+    pseudo_heading = extract_candidates("\u00a0# Project Aurora", empty_index, set(), "DNK")
+    assert any(
+        value == "Project Aurora" and kind == "project-or-deployment"
+        for value, kind, _ in pseudo_heading
+    ), pseudo_heading
 
     cole_index = build_name_index(
         [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
