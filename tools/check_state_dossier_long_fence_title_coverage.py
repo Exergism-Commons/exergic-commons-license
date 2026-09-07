@@ -34,6 +34,11 @@ def visible_lines(body: str, *, hidden_lines: set[int] | None = None) -> list[tu
     ]
 
 
+def canonical_h1_source_line(raw: str) -> bool:
+    """Match only the exact canonical H1 source form used by the broad State audit."""
+    return raw.startswith("# ")
+
+
 def audit() -> list[dict]:
     dossiers = base.canonical_state_dossiers()
     states = {
@@ -96,7 +101,7 @@ def audit() -> list[dict]:
             }
 
     def inspect_raw(*, state: str, source: str, line: int, raw: str, scope: str) -> None:
-        if not raw.strip() or raw.lstrip().startswith("# "):
+        if not raw.strip() or canonical_h1_source_line(raw):
             return
         inspect_rendered(
             state=state,
@@ -253,6 +258,23 @@ def self_test() -> None:
         raw_html_rendered,
         raw_html_surfaces,
     )
+
+    # NBSP is not CommonMark indentation. A Unicode-space-prefixed pseudo-H1 is visible prose and
+    # must never be skipped by Python lstrip(); this is the second half of the fake-fence/pseudo-H1
+    # composition guarded by rendered-markup coverage.
+    pseudo_body = (
+        "\u00a0```text\n"
+        "\u00a0# Australian **Human Rights** Commission\n"
+    )
+    pseudo_hidden = fences.fenced_line_numbers(pseudo_body)
+    assert pseudo_hidden == set(), pseudo_hidden
+    pseudo_lines = visible_lines(pseudo_body, hidden_lines=pseudo_hidden)
+    pseudo_line = pseudo_lines[1][1]
+    assert not canonical_h1_source_line(pseudo_line)
+    pseudo_rendered = commonmark.rendered_with_commonmark_escapes(pseudo_line)
+    assert "Australian Human Rights Commission" in {
+        candidate for candidate, _ in markup.title_candidates(pseudo_rendered).values()
+    }, pseudo_rendered
 
     print("State dossier long-fence title coverage self-test: OK")
 
