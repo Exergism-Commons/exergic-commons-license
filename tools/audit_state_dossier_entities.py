@@ -86,9 +86,17 @@ def _unicode_category_class(*categories: str) -> str:
 # One shared Unicode title-token contract is exported for every title companion. Cased scripts
 # may start on Lu/Lt and scripts without case on Lo; combining marks are continuation-only so
 # decomposed spellings remain intact without allowing marks to manufacture a new title start.
+# A normal word cannot absorb a period: period-bearing forms are explicit, so sentence endings
+# remain hard boundaries without regressing common dotted acronyms/abbreviations in identities.
 UNICODE_TITLE_START = _unicode_category_class("Lu", "Lt", "Lo")
 UNICODE_TITLE_MARK = _unicode_category_class("Mn", "Mc", "Me")
-TITLE_WORD_PATTERN = rf"{UNICODE_TITLE_START}(?:[^\W_]|{UNICODE_TITLE_MARK}|[&.'’/-])*"
+TITLE_PLAIN_WORD_PATTERN = rf"{UNICODE_TITLE_START}(?:[^\W_]|{UNICODE_TITLE_MARK}|[&'’/-])*"
+TITLE_DOTTED_ACRONYM_PATTERN = r"(?:[A-Z]\.){2,}"
+TITLE_DOTTED_ABBREVIATION_PATTERN = r"(?:St|Mt|Ft|Co|Inc|Corp|Ltd)\."
+TITLE_WORD_PATTERN = (
+    rf"(?:{TITLE_PLAIN_WORD_PATTERN}|{TITLE_DOTTED_ACRONYM_PATTERN}|"
+    rf"{TITLE_DOTTED_ABBREVIATION_PATTERN})"
+)
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
@@ -564,6 +572,28 @@ def self_test() -> None:
             for value, kind, _ in code_candidates
         ), (quoted_native, code_candidates)
     assert not looks_named_opaque("ordinary lowercase prose")
+
+    # Ordinary periods are sentence boundaries, not arbitrary title-token characters. The
+    # post-period identity must remain independently discoverable instead of being swallowed by
+    # the pre-period title. Explicit dotted identity forms remain supported.
+    sentence_candidates = extract_candidates(
+        "National Commission for Human. Rights Agency", empty_index, set(), "DNK"
+    )
+    assert any(
+        value == "Rights Agency" and kind == "actor-or-institution"
+        for value, kind, _ in sentence_candidates
+    ), sentence_candidates
+    assert not any("Human. Rights" in value for value, _, _ in sentence_candidates), sentence_candidates
+    for dotted_title in (
+        "U.S. Department of Justice",
+        "St. Louis Police",
+        "Acme Inc. Research Division",
+    ):
+        dotted_candidates = extract_candidates(dotted_title, empty_index, set(), "DNK")
+        assert any(value == dotted_title for value, _, _ in dotted_candidates), (
+            dotted_title,
+            dotted_candidates,
+        )
 
     cole_index = build_name_index(
         [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
