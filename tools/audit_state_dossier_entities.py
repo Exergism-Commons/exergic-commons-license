@@ -206,11 +206,13 @@ def plausible(text: str) -> bool:
 def looks_named_opaque(text: str) -> bool:
     if not plausible(text) or len(text.split()) > 8:
         return False
-    has_upper_or_title = any(
-        char.isupper() or unicodedata.category(char) == "Lt"
+    # Quoted/inline-code surfaces are already high-confidence opaque-name contexts. Preserve
+    # uncased scripts (`Lo`) here without admitting ordinary lowercase `Ll` prose.
+    has_named_script = any(
+        char.isupper() or unicodedata.category(char) in {"Lt", "Lo"}
         for char in text
     )
-    return has_upper_or_title and not text.casefold().startswith((
+    return has_named_script and not text.casefold().startswith((
         "last_", "asof", "review_", "provisional_", "evidence_", "state-",
     ))
 
@@ -548,6 +550,20 @@ def self_test() -> None:
         value == "Project Aurora" and kind == "project-or-deployment"
         for value, kind, _ in pseudo_heading
     ), pseudo_heading
+
+    # Strong opaque-name syntax must work for scripts without case as well as cased scripts.
+    for quoted_native in ("وزارة الداخلية", "東京都公安委員会"):
+        quoted_candidates = extract_candidates(f'"{quoted_native}"', empty_index, set(), "DNK")
+        assert any(
+            value == quoted_native and kind == "quoted-name"
+            for value, kind, _ in quoted_candidates
+        ), (quoted_native, quoted_candidates)
+        code_candidates = extract_candidates(f'`{quoted_native}`', empty_index, set(), "DNK")
+        assert any(
+            value == quoted_native and kind == "opaque-name"
+            for value, kind, _ in code_candidates
+        ), (quoted_native, code_candidates)
+    assert not looks_named_opaque("ordinary lowercase prose")
 
     cole_index = build_name_index(
         [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
