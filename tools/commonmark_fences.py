@@ -6,11 +6,12 @@ Identity auditors must not carry their own regex/state machine: fenced-code reco
 with other block constructs (notably raw HTML, indented code and block containers), so even a locally
 accurate fence grammar can be wrong in context.
 
-This module asks markdown-it-py's CommonMark parser which source ranges are actual ``fence`` tokens,
-then translates those parser line ranges into the exact 1-based indices produced by Python's
-``str.splitlines()``. That translation matters because ``splitlines()`` also separates Unicode line
-separators that CommonMark does not treat as source line endings; returning consumer-native indices
-prevents an earlier visible fragment from shifting the fence mask onto later prose.
+The audit pipeline has historically assembled prose with Python's ``str.splitlines()`` while
+markdown-it-py reports token maps in CommonMark source-line coordinates. Python recognizes several
+additional Unicode/control separators that CommonMark keeps inside the current source line. Rather
+than let different consumers reinterpret those characters differently, this module rejects them
+fail-closed. Accepted audit source therefore has one unambiguous line model: CRLF, CR and LF are the
+only source line endings, matching CommonMark token maps and every downstream ``splitlines()`` loop.
 """
 from __future__ import annotations
 
@@ -19,6 +20,38 @@ from typing import Any
 
 
 _PARSER: Any | None = None
+
+# str.splitlines() treats these characters as line boundaries, but CommonMark does not. Allowing
+# them would give parser token maps and downstream prose assemblers different structural line
+# models; repeated/adjacent separators can even manufacture an empty Python line and flush a
+# visible identity out of a paragraph. Reject the entire class instead of chasing compositions.
+_NON_COMMONMARK_LINE_SEPARATORS = {
+    "\x0b": "VT",
+    "\x0c": "FF",
+    "\x1c": "FS",
+    "\x1d": "GS",
+    "\x1e": "RS",
+    "\x85": "NEL",
+    "\u2028": "LINE SEPARATOR",
+    "\u2029": "PARAGRAPH SEPARATOR",
+}
+
+
+def validate_source_line_model(body: str) -> None:
+    """Reject source separators that disagree with CommonMark's CR/LF line model."""
+    found = sorted(
+        {
+            (ord(char), name)
+            for char, name in _NON_COMMONMARK_LINE_SEPARATORS.items()
+            if char in body
+        }
+    )
+    if found:
+        rendered = ", ".join(f"U+{codepoint:04X} {name}" for codepoint, name in found)
+        raise ValueError(
+            "unsupported non-CommonMark source line separator(s): "
+            f"{rendered}; use ordinary CR/LF line endings or visible whitespace"
+        )
 
 
 def parser() -> Any:
@@ -37,11 +70,11 @@ def parser() -> Any:
 def splitline_commonmark_numbers(body: str) -> list[int]:
     """Map each ``str.splitlines()`` element to its 1-based CommonMark source line.
 
-    Python recognizes several additional line boundaries (for example NEL, VT, FF, U+2028 and
-    U+2029) that CommonMark keeps inside the current source line. Consumers intentionally continue
-    to use ``splitlines()`` for prose assembly, so parser-derived ranges must be projected into that
-    indexing scheme instead of assuming the two notions of a line are identical.
+    ``validate_source_line_model`` guarantees that only CRLF, CR and LF may create source-line
+    boundaries, so Python and CommonMark advance in lockstep. The explicit mapping remains useful
+    as an executable invariant for consumers and regression tests.
     """
+    validate_source_line_model(body)
     commonmark_line = 1
     mapping: list[int] = []
     for raw in body.splitlines(keepends=True):
@@ -57,6 +90,9 @@ def splitline_commonmark_numbers(body: str) -> list[int]:
 
 def fenced_line_numbers(body: str) -> set[int]:
     """Return 1-based ``str.splitlines()`` indices belonging to actual CommonMark fence tokens."""
+    # Validate before parsing so every caller fails closed before it can assemble prose with a
+    # structurally different notion of a line.
+    validate_source_line_model(body)
     commonmark_hidden: set[int] = set()
     for token in parser().parse(body):
         if token.type != "fence" or token.map is None:
@@ -131,27 +167,32 @@ def self_test() -> None:
     unicode_tail = "```text\nhidden\n```\u00a0\nstill hidden\n```\nvisible"
     assert visible_lines(unicode_tail) == [(6, "visible")]
 
-    # Python's splitlines() recognizes boundaries that are not CommonMark source newlines. These
-    # fragments must remain mapped to the same CommonMark line so they cannot shift a later fence
-    # mask backwards onto visible identity prose. This is the adversarial review regression.
-    for separator in ("\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029"):
-        shifted = (
-            f"Research &{separator}Development Agency\n"
-            "```text\n"
-            "hidden\n"
-            "```\n"
-            "visible\n"
-        )
-        assert splitline_commonmark_numbers(shifted) == [1, 1, 2, 3, 4, 5], separator
-        assert fenced_line_numbers(shifted) == {3, 4, 5}, separator
-        assert visible_lines(shifted) == [
-            (1, "Research &"),
-            (2, "Development Agency"),
-            (6, "visible"),
-        ], separator
+    # Adversarial line-model regression: every separator that Python would split but CommonMark
+    # would retain inside a source line is rejected before any consumer can assemble prose. Cover
+    # both a single separator and the exact repeated-separator composition that previously created
+    # an artificial empty Python line and flushed the visible title.
+    for separator, name in _NON_COMMONMARK_LINE_SEPARATORS.items():
+        for injected in (separator, separator + separator, separator + "\n", "\n" + separator):
+            shifted = (
+                f"Research &{injected}Development Agency\n"
+                "```text\n"
+                "hidden\n"
+                "```\n"
+                "visible\n"
+            )
+            try:
+                fenced_line_numbers(shifted)
+            except ValueError as exc:
+                message = str(exc)
+                assert name in message and "non-CommonMark" in message, (separator, message)
+            else:
+                raise AssertionError((separator, injected, "non-CommonMark separator was accepted"))
 
-    # CRLF and bare CR are CommonMark source line endings and therefore advance parser line maps.
+    # Ordinary CRLF, bare CR and LF remain supported and advance CommonMark source lines exactly.
     assert splitline_commonmark_numbers("a\r\nb\rc\nd") == [1, 2, 3, 4]
+    crlf_fence = "visible\r\n```text\r\nhidden\r\n```\r\nafter"
+    assert fenced_line_numbers(crlf_fence) == {2, 3, 4}
+    assert visible_lines(crlf_fence) == [(1, "visible"), (5, "after")]
 
     # Review regression: raw HTML block precedence is resolved by CommonMark itself. The backticks
     # are literal <pre> content; the later Person/title prose remains visible and no fence exists.
