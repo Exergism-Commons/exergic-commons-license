@@ -62,21 +62,22 @@ SCOPE_ROLE_IDENTITY_RE = re.compile(
 
 
 def norm(text: str) -> str:
-    """Normalize identity text without erasing non-ASCII writing systems.
+    """Return one Unicode-safe canonical key for identity matching.
 
-    NFKC makes compatibility spellings comparable, casefold gives Unicode-aware case
-    normalization, combining marks are ignored rather than turned into token boundaries,
-    and every other non-alphanumeric character remains a separator as in the historical
-    ASCII-only normalizer. Arabic, Han and other uncased scripts therefore retain their
-    letters and can participate in the same State-scoped exact-name index.
+    NFKC makes compatibility spellings comparable and casefold supplies Unicode-aware case
+    normalization. Canonically equivalent decomposed/composed spellings are recomposed with
+    NFC after casefold. Combining marks are preserved because many writing systems encode
+    semantically meaningful vowels/letters with them; deleting the whole ``M*`` category can
+    collapse distinct legal names. U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE is mapped
+    narrowly before casefold so the repository's reviewed ``İdris``/``idris`` equivalence
+    remains stable without globally erasing marks. Non-word punctuation remains a separator.
     """
-    text = unicodedata.normalize("NFKC", text).casefold().replace("’", "'")
+    text = unicodedata.normalize("NFKC", text).replace("İ", "i")
+    text = unicodedata.normalize("NFC", text.casefold().replace("’", "'"))
     out: list[str] = []
     for char in text:
-        if char.isalnum():
+        if char.isalnum() or unicodedata.category(char).startswith("M"):
             out.append(char)
-        elif unicodedata.category(char).startswith("M"):
-            continue
         else:
             out.append(" ")
     return " ".join("".join(out).split())
@@ -488,7 +489,13 @@ def self_test() -> None:
     assert norm("أحمد منصور") == "أحمد منصور"
     assert norm("王小明") == "王小明"
     assert norm("İdris Baluken") == "idris baluken"
+    assert norm("I\u0307dris Baluken") == "idris baluken"
     assert norm("Jane-Doe") == "jane doe"
+    assert norm("École Agency") == norm("E\u0301cole Agency")
+    assert norm("कुमार Agency") == "कुमार agency"
+    assert norm("कमर Agency") == "कमर agency"
+    assert norm("कुमार Agency") != norm("कमर Agency")
+    assert norm("أَحمد منصور") != norm("احمد منصور")
     sample = [{
         "source": "x.yml", "state": "ABC", "field": "candidate_parties",
         "match_prefix": "Named Agency", "disposition": "deferred", "resolved_ids": [],
@@ -516,6 +523,10 @@ def self_test() -> None:
             "surface_forms": [{"text": "Media Commission", "normalized": "media commission", "acronym": False}],
         },
         {
+            "id": "AGENCY-AAA-KAMAR", "type": "Agency", "aliases": [norm("कमर Agency")],
+            "surface_forms": [{"text": "कमर Agency", "normalized": norm("कमर Agency"), "acronym": False}],
+        },
+        {
             "id": "ORG-GLOBAL", "type": "Organization", "aliases": ["global source"],
             "surface_forms": [{"text": "Global Source", "normalized": "global source", "acronym": False}],
         },
@@ -533,6 +544,7 @@ def self_test() -> None:
         {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "name": "National Police", "aliases": []},
         {"id": "AGENCY-AAA-FACA", "type": "Agency", "name": "Central Armed Forces", "aliases": ["FACA"]},
         {"id": "AGENCY-AAA-MEDIA-COMMISSION", "type": "Agency", "name": "Media Commission", "aliases": []},
+        {"id": "AGENCY-AAA-KAMAR", "type": "Agency", "name": "कमर Agency", "aliases": []},
         {"id": "ORG-GLOBAL", "type": "Organization", "name": "Global Source", "aliases": []},
         {"id": "PERSON-AAA-AHMAD-MANSOUR", "type": "Person", "name": "أحمد منصور", "aliases": []},
         {"id": "PERSON-AAA-WANG-XIAOMING", "type": "Person", "name": "王小明", "aliases": []},
@@ -541,6 +553,8 @@ def self_test() -> None:
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-NATIONAL-POLICE"]
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "CCC") == []
     assert heuristic_resolve("Global Source", synthetic, idx, "actor", "AAA") == ["ORG-GLOBAL"]
+    assert heuristic_resolve("कमर Agency", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-KAMAR"]
+    assert heuristic_resolve("कुमार Agency", synthetic, idx, "actor", "AAA") == []
     assert heuristic_resolve("أحمد منصور", synthetic, idx, "actor", "AAA") == ["PERSON-AAA-AHMAD-MANSOUR"]
     assert heuristic_resolve("王小明", synthetic, idx, "actor", "AAA") == ["PERSON-AAA-WANG-XIAOMING"]
     assert heuristic_resolve("أحمد منصور", synthetic, idx, "actor", "BBB") == []
