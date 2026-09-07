@@ -6,12 +6,13 @@ Identity auditors must not carry their own regex/state machine: fenced-code reco
 with other block constructs (notably raw HTML, indented code and block containers), so even a locally
 accurate fence grammar can be wrong in context.
 
-The audit pipeline has historically assembled prose with Python's ``str.splitlines()`` while
-markdown-it-py reports token maps in CommonMark source-line coordinates. Python recognizes several
-additional Unicode/control separators that CommonMark keeps inside the current source line. Rather
-than let different consumers reinterpret those characters differently, this module rejects them
-fail-closed. Accepted audit source therefore has one unambiguous line model: CRLF, CR and LF are the
-only source line endings, matching CommonMark token maps and every downstream ``splitlines()`` loop.
+The audit pipeline has historically assembled prose with Python's ``str.splitlines()`` and
+``str.strip()`` while markdown-it-py applies CommonMark source-line and blank-line semantics. Python
+recognizes extra line separators and also treats several extra Unicode/control characters as
+whitespace-only lines that CommonMark keeps inside the current paragraph. Rather than let consumers
+reinterpret either class differently, this module rejects both discrepancies fail-closed. Accepted
+audit source therefore has one unambiguous structural line model: CRLF, CR and LF are the only source
+line endings, and only ASCII space/tab may make a non-empty source line structurally blank.
 """
 from __future__ import annotations
 
@@ -36,9 +37,34 @@ _NON_COMMONMARK_LINE_SEPARATORS = {
     "\u2029": "PARAGRAPH SEPARATOR",
 }
 
+# Python's strip()/isspace() classify these as whitespace, while CommonMark blank lines are made
+# only from spaces and tabs. A line containing only one of these remains paragraph content to
+# CommonMark but historically caused Python prose assemblers to flush the paragraph. Keep the
+# explicit runtime set as regression documentation; validation below is predicate-based so a future
+# Python Unicode-table addition fails closed too instead of silently creating a new bypass class.
+_PYTHON_ONLY_BLANK_WHITESPACE = (
+    "\x1f",
+    "\u00a0",
+    "\u1680",
+    "\u2000",
+    "\u2001",
+    "\u2002",
+    "\u2003",
+    "\u2004",
+    "\u2005",
+    "\u2006",
+    "\u2007",
+    "\u2008",
+    "\u2009",
+    "\u200a",
+    "\u202f",
+    "\u205f",
+    "\u3000",
+)
+
 
 def validate_source_line_model(body: str) -> None:
-    """Reject source separators that disagree with CommonMark's CR/LF line model."""
+    """Reject source constructs for which Python and CommonMark disagree structurally."""
     found = sorted(
         {
             (ord(char), name)
@@ -51,6 +77,23 @@ def validate_source_line_model(body: str) -> None:
         raise ValueError(
             "unsupported non-CommonMark source line separator(s): "
             f"{rendered}; use ordinary CR/LF line endings or visible whitespace"
+        )
+
+    # CommonMark defines a blank line using ASCII space/tab. Python's strip() removes a larger
+    # Unicode whitespace class. All downstream assemblers use strip() for structural blank checks,
+    # so reject only the dangerous composition: a non-empty physical line that Python would erase
+    # completely but CommonMark would retain as paragraph content. Unicode whitespace remains legal
+    # inside any line that also contains visible content.
+    for line_no, raw in enumerate(body.splitlines(), 1):
+        if not raw or raw.strip():
+            continue
+        unexpected = sorted({ord(char) for char in raw if char not in " \t"})
+        if not unexpected:
+            continue
+        rendered = ", ".join(f"U+{codepoint:04X}" for codepoint in unexpected)
+        raise ValueError(
+            "unsupported Python-only blank source line "
+            f"{line_no} containing {rendered}; use ASCII space/tab for blank lines or add visible content"
         )
 
 
@@ -161,11 +204,13 @@ def self_test() -> None:
     assert visible_lines(tab_close) == [(6, "visible")]
     assert visible_lines("```text\nhidden\n   ```\nvisible") == [(4, "visible")]
 
-    # Arbitrary or Unicode trailing content does not silently become a valid closer.
+    # Arbitrary or Unicode trailing content does not silently become a valid closer. NBSP is legal
+    # when the physical line also contains visible content; only Python-only blank lines are banned.
     trailing = "```text\nhidden\n``` trailing\nstill hidden\n```\nvisible"
     assert visible_lines(trailing) == [(6, "visible")]
     unicode_tail = "```text\nhidden\n```\u00a0\nstill hidden\n```\nvisible"
     assert visible_lines(unicode_tail) == [(6, "visible")]
+    assert visible_lines("Research\u00a0& Development Agency") == [(1, "Research\u00a0& Development Agency")]
 
     # Adversarial line-model regression: every separator that Python would split but CommonMark
     # would retain inside a source line is rejected before any consumer can assemble prose. Cover
@@ -187,6 +232,47 @@ def self_test() -> None:
                 assert name in message and "non-CommonMark" in message, (separator, message)
             else:
                 raise AssertionError((separator, injected, "non-CommonMark separator was accepted"))
+
+    # Adversarial blank-line regression: Python strips a larger Unicode whitespace class than
+    # CommonMark recognizes as a blank line. Each of these used to split one CommonMark paragraph
+    # into two Python prose blocks and could hide a complete cross-line identity.
+    for whitespace in _PYTHON_ONLY_BLANK_WHITESPACE:
+        shifted = f"Research &\n{whitespace}\nDevelopment Agency\n"
+        try:
+            fenced_line_numbers(shifted)
+        except ValueError as exc:
+            message = str(exc)
+            assert "Python-only blank" in message and f"U+{ord(whitespace):04X}" in message, (
+                whitespace,
+                message,
+            )
+        else:
+            raise AssertionError((whitespace, "Python-only blank source line was accepted"))
+
+        # Mixed ASCII space/tab plus the same character is the same structural mismatch.
+        mixed_blank = f"Research &\n \t{whitespace}\t \nDevelopment Agency\n"
+        try:
+            fenced_line_numbers(mixed_blank)
+        except ValueError as exc:
+            assert "Python-only blank" in str(exc), (whitespace, str(exc))
+        else:
+            raise AssertionError((whitespace, "mixed Python-only blank source line was accepted"))
+
+    # Pin the current Python whitespace table so a runtime Unicode change cannot silently extend
+    # strip()'s structural blank class without an explicit regression update.
+    current_python_only_blank = tuple(
+        chr(codepoint)
+        for codepoint in range(0x110000)
+        if chr(codepoint).isspace()
+        and chr(codepoint) not in " \t\r\n"
+        and chr(codepoint) not in _NON_COMMONMARK_LINE_SEPARATORS
+    )
+    assert current_python_only_blank == _PYTHON_ONLY_BLANK_WHITESPACE, current_python_only_blank
+
+    # Ordinary CommonMark blanks made only from ASCII spaces/tabs remain supported.
+    ascii_blank = "before\n \t \nafter"
+    assert fenced_line_numbers(ascii_blank) == set()
+    assert visible_lines(ascii_blank) == [(1, "before"), (2, " \t "), (3, "after")]
 
     # Ordinary CRLF, bare CR and LF remain supported and advance CommonMark source lines exactly.
     assert splitline_commonmark_numbers("a\r\nb\rc\nd") == [1, 2, 3, 4]
