@@ -101,11 +101,9 @@ def distinct_concept_coordination(value: str) -> bool:
     return False
 
 
-def overflow_title_surfaces(text: str) -> list[tuple[str, str]]:
-    """Reconstruct classified title runs that continue after a nine-token baseline match."""
-    text = " ".join(text.split())
+def _overflow_title_surfaces_once(text: str) -> list[tuple[str, str]]:
+    """Reconstruct overflow titles for one interpretation of the input text."""
     out: list[tuple[str, str]] = []
-    seen: set[tuple[str, str]] = set()
     for match in base.TITLE_RE.finditer(text):
         raw_baseline = match.group(0)
         baseline = base.clean_candidate(raw_baseline)
@@ -126,11 +124,42 @@ def overflow_title_surfaces(text: str) -> list[tuple[str, str]]:
         kind = base.classify(full)
         if kind is None or not base.plausible(full):
             continue
-        marker = (base.norm(full), kind)
-        if marker in seen:
-            continue
-        seen.add(marker)
         out.append((full, kind))
+    return out
+
+
+def _post_dotted_views(text: str) -> list[str]:
+    """Return complete remaining text from every ambiguous dotted-token boundary in a title match."""
+    views: list[str] = []
+    for match in base.TITLE_RE.finditer(text):
+        matched = match.group(0)
+        for boundary in base.AMBIGUOUS_DOTTED_BOUNDARY_RE.finditer(matched):
+            views.append(matched[boundary.end():] + text[match.end():])
+    return views
+
+
+def overflow_title_surfaces(text: str) -> list[tuple[str, str]]:
+    """Reconstruct long titles for the complete and every ambiguous post-period reading."""
+    normalized_text = " ".join(text.split())
+    pending = [normalized_text]
+    seen_views: set[str] = set()
+    seen_surfaces: set[tuple[str, str]] = set()
+    out: list[tuple[str, str]] = []
+
+    while pending:
+        view = pending.pop()
+        if not view or view in seen_views:
+            continue
+        seen_views.add(view)
+        for candidate, kind in _overflow_title_surfaces_once(view):
+            marker = (base.norm(candidate), kind)
+            if marker in seen_surfaces:
+                continue
+            seen_surfaces.add(marker)
+            out.append((candidate, kind))
+        for suffix_view in _post_dotted_views(view):
+            if suffix_view and suffix_view not in seen_views:
+                pending.append(suffix_view)
     return out
 
 
@@ -290,6 +319,17 @@ def self_test() -> None:
     tail_period = overflow_title_surfaces(tail_period_text)
     assert tail_period, tail_period
     assert all("Inhuman" not in value and "." not in value for value, _ in tail_period), tail_period
+
+    # A dotted token inside the nine-token baseline is byte-for-byte ambiguous with a sentence
+    # ending. Reconstruct and audit both the complete long reading and the complete long suffix;
+    # auditing only the suffix's first nine tokens would recreate the historical ceiling bypass.
+    dotted_long_suffix = (
+        "National Commission for the Prevention of Torture and Other Cruel Agency"
+    )
+    dotted_long_full = "Acme Inc. " + dotted_long_suffix
+    dotted_long = overflow_title_surfaces(dotted_long_full)
+    assert (dotted_long_full, "actor-or-institution") in dotted_long, dotted_long
+    assert (dotted_long_suffix, "actor-or-institution") in dotted_long, dotted_long
 
     print("State dossier long-title coverage self-test: OK")
 
