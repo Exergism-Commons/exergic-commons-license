@@ -21,9 +21,9 @@ import audit_state_dossier_entities as base
 import check_state_dossier_ampersand_title_coverage as amp
 import check_state_dossier_rendered_markup_coverage as markup
 import check_state_dossier_softwrap_coverage as softwrap
+import commonmark_fences as fences
 
 
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 BACKSLASH_ESCAPE_RE = re.compile(r"\\([!\"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])")
 
 
@@ -101,19 +101,14 @@ def audit() -> list[dict]:
 
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
-        fence_marker: str | None = None
+        hidden_lines = fences.fenced_line_numbers(body)
+
         for rel_line, raw in enumerate(body.splitlines(), 1):
-            fence = FENCE_RE.match(raw)
-            if fence:
-                marker = fence.group(1)[0]
-                if fence_marker is None:
-                    fence_marker = marker
-                elif marker == fence_marker:
-                    fence_marker = None
+            if rel_line in hidden_lines or not raw.strip():
                 continue
-            if fence_marker is not None or not raw.strip():
-                continue
-            if raw.lstrip().startswith("# "):
+            if raw.startswith("# "):
+                # Only the canonical literal H1 is excluded. Python lstrip() would turn
+                # NBSP-prefixed visible prose into a fake ATX heading under a different grammar.
                 continue
             inspect(
                 state=state,
@@ -124,8 +119,9 @@ def audit() -> list[dict]:
             )
 
         # Assemble complete prose blocks before rendering so an escaped ampersand or adjacent
-        # markup split by a source soft-wrap cannot form a second bypass class.
-        for block in softwrap.prose_blocks(body):
+        # markup split by a source soft-wrap cannot form a second bypass class. The block assembler
+        # consumes the same parser-derived hidden-line set; it never gets to reinterpret fences.
+        for block in softwrap.prose_blocks(body, hidden_lines=hidden_lines):
             raw_lines = [line for line in block["raw_lines"] if line]
             if not raw_lines:
                 continue
@@ -142,6 +138,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     escaped = commonmark_ampersand_surfaces(r"Research \& Development Agency reported findings")
     assert ("Research & Development Agency", "actor-or-institution") in escaped, escaped
 
@@ -157,6 +154,16 @@ def self_test() -> None:
     # Backslash escapes are literal inside code spans. Do not turn this into an ampersand title.
     literal_code = commonmark_ampersand_surfaces(r"`Research \& Development Agency`")
     assert literal_code == [], literal_code
+
+    # NBSP-prefixed backticks and '# ' are visible CommonMark paragraph text. A local \s fence
+    # state plus lstrip()-heading skip used to hide the complete escaped identity on line two.
+    pseudo_structure = "\u00a0```text\n\u00a0# Research \\& Development Agency\n"
+    hidden = fences.fenced_line_numbers(pseudo_structure)
+    assert hidden == set(), hidden
+    pseudo_line = pseudo_structure.splitlines()[1]
+    assert not pseudo_line.startswith("# ")
+    pseudo = commonmark_ampersand_surfaces(pseudo_line)
+    assert ("Research & Development Agency", "actor-or-institution") in pseudo, pseudo
 
     print("State dossier CommonMark escape coverage self-test: OK")
 
