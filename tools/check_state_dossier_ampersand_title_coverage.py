@@ -22,7 +22,9 @@ import audit_state_dossier_entities as base
 from entity_identity_resolution import build_name_index
 
 
-TITLE_WORD = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ0-9.'’/-]*|[A-ZÀ-ÖØ-Þ]{2,})"
+# Standalone-ampersand reconstruction owns only the separator semantics. Title words use the
+# exact same Unicode Lu/Lt/Lo + mark-continuation contract as the broad dossier extractor.
+TITLE_WORD = base.TITLE_WORD_PATTERN
 TITLE_CONNECTOR = r"(?:of|the|and|for|de|del|la|le|des|da|di|van|von)"
 TITLE_SIDE = rf"{TITLE_WORD}(?:\s+(?:{TITLE_CONNECTOR}|{TITLE_WORD})){{0,8}}"
 AMPERSAND = r"(?:&|＆)"
@@ -244,6 +246,17 @@ def self_test() -> None:
     assert ("Research & Development Agency", "actor-or-institution") in softwrap, softwrap
     fullwidth = ampersand_title_surfaces("Research ＆ Development Agency")
     assert ("Research ＆ Development Agency", "actor-or-institution") in fullwidth, fullwidth
+    unicode_surface = ampersand_title_surfaces("École & Łódź Metropolitan Police")
+    assert ("École & Łódź Metropolitan Police", "actor-or-institution") in unicode_surface, unicode_surface
+    decomposed_surface = ampersand_title_surfaces("E\u0301cole & Łódź Metropolitan Police")
+    assert (
+        "E\u0301cole & Łódź Metropolitan Police",
+        "actor-or-institution",
+    ) in decomposed_surface, decomposed_surface
+    uncased_surface = ampersand_title_surfaces("東京 Research & Development Agency")
+    assert ("東京 Research & Development Agency", "actor-or-institution") in uncased_surface, uncased_surface
+    arabic_surface = ampersand_title_surfaces("وزارة Research & Development Agency")
+    assert ("وزارة Research & Development Agency", "actor-or-institution") in arabic_surface, arabic_surface
     html_amp = ampersand_title_surfaces(rendered.visible_prose("Research &amp; Development Agency"))
     assert any(value == "Research & Development Agency" for value, _ in html_amp), html_amp
     emphasized = ampersand_title_surfaces(rendered.visible_prose("Research **&** Development Agency"))
