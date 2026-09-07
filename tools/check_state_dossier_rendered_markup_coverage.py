@@ -57,8 +57,11 @@ def lower_heading_text(raw: str) -> str | None:
 
 def title_candidates(text: str) -> dict[str, tuple[str, str]]:
     result: dict[str, tuple[str, str]] = {}
-    for match in base.TITLE_RE.finditer(text):
-        value = base.clean_candidate(match.group(0))
+    # Consume the same overlapping dotted-boundary readings as the broad audit. Rendered markup
+    # must not recreate a path where `Inc.`/`St.` can absorb a sentence-final period and suppress
+    # an independently classifiable title that only becomes contiguous after rendering.
+    for raw_value in base.title_candidate_surfaces(text):
+        value = base.clean_candidate(raw_value)
         kind = base.classify(value)
         if kind and base.plausible(value):
             result.setdefault(base.norm(value), (value, kind))
@@ -235,6 +238,12 @@ def self_test() -> None:
         == "National Cyber Crime Investigation Agency"
     )
     assert rendered_only_candidates("Australian Human Rights Commission reported findings") == []
+
+    # The suffix is deliberately split by markup in source and becomes contiguous only after
+    # rendering. Both the full dotted reading and the post-period title must survive rendering.
+    dotted_markup = rendered_only_candidates("Acme Inc. R**ights Agency**")
+    assert any(candidate == "Acme Inc. Rights Agency" for _, candidate, _ in dotted_markup), dotted_markup
+    assert any(candidate == "Rights Agency" for _, candidate, _ in dotted_markup), dotted_markup
 
     index = build_name_index(
         [
