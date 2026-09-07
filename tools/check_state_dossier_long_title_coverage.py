@@ -31,6 +31,7 @@ TITLE_CONNECTOR = r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da
 TITLE_TOKEN = rf"(?:{TITLE_CONNECTOR}|{TITLE_WORD})"
 OVERFLOW_RE = re.compile(rf"(?P<tail>(?:\s+{TITLE_TOKEN})+)")
 DISTINCT_COORDINATION_RE = re.compile(r"\band\s+the\s+", re.I)
+TRAILING_TITLE_PUNCTUATION = frozenset("&.'’/-")
 
 
 def strict_json(path):
@@ -100,8 +101,15 @@ def overflow_title_surfaces(text: str) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     seen: set[tuple[str, str]] = set()
     for match in base.TITLE_RE.finditer(text):
-        baseline = base.clean_candidate(match.group(0))
+        raw_baseline = match.group(0)
+        baseline = base.clean_candidate(raw_baseline)
         if len(baseline.split()) < 9:
+            continue
+        # The historical baseline ended at a word boundary. The Unicode-aware baseline accepts
+        # the same punctuation inside title tokens but can consume a final non-word punctuation
+        # mark before whitespace. Do not reinterpret text after such punctuation as title
+        # continuation: preserve the old sentence/token boundary semantics exactly.
+        if raw_baseline and raw_baseline[-1] in TRAILING_TITLE_PUNCTUATION:
             continue
         continuation = OVERFLOW_RE.match(text, match.end())
         if continuation is None:
