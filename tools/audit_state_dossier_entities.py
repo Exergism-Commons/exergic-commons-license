@@ -106,6 +106,12 @@ TITLE_RE = re.compile(
     rf"(?<!\w){TITLE_WORD_PATTERN}"
     rf"(?:\s+(?:of|the|and|for|de|del|la|le|des|{TITLE_WORD_PATTERN})){{0,8}}(?!\w)"
 )
+# A dotted acronym/abbreviation may be internal to one identity (`St. Louis Police`) or may also
+# carry the sentence-final period (`Acme Inc. Rights Agency`). Regex tokenization cannot infer that
+# linguistic role from the same source bytes. Preserve the complete reading, but independently
+# audit any classifiable title beginning after a dotted token so a reviewed/materialized glued
+# reading can never hide a distinct identity at the start of the following sentence.
+AMBIGUOUS_DOTTED_BOUNDARY_RE = re.compile(rf"\.\s+(?={TITLE_WORD_PATTERN})")
 ACRONYM_RE = re.compile(r"\b[A-Z][A-Z0-9-]{2,14}\b")
 URL_RE = re.compile(r"https?://\S+")
 MD_LINK_RE = re.compile(r"\[([^\]]+)\]\([^\)]+\)")
@@ -117,6 +123,18 @@ PATHISH_RE = re.compile(r"(?:^\.?\.?/|[/\\]|\.(?:md|yml|yaml|json|ttl|rq|py)$)",
 def clean_candidate(text: str) -> str:
     text = text.strip(" \t\r\n.,;:()[]{}<>*_#'\"")
     return re.sub(r"\s+", " ", text)
+
+
+def title_candidate_surfaces(text: str) -> Iterable[str]:
+    """Yield ordinary title matches plus overlapping post-dotted-token readings."""
+    for match in TITLE_RE.finditer(text):
+        matched = match.group(0)
+        yield matched
+        for boundary in AMBIGUOUS_DOTTED_BOUNDARY_RE.finditer(matched):
+            suffix = matched[boundary.end():]
+            suffix_match = TITLE_RE.match(suffix)
+            if suffix_match is not None:
+                yield suffix_match.group(0)
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, object], int]:
@@ -260,8 +278,8 @@ def extract_candidates(
         value = clean_candidate(match.group(1))
         if looks_named_opaque(value):
             extracted.append((value, "quoted-name", resolve_name(identity_index, state, value)))
-    for match in TITLE_RE.finditer(line):
-        value = clean_candidate(match.group(0))
+    for raw_value in title_candidate_surfaces(line):
+        value = clean_candidate(raw_value)
         kind = classify(value)
         if kind and plausible(value):
             extracted.append((value, kind, resolve_name(identity_index, state, value)))
@@ -594,6 +612,24 @@ def self_test() -> None:
             dotted_title,
             dotted_candidates,
         )
+
+    # A dotted token can itself carry the period ending the previous sentence. Because that is
+    # byte-for-byte ambiguous with an internal abbreviation, audit both readings rather than
+    # letting a reviewed complete title suppress a valid post-period identity.
+    ambiguous_dotted = extract_candidates("Acme Inc. Rights Agency", empty_index, set(), "DNK")
+    assert any(
+        value == "Acme Inc. Rights Agency" and kind == "actor-or-institution"
+        for value, kind, _ in ambiguous_dotted
+    ), ambiguous_dotted
+    assert any(
+        value == "Rights Agency" and kind == "actor-or-institution"
+        for value, kind, _ in ambiguous_dotted
+    ), ambiguous_dotted
+    us_dotted = extract_candidates("U.S. Department of Justice", empty_index, set(), "DNK")
+    assert any(
+        value == "Department of Justice" and kind == "actor-or-institution"
+        for value, kind, _ in us_dotted
+    ), us_dotted
 
     cole_index = build_name_index(
         [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
