@@ -1,0 +1,27 @@
+name: Temporary diagnose PR 256 supersessions
+
+on:
+  push:
+    branches:
+      - agent/canonical-entity-dossiers-main-integration
+    paths:
+      - '.github/workflows/temp-diagnose-supersessions.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Locate superseded identity materializations and references
+        run: |
+          set -euo pipefail
+          for id in AGENCY-LSO-LCS AGENCY-PHL-MPD AGENCY-PHL-PNP AGENCY-SSD-NSS; do
+            echo "===== ${id} ====="
+            git grep -n -F "${id}" -- . ':(exclude)knowledge/generated/entity-id-supersessions-v1.json' || true
+            echo
+          done
