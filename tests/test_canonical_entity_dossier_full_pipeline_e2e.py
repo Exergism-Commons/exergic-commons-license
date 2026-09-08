@@ -112,6 +112,11 @@ class CanonicalV50FullPipelineTests(unittest.TestCase):
             self.git(root, "add", "knowledge/entities", "knowledge/generated", "dossiers/states")
             self.git(root, "commit", "-q", "-m", "v49 base")
             base = self.git(root, "rev-parse", "HEAD")
+            existing_versions = [
+                int(path.stem.rsplit("v", 1)[1])
+                for path in (root / "knowledge/generated").glob("canonical-entity-dossier-migration-v*.json")
+            ]
+            fixture_version = max(existing_versions, default=49) + 1
 
             state, state_context = self.choose_state(root)
             entity_id = "DEPLOYMENT-E2E-V50"
@@ -146,7 +151,7 @@ entity_type: deployment
 jurisdiction: {state}
 evidence_cutoff: 2026-08-20
 last_reviewed: 2026-08-20
-review_stage: canonical-entity-dossier-v50-e2e
+review_stage: canonical-entity-dossier-v{fixture_version}-e2e
 operative: false
 ---
 # {name}
@@ -193,7 +198,7 @@ The fixture is identity-only. State context is provenance and must not be inheri
             )
 
             manifest = {
-                "version": 50,
+                "version": fixture_version,
                 "date": "2026-08-20",
                 "purpose": "Full-pipeline atomic post-v49 Deployment regression fixture.",
                 "migrationRule": "Identity arrives atomically with its dedicated dossier; no governance inference.",
@@ -224,7 +229,7 @@ The fixture is identity-only. State context is provenance and must not be inheri
             manifest_path = (
                 root
                 / "knowledge/generated"
-                / "canonical-entity-dossier-migration-v50.json"
+                / f"canonical-entity-dossier-migration-v{fixture_version}.json"
             )
             manifest_path.write_text(
                 json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
