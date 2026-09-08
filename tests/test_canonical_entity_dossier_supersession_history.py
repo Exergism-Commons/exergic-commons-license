@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
@@ -56,7 +57,9 @@ class CanonicalHistoricalSupersessionTests(unittest.TestCase):
 
     def test_coverage_loader_rejects_self_and_duplicate_sources(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "supersessions.json"
+            root = Path(tmp)
+            path = root / "knowledge/generated/entity-id-supersessions-v1.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(
                 json.dumps(
                     {
@@ -69,7 +72,8 @@ class CanonicalHistoricalSupersessionTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            mapping, errors = coverage.checker.load_supersessions(path)
+            with mock.patch.object(coverage.checker, "ROOT", root):
+                mapping, errors = coverage.checker.load_supersessions(path)
             self.assertEqual(mapping, {"ORG-B": "ORG-C"})
             self.assertTrue(any("self-supersession" in error for error in errors), errors)
             self.assertTrue(any("duplicate supersession source ORG-B" in error for error in errors), errors)
