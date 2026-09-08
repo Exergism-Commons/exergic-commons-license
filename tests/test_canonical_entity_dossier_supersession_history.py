@@ -152,6 +152,25 @@ class CanonicalHistoricalSupersessionTests(unittest.TestCase):
                 )
         self.assertEqual(errors, [])
 
+    def test_canonical_checker_reports_missing_supersession_target_without_nameerror(self) -> None:
+        mapping, errors = coverage.checker.load_supersessions()
+        self.assertEqual(errors, [])
+        invalid_mapping = dict(mapping)
+        invalid_mapping["ORG-TEST-MISSING-SOURCE"] = "ORG-TEST-MISSING-TARGET"
+        with mock.patch.object(
+            coverage.checker, "load_supersessions", return_value=(invalid_mapping, [])
+        ), mock.patch.object(
+            sys, "argv", ["check_canonical_entity_dossiers.py"]
+        ), mock.patch("builtins.print") as output:
+            return_code = coverage.checker.main()
+        self.assertEqual(return_code, 1)
+        rendered = "\n".join(str(call.args[0]) for call in output.call_args_list if call.args)
+        self.assertIn(
+            "knowledge/generated/entity-id-supersessions-v*.json: supersession target is not a current ABox identity: "
+            "ORG-TEST-MISSING-SOURCE -> ORG-TEST-MISSING-TARGET",
+            rendered,
+        )
+
     def test_baseline_preservation_accepts_authoritative_source_removal(self) -> None:
         before = {"id": "ORG-OLD", "iri": "ecl:ORG-OLD", "type": "Organization"}
         target = {"id": "ORG-NEW", "iri": "ecl:ORG-NEW", "type": "Organization"}
