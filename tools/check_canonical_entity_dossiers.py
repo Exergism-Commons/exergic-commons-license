@@ -19,6 +19,7 @@ DEFAULT_MANIFEST_DIR = ROOT / "knowledge/generated"
 DEFAULT_PALETTE = ROOT / "knowledge/generated/dossier-visual-palette-v1.json"
 EVIDENCE_IMAGE_DIR = ROOT / "dossiers/evidence-images"
 SUPERSESSIONS_DIR = ROOT / "knowledge/generated"
+SUPERSESSIONS_PATH = SUPERSESSIONS_DIR / identity_resolution.SUPERSESSION_GLOB
 TYPE_DIR = {"Agency":"agencies","Institution":"institutions","Organization":"organizations","Person":"persons","Project":"projects"}
 EXPECTED_PALETTE = {"R":"#B42318","S":"#E67E22","U":"#D4A017","N":"#2E7D32","UNKNOWN":"#667085"}
 VALID_ENTITY_STATE_CONTEXTS = {"R", "S", "U", "N"}
