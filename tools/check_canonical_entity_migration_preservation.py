@@ -21,6 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_REL_DIR = Path("knowledge/generated")
 ENTITY_REL_DIR = Path("knowledge/entities")
+SUPERSESSIONS_REL = Path("knowledge/generated/entity-id-supersessions-v1.json")
 ALLOWED_CHANGED_FIELDS = {"dossier"}
 MANIFEST_RE = re.compile(r"^knowledge/generated/canonical-entity-dossier-migration-v(\d+)\.json$")
 FROZEN_FINAL_VERSION = 49
@@ -37,6 +38,33 @@ _MISSING = object()
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+
+
+def current_supersession_map(root: Path = ROOT) -> dict[str, str]:
+    """Return direct current supersessions; chains/dangling targets fail closed in callers."""
+    path = root / SUPERSESSIONS_REL
+    if not path.is_file():
+        return {}
+    payload = load_json(path)
+    rows = payload.get("supersessions")
+    if not isinstance(rows, list):
+        raise RuntimeError(f"{SUPERSESSIONS_REL}: supersessions must be a list")
+    mapping: dict[str, str] = {}
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise RuntimeError(f"{SUPERSESSIONS_REL}: supersession row {index} must be an object")
+        source, target = row.get("from"), row.get("to")
+        if not isinstance(source, str) or not source or not isinstance(target, str) or not target:
+            raise RuntimeError(f"{SUPERSESSIONS_REL}: supersession row {index} requires non-empty from/to ids")
+        if source == target or source in mapping:
+            raise RuntimeError(f"{SUPERSESSIONS_REL}: invalid/duplicate supersession source {source!r}")
+        mapping[source] = target
+    for source, target in mapping.items():
+        if target in mapping:
+            raise RuntimeError(f"{SUPERSESSIONS_REL}: supersession must resolve in one hop: {source} -> {target}")
+    return mapping
 
 
 def git_show(ref: str, rel: str, root: Path = ROOT) -> str | None:
@@ -177,6 +205,7 @@ def validate(base_ref: str, root: Path = ROOT) -> tuple[list[str], dict[str, int
         historical_ids = base_migrated_ids(base_ref, root)
         current_entities = current_entity_index(root)
         base_entities = base_entity_index(base_ref, root)
+        supersessions = current_supersession_map(root)
     except (RuntimeError, json.JSONDecodeError) as exc:
         return [str(exc)], {"newlyMigrated": 0, "atomicNew": 0, "manifestlessNew": 0}
 
@@ -205,11 +234,25 @@ def validate(base_ref: str, root: Path = ROOT) -> tuple[list[str], dict[str, int
             if entity_id in historical_ids:
                 continue
 
-            newly_migrated.add(entity_id)
             current_entry = current_entities.get(entity_id)
             if current_entry is None:
+                target_id = supersessions.get(entity_id)
+                if version <= FROZEN_FINAL_VERSION and target_id is not None:
+                    current_target = current_entities.get(target_id)
+                    base_target = base_entities.get(target_id)
+                    if current_target is None:
+                        errors.append(f"{entity_id}: supersession target {target_id} is missing from current ABox")
+                    elif base_target is None:
+                        errors.append(
+                            f"{entity_id}: historical supersession target {target_id} did not exist at comparison base {base_ref}"
+                        )
+                    elif current_target[0].get("type") != row.get("type") or base_target[0].get("type") != row.get("type"):
+                        errors.append(f"{entity_id}: supersession target {target_id} does not preserve manifest type {row.get('type')!r}")
+                    continue
+                newly_migrated.add(entity_id)
                 errors.append(f"{entity_id}: current ABox entity file is missing (.json/.jsonld)")
                 continue
+            newly_migrated.add(entity_id)
             after, after_rel = current_entry
             before_entry = base_entities.get(entity_id)
 

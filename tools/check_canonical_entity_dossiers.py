@@ -16,6 +16,7 @@ ENTITY_DIR = ROOT / "knowledge/entities"
 DEFAULT_MANIFEST_DIR = ROOT / "knowledge/generated"
 DEFAULT_PALETTE = ROOT / "knowledge/generated/dossier-visual-palette-v1.json"
 EVIDENCE_IMAGE_DIR = ROOT / "dossiers/evidence-images"
+SUPERSESSIONS_PATH = ROOT / "knowledge/generated/entity-id-supersessions-v1.json"
 TYPE_DIR = {"Agency":"agencies","Institution":"institutions","Organization":"organizations","Person":"persons","Project":"projects"}
 EXPECTED_PALETTE = {"R":"#B42318","S":"#E67E22","U":"#D4A017","N":"#2E7D32","UNKNOWN":"#667085"}
 VALID_ENTITY_STATE_CONTEXTS = {"R", "S", "U", "N"}
@@ -35,6 +36,39 @@ HTML_IMAGE_RE = re.compile(
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+
+
+def load_supersessions(path: Path = SUPERSESSIONS_PATH) -> tuple[dict[str, str], list[str]]:
+    """Load direct identity supersessions used to reconcile immutable historical manifests."""
+    if not path.is_file():
+        return {}, []
+    try:
+        payload = load_json(path)
+    except (OSError, json.JSONDecodeError) as exc:
+        return {}, [f"{path.relative_to(ROOT)}: cannot load supersessions: {exc}"]
+    rows = payload.get("supersessions")
+    if not isinstance(rows, list):
+        return {}, [f"{path.relative_to(ROOT)}: supersessions must be a list"]
+    mapping: dict[str, str] = {}
+    errors: list[str] = []
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            errors.append(f"{path.relative_to(ROOT)}: supersession row {index} must be an object")
+            continue
+        source, target = row.get("from"), row.get("to")
+        if not isinstance(source, str) or not source or not isinstance(target, str) or not target:
+            errors.append(f"{path.relative_to(ROOT)}: supersession row {index} requires non-empty from/to ids")
+            continue
+        if source == target:
+            errors.append(f"{path.relative_to(ROOT)}: self-supersession is forbidden for {source}")
+            continue
+        if source in mapping:
+            errors.append(f"{path.relative_to(ROOT)}: duplicate supersession source {source}")
+            continue
+        mapping[source] = target
+    return mapping, errors
 
 
 def manifest_paths(manifest_dir: Path) -> list[Path]:
@@ -305,6 +339,13 @@ def main() -> int:
             stats["missing"] += 1
     if len(missing) > max_missing:
         errors.append(f"dedicated-dossier ratchet regressed: {len(missing)} missing > allowed {max_missing}")
+    supersessions, supersession_errors = load_supersessions()
+    errors.extend(supersession_errors)
+    for source, target in sorted(supersessions.items()):
+        if target in supersessions:
+            errors.append(f"{SUPERSESSIONS_PATH.relative_to(ROOT)}: supersession must resolve in one hop: {source} -> {target}")
+        if target not in entities:
+            errors.append(f"{SUPERSESSIONS_PATH.relative_to(ROOT)}: supersession target is not a current ABox identity: {source} -> {target}")
     migrated_ids: set[str] = set()
     for path, manifest in zip(paths, manifests):
         rows = manifest.get("entities")
@@ -317,22 +358,50 @@ def main() -> int:
                 errors.append(f"{path.relative_to(ROOT)}: duplicate migrated entity across manifests: {entity_id}")
                 continue
             migrated_ids.add(entity_id)
-            if entity_id not in entities:
-                errors.append(f"{path.relative_to(ROOT)}: manifest entity missing: {entity_id}")
-                continue
-            entity, entity_file = entities[entity_id]
-            if entity.get("type") != row["type"]:
-                errors.append(f"{entity_id}: type mismatch")
-            if entity.get("name") != row["name"]:
-                errors.append(f"{entity_id}: name mismatch")
-            good, rel = is_dedicated(entity, entity_file)
             expected_rel = Path(row["dossier"])
-            if not good:
-                errors.append(f"{entity_id}: does not point to an existing dedicated dossier")
-                continue
-            if rel != expected_rel:
-                errors.append(f"{entity_id}: dossier path {rel} != manifest {expected_rel}")
+            entity_entry = entities.get(entity_id)
+            if entity_entry is None:
+                target_id = supersessions.get(entity_id)
+                if target_id is None:
+                    errors.append(f"{path.relative_to(ROOT)}: manifest entity missing: {entity_id}")
+                    continue
+                target_entry = entities.get(target_id)
+                if target_entry is None:
+                    errors.append(f"{path.relative_to(ROOT)}: superseded manifest entity {entity_id} has missing target {target_id}")
+                    continue
+                target_entity, _target_file = target_entry
+                if target_entity.get("type") != row["type"]:
+                    errors.append(f"{entity_id}: supersession target {target_id} type mismatch")
+                expected_dir = TYPE_DIR.get(row["type"])
+                parts = expected_rel.parts
+                if (
+                    expected_dir is None
+                    or len(parts) < 3
+                    or parts[0] != "dossiers"
+                    or parts[1] != expected_dir
+                    or expected_rel.suffix != ".md"
+                    or not (ROOT / expected_rel).is_file()
+                ):
+                    errors.append(
+                        f"{path.relative_to(ROOT)}: superseded historical row {entity_id} does not retain an existing type-appropriate dossier"
+                    )
+                    continue
+            else:
+                entity, entity_file = entity_entry
+                if entity.get("type") != row["type"]:
+                    errors.append(f"{entity_id}: type mismatch")
+                if entity.get("name") != row["name"]:
+                    errors.append(f"{entity_id}: name mismatch")
+                good, rel = is_dedicated(entity, entity_file)
+                if not good:
+                    errors.append(f"{entity_id}: does not point to an existing dedicated dossier")
+                    continue
+                if rel != expected_rel:
+                    errors.append(f"{entity_id}: dossier path {rel} != manifest {expected_rel}")
             dossier_path = ROOT / expected_rel
+            if not dossier_path.is_file():
+                errors.append(f"{entity_id}: manifest dossier does not exist: {expected_rel}")
+                continue
             text = dossier_path.read_text(encoding="utf-8")
             fm = frontmatter(text)
             if fm.get("id") != f"ECL-{entity_id}": errors.append(f"{expected_rel}: frontmatter id mismatch")
