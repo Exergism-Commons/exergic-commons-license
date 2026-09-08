@@ -22,6 +22,7 @@ from typing import Callable, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 GENERATED_DIR = ROOT / "knowledge" / "generated"
+ENTITY_SUFFIXES = {".json", ".jsonld"}
 SUPERSESSION_GLOB = "entity-id-supersessions-v*.json"
 SUPERSESSION_RE = re.compile(r"^entity-id-supersessions-v([1-9][0-9]*)\.json$")
 
@@ -153,10 +154,20 @@ def default_normalizer(value: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
 
-def load_repository_entities() -> tuple[list[dict], set[str]]:
+def repository_entity_paths(entity_dir: Path | None = None) -> list[Path]:
+    """Return the recursive canonical .json/.jsonld entity surface."""
+    entity_dir = ENTITY_DIR if entity_dir is None else entity_dir
+    return sorted(
+        path
+        for path in entity_dir.rglob("*")
+        if path.is_file() and path.suffix in ENTITY_SUFFIXES
+    )
+
+
+def load_repository_entities(entity_dir: Path | None = None) -> tuple[list[dict], set[str]]:
     entities: list[dict] = []
     entity_ids: set[str] = set()
-    for path in sorted(ENTITY_DIR.glob("*.json")):
+    for path in repository_entity_paths(entity_dir):
         data = json.loads(path.read_text(encoding="utf-8"))
         entities.append(data)
         entity_id = data.get("id")
