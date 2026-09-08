@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import check_canonical_entity_dossiers_extended as coverage  # noqa: E402
+import check_canonical_entity_manifest_history as history  # noqa: E402
 import check_canonical_entity_migration_preservation as preservation  # noqa: E402
 import check_canonical_entity_migration_preservation_extended as preservation_extended  # noqa: E402
 
@@ -105,6 +106,51 @@ class CanonicalHistoricalSupersessionTests(unittest.TestCase):
             )
             with self.assertRaisesRegex(RuntimeError, "chains are forbidden"):
                 preservation.current_supersession_map(root)
+
+    def test_supersession_history_rejects_rewrite_of_published_version(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            v1 = self._write_supersession_manifest(
+                root, 1, [{"from": "ORG-A", "to": "ORG-C", "reason": "retargeted"}], None
+            )
+            base_rel = "knowledge/generated/entity-id-supersessions-v1.json"
+            with mock.patch.object(history, "ROOT", root), mock.patch.object(
+                history, "git_bytes", return_value=b'{"version":1,"follows":null,"supersessions":[{"from":"ORG-A","to":"ORG-B","reason":"published"}]}'
+            ):
+                errors = history.validate_base_versioned_history(
+                    base_ref="BASE",
+                    current_paths=[v1],
+                    base_paths=[base_rel],
+                    prefix=history.SUPERSESSION_PREFIX,
+                    label="identity supersession",
+                )
+        self.assertTrue(any("immutable once present in the PR base" in error for error in errors), errors)
+        self.assertTrue(any("append a new version instead" in error for error in errors), errors)
+
+    def test_supersession_history_allows_new_contiguous_version(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            v1 = self._write_supersession_manifest(
+                root, 1, [{"from": "ORG-A", "to": "ORG-B", "reason": "published"}], None
+            )
+            v2 = self._write_supersession_manifest(
+                root,
+                2,
+                [{"from": "ORG-C", "to": "ORG-D", "reason": "new normalization"}],
+                str(v1.relative_to(root)),
+            )
+            base_rel = "knowledge/generated/entity-id-supersessions-v1.json"
+            with mock.patch.object(history, "ROOT", root), mock.patch.object(
+                history, "git_bytes", return_value=v1.read_bytes()
+            ):
+                errors = history.validate_base_versioned_history(
+                    base_ref="BASE",
+                    current_paths=[v1, v2],
+                    base_paths=[base_rel],
+                    prefix=history.SUPERSESSION_PREFIX,
+                    label="identity supersession",
+                )
+        self.assertEqual(errors, [])
 
     def test_baseline_preservation_accepts_authoritative_source_removal(self) -> None:
         before = {"id": "ORG-OLD", "iri": "ecl:ORG-OLD", "type": "Organization"}
