@@ -2,15 +2,18 @@
 """Audit ABox coverage of already-curated State Schedule-freeze references.
 
 This is an identity-coverage gate, not an attribution engine. Every actor/project
-reference in the curated freeze corpus must either resolve to one or more exact ABox
-identities or carry an explicit reviewed deferral. Domestic heuristic resolution is
-State-scoped; explicit reviewed dispositions may intentionally bind cross-State referents.
+reference, and every identity-bearing scope mention, must either resolve to one or more
+exact ABox identities or carry an explicit reviewed deferral. Domestic heuristic
+resolution is State-scoped; explicit reviewed dispositions may intentionally bind
+cross-State referents.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -36,12 +39,53 @@ SCOPE_FIELDS = (
 )
 CAPACITY_SPLITS = (", only ", ", including ", " only when ", " only in ", " only where ")
 VALID_DISPOSITIONS = {"bound", "deferred", "partial-deferred"}
+BLOB_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+ACRONYM_SURFACE_RE = re.compile(r"^[A-Z0-9][A-Z0-9.-]{2,}$")
+SCOPE_NAMED_IDENTITY_RE = re.compile(
+    r"\b(?:"
+    r"(?:[A-Z][A-Za-z0-9'’.-]*(?:\s+|[-/])){1,6}"
+    r"(?:Ministry|Department|Directorate|Bureau|Office|Commission|Committee|Council|Court|Tribunal|Agency|"
+    r"Secretariat|Administration|Police|Prison|Penitentiary|Service|Force|Forces|Branch|Unit|Centre|Center)"
+    r"|(?:Ministry|Department|Directorate|Bureau|Office|Commission|Committee|Council|Court|Tribunal|Agency|"
+    r"Secretariat|Administration|Police|Prison|Penitentiary|Service|Force|Forces|Branch|Unit|Centre|Center)"
+    r"(?:\s+of)?(?:\s+[A-Z][A-Za-z0-9'’.-]*){1,6}"
+    r"|Penitentiary\s+no\.\s*\d+\s+[A-Z][A-Za-z0-9'’.-]*"
+    r")\b"
+)
+SCOPE_ROLE_IDENTITY_RE = re.compile(
+    r"\b(?:competent|responsible|participating|implementing|administering|custodial|prosecuting|designated)\s+"
+    r"(?:[a-z0-9'’.-]+\s+){0,4}"
+    r"(?:agency|department|ministry|directorate|bureau|office|commission|committee|council|court|tribunal|"
+    r"police|prison|penitentiary|service|force|forces|branch|unit|secretariat|administration)\b",
+    re.I,
+)
 
 
 def norm(text: str) -> str:
-    text = text.lower().replace("’", "'")
-    text = re.sub(r"[^a-z0-9]+", " ", text)
-    return " ".join(text.split())
+    """Return one Unicode-safe canonical key for identity matching.
+
+    NFKC makes compatibility spellings comparable and casefold supplies Unicode-aware case
+    normalization. Canonically equivalent decomposed/composed spellings are recomposed with
+    NFC after casefold. Combining marks are preserved because many writing systems encode
+    semantically meaningful vowels/letters with them; deleting the whole ``M*`` category can
+    collapse distinct legal names. U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE is mapped
+    narrowly before casefold so the repository's reviewed ``İdris``/``idris`` equivalence
+    remains stable without globally erasing marks. Non-word punctuation remains a separator.
+    """
+    text = unicodedata.normalize("NFKC", text).replace("İ", "i")
+    text = unicodedata.normalize("NFC", text.casefold().replace("’", "'"))
+    out: list[str] = []
+    for char in text:
+        if char.isalnum() or unicodedata.category(char).startswith("M"):
+            out.append(char)
+        else:
+            out.append(" ")
+    return " ".join("".join(out).split())
+
+
+def git_blob_sha1(content: bytes) -> str:
+    header = f"blob {len(content)}\0".encode("ascii")
+    return hashlib.sha1(header + content).hexdigest()
 
 
 def load_entities():
@@ -58,7 +102,19 @@ def load_entities():
             continue
         names = [data.get("name"), *(data.get("aliases") or [])]
         aliases = sorted({norm(x) for x in names if isinstance(x, str) and norm(x)}, key=len, reverse=True)
-        row = {"id": data["id"], "type": data["type"], "aliases": aliases, "name": data.get("name")}
+        surface_forms = [
+            {
+                "text": x,
+                "normalized": norm(x),
+                "acronym": bool(ACRONYM_SURFACE_RE.fullmatch(x) and re.search(r"[A-Z]", x)),
+            }
+            for x in names
+            if isinstance(x, str) and norm(x)
+        ]
+        row = {
+            "id": data["id"], "type": data["type"], "aliases": aliases,
+            "surface_forms": surface_forms, "name": data.get("name"),
+        }
         rows.append(row)
         by_id[data["id"]] = row
         raw_non_state.append(data)
@@ -68,8 +124,20 @@ def load_entities():
 
 def load_dispositions() -> list[dict]:
     rows: list[dict] = []
+    pinned_sources: dict[str, str] = {}
+    referenced_sources: set[str] = set()
     for path in sorted((ROOT / "knowledge" / "generated").glob(DISPOSITION_GLOB)):
         data = json.loads(path.read_text(encoding="utf-8"))
+        source_blobs = data.get("source_blobs")
+        if not isinstance(source_blobs, dict) or not source_blobs:
+            raise ValueError(f"reviewed Schedule dispositions must pin source_blobs: {path}")
+        for source, expected_sha in source_blobs.items():
+            if not isinstance(source, str) or not source or not isinstance(expected_sha, str) or not BLOB_SHA_RE.fullmatch(expected_sha):
+                raise ValueError(f"invalid source blob pin in {path}: {source!r} -> {expected_sha!r}")
+            previous = pinned_sources.get(source)
+            if previous is not None and previous != expected_sha:
+                raise ValueError(f"conflicting source blob pins for {source}: {previous} vs {expected_sha}")
+            pinned_sources[source] = expected_sha
         for index, row in enumerate(data.get("entries", [])):
             if row.get("disposition") not in VALID_DISPOSITIONS:
                 raise ValueError(f"invalid disposition in {path}:{index}: {row.get('disposition')!r}")
@@ -77,9 +145,29 @@ def load_dispositions() -> list[dict]:
             missing = required - set(row)
             if missing:
                 raise ValueError(f"missing disposition fields in {path}:{index}: {sorted(missing)}")
+            source = row["source"]
+            if not isinstance(source, str) or source not in source_blobs:
+                raise ValueError(f"disposition source is not blob-pinned in {path}:{index}: {source!r}")
+            referenced_sources.add(source)
             copy = dict(row)
             copy["manifest"] = str(path.relative_to(ROOT))
+            copy["disposition_key"] = f"{path.relative_to(ROOT)}#{index}"
             rows.append(copy)
+
+    stale_pins = sorted(set(pinned_sources) - referenced_sources)
+    if stale_pins:
+        raise ValueError(f"unused Schedule source blob pins: {stale_pins}")
+    for source in sorted(referenced_sources):
+        source_path = ROOT / source
+        if not source_path.is_file():
+            raise ValueError(f"pinned Schedule source does not exist: {source}")
+        actual_sha = git_blob_sha1(source_path.read_bytes())
+        expected_sha = pinned_sources[source]
+        if actual_sha != expected_sha:
+            raise ValueError(
+                f"reviewed Schedule source changed: {source}; expected blob {expected_sha}, got {actual_sha}. "
+                "Re-review its actor/project/scope identity references before updating the pin."
+            )
     return rows
 
 
@@ -137,9 +225,66 @@ def heuristic_resolve(raw: str, entities: list[dict], identity_index, expected: 
     return sorted({entity_id for score, entity_id in matches if score == best})
 
 
+def embedded_identity_matches(
+    raw: str, entities: list[dict], identity_index, expected: str, state: str | None
+) -> list[str]:
+    """Return every exact State-safe ABox identity surface embedded in free-form text.
+
+    Long names/aliases use normalized token boundaries. Acronym-like surfaces are matched
+    case-sensitively against the original text, which lets short current aliases such as
+    FACA, BIA or KNCHR participate without turning ordinary short words into identities.
+    """
+    raw_norm = norm(raw)
+    padded_raw = f" {raw_norm} "
+    matches: set[str] = set()
+    for entity in entities:
+        if not eligible_in_state(identity_index, entity["id"], state):
+            continue
+        is_project = entity["type"] in {"Project", "Deployment"}
+        if expected == "actor" and is_project:
+            continue
+        if expected == "project" and not is_project:
+            continue
+        forms = entity.get("surface_forms") or [
+            {"text": alias, "normalized": alias, "acronym": False}
+            for alias in entity.get("aliases", [])
+        ]
+        for form in forms:
+            text = form.get("text") or ""
+            alias = form.get("normalized") or norm(text)
+            if not alias:
+                continue
+            if form.get("acronym"):
+                if re.search(rf"(?<![A-Za-z0-9]){re.escape(text)}(?![A-Za-z0-9])", raw):
+                    matches.add(entity["id"])
+                    break
+            elif len(alias) >= 6 and f" {alias} " in padded_raw:
+                matches.add(entity["id"])
+                break
+    return sorted(matches)
+
+
+def scope_identity_signal(raw: str, entities: list[dict], identity_index, state: str | None) -> bool:
+    """Return true when a scope value contains a specific identity worth coverage review.
+
+    Exact State-safe embedded ABox surfaces count first, including short case-sensitive
+    acronyms. The regexes additionally catch named institutions/facilities and role-qualified
+    organizational references that are not yet materialized, so they cannot disappear merely
+    because the field is nominally scope.
+    """
+    if embedded_identity_matches(raw, entities, identity_index, "identity", state):
+        return True
+    if heuristic_resolve(raw, entities, identity_index, "identity", state):
+        return True
+    return bool(SCOPE_NAMED_IDENTITY_RE.search(raw) or SCOPE_ROLE_IDENTITY_RE.search(raw))
+
+
 def matching_disposition(
     source: str, state: str | None, field: str, raw: str, dispositions: list[dict]
 ) -> dict | None:
+    # Prefixes are safe here because the containing source file is content-addressed and
+    # checked by load_dispositions(). Any edit to the reviewed reference invalidates the
+    # source blob pin before this matcher runs.
     matches = [
         row for row in dispositions
         if row["source"] == source
@@ -169,6 +314,13 @@ def validate_disposition_targets(row: dict, by_id: dict[str, dict], expected: st
         raise ValueError(f"partial-deferred disposition needs at least one exact target: {row}")
 
 
+def missing_reviewed_identity_bindings(
+    row: dict, raw: str, entities: list[dict], identity_index, expected: str, state: str | None
+) -> list[str]:
+    embedded = set(embedded_identity_matches(raw, entities, identity_index, expected, state))
+    return sorted(embedded - set(row["resolved_ids"]))
+
+
 def reference_row(
     *, kind: str, expected: str, state: str | None, outcome: str | None, field: str, raw: str,
     source: str, record_index: int, entities: list[dict], by_id: dict[str, dict], identity_index,
@@ -177,6 +329,14 @@ def reference_row(
     disposition = matching_disposition(source, state, field, raw, dispositions)
     if disposition:
         validate_disposition_targets(disposition, by_id, expected)
+        missing_bindings = missing_reviewed_identity_bindings(
+            disposition, raw, entities, identity_index, expected, state
+        )
+        if missing_bindings:
+            raise ValueError(
+                "reviewed Schedule disposition omits exact current ABox identities "
+                f"{missing_bindings}: {disposition['disposition_key']}"
+            )
         status = {
             "bound": "resolved", "deferred": "deferred", "partial-deferred": "partial-deferred",
         }[disposition["disposition"]]
@@ -184,17 +344,30 @@ def reference_row(
         source_kind = "reviewed-disposition"
         reason = disposition["reason"]
         disposition_manifest = disposition["manifest"]
+        disposition_key = disposition["disposition_key"]
     else:
-        matches = heuristic_resolve(raw, entities, identity_index, expected, state)
-        status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
-        source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
+        if expected == "identity":
+            matches = embedded_identity_matches(raw, entities, identity_index, expected, state)
+            if matches:
+                status = "resolved"
+                source_kind = "state-safe-exact-embedded-name-or-alias"
+            else:
+                matches = heuristic_resolve(raw, entities, identity_index, expected, state)
+                status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
+                source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
+        else:
+            matches = heuristic_resolve(raw, entities, identity_index, expected, state)
+            status = "resolved" if len(matches) == 1 else ("ambiguous" if matches else "unresolved")
+            source_kind = "jurisdiction-safe-canonical-name-or-alias" if matches else None
         reason = None
         disposition_manifest = None
+        disposition_key = None
     return {
         "kind": kind, "state": state, "outcome": outcome, "field": field, "raw": raw,
         "identity_head": identity_head(raw), "resolved_ids": matches, "status": status,
         "resolution_source": source_kind, "disposition_reason": reason,
-        "disposition_manifest": disposition_manifest, "source": source, "record_index": record_index,
+        "disposition_manifest": disposition_manifest, "disposition_key": disposition_key,
+        "source": source, "record_index": record_index,
     }
 
 
@@ -225,39 +398,54 @@ def audit() -> dict:
                     ))
             for field in SCOPE_FIELDS:
                 for raw in list_values(record.get(field)):
-                    references.append({
-                        "kind": "scope-reference", "state": state, "outcome": outcome, "field": field,
-                        "raw": raw, "identity_head": None, "resolved_ids": [], "status": "context-only",
-                        "resolution_source": None, "disposition_reason": None, "disposition_manifest": None,
-                        "source": source, "record_index": record_index,
-                    })
+                    if scope_identity_signal(raw, entities, identity_index, state):
+                        references.append(reference_row(
+                            kind="scope-identity-reference", expected="identity", state=state, outcome=outcome,
+                            field=field, raw=raw, source=source, record_index=record_index,
+                            entities=entities, by_id=by_id, identity_index=identity_index, dispositions=dispositions,
+                        ))
+                    else:
+                        references.append({
+                            "kind": "scope-reference", "state": state, "outcome": outcome, "field": field,
+                            "raw": raw, "identity_head": None, "resolved_ids": [], "status": "context-only",
+                            "resolution_source": None, "disposition_reason": None, "disposition_manifest": None,
+                            "disposition_key": None, "source": source, "record_index": record_index,
+                        })
 
-    counted = [row for row in references if row["kind"] != "scope-reference"]
+    counted = [row for row in references if row["status"] != "context-only"]
     statuses = Counter(row["status"] for row in counted)
     kinds = Counter(row["kind"] for row in counted)
     states = {row["state"] for row in counted if isinstance(row["state"], str)}
+    used_dispositions = {row["disposition_key"] for row in counted if row.get("disposition_key")}
+    stale_dispositions = sorted(
+        row["disposition_key"] for row in dispositions if row["disposition_key"] not in used_dispositions
+    )
     return {
-        "schema_version": 3,
+        "schema_version": 6,
         "semantics": {
-            "purpose": "coverage audit of already-curated Schedule-preparation actor/project references",
-            "completeness_rule": "Every curated actor/project reference must be resolved, deferred or partial-deferred; ambiguous/unresolved is a CI failure.",
+            "purpose": "coverage audit of curated Schedule-preparation actor/project references and identity-bearing scope mentions",
+            "completeness_rule": "Every curated actor/project reference and every identity-bearing scope mention must be resolved, deferred or partial-deferred; ambiguous/unresolved and stale reviewed dispositions are CI failures.",
             "identity_resolution": "heuristic domestic identity matching is State-scoped; reviewed dispositions may explicitly bind cross-State referents",
+            "review_binding": "reviewed dispositions are valid only while their entire Schedule source file retains its pinned Git blob identity and must include every exact current State-safe ABox identity embedded in the reviewed value",
             "non_inference": [
                 "reference matching is not attribution",
                 "identity resolution does not inherit the State outcome",
                 "cross-State domestic matching requires an explicit reviewed disposition",
-                "scope-reference fields are context only and are never coerced into an Actor or Project identity",
+                "a scope-identity reference records only that a named identity occurs in scope text; it does not coerce that identity into an Actor or Project role",
+                "scope values with no specific identity signal remain context-only",
                 "deferred and partial-deferred are explicit representation states, not evidence or governance judgments",
             ],
         },
         "counts": {
-            "freeze_files": len(files), "states_with_actor_or_project_references": len(states),
+            "freeze_files": len(files), "states_with_audited_references": len(states),
             "actor_references": kinds["actor-reference"], "project_references": kinds["project-reference"],
+            "scope_identity_references": kinds["scope-identity-reference"],
             "resolved": statuses["resolved"], "partial_deferred": statuses["partial-deferred"],
             "deferred": statuses["deferred"], "ambiguous": statuses["ambiguous"],
-            "unresolved": statuses["unresolved"],
-            "scope_context_references": sum(row["kind"] == "scope-reference" for row in references),
+            "unresolved": statuses["unresolved"], "stale_dispositions": len(stale_dispositions),
+            "scope_context_references": sum(row["status"] == "context-only" for row in references),
         },
+        "stale_dispositions": stale_dispositions,
         "references": references,
     }
 
@@ -268,14 +456,17 @@ def write_markdown(report: dict, path: Path) -> None:
         "# Schedule freeze reference coverage", "",
         "> Identity-coverage audit only. Resolution has no governance or attribution effect.", "",
         f"- Freeze files: **{counts['freeze_files']}**",
-        f"- States with actor/project references: **{counts['states_with_actor_or_project_references']}**",
+        f"- States with audited references: **{counts['states_with_audited_references']}**",
         f"- Actor references: **{counts['actor_references']}**",
         f"- Project references: **{counts['project_references']}**",
+        f"- Scope identity mentions: **{counts['scope_identity_references']}**",
+        f"- Scope context-only values: **{counts['scope_context_references']}**",
         f"- Resolved: **{counts['resolved']}**",
         f"- Partial/deferred: **{counts['partial_deferred']}**",
         f"- Deferred: **{counts['deferred']}**",
         f"- Ambiguous: **{counts['ambiguous']}**",
-        f"- Unresolved: **{counts['unresolved']}**", "",
+        f"- Unresolved: **{counts['unresolved']}**",
+        f"- Stale reviewed dispositions: **{counts['stale_dispositions']}**", "",
         "## Non-resolved curated references", "",
         "| State | Kind | Field | Identity head | Status | Reason | Source |",
         "|---|---|---|---|---|---|---|",
@@ -294,26 +485,95 @@ def write_markdown(report: dict, path: Path) -> None:
 def self_test() -> None:
     assert identity_head("Zambia Police Service, only in qualifying cases") == "Zambia Police Service"
     assert identity_head("NISA only where evidence exists") == "NISA"
+    assert git_blob_sha1(b"") == "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    assert norm("أحمد منصور") == "أحمد منصور"
+    assert norm("王小明") == "王小明"
+    assert norm("İdris Baluken") == "idris baluken"
+    assert norm("I\u0307dris Baluken") == "idris baluken"
+    assert norm("Jane-Doe") == "jane doe"
+    assert norm("École Agency") == norm("E\u0301cole Agency")
+    assert norm("कुमार Agency") == "कुमार agency"
+    assert norm("कमर Agency") == "कमर agency"
+    assert norm("कुमार Agency") != norm("कमर Agency")
+    assert norm("أَحمد منصور") != norm("احمد منصور")
     sample = [{
         "source": "x.yml", "state": "ABC", "field": "candidate_parties",
         "match_prefix": "Named Agency", "disposition": "deferred", "resolved_ids": [],
-        "reason": "test", "manifest": "m.json"
+        "reason": "test", "manifest": "m.json", "disposition_key": "m.json#0",
     }]
     assert matching_disposition("x.yml", "ABC", "candidate_parties", "Named Agency, only here", sample)
     synthetic = [
-        {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
-        {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"]},
-        {"id": "ORG-GLOBAL", "type": "Organization", "aliases": ["global source"]},
+        {
+            "id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"],
+            "surface_forms": [{"text": "National Police", "normalized": "national police", "acronym": False}],
+        },
+        {
+            "id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "aliases": ["national police"],
+            "surface_forms": [{"text": "National Police", "normalized": "national police", "acronym": False}],
+        },
+        {
+            "id": "AGENCY-AAA-FACA", "type": "Agency", "aliases": ["central armed forces", "faca"],
+            "surface_forms": [
+                {"text": "Central Armed Forces", "normalized": "central armed forces", "acronym": False},
+                {"text": "FACA", "normalized": "faca", "acronym": True},
+            ],
+        },
+        {
+            "id": "AGENCY-AAA-MEDIA-COMMISSION", "type": "Agency", "aliases": ["media commission"],
+            "surface_forms": [{"text": "Media Commission", "normalized": "media commission", "acronym": False}],
+        },
+        {
+            "id": "AGENCY-AAA-KAMAR", "type": "Agency", "aliases": [norm("कमर Agency")],
+            "surface_forms": [{"text": "कमर Agency", "normalized": norm("कमर Agency"), "acronym": False}],
+        },
+        {
+            "id": "ORG-GLOBAL", "type": "Organization", "aliases": ["global source"],
+            "surface_forms": [{"text": "Global Source", "normalized": "global source", "acronym": False}],
+        },
+        {
+            "id": "PERSON-AAA-AHMAD-MANSOUR", "type": "Person", "aliases": [norm("أحمد منصور")],
+            "surface_forms": [{"text": "أحمد منصور", "normalized": norm("أحمد منصور"), "acronym": False}],
+        },
+        {
+            "id": "PERSON-AAA-WANG-XIAOMING", "type": "Person", "aliases": [norm("王小明")],
+            "surface_forms": [{"text": "王小明", "normalized": norm("王小明"), "acronym": False}],
+        },
     ]
     raw = [
         {"id": "AGENCY-AAA-NATIONAL-POLICE", "type": "Agency", "name": "National Police", "aliases": []},
         {"id": "AGENCY-BBB-NATIONAL-POLICE", "type": "Agency", "name": "National Police", "aliases": []},
+        {"id": "AGENCY-AAA-FACA", "type": "Agency", "name": "Central Armed Forces", "aliases": ["FACA"]},
+        {"id": "AGENCY-AAA-MEDIA-COMMISSION", "type": "Agency", "name": "Media Commission", "aliases": []},
+        {"id": "AGENCY-AAA-KAMAR", "type": "Agency", "name": "कमर Agency", "aliases": []},
         {"id": "ORG-GLOBAL", "type": "Organization", "name": "Global Source", "aliases": []},
+        {"id": "PERSON-AAA-AHMAD-MANSOUR", "type": "Person", "name": "أحمد منصور", "aliases": []},
+        {"id": "PERSON-AAA-WANG-XIAOMING", "type": "Person", "name": "王小明", "aliases": []},
     ]
     idx = build_name_index(raw, state_codes={"AAA", "BBB"}, normalizer=norm)
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-NATIONAL-POLICE"]
     assert heuristic_resolve("National Police", synthetic, idx, "actor", "CCC") == []
     assert heuristic_resolve("Global Source", synthetic, idx, "actor", "AAA") == ["ORG-GLOBAL"]
+    assert heuristic_resolve("कमर Agency", synthetic, idx, "actor", "AAA") == ["AGENCY-AAA-KAMAR"]
+    assert heuristic_resolve("कुमार Agency", synthetic, idx, "actor", "AAA") == []
+    assert heuristic_resolve("أحمد منصور", synthetic, idx, "actor", "AAA") == ["PERSON-AAA-AHMAD-MANSOUR"]
+    assert heuristic_resolve("王小明", synthetic, idx, "actor", "AAA") == ["PERSON-AAA-WANG-XIAOMING"]
+    assert heuristic_resolve("أحمد منصور", synthetic, idx, "actor", "BBB") == []
+    assert embedded_identity_matches("incident documented by FACA", synthetic, idx, "identity", "AAA") == ["AGENCY-AAA-FACA"]
+    assert not embedded_identity_matches("incident documented by faca", synthetic, idx, "identity", "AAA")
+    assert scope_identity_signal("the incident documented by FACA", synthetic, idx, "AAA")
+    composite = embedded_identity_matches(
+        "National Police / Media Commission workflow", synthetic, idx, "identity", "AAA"
+    )
+    assert composite == ["AGENCY-AAA-MEDIA-COMMISSION", "AGENCY-AAA-NATIONAL-POLICE"]
+    reviewed = {"resolved_ids": ["AGENCY-AAA-NATIONAL-POLICE"]}
+    assert missing_reviewed_identity_bindings(
+        reviewed, "National Police / Media Commission workflow", synthetic, idx, "identity", "AAA"
+    ) == ["AGENCY-AAA-MEDIA-COMMISSION"]
+    assert scope_identity_signal("28 February 2026 Ministry of Interior enforcement cohort", synthetic, idx, "AAA")
+    assert scope_identity_signal("identified by Qatar News Agency and the competent cybercrime department", synthetic, idx, "AAA")
+    assert scope_identity_signal("after the Supreme Court retrial order", synthetic, idx, "AAA")
+    assert scope_identity_signal("custody at Penitentiary no. 2 Lipcani", synthetic, idx, "AAA")
+    assert not scope_identity_signal("the 313-person cohort active during the review period", synthetic, idx, "AAA")
     print("Schedule reference audit self-test: OK")
 
 
@@ -335,7 +595,11 @@ def main() -> int:
         args.markdown.parent.mkdir(parents=True, exist_ok=True)
         write_markdown(report, args.markdown)
     print(json.dumps(report["counts"], sort_keys=True))
-    if args.fail_on_unresolved_curated and (report["counts"]["unresolved"] or report["counts"]["ambiguous"]):
+    if args.fail_on_unresolved_curated and (
+        report["counts"]["unresolved"] or report["counts"]["ambiguous"] or report["counts"]["stale_dispositions"]
+    ):
+        if report["counts"]["stale_dispositions"]:
+            print("STALE_SCHEDULE_DISPOSITIONS=" + json.dumps(report["stale_dispositions"], sort_keys=True))
         return 2
     return 0
 

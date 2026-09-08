@@ -4,7 +4,7 @@
   "id": "AGENCY-USA-DOD",
   "type": "Agency",
   "name": "U.S. Department of Defense",
-  "aliases": ["DoD", "DOD", "Department of War"],
+  "aliases": ["DoD", "Department of War"],
   "dossier": "../../dossiers/agencies/USA-DOD.md",
   "provenance": ["../../dossiers/agencies/USA-DOD.md", "https://www.defense.gov/About/", "https://www.whitehouse.gov/presidential-actions/2025/09/restoring-the-united-states-department-of-war/"],
   "lastSubstantiveReview": "2026-08-15",

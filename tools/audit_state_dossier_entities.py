@@ -12,11 +12,16 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
+import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
+import yaml
+
+from audit_schedule_reference_coverage import norm
 from entity_identity_resolution import build_name_index, resolve_normalized, self_test as resolution_self_test
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,7 +42,7 @@ PROJECT_TERMS = {
 STOP_PHRASES = {
     "Current determination", "ECL criteria", "Evidence supporting", "Counter evidence",
     "Adversarial determination", "Review trigger", "Review triggers", "Procedural history",
-    "Restricted Project", "Restricted Projects", "State dossier", "State review",
+    "Restricted Project", "Restricted Projects", "Project", "State dossier", "State review",
     "Schedule boundary", "Governance record", "No current", "Ordinary State",
     "Human Rights", "International Law", "Current ECL", "Schedule translation",
     "State-wide", "State level", "State-level", "whole State", "State apparatus",
@@ -48,15 +53,65 @@ ACRONYM_STOP = {
     "UPHOLD", "UPHELD", "NARROW", "DEFINE", "DOWNGRADE", "ESCALATE", "RETAIN",
     "REMOVE", "REVIEW", "ADVERSARIAL", "UNKNOWN", "TODO", "TBD",
 }
+FRONTMATTER_IDENTITY_FIELDS = ("provisional_scope", "adversarial_result")
+
+
+def _unicode_category_class(*categories: str) -> str:
+    """Build a compact regex class from Python's current Unicode category table."""
+    wanted = set(categories)
+    ranges: list[tuple[int, int]] = []
+    start: int | None = None
+    previous: int | None = None
+    for codepoint in range(sys.maxunicode + 1):
+        if unicodedata.category(chr(codepoint)) not in wanted:
+            if start is not None and previous is not None:
+                ranges.append((start, previous))
+                start = previous = None
+            continue
+        if start is None:
+            start = previous = codepoint
+        elif previous is not None and codepoint == previous + 1:
+            previous = codepoint
+        else:
+            ranges.append((start, previous if previous is not None else start))
+            start = previous = codepoint
+    if start is not None and previous is not None:
+        ranges.append((start, previous))
+    return "[" + "".join(
+        chr(first) if first == last else f"{chr(first)}-{chr(last)}"
+        for first, last in ranges
+    ) + "]"
+
+
+# One shared Unicode title-token contract is exported for every title companion. Cased scripts
+# may start on Lu/Lt and scripts without case on Lo; combining marks are continuation-only so
+# decomposed spellings remain intact without allowing marks to manufacture a new title start.
+# A normal word cannot absorb a period: period-bearing forms are explicit, so sentence endings
+# remain hard boundaries without regressing common dotted acronyms/abbreviations in identities.
+UNICODE_TITLE_START = _unicode_category_class("Lu", "Lt", "Lo")
+UNICODE_TITLE_MARK = _unicode_category_class("Mn", "Mc", "Me")
+TITLE_PLAIN_WORD_PATTERN = rf"{UNICODE_TITLE_START}(?:[^\W_]|{UNICODE_TITLE_MARK}|[&'’/-])*"
+TITLE_DOTTED_ACRONYM_PATTERN = r"(?:[A-Z]\.){2,}"
+TITLE_DOTTED_ABBREVIATION_PATTERN = r"(?:St|Mt|Ft|Co|Inc|Corp|Ltd)\."
+TITLE_WORD_PATTERN = (
+    rf"(?:{TITLE_DOTTED_ACRONYM_PATTERN}|{TITLE_DOTTED_ABBREVIATION_PATTERN}|"
+    rf"{TITLE_PLAIN_WORD_PATTERN})"
+)
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 INLINE_CODE_RE = re.compile(r"`([^`\n]{2,120})`")
 QUOTED_RE = re.compile(r"[\"“]([^\"”\n]{2,120})[\"”]")
 TITLE_RE = re.compile(
-    r"\b(?:[A-Z][A-Za-z0-9&.'’/-]*|[A-Z]{2,})"
-    r"(?:\s+(?:of|the|and|for|de|del|la|le|des|[A-Z][A-Za-z0-9&.'’/-]*|[A-Z]{2,})){0,8}\b"
+    rf"(?<!\w){TITLE_WORD_PATTERN}"
+    rf"(?:\s+(?:of|the|and|for|de|del|la|le|des|{TITLE_WORD_PATTERN})){{0,8}}(?!\w)"
 )
+# A dotted acronym/abbreviation may be internal to one identity (`St. Louis Police`) or may also
+# carry the sentence-final period (`Acme Inc. Rights Agency`). Regex tokenization cannot infer that
+# linguistic role from the same source bytes. Preserve the complete reading, but independently
+# audit any classifiable title beginning after a dotted token so a reviewed/materialized glued
+# reading can never hide a distinct identity at the start of the following sentence.
+AMBIGUOUS_DOTTED_BOUNDARY_RE = re.compile(rf"\.\s+(?={TITLE_WORD_PATTERN})")
 ACRONYM_RE = re.compile(r"\b[A-Z][A-Z0-9-]{2,14}\b")
 URL_RE = re.compile(r"https?://\S+")
 MD_LINK_RE = re.compile(r"\[([^\]]+)\]\([^\)]+\)")
@@ -65,38 +120,50 @@ ENTITY_ID_RE = re.compile(r"(?:ORG|AGENCY|PERSON|PROJECT|DEPLOYMENT|INSTITUTION)
 PATHISH_RE = re.compile(r"(?:^\.?\.?/|[/\\]|\.(?:md|yml|yaml|json|ttl|rq|py)$)", re.I)
 
 
-def norm(text: str) -> str:
-    text = text.lower().replace("’", "'")
-    text = re.sub(r"[^a-z0-9]+", " ", text)
-    return " ".join(text.split())
-
-
 def clean_candidate(text: str) -> str:
     text = text.strip(" \t\r\n.,;:()[]{}<>*_#'\"")
     return re.sub(r"\s+", " ", text)
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str], int]:
+def title_candidate_surfaces(text: str) -> Iterable[str]:
+    """Yield ordinary title matches plus overlapping post-dotted-token readings."""
+    for match in TITLE_RE.finditer(text):
+        matched = match.group(0)
+        yield matched
+        for boundary in AMBIGUOUS_DOTTED_BOUNDARY_RE.finditer(matched):
+            suffix = matched[boundary.end():]
+            suffix_match = TITLE_RE.match(suffix)
+            if suffix_match is not None:
+                yield suffix_match.group(0)
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, object], int]:
+    """Parse YAML frontmatter without flattening block scalars into marker tokens."""
     match = FRONT_RE.match(text)
     if not match:
         return {}, 0
-    out: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        out[key.strip()] = value.strip().strip("\"'")
-    return out, match.end()
+    try:
+        loaded = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as exc:
+        raise ValueError(f"invalid State-dossier YAML frontmatter: {exc}") from exc
+    if loaded is None:
+        return {}, match.end()
+    if not isinstance(loaded, dict) or not all(isinstance(key, str) for key in loaded):
+        raise ValueError("State-dossier frontmatter must be a YAML mapping with string keys")
+    return dict(loaded), match.end()
 
 
-def canonical_state_dossiers() -> list[tuple[Path, dict[str, str], int]]:
-    dossiers: list[tuple[Path, dict[str, str], int]] = []
+def canonical_state_dossiers() -> list[tuple[Path, dict[str, object], int]]:
+    dossiers: list[tuple[Path, dict[str, object], int]] = []
     seen_iso: set[str] = set()
     for path in sorted(STATE_DIR.glob("*.md")):
         text = path.read_text(encoding="utf-8")
         front, body_offset = parse_frontmatter(text)
-        match = CANONICAL_STATE_ID_RE.fullmatch(front.get("id", ""))
-        iso = front.get("iso3", "")
+        entity_id = front.get("id")
+        iso = front.get("iso3")
+        if not isinstance(entity_id, str) or not isinstance(iso, str):
+            continue
+        match = CANONICAL_STATE_ID_RE.fullmatch(entity_id)
         if not match or iso != match.group(1) or path.stem != iso:
             continue
         if iso in seen_iso:
@@ -165,7 +232,13 @@ def plausible(text: str) -> bool:
 def looks_named_opaque(text: str) -> bool:
     if not plausible(text) or len(text.split()) > 8:
         return False
-    return bool(re.search(r"[A-Z]", text)) and not text.lower().startswith((
+    # Quoted/inline-code surfaces are already high-confidence opaque-name contexts. Preserve
+    # uncased scripts (`Lo`) here without admitting ordinary lowercase `Ll` prose.
+    has_named_script = any(
+        char.isupper() or unicodedata.category(char) in {"Lt", "Lo"}
+        for char in text
+    )
+    return has_named_script and not text.casefold().startswith((
         "last_", "asof", "review_", "provisional_", "evidence_", "state-",
     ))
 
@@ -176,6 +249,79 @@ def material_section(section: str) -> bool:
         "participant", "attribution", "scope", "current determination", "criteria engaged",
         "evidence supporting", "material", "project", "deployment",
     ))
+
+
+def extract_candidates(
+    text: str,
+    identity_index,
+    identity_ids: set[str],
+    state: str,
+) -> list[tuple[str, str, str | None]]:
+    """Apply the broad body-prose candidate extractor to one textual surface."""
+    line = URL_RE.sub("", text)
+    line = MD_LINK_RE.sub(lambda match: match.group(1), line)
+    # Body heading structure is decided by iter_occurrences() from the source syntax and the
+    # canonical H1 invariant. Do not apply Python lstrip() here: Unicode whitespace such as NBSP
+    # is visible prose under CommonMark and must not turn `NBSP + # Project Aurora` into a skipped
+    # pseudo-heading. Frontmatter textual surfaces likewise remain auditable when they contain `#`.
+    if not line.strip():
+        return []
+
+    extracted: list[tuple[str, str, str | None]] = []
+    for match in INLINE_CODE_RE.finditer(line):
+        value = clean_candidate(match.group(1))
+        if ENTITY_ID_RE.fullmatch(value):
+            extracted.append((value, "id-reference", value if value in identity_ids else None))
+        elif looks_named_opaque(value):
+            extracted.append((value, "opaque-name", resolve_name(identity_index, state, value)))
+    for match in QUOTED_RE.finditer(line):
+        value = clean_candidate(match.group(1))
+        if looks_named_opaque(value):
+            extracted.append((value, "quoted-name", resolve_name(identity_index, state, value)))
+    for raw_value in title_candidate_surfaces(line):
+        value = clean_candidate(raw_value)
+        kind = classify(value)
+        if kind and plausible(value):
+            extracted.append((value, kind, resolve_name(identity_index, state, value)))
+    for match in ACRONYM_RE.finditer(line):
+        value = match.group(0)
+        if plausible(value) and value not in ACRONYM_STOP and not value.endswith("-"):
+            extracted.append((value, "acronym-review", resolve_name(identity_index, state, value)))
+
+    out: list[tuple[str, str, str | None]] = []
+    seen: set[tuple[str, str]] = set()
+    for value, kind, resolved in extracted:
+        marker = (norm(value), kind)
+        if marker in seen:
+            continue
+        seen.add(marker)
+        out.append((value, kind, resolved))
+    return out
+
+
+def frontmatter_identity_values(text: str, front: dict[str, object]) -> list[tuple[str, int, str]]:
+    """Return identity-bearing textual frontmatter fields after YAML scalar decoding."""
+    line_numbers: dict[str, int] = {}
+    match = FRONT_RE.match(text)
+    if match:
+        for lineno, raw in enumerate(match.group(1).splitlines(), 2):
+            if not raw or raw[0].isspace() or ":" not in raw:
+                continue
+            key = raw.split(":", 1)[0].strip()
+            if key in FRONTMATTER_IDENTITY_FIELDS and key not in line_numbers:
+                line_numbers[key] = lineno
+
+    rows: list[tuple[str, int, str]] = []
+    for field in FRONTMATTER_IDENTITY_FIELDS:
+        if field not in front:
+            continue
+        value = front[field]
+        if not isinstance(value, str):
+            raise ValueError(f"frontmatter field {field!r} must be a textual YAML scalar")
+        value = value.strip()
+        if value:
+            rows.append((field, line_numbers.get(field, 1), value))
+    return rows
 
 
 @dataclass(frozen=True)
@@ -194,7 +340,7 @@ class Occurrence:
 
 def iter_occurrences(
     path: Path,
-    front: dict[str, str],
+    front: dict[str, object],
     body_offset: int,
     identity_index,
     identity_ids: set[str],
@@ -203,52 +349,49 @@ def iter_occurrences(
     body = text[body_offset:]
     line_offset = text[:body_offset].count("\n")
     state = front["iso3"]
-    outcome = front.get("provisional_outcome")
-    section = "preamble"
+    if not isinstance(state, str):
+        raise ValueError(f"canonical dossier {path} has non-textual iso3")
+    outcome_value = front.get("provisional_outcome")
+    outcome = outcome_value if isinstance(outcome_value, str) else None
+    dossier = str(path.relative_to(ROOT))
 
-    for relative_lineno, raw in enumerate(body.splitlines(), 1):
-        lineno = line_offset + relative_lineno
-        heading = HEADING_RE.match(raw)
-        if heading:
-            section = heading.group(1).strip()
-            continue
-        line = URL_RE.sub("", raw)
-        line = MD_LINK_RE.sub(lambda match: match.group(1), line)
-        if not line.strip() or line.lstrip().startswith("#"):
-            continue
-
-        extracted: list[tuple[str, str, str | None]] = []
-        for match in INLINE_CODE_RE.finditer(line):
-            value = clean_candidate(match.group(1))
-            if ENTITY_ID_RE.fullmatch(value):
-                extracted.append((value, "id-reference", value if value in identity_ids else None))
-            elif looks_named_opaque(value):
-                extracted.append((value, "opaque-name", resolve_name(identity_index, state, value)))
-        for match in QUOTED_RE.finditer(line):
-            value = clean_candidate(match.group(1))
-            if looks_named_opaque(value):
-                extracted.append((value, "quoted-name", resolve_name(identity_index, state, value)))
-        for match in TITLE_RE.finditer(line):
-            value = clean_candidate(match.group(0))
-            kind = classify(value)
-            if kind and plausible(value):
-                extracted.append((value, kind, resolve_name(identity_index, state, value)))
-        for match in ACRONYM_RE.finditer(line):
-            value = match.group(0)
-            if plausible(value) and value not in ACRONYM_STOP and not value.endswith("-"):
-                extracted.append((value, "acronym-review", resolve_name(identity_index, state, value)))
-
-        seen_line: set[tuple[str, str]] = set()
-        for value, kind, resolved in extracted:
-            marker = (norm(value), kind)
-            if marker in seen_line:
-                continue
-            seen_line.add(marker)
+    # These are the only frontmatter fields whose contract explicitly permits identity-bearing
+    # prose. Feed them through exactly the same extractor/resolver as body prose so a tree-ratchet
+    # refresh cannot turn frontmatter into an identity-review side channel.
+    for field, lineno, raw in frontmatter_identity_values(text, front):
+        for value, kind, resolved in extract_candidates(raw, identity_index, identity_ids, state):
             yield Occurrence(
                 candidate=value,
                 normalized=norm(value),
                 kind=kind,
-                dossier=str(path.relative_to(ROOT)),
+                dossier=dossier,
+                state=state,
+                outcome=outcome,
+                section=f"frontmatter:{field}",
+                line=lineno,
+                snippet=f"{field}: {raw}"[:360],
+                resolved_id=resolved,
+            )
+
+    section = "preamble"
+    for relative_lineno, raw in enumerate(body.splitlines(), 1):
+        lineno = line_offset + relative_lineno
+        heading = HEADING_RE.match(raw)
+        candidate_surface = raw
+        if heading:
+            section = heading.group(1).strip()
+            # H1 is the canonical State title (for example `# North Korea (DPRK)`), so it is
+            # outside this non-State identity audit. Lower-level headings remain auditable prose.
+            if raw.startswith("# "):
+                continue
+            candidate_surface = section
+
+        for value, kind, resolved in extract_candidates(candidate_surface, identity_index, identity_ids, state):
+            yield Occurrence(
+                candidate=value,
+                normalized=norm(value),
+                kind=kind,
+                dossier=dossier,
                 state=state,
                 outcome=outcome,
                 section=section,
@@ -260,7 +403,7 @@ def iter_occurrences(
 
 def audit() -> dict:
     dossiers = canonical_state_dossiers()
-    state_codes = {front["iso3"] for _, front, _ in dossiers}
+    state_codes = {front["iso3"] for _, front, _ in dossiers if isinstance(front.get("iso3"), str)}
     identity_index, identity_ids, entity_types = load_identity_index(state_codes)
     occurrences: list[Occurrence] = []
     for path, front, body_offset in dossiers:
@@ -391,15 +534,166 @@ def write_markdown(report: dict, path: Path, limit: int = 300) -> None:
 
 def self_test() -> None:
     assert norm("Udbetaling Danmark / ATP") == "udbetaling danmark atp"
+    assert norm("École Agency") == "école agency"
+    assert norm("Cole Agency") == "cole agency"
+    assert norm("École Agency") != norm("Cole Agency")
+    assert norm("Ｅ́cole Agency") == norm("École Agency")
     assert classify("National Police Service") == "actor-or-institution"
     assert classify("Project Maven System") == "project-or-deployment"
     assert classify("ordinary prose") is None
     assert not plausible("ECL")
+    assert not plausible("Project")
     assert not plausible("../../reviews/2026/foo.md")
     assert not plausible("UPHOLD")
     assert plausible("OHCHR")
-    front, offset = parse_frontmatter("---\nid: ECL-STATE-DNK\niso3: DNK\n---\n# Denmark\n")
+
+    empty_index = build_name_index([], state_codes={"DNK"}, normalizer=norm)
+    for unicode_title in (
+        "École Nationale de Police",
+        "E\u0301cole Nationale de Police",
+        "Łódź Metropolitan Police",
+        "İstanbul Security Directorate",
+        "Česká Národní Police",
+        "東京 Metropolitan Police",
+        "وزارة الداخلية Agency",
+        "कुमार Agency",
+    ):
+        title_candidates = extract_candidates(unicode_title, empty_index, set(), "DNK")
+        assert any(
+            value == unicode_title and kind == "actor-or-institution"
+            for value, kind, _ in title_candidates
+        ), unicode_title
+    nfc = extract_candidates("École Nationale de Police", empty_index, set(), "DNK")
+    nfd = extract_candidates("E\u0301cole Nationale de Police", empty_index, set(), "DNK")
+    assert {norm(value) for value, kind, _ in nfc if kind == "actor-or-institution"} == {
+        norm(value) for value, kind, _ in nfd if kind == "actor-or-institution"
+    }
+
+    # Python lstrip() must never manufacture Markdown structure. NBSP is visible CommonMark prose,
+    # so a pseudo-heading containing a project remains a complete review candidate.
+    pseudo_heading = extract_candidates("\u00a0# Project Aurora", empty_index, set(), "DNK")
+    assert any(
+        value == "Project Aurora" and kind == "project-or-deployment"
+        for value, kind, _ in pseudo_heading
+    ), pseudo_heading
+
+    # Strong opaque-name syntax must work for scripts without case as well as cased scripts.
+    for quoted_native in ("وزارة الداخلية", "東京都公安委員会"):
+        quoted_candidates = extract_candidates(f'"{quoted_native}"', empty_index, set(), "DNK")
+        assert any(
+            value == quoted_native and kind == "quoted-name"
+            for value, kind, _ in quoted_candidates
+        ), (quoted_native, quoted_candidates)
+        code_candidates = extract_candidates(f'`{quoted_native}`', empty_index, set(), "DNK")
+        assert any(
+            value == quoted_native and kind == "opaque-name"
+            for value, kind, _ in code_candidates
+        ), (quoted_native, code_candidates)
+    assert not looks_named_opaque("ordinary lowercase prose")
+
+    # Ordinary periods are sentence boundaries, not arbitrary title-token characters. The
+    # post-period identity must remain independently discoverable instead of being swallowed by
+    # the pre-period title. Explicit dotted identity forms remain supported.
+    sentence_candidates = extract_candidates(
+        "National Commission for Human. Rights Agency", empty_index, set(), "DNK"
+    )
+    assert any(
+        value == "Rights Agency" and kind == "actor-or-institution"
+        for value, kind, _ in sentence_candidates
+    ), sentence_candidates
+    assert not any("Human. Rights" in value for value, _, _ in sentence_candidates), sentence_candidates
+    for dotted_title in (
+        "U.S. Department of Justice",
+        "St. Louis Police",
+        "Acme Inc. Research Division",
+    ):
+        dotted_candidates = extract_candidates(dotted_title, empty_index, set(), "DNK")
+        assert any(value == dotted_title for value, _, _ in dotted_candidates), (
+            dotted_title,
+            dotted_candidates,
+        )
+
+    # A dotted token can itself carry the period ending the previous sentence. Because that is
+    # byte-for-byte ambiguous with an internal abbreviation, audit both readings rather than
+    # letting a reviewed complete title suppress a valid post-period identity.
+    ambiguous_dotted = extract_candidates("Acme Inc. Rights Agency", empty_index, set(), "DNK")
+    assert any(
+        value == "Acme Inc. Rights Agency" and kind == "actor-or-institution"
+        for value, kind, _ in ambiguous_dotted
+    ), ambiguous_dotted
+    assert any(
+        value == "Rights Agency" and kind == "actor-or-institution"
+        for value, kind, _ in ambiguous_dotted
+    ), ambiguous_dotted
+    us_dotted = extract_candidates("U.S. Department of Justice", empty_index, set(), "DNK")
+    assert any(
+        value == "Department of Justice" and kind == "actor-or-institution"
+        for value, kind, _ in us_dotted
+    ), us_dotted
+
+    cole_index = build_name_index(
+        [{"id": "AGENCY-DNK-COLE", "type": "Agency", "name": "Cole Agency", "aliases": []}],
+        state_codes={"DNK"},
+        normalizer=norm,
+    )
+    assert resolve_name(cole_index, "DNK", "Cole Agency") == "AGENCY-DNK-COLE"
+    assert resolve_name(cole_index, "DNK", "École Agency") is None
+    ecole_index = build_name_index(
+        [{"id": "AGENCY-DNK-ECOLE", "type": "Agency", "name": "École Agency", "aliases": []}],
+        state_codes={"DNK"},
+        normalizer=norm,
+    )
+    assert resolve_name(ecole_index, "DNK", "ÉCOLE AGENCY") == "AGENCY-DNK-ECOLE"
+
+    sample = (
+        "---\n"
+        "id: ECL-STATE-DNK\n"
+        "iso3: DNK\n"
+        "provisional_scope: >\n"
+        "  NCCIA project\n"
+        "adversarial_result: |-\n"
+        "  Operation Aurora remains in scope\n"
+        "issue: Human Rights Watch\n"
+        "---\n"
+        "# Denmark\n"
+    )
+    front, offset = parse_frontmatter(sample)
     assert front["iso3"] == "DNK" and offset > 0
+    assert frontmatter_identity_values(sample, front) == [
+        ("provisional_scope", 4, "NCCIA project"),
+        ("adversarial_result", 6, "Operation Aurora remains in scope"),
+    ]
+    scope_candidates = extract_candidates(front["provisional_scope"], empty_index, set(), "DNK")
+    result_candidates = extract_candidates(front["adversarial_result"], empty_index, set(), "DNK")
+    assert any(value == "NCCIA" and kind == "acronym-review" for value, kind, _ in scope_candidates)
+    assert any(
+        value == "Operation Aurora" and kind == "project-or-deployment"
+        for value, kind, _ in result_candidates
+    )
+    heading = HEADING_RE.match("## Project Aurora")
+    assert heading
+    heading_candidates = extract_candidates(heading.group(1).strip(), empty_index, set(), "DNK")
+    assert any(
+        value == "Project Aurora" and kind == "project-or-deployment"
+        for value, kind, _ in heading_candidates
+    )
+    state_heading = HEADING_RE.match("# North Korea (DPRK)")
+    assert state_heading and "# North Korea (DPRK)".startswith("# ")
+    bad = (
+        "---\n"
+        "id: ECL-STATE-DNK\n"
+        "iso3: DNK\n"
+        "provisional_scope:\n"
+        "  - NCCIA project\n"
+        "---\n"
+    )
+    bad_front, _ = parse_frontmatter(bad)
+    try:
+        frontmatter_identity_values(bad, bad_front)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("non-textual identity-bearing frontmatter must fail closed")
     resolution_self_test()
     print("entity audit self-test: OK")
 

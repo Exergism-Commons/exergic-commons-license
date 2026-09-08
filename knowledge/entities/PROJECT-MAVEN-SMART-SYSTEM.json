@@ -4,6 +4,7 @@
   "id": "PROJECT-MAVEN-SMART-SYSTEM",
   "type": "Project",
   "name": "Maven Smart System",
+  "aliases": ["Maven"],
   "dossier": "../../dossiers/projects/MAVEN-SMART-SYSTEM.md",
   "lastSubstantiveReview": "2026-08-13",
   "reviewClass": "manual",

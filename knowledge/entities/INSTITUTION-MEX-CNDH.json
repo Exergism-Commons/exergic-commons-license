@@ -4,11 +4,8 @@
   "id": "INSTITUTION-MEX-CNDH",
   "type": "Institution",
   "name": "National Human Rights Commission of Mexico",
-  "aliases": [
-    "CNDH",
-    "Comisión Nacional de los Derechos Humanos"
-  ],
-  "dossier": "../../dossiers/institutions/MEX-CNDH.md",
+  "aliases": ["CNDH", "Comisión Nacional de los Derechos Humanos"],
+  "dossier": "../../dossiers/states/MEX.md",
   "lastSubstantiveReview": "2026-08-18",
   "reviewDue": "2026-09-18",
   "reviewClass": "active",
