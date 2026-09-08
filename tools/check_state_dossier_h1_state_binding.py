@@ -45,7 +45,7 @@ def load_state_identity(iso: str) -> dict:
 
 
 def non_commonmark_h1_like_line(text: str) -> str | None:
-    """Return an H1 accepted by the legacy Python-\s regex but not by CommonMark syntax."""
+    """Return an H1 accepted by the legacy Python whitespace regex but not by CommonMark syntax."""
     front = identity_sets.FRONT.match(text)
     if front is None:
         return None
@@ -148,8 +148,8 @@ def self_test() -> None:
     reason = binding_error(unknown_alias, identity_sets.parse_frontmatter_text(unknown_alias), identity)
     assert reason and "not present on the State identity" in reason, reason
 
-    # Legacy H1_RE uses Python \s and would accept these as the one canonical H1. CommonMark does
-    # not: NBSP remains paragraph text and a tab creates indentation rather than <=3 spaces.
+    # Legacy H1_RE uses Python whitespace semantics and would accept these as the one canonical H1.
+    # CommonMark does not: NBSP remains paragraph text and a tab creates indentation rather than <=3 spaces.
     for prefix in ("\u00a0", "\t", " \t"):
         pseudo = canonical.replace("# North Korea (DPRK)", prefix + "# North Korea (DPRK)")
         assert identity_sets.H1_RE.fullmatch((prefix + "# North Korea (DPRK)")) is not None
