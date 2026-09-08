@@ -62,7 +62,7 @@ jobs:
 
           changed = []
           missing = []
-          pattern = re.compile(r'(?m)^(\s*"dossier"\s*:\s*)"[^"]*"(\s*,?)$')
+          pattern = re.compile(r'("dossier"\s*:\s*)"(?:\\.|[^"\\])*"')
           for path in sorted((root / 'knowledge' / 'entities').rglob('*')):
               if not path.is_file() or path.suffix.lower() not in {'.json', '.jsonld'}:
                   continue
@@ -81,10 +81,10 @@ jobs:
               if data.get('dossier') == desired:
                   continue
               text = path.read_text(encoding='utf-8')
-              replacement = lambda m: f'{m.group(1)}"{desired}"{m.group(2)}'
+              replacement = lambda m: f'{m.group(1)}{json.dumps(desired)}'
               updated, count = pattern.subn(replacement, text, count=1)
               if count != 1:
-                  raise SystemExit(f'{path}: expected exactly one simple dossier field, got {count}')
+                  raise SystemExit(f'{path}: expected exactly one dossier field, got {count}')
               parsed = json.loads(updated)
               if parsed.get('dossier') != desired:
                   raise SystemExit(f'{path}: dossier replacement did not round-trip')
