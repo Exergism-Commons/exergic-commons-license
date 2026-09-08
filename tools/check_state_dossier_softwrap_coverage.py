@@ -20,10 +20,11 @@ MULTILINE_REFERENCE_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\[[^\]]*\]", re.S)
 
 
 def source_line(raw: str) -> str:
-    # A backslash immediately before a source newline is a CommonMark hard-break marker,
-    # not visible prose. Remove it while preserving inline markup until the complete prose
-    # block has been assembled; markup may itself span the source-line boundary.
-    return re.sub(r"\\\s*$", "", raw)
+    # A CommonMark backslash hard break exists only when the backslash is immediately before the
+    # source line ending. ``splitlines()`` has already removed that ending, so remove exactly one
+    # terminal backslash and nothing else. Python ``\s`` would also erase NBSP/Unicode whitespace
+    # after the backslash and manufacture prose that CommonMark never renders.
+    return raw[:-1] if raw.endswith("\\") else raw
 
 
 def strip_quote(raw: str) -> str:
@@ -214,6 +215,15 @@ def self_test() -> None:
     ambiguous = cross_line_candidates("Acme Inc.\nNational Human\nRights Agency\n")
     assert any(row["candidate"] == "Acme Inc. National Human Rights Agency" for row in ambiguous), ambiguous
     assert any(row["candidate"] == "National Human Rights Agency" for row in ambiguous), ambiguous
+
+    # CommonMark hard breaks use a backslash immediately before the line ending. Unicode whitespace
+    # after the backslash is visible content, not part of that marker; never erase it with Python
+    # ``\s`` and manufacture a cross-line title that is absent from rendered Markdown.
+    assert source_line("National Human\\") == "National Human"
+    unicode_after_backslash = "National Human\\\u00a0"
+    assert source_line(unicode_after_backslash) == unicode_after_backslash
+    fabricated = cross_line_candidates("National Human\\\u00a0\nRights Agency\n")
+    assert not any(row["candidate"] == "National Human Rights Agency" for row in fabricated), fabricated
 
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
