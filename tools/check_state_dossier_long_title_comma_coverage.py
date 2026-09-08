@@ -42,10 +42,9 @@ LONG_COMMA_TITLE_RE = re.compile(
 TERMINAL_CLASS_TERMS = base.ORG_TERMS | base.PROJECT_TERMS
 
 
-def comma_long_title_surfaces(text: str) -> list[tuple[str, str]]:
-    text = " ".join(text.split())
+def _comma_long_title_surfaces_once(text: str) -> list[tuple[str, str]]:
+    """Extract complete long comma-bearing titles for one interpretation of the text."""
     out: list[tuple[str, str]] = []
-    seen: set[tuple[str, str]] = set()
     for match in LONG_COMMA_TITLE_RE.finditer(text):
         raw = match.group("title")
         if "," not in raw:
@@ -63,11 +62,42 @@ def comma_long_title_surfaces(text: str) -> list[tuple[str, str]]:
         kind = base.classify(candidate)
         if kind is None or not base.plausible(candidate):
             continue
-        marker = (base.norm(candidate), kind)
-        if marker in seen:
-            continue
-        seen.add(marker)
         out.append((candidate, kind))
+    return out
+
+
+def _post_dotted_views(text: str) -> list[str]:
+    """Return remaining text after dotted tokens that occur inside a long comma title match."""
+    views: list[str] = []
+    for match in LONG_COMMA_TITLE_RE.finditer(text):
+        matched = match.group("title")
+        for boundary in base.AMBIGUOUS_DOTTED_BOUNDARY_RE.finditer(matched):
+            views.append(matched[boundary.end():] + text[match.end():])
+    return views
+
+
+def comma_long_title_surfaces(text: str) -> list[tuple[str, str]]:
+    """Return long comma titles for complete and ambiguous post-period readings."""
+    normalized_text = " ".join(text.split())
+    pending = [normalized_text]
+    seen_views: set[str] = set()
+    seen_surfaces: set[tuple[str, str]] = set()
+    out: list[tuple[str, str]] = []
+
+    while pending:
+        view = pending.pop()
+        if not view or view in seen_views:
+            continue
+        seen_views.add(view)
+        for candidate, kind in _comma_long_title_surfaces_once(view):
+            marker = (base.norm(candidate), kind)
+            if marker in seen_surfaces:
+                continue
+            seen_surfaces.add(marker)
+            out.append((candidate, kind))
+        for suffix_view in _post_dotted_views(view):
+            if suffix_view and suffix_view not in seen_views:
+                pending.append(suffix_view)
     return out
 
 
@@ -184,6 +214,16 @@ def self_test() -> None:
     )
     dotted_comma_found = comma_long_title_surfaces(dotted_comma)
     assert (dotted_comma, "actor-or-institution") in dotted_comma_found, dotted_comma_found
+
+    # Exact coverage of a glued reading must not suppress a distinct long comma-bearing identity
+    # after an ambiguous dotted token. Emit both interpretations for independent resolution.
+    dotted_suffix = (
+        "National Commission for the Prevention of Torture and Other Cruel, Inhuman Agency"
+    )
+    dotted_full = "Acme Inc. " + dotted_suffix
+    dotted_views = comma_long_title_surfaces(dotted_full)
+    assert (dotted_full, "actor-or-institution") in dotted_views, dotted_views
+    assert (dotted_suffix, "actor-or-institution") in dotted_views, dotted_views
 
     # Ordinary short comma-bearing names do not enter this long-title guard.
     assert comma_long_title_surfaces("Research, Development Agency") == []
