@@ -119,11 +119,16 @@ def visible_prose(text: str) -> str:
 
 
 def rendered_line_fragment(text: str) -> str:
-    """Normalize source-newline syntax that renders only as whitespace."""
-    value = text.rstrip()
-    if value.endswith("\\"):
-        value = value[:-1]
-    return value.strip()
+    """Normalize source-newline syntax that renders only as whitespace.
+
+    A CommonMark backslash hard break exists only when the backslash is literally the final
+    source character before the line ending. Check that condition before trimming any whitespace;
+    otherwise ``\\ `` / ``\\\u00a0`` would be misrendered as a terminal backslash and could glue
+    identities/actions that are not adjacent in rendered Markdown.
+    """
+    if text.endswith("\\"):
+        text = text[:-1]
+    return text.strip()
 
 
 def rendered_prose_segments(body: str) -> list[tuple[int, str, str]]:
@@ -332,6 +337,19 @@ def self_test() -> None:
     assert len(soft) == 1 and extract_names(soft[0][2]) == expected
     hard = rendered_prose_segments("Cellebrite\\\nsupplied software\n")
     assert len(hard) == 1 and extract_names(hard[0][2]) == expected
+
+    # A backslash is a CommonMark hard-break marker only when it is literally terminal.
+    # Whitespace after it must remain semantically visible enough to prevent false adjacency.
+    assert rendered_line_fragment("Cellebrite\\") == "Cellebrite"
+    assert rendered_line_fragment("Cellebrite\\ ") == "Cellebrite\\"
+    assert rendered_line_fragment("Cellebrite\\\u00a0") == "Cellebrite\\"
+    false_ascii_hard_break = rendered_prose_segments("Cellebrite\\ \nsupplied software\n")
+    assert len(false_ascii_hard_break) == 1
+    assert extract_names(false_ascii_hard_break[0][2]) == []
+    false_nbsp_hard_break = rendered_prose_segments("Cellebrite\\\u00a0\nsupplied software\n")
+    assert len(false_nbsp_hard_break) == 1
+    assert extract_names(false_nbsp_hard_break[0][2]) == []
+
     separate_items = rendered_prose_segments("- Cellebrite\n- supplied software\n")
     assert not any(extract_names(segment[2]) for segment in separate_items)
     fenced = rendered_prose_segments("```text\nCellebrite supplied software\n```\n")
