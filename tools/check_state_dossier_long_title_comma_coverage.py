@@ -6,9 +6,10 @@ boundary. That can fragment a complete long institutional name such as ``Nationa
 for the Prevention of Torture and Other Cruel, Inhuman or Degrading Treatment Agency``.
 
 This independent guard reconstructs long title-shaped runs with a narrowly bounded comma
-separator between title tokens. Sentence-ending punctuation (period, semicolon, colon,
-question mark and exclamation mark) remains a hard boundary. Complete surfaces must resolve
-to a current State-safe identity; this guard does not infer identity equivalence or governance.
+separator between title tokens. Ordinary sentence-ending punctuation remains a hard boundary;
+periods are accepted only inside the shared explicit dotted-acronym/abbreviation token forms.
+Complete surfaces must resolve to a current State-safe identity; this guard does not infer
+identity equivalence or governance.
 """
 from __future__ import annotations
 
@@ -22,19 +23,18 @@ import check_state_dossier_softwrap_coverage as softwrap
 import commonmark_fences as fences
 
 
-# This companion deliberately owns comma/sentence boundaries while reusing the base Unicode
-# start/mark classes. Preserve the historical rule that a normal title word cannot absorb a
-# period; only an explicit dotted acronym form may contain one.
-TITLE_WORD = (
-    rf"(?:{base.UNICODE_TITLE_START}(?:[^\W_]|{base.UNICODE_TITLE_MARK}|[&'’/-])*"
-    r"|(?:[A-Z]\.){2,})"
-)
+# Reuse the exact shared sentence-safe title token contract. Ordinary words cannot absorb a
+# period, while dotted acronyms and the closed abbreviation set (`Inc.`, `St.`, ...) remain valid
+# identity tokens. A private stricter clone here previously truncated complete comma-bearing names
+# whenever such an abbreviation occurred later in the run.
+TITLE_WORD = base.TITLE_WORD_PATTERN
 TITLE_CONNECTOR = (
     r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
 )
 TITLE_TOKEN = rf"(?:{TITLE_CONNECTOR}|{TITLE_WORD})"
 # A comma is accepted only as punctuation *between* two title tokens. Other sentence-level
-# punctuation is not part of the separator grammar and therefore terminates the run.
+# punctuation is not part of the separator grammar and therefore terminates the run unless it is
+# already contained in one of the explicit dotted token forms above.
 TITLE_SEPARATOR = r"(?:\s+|,\s+)"
 LONG_COMMA_TITLE_RE = re.compile(
     rf"\b(?P<title>{TITLE_WORD}(?:{TITLE_SEPARATOR}{TITLE_TOKEN}){{9,}})"
@@ -175,11 +175,21 @@ def self_test() -> None:
     decomposed_comma_found = comma_long_title_surfaces(decomposed_comma)
     assert (decomposed_comma, "actor-or-institution") in decomposed_comma_found, decomposed_comma_found
 
+    # P1 regression: an explicit dotted abbreviation later in a long comma-bearing title is part
+    # of the shared title grammar. The previous clone stopped before ``Inc.`` and emitted no full
+    # terminal-class identity, so the complete surface could escape exact materialization checks.
+    dotted_comma = (
+        "National Commission for the Prevention of Torture and Other Cruel, "
+        "Inhuman Inc. Research Agency"
+    )
+    dotted_comma_found = comma_long_title_surfaces(dotted_comma)
+    assert (dotted_comma, "actor-or-institution") in dotted_comma_found, dotted_comma_found
+
     # Ordinary short comma-bearing names do not enter this long-title guard.
     assert comma_long_title_surfaces("Research, Development Agency") == []
 
-    # Sentence-ending punctuation remains a hard boundary and cannot glue title fragments or
-    # turn the class word occurring earlier in the phrase into a truncated complete identity.
+    # Ordinary sentence-ending punctuation remains a hard boundary and cannot glue title fragments
+    # or turn a class word occurring earlier in the phrase into a truncated complete identity.
     for punctuation in (".", ";", ":", "?", "!"):
         separated = comma_long_title_surfaces(
             "National Commission for the Prevention of Torture and Other Cruel, "
