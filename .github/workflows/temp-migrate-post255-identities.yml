@@ -1,4 +1,4 @@
-name: Temporary migrate post-255 canonical identities
+name: Temporary apply PR 256 supersession compatibility
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  migrate:
+  patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -20,21 +20,17 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Materialize post-255 canonical dossiers
-        run: python tools/temp_reconcile_pr256_post255.py
-      - name: Render deterministic visual set
+      - name: Patch canonical guards for immutable superseded history
         run: |
-          rm -rf build/post255-generated
-          python tools/render_dossier_visuals.py --out build/post255-generated
-          rsync -a --delete build/post255-generated/ dossiers/assets/generated/
-          python -m py_compile tests/test_canonical_entity_dossier_full_pipeline_e2e.py
-      - name: Commit staged migration
+          set -euo pipefail
+          python tools/temp_patch_pr256_supersession_compat.py
+          python -m py_compile tools/check_canonical_entity_dossiers.py tools/check_canonical_entity_migration_preservation.py
+      - name: Commit guard compatibility
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add knowledge/entities knowledge/generated/canonical-entity-dossier-migration-v50.json dossiers tests/test_canonical_entity_dossier_full_pipeline_e2e.py
-          git status --short
+          git add tools/check_canonical_entity_dossiers.py tools/check_canonical_entity_migration_preservation.py
           git diff --cached --check
-          git commit -m 'Migrate post-255 identities to canonical dossiers'
+          git commit -m 'Honor identity supersessions in canonical dossier history'
           git push origin HEAD:agent/canonical-entity-dossiers-main-integration
