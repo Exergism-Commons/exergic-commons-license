@@ -1,0 +1,15 @@
+{
+  "@context": "../../ontology/ecl-context.jsonld",
+  "iri": "ecl:PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28",
+  "id": "PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28",
+  "type": "Project",
+  "name": "Operação Contenção — 28 October 2025 Alemão/Penha phase",
+  "aliases": [
+    "Operação Contenção 28 October 2025 Alemão/Penha phase"
+  ],
+  "dossier": "../../dossiers/states/BRA.md",
+  "lastSubstantiveReview": "2026-08-25",
+  "reviewDue": "2026-09-25",
+  "reviewClass": "active",
+  "reviewReason": "Identity-only Project for the exact 28 October 2025 Alemão/Penha phase frozen in registry/schedule-state-s-freezes/batch-08-case-projects.yml. The identity does not extend to earlier or later Operação Contenção phases and does not infer participation, culpability or a governance outcome."
+}

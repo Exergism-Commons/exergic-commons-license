@@ -4,6 +4,7 @@
   "id": "ORG-PALANTIR-TECHNOLOGIES",
   "type": "Organization",
   "name": "Palantir Technologies Inc.",
+  "aliases": ["Palantir"],
   "dossier": "../../dossiers/organizations/PALANTIR-TECHNOLOGIES.md",
   "lastSubstantiveReview": "2026-08-13",
   "reviewClass": "manual",
