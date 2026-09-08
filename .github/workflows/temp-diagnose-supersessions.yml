@@ -1,4 +1,4 @@
-name: Temporary diagnose PR 256 supersessions
+name: Temporary diagnose PR 256 post-v49 fixtures
 
 on:
   push:
@@ -17,11 +17,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Locate superseded identity materializations and references
+      - name: Locate hard-coded v50 assumptions
         run: |
           set -euo pipefail
-          for id in AGENCY-LSO-LCS AGENCY-PHL-MPD AGENCY-PHL-PNP AGENCY-SSD-NSS; do
-            echo "===== ${id} ====="
-            git grep -n -F "${id}" -- . ':(exclude)knowledge/generated/entity-id-supersessions-v1.json' || true
-            echo
-          done
+          git grep -n -E 'v50|version.*50|FROZEN_FINAL_VERSION' -- tests tools .github/workflows || true
