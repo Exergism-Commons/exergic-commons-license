@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 import check_state_dossier_identity_sets as identity_sets
@@ -18,6 +19,10 @@ import check_state_dossier_identity_sets as identity_sets
 ROOT = identity_sets.ROOT
 DOSSIERS = identity_sets.DOSSIERS
 ENTITIES = identity_sets.ENTITIES
+# CommonMark permits up to three literal spaces before an ATX heading marker. Python ``\s`` is
+# broader (NBSP, tabs, Unicode spaces, etc.) and must not be allowed to manufacture a canonical
+# H1 that the Markdown renderer does not recognize as the dossier heading.
+COMMONMARK_H1_RE = re.compile(r"^ {0,3}#(?!#)[ \t]+(.+?)[ \t]*$")
 
 
 def load_state_identity(iso: str) -> dict:
@@ -39,6 +44,18 @@ def load_state_identity(iso: str) -> dict:
     return data
 
 
+def non_commonmark_h1_like_line(text: str) -> str | None:
+    """Return an H1 accepted by the legacy Python-\s regex but not by CommonMark syntax."""
+    front = identity_sets.FRONT.match(text)
+    if front is None:
+        return None
+    body = text[front.end():]
+    for raw in body.splitlines():
+        if identity_sets.H1_RE.fullmatch(raw) and COMMONMARK_H1_RE.fullmatch(raw) is None:
+            return raw
+    return None
+
+
 def binding_error(text: str, front: dict[str, object], state_identity: dict) -> str | None:
     iso = front.get("iso3")
     entity = front.get("entity")
@@ -46,6 +63,13 @@ def binding_error(text: str, front: dict[str, object], state_identity: dict) -> 
         return "canonical State dossier lacks textual iso3/entity"
     if state_identity.get("id") != f"STATE-{iso}" or state_identity.get("iso3") != iso:
         return "State dossier and State identity ISO binding disagree"
+
+    pseudo_h1 = non_commonmark_h1_like_line(text)
+    if pseudo_h1 is not None:
+        return (
+            "canonical State dossier contains an H1-like line accepted only by Python whitespace "
+            f"semantics, not CommonMark: {pseudo_h1!r}"
+        )
 
     name = state_identity.get("name")
     aliases = state_identity.get("aliases") or []
@@ -109,6 +133,10 @@ def self_test() -> None:
     front = identity_sets.parse_frontmatter_text(canonical)
     assert binding_error(canonical, front, identity) is None
 
+    # CommonMark also accepts one to three literal leading spaces on ATX headings.
+    three_space = canonical.replace("# North Korea (DPRK)", "   # North Korea (DPRK)")
+    assert binding_error(three_space, identity_sets.parse_frontmatter_text(three_space), identity) is None
+
     drifted = canonical.replace("entity: North Korea", "entity: Project Aurora").replace(
         "# North Korea (DPRK)", "# Project Aurora"
     )
@@ -119,6 +147,15 @@ def self_test() -> None:
     unknown_alias = canonical.replace("# North Korea (DPRK)", "# North Korea (Project Aurora)")
     reason = binding_error(unknown_alias, identity_sets.parse_frontmatter_text(unknown_alias), identity)
     assert reason and "not present on the State identity" in reason, reason
+
+    # Legacy H1_RE uses Python \s and would accept these as the one canonical H1. CommonMark does
+    # not: NBSP remains paragraph text and a tab creates indentation rather than <=3 spaces.
+    for prefix in ("\u00a0", "\t", " \t"):
+        pseudo = canonical.replace("# North Korea (DPRK)", prefix + "# North Korea (DPRK)")
+        assert identity_sets.H1_RE.fullmatch((prefix + "# North Korea (DPRK)")) is not None
+        reason = binding_error(pseudo, identity_sets.parse_frontmatter_text(pseudo), identity)
+        assert reason and "not CommonMark" in reason, (prefix, reason)
+
     print("State dossier H1/State identity binding self-test: OK")
 
 
