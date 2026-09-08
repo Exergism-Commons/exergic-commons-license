@@ -118,7 +118,10 @@ def _overflow_title_surfaces_once(text: str) -> list[tuple[str, str]]:
         continuation = OVERFLOW_RE.match(text, match.end())
         if continuation is None:
             continue
-        full = base.clean_candidate(baseline + continuation.group("tail"))
+        # Clean only after the complete surface is assembled. If the ninth baseline token is
+        # `Inc.`/`U.S.`, cleaning the baseline first would treat its internal period as terminal
+        # punctuation and silently reconstruct a different identity (`Inc Research ...`).
+        full = base.clean_candidate(raw_baseline + continuation.group("tail"))
         if distinct_concept_coordination(full):
             continue
         kind = base.classify(full)
