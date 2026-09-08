@@ -103,18 +103,48 @@ def prose_blocks(body: str, *, hidden_lines: set[int] | None = None) -> list[dic
     return blocks
 
 
+def title_match_views(text: str) -> list[tuple[int, int, str]]:
+    """Return baseline title matches plus overlapping post-dotted-token readings with spans.
+
+    The broad line-level extractor audits both readings of an explicit dotted token because the
+    same bytes may represent an internal abbreviation (`St. Louis Police`) or a sentence-final
+    period (`Acme Inc. Rights Agency`). Soft-wrap coverage needs the same overlap *with source-span
+    coordinates* so it can prove whether each reading crosses a physical line boundary.
+    """
+    out: list[tuple[int, int, str]] = []
+    seen: set[tuple[int, int, str]] = set()
+    for match in base.TITLE_RE.finditer(text):
+        row = (match.start(), match.end(), match.group(0))
+        if row not in seen:
+            seen.add(row)
+            out.append(row)
+        matched = match.group(0)
+        for boundary in base.AMBIGUOUS_DOTTED_BOUNDARY_RE.finditer(matched):
+            suffix_text = matched[boundary.end():]
+            suffix_match = base.TITLE_RE.match(suffix_text)
+            if suffix_match is None:
+                continue
+            start = match.start() + boundary.end() + suffix_match.start()
+            end = match.start() + boundary.end() + suffix_match.end()
+            row = (start, end, suffix_match.group(0))
+            if row not in seen:
+                seen.add(row)
+                out.append(row)
+    return out
+
+
 def cross_line_candidates(body: str) -> list[dict]:
-    """Extract TITLE_RE candidates whose rendered match crosses a source-line boundary."""
+    """Extract title candidates whose rendered reading crosses a source-line boundary."""
     found: list[dict] = []
     for block in prose_blocks(body):
         lines = [line for line in block["lines"] if line]
         if len(lines) < 2:
             continue
         joined, boundaries = render_prose_block(lines)
-        for match in base.TITLE_RE.finditer(joined):
-            if not any(match.start() <= boundary < match.end() for boundary in boundaries):
+        for start, end, raw_value in title_match_views(joined):
+            if not any(start <= boundary < end for boundary in boundaries):
                 continue
-            value = base.clean_candidate(match.group(0))
+            value = base.clean_candidate(raw_value)
             kind = base.classify(value)
             if kind and base.plausible(value):
                 found.append({
@@ -177,6 +207,14 @@ def self_test() -> None:
     assert any(row["candidate"] == "National Cyber Crime Investigation Agency" for row in link_split), link_split
     reference_split = cross_line_candidates("National [Cyber\nCrime Investigation][nccia] Agency reported findings.\n")
     assert any(row["candidate"] == "National Cyber Crime Investigation Agency" for row in reference_split), reference_split
+
+    # P1 regression: a dotted token on the preceding source line is byte-for-byte ambiguous with
+    # a sentence ending. The complete glued reading and the post-period identity both cross source
+    # boundaries, so a non-overlapping TITLE_RE.finditer() must not let the latter disappear.
+    ambiguous = cross_line_candidates("Acme Inc.\nNational Human\nRights Agency\n")
+    assert any(row["candidate"] == "Acme Inc. National Human Rights Agency" for row in ambiguous), ambiguous
+    assert any(row["candidate"] == "National Human Rights Agency" for row in ambiguous), ambiguous
+
     assert cross_line_candidates("- Example Vendor\n- Technology supplied software\n") == []
     assert cross_line_candidates("```text\nAustralian Human\nRights Commission\n```\n") == []
     assert cross_line_candidates("## Australian Human\nRights Commission\n") == []
