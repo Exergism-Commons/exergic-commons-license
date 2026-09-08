@@ -1,0 +1,112 @@
+name: Temporary reconcile PR 256 dossier pointers
+
+on:
+  push:
+    branches:
+      - agent/canonical-entity-dossiers-main-integration
+    paths:
+      - '.github/workflows/temp-reconcile-pr256-dossiers.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Restore exact canonical dossier bindings without rewriting other ABox fields
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+
+          root = Path('.')
+          type_dirs = {
+              'Agency': 'agencies',
+              'Institution': 'institutions',
+              'Organization': 'organizations',
+              'Person': 'persons',
+              'Project': 'projects',
+              'Deployment': 'projects',
+          }
+
+          dossier_by_id = {}
+          duplicates = []
+          for dirname in sorted(set(type_dirs.values())):
+              for path in sorted((root / 'dossiers' / dirname).glob('*.md')):
+                  text = path.read_text(encoding='utf-8')
+                  if not text.startswith('---\n'):
+                      continue
+                  end = text.find('\n---\n', 4)
+                  if end < 0:
+                      continue
+                  fm = {}
+                  for line in text[4:end].splitlines():
+                      if ':' not in line:
+                          continue
+                      k, v = line.split(':', 1)
+                      fm[k.strip()] = v.strip().strip('"').strip("'")
+                  raw = fm.get('id', '')
+                  if not raw.startswith('ECL-'):
+                      continue
+                  entity_id = raw[4:]
+                  if entity_id in dossier_by_id:
+                      duplicates.append((entity_id, dossier_by_id[entity_id], path))
+                  dossier_by_id[entity_id] = path
+          if duplicates:
+              raise SystemExit('duplicate dossier frontmatter ids: ' + repr(duplicates))
+
+          changed = []
+          missing = []
+          pattern = re.compile(r'(?m)^(\s*"dossier"\s*:\s*)"[^"]*"(\s*,?)$')
+          for path in sorted((root / 'knowledge' / 'entities').rglob('*')):
+              if not path.is_file() or path.suffix.lower() not in {'.json', '.jsonld'}:
+                  continue
+              data = json.loads(path.read_text(encoding='utf-8'))
+              entity_id = data.get('id')
+              entity_type = data.get('type')
+              if entity_type not in type_dirs or not isinstance(entity_id, str):
+                  continue
+              dossier = dossier_by_id.get(entity_id)
+              if dossier is None:
+                  missing.append(entity_id)
+                  continue
+              if dossier.parent.name != type_dirs[entity_type]:
+                  raise SystemExit(f'{entity_id}: exact dossier is under wrong type directory: {dossier}')
+              desired = Path(os.path.relpath(dossier, path.parent)).as_posix()
+              if data.get('dossier') == desired:
+                  continue
+              text = path.read_text(encoding='utf-8')
+              replacement = lambda m: f'{m.group(1)}"{desired}"{m.group(2)}'
+              updated, count = pattern.subn(replacement, text, count=1)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one simple dossier field, got {count}')
+              parsed = json.loads(updated)
+              if parsed.get('dossier') != desired:
+                  raise SystemExit(f'{path}: dossier replacement did not round-trip')
+              before = dict(data); after = dict(parsed)
+              before.pop('dossier', None); after.pop('dossier', None)
+              if before != after:
+                  raise SystemExit(f'{path}: non-dossier content changed')
+              path.write_text(updated, encoding='utf-8')
+              changed.append((entity_id, desired))
+
+          print(f'exact dedicated dossier bindings restored: {len(changed)}')
+          print(f'current non-State identities without exact dedicated dossier: {len(missing)}')
+          for entity_id in missing:
+              print(f'MISSING {entity_id}')
+          PY
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add knowledge/entities
+          if git diff --cached --quiet; then
+            echo 'No ABox dossier pointers required reconciliation.'
+          else
+            git commit -m 'Reconcile canonical dossier pointers with merged #255 identities'
+            git push origin HEAD:agent/canonical-entity-dossiers-main-integration
+          fi
