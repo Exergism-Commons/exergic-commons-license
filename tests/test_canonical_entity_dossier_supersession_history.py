@@ -14,6 +14,7 @@ sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import check_canonical_entity_dossiers_extended as coverage  # noqa: E402
 import check_canonical_entity_migration_preservation as preservation  # noqa: E402
+import check_canonical_entity_migration_preservation_extended as preservation_extended  # noqa: E402
 
 
 class CanonicalHistoricalSupersessionTests(unittest.TestCase):
@@ -108,20 +109,43 @@ class CanonicalHistoricalSupersessionTests(unittest.TestCase):
     def test_baseline_preservation_accepts_authoritative_source_removal(self) -> None:
         before = {"id": "ORG-OLD", "iri": "ecl:ORG-OLD", "type": "Organization"}
         target = {"id": "ORG-NEW", "iri": "ecl:ORG-NEW", "type": "Organization"}
-        with mock.patch(
-            "check_canonical_entity_migration_preservation_extended._supported_base_records",
-            return_value={"ORG-OLD": before},
+        with mock.patch.object(
+            preservation_extended, "_supported_base_records", return_value={"ORG-OLD": before}
         ), mock.patch.object(
             preservation, "current_entity_index", return_value={"ORG-NEW": (target, "knowledge/entities/ORG-NEW.json")}
         ), mock.patch.object(
             preservation, "current_supersession_map", return_value={"ORG-OLD": "ORG-NEW"}
         ):
-            self.assertEqual(
-                __import__("check_canonical_entity_migration_preservation_extended").validate_baseline_identity_preservation(
-                    "BASE", REPO_ROOT
-                ),
-                [],
-            )
+            self.assertEqual(preservation_extended.validate_baseline_identity_preservation("BASE", REPO_ROOT), [])
+
+    def test_baseline_preservation_rejects_unmapped_deletion(self) -> None:
+        before = {"id": "ORG-OLD", "iri": "ecl:ORG-OLD", "type": "Organization"}
+        with mock.patch.object(
+            preservation_extended, "_supported_base_records", return_value={"ORG-OLD": before}
+        ), mock.patch.object(
+            preservation, "current_entity_index", return_value={}
+        ), mock.patch.object(
+            preservation, "current_supersession_map", return_value={}
+        ):
+            errors = preservation_extended.validate_baseline_identity_preservation("BASE", REPO_ROOT)
+        self.assertTrue(any("deleted without an authoritative identity supersession" in error for error in errors), errors)
+
+    def test_baseline_preservation_rejects_materialized_supersession_source(self) -> None:
+        before = {"id": "ORG-OLD", "iri": "ecl:ORG-OLD", "type": "Organization"}
+        target = {"id": "ORG-NEW", "iri": "ecl:ORG-NEW", "type": "Organization"}
+        current = {
+            "ORG-OLD": (before, "knowledge/entities/ORG-OLD.json"),
+            "ORG-NEW": (target, "knowledge/entities/ORG-NEW.json"),
+        }
+        with mock.patch.object(
+            preservation_extended, "_supported_base_records", return_value={"ORG-OLD": before}
+        ), mock.patch.object(
+            preservation, "current_entity_index", return_value=current
+        ), mock.patch.object(
+            preservation, "current_supersession_map", return_value={"ORG-OLD": "ORG-NEW"}
+        ):
+            errors = preservation_extended.validate_baseline_identity_preservation("BASE", REPO_ROOT)
+        self.assertTrue(any("superseded source remains materialized" in error for error in errors), errors)
 
 
 if __name__ == "__main__":
