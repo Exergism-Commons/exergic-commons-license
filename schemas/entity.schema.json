@@ -54,7 +54,8 @@
           "anyOf": [
             {"required": ["currentGovernance"]}, {"required": ["governanceStatus"]},
             {"required": ["restrictionStatus"]}, {"required": ["tier"]},
-            {"required": ["outcome"]}, {"required": ["provisional_outcome"]}, {"required": ["status"]}
+            {"required": ["outcome"]}, {"required": ["provisional_outcome"]}, {"required": ["status"]},
+            {"required": ["identityLifecycle"]}, {"required": ["supersededBy"]}
           ]
         }
       }
