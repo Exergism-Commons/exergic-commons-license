@@ -24,20 +24,21 @@ import commonmark_fences as fences
 
 
 REVIEW_PATH = base.ROOT / "knowledge/generated/state-dossier-long-title-dispositions-v1.json"
-# Reuse the shared Unicode start/mark contract without importing the broad extractor's ordinary
-# internal-period allowance: in an overflow tail a sentence-ending period is a structural
-# boundary. Dotted acronyms remain supported explicitly.
-TITLE_WORD = (
-    rf"(?:{base.UNICODE_TITLE_START}(?:[^\W_]|{base.UNICODE_TITLE_MARK}|[&'’/-])*"
-    r"|(?:[A-Z]\.){2,})"
-)
+# Reuse the exact shared sentence-safe title token contract. Ordinary words cannot contain a
+# period; only explicit dotted acronyms and the closed abbreviation set can. This matters in the
+# overflow tail too: otherwise a legitimate ``Inc.``/``St.`` after token nine truncates the full
+# identity before the long-title guard can review it.
+TITLE_WORD = base.TITLE_WORD_PATTERN
 # Lowercase connectors are token-bounded so ``de`` cannot consume the prefix of ``described``.
 # ``or`` is required for complete institutional names such as ``... Cruel Inhuman or Degrading ...``.
 TITLE_CONNECTOR = r"(?:(?:of|the|and|or|for|against|on|in|to|de|del|la|le|des|da|di|do|dos|van|von)\b)"
 TITLE_TOKEN = rf"(?:{TITLE_CONNECTOR}|{TITLE_WORD})"
 OVERFLOW_RE = re.compile(rf"(?P<tail>(?:\s+{TITLE_TOKEN})+)")
 DISTINCT_COORDINATION_RE = re.compile(r"\band\s+the\s+", re.I)
-TRAILING_TITLE_PUNCTUATION = frozenset("&.'’/-")
+# Period is deliberately absent: the shared TITLE_WORD contract can consume it only as part of an
+# explicit dotted token. Such bytes are linguistically ambiguous with a sentence ending, so this
+# guard audits the complete reading while ``_post_dotted_views`` audits the post-period reading.
+TRAILING_TITLE_PUNCTUATION = frozenset("&'’/-")
 
 
 def strict_json(path):
@@ -109,10 +110,9 @@ def _overflow_title_surfaces_once(text: str) -> list[tuple[str, str]]:
         baseline = base.clean_candidate(raw_baseline)
         if len(baseline.split()) < 9:
             continue
-        # The historical baseline ended at a word boundary. The Unicode-aware baseline accepts
-        # the same punctuation inside title tokens but can consume a final non-word punctuation
-        # mark before whitespace. Do not reinterpret text after such punctuation as title
-        # continuation: preserve the old sentence/token boundary semantics exactly.
+        # The baseline may end in punctuation that is genuinely structural for this grammar.
+        # Explicit dotted acronyms/abbreviations are not in this set: they are intentionally
+        # ambiguous and both the complete and post-period readings are audited fail-closed.
         if raw_baseline and raw_baseline[-1] in TRAILING_TITLE_PUNCTUATION:
             continue
         continuation = OVERFLOW_RE.match(text, match.end())
@@ -297,14 +297,13 @@ def self_test() -> None:
     )
     assert coordinated == [], coordinated
 
-    # A period ending the nine-token baseline suppresses overflow entirely.
+    # An ordinary period remains a hard boundary because ordinary TITLE_WORD tokens cannot absorb it.
     baseline_period = overflow_title_surfaces(
         "National Commission for the Prevention of Torture and Other. Degrading Treatment Agency"
     )
     assert baseline_period == [], baseline_period
 
-    # A period in the continuation may leave a legitimate title-shaped prefix before the period,
-    # but no emitted candidate may contain material from both sides of that sentence boundary.
+    # An ordinary period in the continuation likewise cannot glue title fragments.
     tail_period_text = (
         "National Commission for the Prevention of Torture and Other Cruel. "
         "Inhuman Degrading Treatment Agency"
@@ -323,6 +322,21 @@ def self_test() -> None:
     dotted_long = overflow_title_surfaces(dotted_long_full)
     assert (dotted_long_full, "actor-or-institution") in dotted_long, dotted_long
     assert (dotted_long_suffix, "actor-or-institution") in dotted_long, dotted_long
+
+    # P1 regression: the explicit dotted abbreviation may itself occur only after the historical
+    # nine-token ceiling. A private copy of the title token grammar used to stop at ``Inc.`` and
+    # emit only a classified prefix, allowing the complete identity to remain outside review.
+    dotted_overflow = (
+        "National Commission for the Prevention of Torture and Other Cruel Inc. Research Agency"
+    )
+    dotted_overflow_found = overflow_title_surfaces(dotted_overflow)
+    assert (dotted_overflow, "actor-or-institution") in dotted_overflow_found, dotted_overflow_found
+
+    # The same ambiguity exists when the dotted abbreviation is exactly the ninth baseline token;
+    # a blanket trailing-period guard must not suppress the legitimate complete reading.
+    dotted_ninth = "National Commission for the Prevention of Torture and Inc. Research Agency"
+    dotted_ninth_found = overflow_title_surfaces(dotted_ninth)
+    assert (dotted_ninth, "actor-or-institution") in dotted_ninth_found, dotted_ninth_found
 
     # Table rows are deliberately outside prose_blocks(). A NBSP-prefixed backtick line is not a
     # CommonMark fence opener, so it cannot hide the only same-line scan of the following long title.
