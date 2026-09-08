@@ -20,9 +20,9 @@ import re
 import audit_state_dossier_entities as base
 import check_state_dossier_rendered_markup_coverage as markup
 import check_state_dossier_softwrap_coverage as softwrap
+import commonmark_fences as fences
 
 
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 REVIEW_PATH = base.ROOT / "knowledge/generated/state-dossier-long-title-dispositions-v1.json"
 # Reuse the shared Unicode start/mark contract without importing the broad extractor's ordinary
 # internal-period allowance: in an overflow tail a sentence-ending period is a structural
@@ -214,19 +214,11 @@ def audit() -> list[dict]:
 
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
-        fence_marker: str | None = None
+        hidden_lines = fences.fenced_line_numbers(body)
         for rel_line, raw in enumerate(body.splitlines(), 1):
-            fence = FENCE_RE.match(raw)
-            if fence:
-                marker = fence.group(1)[0]
-                if fence_marker is None:
-                    fence_marker = marker
-                elif marker == fence_marker:
-                    fence_marker = None
+            if rel_line in hidden_lines or not raw.strip():
                 continue
-            if fence_marker is not None or not raw.strip():
-                continue
-            if raw.lstrip().startswith("# "):
+            if raw.startswith("# "):
                 continue
             inspect(
                 state=state,
@@ -237,8 +229,8 @@ def audit() -> list[dict]:
             )
 
         # Reconstruct soft-wrapped title runs before checking the ceiling as a second line of
-        # defense. Fenced code and canonical H1 handling remain owned by the shared block parser.
-        for block in softwrap.prose_blocks(body):
+        # defense. Fenced code and source-line semantics come from the exact shared parser result.
+        for block in softwrap.prose_blocks(body, hidden_lines=hidden_lines):
             lines = [line for line in block["lines"] if line]
             if not lines:
                 continue
@@ -270,6 +262,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     long_name = (
         "National Commission for the Prevention of Torture and Other Cruel Inhuman or "
         "Degrading Treatment Agency"
@@ -330,6 +323,14 @@ def self_test() -> None:
     dotted_long = overflow_title_surfaces(dotted_long_full)
     assert (dotted_long_full, "actor-or-institution") in dotted_long, dotted_long
     assert (dotted_long_suffix, "actor-or-institution") in dotted_long, dotted_long
+
+    # Table rows are deliberately outside prose_blocks(). A NBSP-prefixed backtick line is not a
+    # CommonMark fence opener, so it cannot hide the only same-line scan of the following long title.
+    pseudo_fence_table = f"\u00a0```text\n| {long_name} | evidence |\n"
+    hidden = fences.fenced_line_numbers(pseudo_fence_table)
+    assert hidden == set(), hidden
+    table_line = pseudo_fence_table.splitlines()[1]
+    assert (long_name, "actor-or-institution") in overflow_title_surfaces(table_line), table_line
 
     print("State dossier long-title coverage self-test: OK")
 
