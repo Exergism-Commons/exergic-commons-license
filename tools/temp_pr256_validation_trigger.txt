@@ -1,1 +1,1 @@
-Temporary validation trigger for the post-#255 PR #256 integration. Remove before updating the PR branch.
+Temporary validation trigger for the post-#255 PR #256 integration. Pass 2 after supersession-aware canonical guards. Remove before updating the PR branch.
