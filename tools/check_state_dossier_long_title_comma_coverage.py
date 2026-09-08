@@ -19,9 +19,9 @@ import re
 import audit_state_dossier_entities as base
 import check_state_dossier_rendered_markup_coverage as markup
 import check_state_dossier_softwrap_coverage as softwrap
+import commonmark_fences as fences
 
 
-FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 # This companion deliberately owns comma/sentence boundaries while reusing the base Unicode
 # start/mark classes. Preserve the historical rule that a normal title word cannot absorb a
 # period; only an explicit dotted acronym form may contain one.
@@ -116,19 +116,11 @@ def audit() -> list[dict]:
 
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
-        fence_marker: str | None = None
+        hidden_lines = fences.fenced_line_numbers(body)
         for rel_line, raw in enumerate(body.splitlines(), 1):
-            fence = FENCE_RE.match(raw)
-            if fence:
-                marker = fence.group(1)[0]
-                if fence_marker is None:
-                    fence_marker = marker
-                elif marker == fence_marker:
-                    fence_marker = None
+            if rel_line in hidden_lines or not raw.strip():
                 continue
-            if fence_marker is not None or not raw.strip():
-                continue
-            if raw.lstrip().startswith("# "):
+            if raw.startswith("# "):
                 continue
             inspect(
                 state=state,
@@ -138,7 +130,7 @@ def audit() -> list[dict]:
                 snippet=raw,
             )
 
-        for block in softwrap.prose_blocks(body):
+        for block in softwrap.prose_blocks(body, hidden_lines=hidden_lines):
             lines = [line for line in block["lines"] if line]
             if not lines:
                 continue
@@ -155,6 +147,7 @@ def audit() -> list[dict]:
 
 
 def self_test() -> None:
+    fences.self_test()
     reported = (
         "National Commission for the Prevention of Torture and Other Cruel, "
         "Inhuman or Degrading Treatment Agency"
@@ -193,6 +186,19 @@ def self_test() -> None:
             f"Inhuman{punctuation} Degrading Treatment Agency"
         )
         assert separated == [], (punctuation, separated)
+
+    # Concrete composition regression: a NBSP-prefixed fence opener is visible CommonMark prose.
+    # The following table row is intentionally absent from prose_blocks(), so the same-line scan
+    # must not disappear behind a Python-\s fence state. It contains the complete long comma title.
+    table_title = (
+        "National Commission for the Prevention of Torture and Other Cruel, "
+        "Inhuman or Degrading Treatment Agency"
+    )
+    pseudo_fence_table = f"\u00a0```text\n| {table_title} | evidence |\n"
+    hidden = fences.fenced_line_numbers(pseudo_fence_table)
+    assert hidden == set(), hidden
+    table_line = pseudo_fence_table.splitlines()[1]
+    assert any(value == table_title for value, _ in comma_long_title_surfaces(table_line)), table_line
 
     print("State dossier long comma-title coverage self-test: OK")
 
