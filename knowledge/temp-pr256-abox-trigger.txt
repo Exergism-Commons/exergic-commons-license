@@ -1,0 +1,1 @@
+Temporary CI trigger for State ABox integrity after post-#255 PR #256 reconciliation. Remove before updating the PR branch.
