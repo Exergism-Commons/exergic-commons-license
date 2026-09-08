@@ -41,16 +41,36 @@ def validate_baseline_identity_preservation(base_ref: str, root: Path = ROOT) ->
     try:
         base_records = _supported_base_records(base_ref, root)
         current = checker.current_entity_index(root)
+        supersessions = checker.current_supersession_map(root)
     except (RuntimeError, json.JSONDecodeError) as exc:
         return [str(exc)]
 
     errors: list[str] = []
     for entity_id, before in sorted(base_records.items()):
         current_entry = current.get(entity_id)
+        target_id = supersessions.get(entity_id)
         if current_entry is None:
+            if target_id is None:
+                errors.append(
+                    f"{entity_id}: supported non-State identity existed at comparison base {base_ref} "
+                    "but was deleted without an authoritative identity supersession"
+                )
+                continue
+            target_entry = current.get(target_id)
+            if target_entry is None:
+                errors.append(f"{entity_id}: supersession target {target_id} is missing from current ABox")
+                continue
+            target, _target_rel = target_entry
+            if before.get("type") != target.get("type"):
+                errors.append(
+                    f"{entity_id}: supersession target {target_id} changes identity type "
+                    f"{before.get('type')!r} -> {target.get('type')!r}"
+                )
+            continue
+        if target_id is not None:
             errors.append(
-                f"{entity_id}: supported non-State identity existed at comparison base {base_ref} "
-                "but was deleted; use identityLifecycle/supersededBy rather than shrinking the coverage denominator"
+                f"{entity_id}: superseded source remains materialized; authoritative supersession "
+                f"requires source removal in favor of {target_id}"
             )
             continue
         after, _rel = current_entry

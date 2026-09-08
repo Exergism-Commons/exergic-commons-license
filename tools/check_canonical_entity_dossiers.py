@@ -11,12 +11,14 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+import entity_identity_resolution as identity_resolution
+
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge/entities"
 DEFAULT_MANIFEST_DIR = ROOT / "knowledge/generated"
 DEFAULT_PALETTE = ROOT / "knowledge/generated/dossier-visual-palette-v1.json"
 EVIDENCE_IMAGE_DIR = ROOT / "dossiers/evidence-images"
-SUPERSESSIONS_PATH = ROOT / "knowledge/generated/entity-id-supersessions-v1.json"
+SUPERSESSIONS_DIR = ROOT / "knowledge/generated"
 TYPE_DIR = {"Agency":"agencies","Institution":"institutions","Organization":"organizations","Person":"persons","Project":"projects"}
 EXPECTED_PALETTE = {"R":"#B42318","S":"#E67E22","U":"#D4A017","N":"#2E7D32","UNKNOWN":"#667085"}
 VALID_ENTITY_STATE_CONTEXTS = {"R", "S", "U", "N"}
@@ -40,36 +42,17 @@ def load_json(path: Path) -> dict:
 
 
 
-def load_supersessions(path: Path = SUPERSESSIONS_PATH) -> tuple[dict[str, str], list[str]]:
-    """Load direct identity supersessions used to reconcile immutable historical manifests."""
-    if not path.is_file():
-        return {}, []
+def load_supersessions(path: Path | None = None) -> tuple[dict[str, str], list[str]]:
+    """Load the authoritative contiguous identity-supersession manifest chain."""
+    generated_dir = SUPERSESSIONS_DIR if path is None else (path if path.is_dir() else path.parent)
     try:
-        payload = load_json(path)
-    except (OSError, json.JSONDecodeError) as exc:
-        return {}, [f"{path.relative_to(ROOT)}: cannot load supersessions: {exc}"]
-    rows = payload.get("supersessions")
-    if not isinstance(rows, list):
-        return {}, [f"{path.relative_to(ROOT)}: supersessions must be a list"]
-    mapping: dict[str, str] = {}
-    errors: list[str] = []
-    for index, row in enumerate(rows):
-        if not isinstance(row, dict):
-            errors.append(f"{path.relative_to(ROOT)}: supersession row {index} must be an object")
-            continue
-        source, target = row.get("from"), row.get("to")
-        if not isinstance(source, str) or not source or not isinstance(target, str) or not target:
-            errors.append(f"{path.relative_to(ROOT)}: supersession row {index} requires non-empty from/to ids")
-            continue
-        if source == target:
-            errors.append(f"{path.relative_to(ROOT)}: self-supersession is forbidden for {source}")
-            continue
-        if source in mapping:
-            errors.append(f"{path.relative_to(ROOT)}: duplicate supersession source {source}")
-            continue
-        mapping[source] = target
-    return mapping, errors
-
+        return identity_resolution.load_id_supersessions(generated_dir, ROOT), []
+    except (AssertionError, OSError, json.JSONDecodeError, ValueError) as exc:
+        try:
+            rel = generated_dir.relative_to(ROOT)
+        except ValueError:
+            rel = generated_dir
+        return {}, [f"{rel}: cannot load identity supersessions: {exc}"]
 
 def manifest_paths(manifest_dir: Path) -> list[Path]:
     paths = list(manifest_dir.glob("canonical-entity-dossier-migration-v*.json"))

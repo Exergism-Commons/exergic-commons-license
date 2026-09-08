@@ -18,10 +18,14 @@ import re
 import subprocess
 from pathlib import Path
 
+import entity_identity_resolution as identity_resolution
+
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_REL_DIR = Path("knowledge/generated")
 ENTITY_REL_DIR = Path("knowledge/entities")
-SUPERSESSIONS_REL = Path("knowledge/generated/entity-id-supersessions-v1.json")
+SUPERSESSIONS_REL_DIR = Path("knowledge/generated")
+# Backward-compatible alias used by older synthetic fixtures.
+SUPERSESSIONS_REL = SUPERSESSIONS_REL_DIR / "entity-id-supersessions-v1.json"
 ALLOWED_CHANGED_FIELDS = {"dossier"}
 MANIFEST_RE = re.compile(r"^knowledge/generated/canonical-entity-dossier-migration-v(\d+)\.json$")
 FROZEN_FINAL_VERSION = 49
@@ -43,29 +47,11 @@ def load_json(path: Path) -> dict:
 
 
 def current_supersession_map(root: Path = ROOT) -> dict[str, str]:
-    """Return direct current supersessions; chains/dangling targets fail closed in callers."""
-    path = root / SUPERSESSIONS_REL
-    if not path.is_file():
-        return {}
-    payload = load_json(path)
-    rows = payload.get("supersessions")
-    if not isinstance(rows, list):
-        raise RuntimeError(f"{SUPERSESSIONS_REL}: supersessions must be a list")
-    mapping: dict[str, str] = {}
-    for index, row in enumerate(rows):
-        if not isinstance(row, dict):
-            raise RuntimeError(f"{SUPERSESSIONS_REL}: supersession row {index} must be an object")
-        source, target = row.get("from"), row.get("to")
-        if not isinstance(source, str) or not source or not isinstance(target, str) or not target:
-            raise RuntimeError(f"{SUPERSESSIONS_REL}: supersession row {index} requires non-empty from/to ids")
-        if source == target or source in mapping:
-            raise RuntimeError(f"{SUPERSESSIONS_REL}: invalid/duplicate supersession source {source!r}")
-        mapping[source] = target
-    for source, target in mapping.items():
-        if target in mapping:
-            raise RuntimeError(f"{SUPERSESSIONS_REL}: supersession must resolve in one hop: {source} -> {target}")
-    return mapping
-
+    """Return the authoritative contiguous direct supersession map."""
+    try:
+        return identity_resolution.load_id_supersessions(root / SUPERSESSIONS_REL_DIR, root)
+    except (AssertionError, OSError, json.JSONDecodeError, ValueError) as exc:
+        raise RuntimeError(f"{SUPERSESSIONS_REL_DIR}: invalid identity supersession chain: {exc}") from exc
 
 def git_show(ref: str, rel: str, root: Path = ROOT) -> str | None:
     proc = subprocess.run(

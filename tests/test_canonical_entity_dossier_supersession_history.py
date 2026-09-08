@@ -55,47 +55,73 @@ class CanonicalHistoricalSupersessionTests(unittest.TestCase):
         self.assertEqual(target["type"], row["type"])
         self.assertFalse((REPO_ROOT / "knowledge/entities/AGENCY-SSD-NSS.json").exists())
 
-    def test_coverage_loader_rejects_self_and_duplicate_sources(self) -> None:
+    def _write_supersession_manifest(self, root: Path, version: int, rows: list[dict], follows: str | None) -> Path:
+        path = root / f"knowledge/generated/entity-id-supersessions-v{version}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"version": version, "follows": follows, "supersessions": rows}),
+            encoding="utf-8",
+        )
+        return path
+
+    def test_coverage_and_preservation_load_every_versioned_supersession_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            path = root / "knowledge/generated/entity-id-supersessions-v1.json"
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(
-                json.dumps(
-                    {
-                        "supersessions": [
-                            {"from": "ORG-A", "to": "ORG-A"},
-                            {"from": "ORG-B", "to": "ORG-C"},
-                            {"from": "ORG-B", "to": "ORG-D"},
-                        ]
-                    }
-                ),
-                encoding="utf-8",
+            v1 = self._write_supersession_manifest(
+                root, 1, [{"from": "ORG-A", "to": "ORG-B", "reason": "canonical rename"}], None
+            )
+            self._write_supersession_manifest(
+                root, 2, [{"from": "ORG-C", "to": "ORG-D", "reason": "canonical rename"}],
+                str(v1.relative_to(root)),
+            )
+            with mock.patch.object(coverage.checker, "ROOT", root), mock.patch.object(
+                coverage.checker, "SUPERSESSIONS_DIR", root / "knowledge/generated"
+            ):
+                mapping, errors = coverage.checker.load_supersessions()
+            self.assertEqual(errors, [])
+            self.assertEqual(mapping, {"ORG-A": "ORG-B", "ORG-C": "ORG-D"})
+            self.assertEqual(preservation.current_supersession_map(root), mapping)
+
+    def test_coverage_loader_rejects_self_supersession(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_supersession_manifest(
+                root, 1, [{"from": "ORG-A", "to": "ORG-A", "reason": "invalid"}], None
             )
             with mock.patch.object(coverage.checker, "ROOT", root):
                 mapping, errors = coverage.checker.load_supersessions(path)
-            self.assertEqual(mapping, {"ORG-B": "ORG-C"})
+            self.assertEqual(mapping, {})
             self.assertTrue(any("self-supersession" in error for error in errors), errors)
-            self.assertTrue(any("duplicate supersession source ORG-B" in error for error in errors), errors)
 
     def test_preservation_loader_rejects_supersession_chains(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            path = root / preservation.SUPERSESSIONS_REL
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(
-                json.dumps(
-                    {
-                        "supersessions": [
-                            {"from": "ORG-A", "to": "ORG-B"},
-                            {"from": "ORG-B", "to": "ORG-C"},
-                        ]
-                    }
-                ),
-                encoding="utf-8",
+            self._write_supersession_manifest(
+                root, 1, [
+                    {"from": "ORG-A", "to": "ORG-B", "reason": "first"},
+                    {"from": "ORG-B", "to": "ORG-C", "reason": "second"},
+                ], None
             )
-            with self.assertRaisesRegex(RuntimeError, "one hop"):
+            with self.assertRaisesRegex(RuntimeError, "chains are forbidden"):
                 preservation.current_supersession_map(root)
+
+    def test_baseline_preservation_accepts_authoritative_source_removal(self) -> None:
+        before = {"id": "ORG-OLD", "iri": "ecl:ORG-OLD", "type": "Organization"}
+        target = {"id": "ORG-NEW", "iri": "ecl:ORG-NEW", "type": "Organization"}
+        with mock.patch(
+            "check_canonical_entity_migration_preservation_extended._supported_base_records",
+            return_value={"ORG-OLD": before},
+        ), mock.patch.object(
+            preservation, "current_entity_index", return_value={"ORG-NEW": (target, "knowledge/entities/ORG-NEW.json")}
+        ), mock.patch.object(
+            preservation, "current_supersession_map", return_value={"ORG-OLD": "ORG-NEW"}
+        ):
+            self.assertEqual(
+                __import__("check_canonical_entity_migration_preservation_extended").validate_baseline_identity_preservation(
+                    "BASE", REPO_ROOT
+                ),
+                [],
+            )
 
 
 if __name__ == "__main__":
