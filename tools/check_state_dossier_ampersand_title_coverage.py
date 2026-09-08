@@ -81,21 +81,45 @@ def classify_ampersand_surface(text: str) -> str | None:
     return None
 
 
-def ampersand_title_surfaces(prose: str) -> list[tuple[str, str]]:
-    """Return complete classified title surfaces containing standalone ampersands."""
-    text = " ".join(prose.split())
+def _ampersand_title_surfaces_once(text: str) -> list[tuple[str, str]]:
+    """Extract complete classified ampersand surfaces for one interpretation of the text."""
     out: list[tuple[str, str]] = []
-    seen: set[tuple[str, str]] = set()
     for match in AMPERSAND_TITLE_RE.finditer(text):
         value = base.clean_candidate(match.group("surface"))
         kind = classify_ampersand_surface(value)
         if kind is None or not base.plausible(value):
             continue
-        marker = (base.norm(value), kind)
-        if marker in seen:
-            continue
-        seen.add(marker)
         out.append((value, kind))
+    return out
+
+
+def ampersand_title_surfaces(prose: str) -> list[tuple[str, str]]:
+    """Return complete ampersand identities for full and ambiguous post-period readings."""
+    normalized_text = " ".join(prose.split())
+    pending = [normalized_text]
+    seen_views: set[str] = set()
+    seen_surfaces: set[tuple[str, str]] = set()
+    out: list[tuple[str, str]] = []
+
+    while pending:
+        view = pending.pop()
+        if not view or view in seen_views:
+            continue
+        seen_views.add(view)
+        for value, kind in _ampersand_title_surfaces_once(view):
+            marker = (base.norm(value), kind)
+            if marker not in seen_surfaces:
+                seen_surfaces.add(marker)
+                out.append((value, kind))
+
+            # Every period inside this matched title must come from the shared explicit dotted
+            # acronym/abbreviation grammar. The same bytes can therefore be an internal token or
+            # a sentence ending. Re-run the ampersand grammar on the post-period reading so an
+            # exact/materialized glued identity cannot hide a distinct unresolved suffix identity.
+            for boundary in base.AMBIGUOUS_DOTTED_BOUNDARY_RE.finditer(value):
+                suffix = value[boundary.end():]
+                if suffix and suffix not in seen_views:
+                    pending.append(suffix)
     return out
 
 
@@ -221,9 +245,9 @@ def audit() -> list[dict]:
         line_offset = text[:body_offset].count("\n")
         body = text[body_offset:]
         for rel_line, snippet, prose in rendered.rendered_prose_segments(body):
-            # The H1 is structurally constrained by check_state_dossier_identity_sets.py to be
-            # the canonical State title. Keep this non-State guard aligned with that contract.
-            if snippet.lstrip().startswith("# "):
+            # Only the literal canonical H1 marker is excluded here. Python lstrip() would turn
+            # NBSP-prefixed visible prose into a fake H1 and hide an ampersand identity.
+            if snippet.startswith("# "):
                 continue
             inspect(
                 state=state,
@@ -289,6 +313,20 @@ def self_test() -> None:
         value == "Research & Development, Inc. & Project Aurora" or value == "Research & Development, Inc & Project Aurora"
         for value, _ in internal_suffix
     ), internal_suffix
+
+    # A dotted abbreviation can be internal to one ampersand identity or can terminate the
+    # previous sentence. Audit both readings so exact coverage of the glued form cannot suppress
+    # the distinct suffix identity.
+    dotted = ampersand_title_surfaces("Acme Inc. Research & Development Agency")
+    assert ("Acme Inc. Research & Development Agency", "actor-or-institution") in dotted, dotted
+    assert ("Research & Development Agency", "actor-or-institution") in dotted, dotted
+
+    # NBSP before '# ' is visible CommonMark prose, not the canonical ATX H1 marker. The audit loop
+    # uses startswith rather than lstrip so this surface remains eligible for ampersand review.
+    pseudo_heading = "\u00a0# Research & Development Agency"
+    assert not pseudo_heading.startswith("# ")
+    pseudo_heading_titles = ampersand_title_surfaces(rendered.visible_prose(pseudo_heading))
+    assert ("Research & Development Agency", "actor-or-institution") in pseudo_heading_titles, pseudo_heading_titles
 
     assert ampersand_title_surfaces("Alpha & Beta") == []
     assert ampersand_title_surfaces("research & development agency") == []
