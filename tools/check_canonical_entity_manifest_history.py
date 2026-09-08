@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate canonical dossier migration history as an immutable, append-only ratchet."""
+"""Validate canonical dossier and identity-supersession history as immutable append-only ratchets."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "knowledge/generated"
 MANIFEST_PREFIX = "knowledge/generated/canonical-entity-dossier-migration-v"
+SUPERSESSION_PREFIX = "knowledge/generated/entity-id-supersessions-v"
 FROZEN_FINAL_VERSION = 49
 FROZEN_MIGRATED_ENTITIES = 242
 PRE_MIGRATION_MISSING = 242
@@ -23,7 +24,7 @@ def version_from_path(path: Path) -> int:
     return int(path.stem.rsplit("v", 1)[1])
 
 
-def git_manifest_paths(ref: str) -> list[str]:
+def git_versioned_paths(ref: str, prefix: str, label: str) -> list[str]:
     proc = subprocess.run(
         ["git", "ls-tree", "-r", "--name-only", ref, "--", "knowledge/generated"],
         cwd=ROOT,
@@ -32,14 +33,22 @@ def git_manifest_paths(ref: str) -> list[str]:
         check=False,
     )
     if proc.returncode != 0:
-        raise RuntimeError(f"cannot list migration manifests at {ref}: {proc.stderr.strip()}")
+        raise RuntimeError(f"cannot list {label} manifests at {ref}: {proc.stderr.strip()}")
     result: list[str] = []
     for line in proc.stdout.splitlines():
-        if line.startswith(MANIFEST_PREFIX) and line.endswith(".json"):
-            suffix = line[len(MANIFEST_PREFIX):-5]
-            if suffix.isdigit():
+        if line.startswith(prefix) and line.endswith(".json"):
+            suffix = line[len(prefix):-5]
+            if suffix.isdigit() and not suffix.startswith("0"):
                 result.append(line)
-    return sorted(result, key=lambda rel: int(rel[len(MANIFEST_PREFIX):-5]))
+    return sorted(result, key=lambda rel: int(rel[len(prefix):-5]))
+
+
+def git_manifest_paths(ref: str) -> list[str]:
+    return git_versioned_paths(ref, MANIFEST_PREFIX, "migration")
+
+
+def git_supersession_paths(ref: str) -> list[str]:
+    return git_versioned_paths(ref, SUPERSESSION_PREFIX, "identity supersession")
 
 
 def git_bytes(ref: str, rel: str) -> bytes | None:
@@ -50,6 +59,47 @@ def git_bytes(ref: str, rel: str) -> bytes | None:
         check=False,
     )
     return proc.stdout if proc.returncode == 0 else None
+
+
+def validate_base_versioned_history(
+    *,
+    base_ref: str,
+    current_paths: list[Path],
+    base_paths: list[str],
+    prefix: str,
+    label: str,
+) -> list[str]:
+    """Freeze every version already published in the comparison base and allow append-only versions."""
+    errors: list[str] = []
+    current_by_rel = {path.relative_to(ROOT).as_posix(): path for path in current_paths}
+    for rel in base_paths:
+        current = current_by_rel.get(rel)
+        if current is None:
+            errors.append(f"{rel}: historical {label} manifest from PR base was deleted")
+            continue
+        before = git_bytes(base_ref, rel)
+        after = current.read_bytes()
+        if before is None:
+            errors.append(f"{rel}: could not read historical {label} manifest from PR base {base_ref}")
+        elif before != after:
+            errors.append(
+                f"{rel}: historical {label} manifest is immutable once present in the PR base; "
+                "append a new version instead"
+            )
+
+    base_versions = [int(rel[len(prefix):-5]) for rel in base_paths]
+    max_base_version = max(base_versions, default=0)
+    current_versions = [version_from_path(path) for path in current_paths]
+    new_versions = [version for version in current_versions if version > max_base_version]
+    expected_new = (
+        list(range(max_base_version + 1, current_versions[-1] + 1)) if current_versions else []
+    )
+    if new_versions != expected_new:
+        errors.append(
+            f"new {label} manifests must append contiguously after the PR base; "
+            f"base_max=v{max_base_version}, new={new_versions}, expected={expected_new}"
+        )
+    return errors
 
 
 def main() -> int:
@@ -166,36 +216,41 @@ def main() -> int:
     if paths and load_json(paths[-1]).get("maxMissingDedicatedDossiers") != 0:
         errors.append("latest migration manifest must preserve a 0 missing-dossier ceiling")
 
+    supersession_paths = sorted(
+        MANIFEST_DIR.glob("entity-id-supersessions-v*.json"),
+        key=version_from_path,
+    )
+
     if args.base_ref:
         try:
             base_paths = git_manifest_paths(args.base_ref)
         except RuntimeError as exc:
             errors.append(str(exc))
             base_paths = []
-        current_by_rel = {path.relative_to(ROOT).as_posix(): path for path in paths}
-        for rel in base_paths:
-            current = current_by_rel.get(rel)
-            if current is None:
-                errors.append(f"{rel}: historical migration manifest from PR base was deleted")
-                continue
-            before = git_bytes(args.base_ref, rel)
-            after = current.read_bytes()
-            if before is None:
-                errors.append(f"{rel}: could not read historical manifest from PR base {args.base_ref}")
-            elif before != after:
-                errors.append(
-                    f"{rel}: historical migration manifest is immutable once present in the PR base"
-                )
-
-        base_versions = [int(rel[len(MANIFEST_PREFIX):-5]) for rel in base_paths]
-        max_base_version = max(base_versions, default=0)
-        new_versions = [version for version in versions if version > max_base_version]
-        expected_new = list(range(max_base_version + 1, versions[-1] + 1)) if versions else []
-        if new_versions != expected_new:
-            errors.append(
-                "new migration manifests must append contiguously after the PR base; "
-                f"base_max=v{max_base_version}, new={new_versions}, expected={expected_new}"
+        errors.extend(
+            validate_base_versioned_history(
+                base_ref=args.base_ref,
+                current_paths=paths,
+                base_paths=base_paths,
+                prefix=MANIFEST_PREFIX,
+                label="migration",
             )
+        )
+
+        try:
+            base_supersession_paths = git_supersession_paths(args.base_ref)
+        except RuntimeError as exc:
+            errors.append(str(exc))
+            base_supersession_paths = []
+        errors.extend(
+            validate_base_versioned_history(
+                base_ref=args.base_ref,
+                current_paths=supersession_paths,
+                base_paths=base_supersession_paths,
+                prefix=SUPERSESSION_PREFIX,
+                label="identity supersession",
+            )
+        )
 
     if errors:
         for error in errors:
@@ -203,7 +258,11 @@ def main() -> int:
         return 1
 
     latest = versions[-1]
-    base_note = f"; base-ref immutability checked against {args.base_ref}" if args.base_ref else ""
+    base_note = (
+        f"; base-ref migration + identity-supersession immutability checked against {args.base_ref}"
+        if args.base_ref
+        else ""
+    )
     print(
         "canonical migration history: OK "
         f"(v1-v{latest}; {len(seen)} unique rows; frozen v1-v{FROZEN_FINAL_VERSION} "
