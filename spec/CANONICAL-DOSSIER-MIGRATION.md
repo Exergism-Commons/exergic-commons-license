@@ -22,9 +22,13 @@ Every supported non-State identity must point to an existing type-appropriate do
 
 ## Identity lifecycle
 
-A supported identity MUST NOT disappear or change its stable `id`/`iri`/`type` merely to reduce the dossier denominator or rewrite history. Lifecycle changes use the entity fields `identityLifecycle` (`active`, `retired`, `superseded`) and, for `superseded`, mandatory `supersededBy`.
+A supported identity MUST NOT disappear or change its stable `id`/`iri`/`type` merely to reduce the dossier denominator or rewrite history. Ordinary lifecycle changes use the entity fields `identityLifecycle` (`active`, `retired`, `superseded`) and, for `superseded`, mandatory `supersededBy`.
 
-Omission of `identityLifecycle` means active for existing records. `supersededBy` is legal only when `identityLifecycle` is `superseded`. Retirement/supersession preserves the original canonical record and its immutable identity core.
+Omission of `identityLifecycle` means active for existing records. `supersededBy` is legal only when `identityLifecycle` is `superseded`. Retirement or lifecycle supersession preserves the original canonical record and its immutable identity core.
+
+**Canonical ID normalization is a distinct mechanism from lifecycle supersession.** When an adopted identifier itself is found to be non-canonical, the replacement MUST be recorded as a direct `from` -> `to` row in the authoritative contiguous `knowledge/generated/entity-id-supersessions-v<N>.json` chain. In that case the old source ABox record MUST be removed, the direct target MUST remain materialized with the same canonical entity type and jurisdictional scope, and historical dossiers/manifests MAY continue to reference the old ID because resolver semantics map it to the live canonical target. A supersession source that remains materialized, an unmapped deletion, a dangling/type-changing target, self-supersession or a supersession chain is a CI error.
+
+Identity-supersession manifests are append-only historical records. Every version already present in the comparison base is byte-for-byte immutable; an additional ID normalization MUST be introduced in the next contiguous version rather than by editing or retargeting any published row. The `follows` chain and the complete version sequence are normative. This base-relative immutability prevents historical references from silently resolving to a different entity after publication.
 
 ## Identity-only frontmatter and rendered Markdown
 
@@ -42,7 +46,7 @@ The historical v1-v49 prefix is immutable. Later manifests append contiguously. 
 
 A post-v49 atomic registration is strictly **identity-only**. It may contain canonical identity, aliases/provenance, dossier mapping and review-clock metadata, but MUST NOT introduce graph relationships (`partOf`, `controls`, `participatesIn`, `operates`, `deploys`, `materiallyBenefits`, `targetsOrAffects`, `remediates`, `reviews`, tracked-object relations, or any future non-identity field). Relationship curation is a separate reviewed change after the identity exists. A new atomic identity starts active and cannot arrive already retired/superseded.
 
-Existing identities may be migrated only from a non-dedicated pointer to a type-appropriate dedicated dossier, preserving the comparison-base source dossier and changing no ABox field except `dossier`. After adoption, base-relative preservation separately freezes the identity core `id`/`iri`/`type` while allowing ordinary review metadata to evolve.
+Existing identities may be migrated only from a non-dedicated pointer to a type-appropriate dedicated dossier, preserving the comparison-base source dossier and changing no ABox field except `dossier`. After adoption, base-relative preservation separately freezes the identity core `id`/`iri`/`type` while allowing ordinary review metadata to evolve. The sole removal exception is the canonical ID-normalization mechanism defined above, which preserves the historical source identifier in the immutable supersession chain while requiring the live ABox source record to disappear.
 
 ## State-context snapshot semantics
 
@@ -96,6 +100,8 @@ Canonical CI exercises the valid corpus and negative mutations covering at least
 - canonical local JSON-LD context, compact `iri`/`type` dialect and `id == iri` identity binding;
 - entity placement, recursive schema and case-sensitive suffixes;
 - immutable identity core and explicit retirement/supersession lifecycle;
+- immutable base-relative identity-supersession manifests plus append-only contiguous new versions;
+- canonical ID normalization as a distinct source-removal exception with same-type live target;
 - relationship-free post-v49 atomic identity registration;
 - strict frontmatter and governance-key smuggling;
 - comments, fences, indented code, multiline code spans, raw HTML and multiline reference definitions;
