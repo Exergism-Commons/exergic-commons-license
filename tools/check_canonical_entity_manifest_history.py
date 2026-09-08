@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "knowledge/generated"
 MANIFEST_PREFIX = "knowledge/generated/canonical-entity-dossier-migration-v"
 SUPERSESSION_PREFIX = "knowledge/generated/entity-id-supersessions-v"
+ENTITY_REL_DIR = "knowledge/entities"
+ENTITY_SUFFIXES = {".json", ".jsonld"}
 FROZEN_FINAL_VERSION = 49
 FROZEN_MIGRATED_ENTITIES = 242
 PRE_MIGRATION_MISSING = 242
@@ -24,18 +26,22 @@ def version_from_path(path: Path) -> int:
     return int(path.stem.rsplit("v", 1)[1])
 
 
-def git_versioned_paths(ref: str, prefix: str, label: str) -> list[str]:
+def git_paths(ref: str, rel_dir: str) -> list[str]:
     proc = subprocess.run(
-        ["git", "ls-tree", "-r", "--name-only", ref, "--", "knowledge/generated"],
+        ["git", "ls-tree", "-r", "--name-only", ref, "--", rel_dir],
         cwd=ROOT,
         text=True,
         capture_output=True,
         check=False,
     )
     if proc.returncode != 0:
-        raise RuntimeError(f"cannot list {label} manifests at {ref}: {proc.stderr.strip()}")
+        raise RuntimeError(f"cannot list {rel_dir} at {ref}: {proc.stderr.strip()}")
+    return proc.stdout.splitlines()
+
+
+def git_versioned_paths(ref: str, prefix: str, label: str) -> list[str]:
     result: list[str] = []
-    for line in proc.stdout.splitlines():
+    for line in git_paths(ref, "knowledge/generated"):
         if line.startswith(prefix) and line.endswith(".json"):
             suffix = line[len(prefix):-5]
             if suffix.isdigit() and not suffix.startswith("0"):
@@ -59,6 +65,92 @@ def git_bytes(ref: str, rel: str) -> bytes | None:
         check=False,
     )
     return proc.stdout if proc.returncode == 0 else None
+
+
+def _git_json(ref: str, rel: str, label: str) -> dict:
+    raw = git_bytes(ref, rel)
+    if raw is None:
+        raise RuntimeError(f"cannot read {label} {rel} at {ref}")
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"cannot parse {label} {rel} at {ref}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise RuntimeError(f"{label} {rel} at {ref} must be a JSON object")
+    return value
+
+
+def git_curated_identity_ids(
+    base_ref: str,
+    base_manifest_paths: list[str],
+    base_supersession_paths: list[str],
+) -> set[str]:
+    """Return identities that were already curated before new supersession versions."""
+    curated: set[str] = set()
+    for rel in git_paths(base_ref, ENTITY_REL_DIR):
+        if Path(rel).suffix not in ENTITY_SUFFIXES:
+            continue
+        record = _git_json(base_ref, rel, "ABox entity")
+        entity_id = record.get("id")
+        if isinstance(entity_id, str) and entity_id:
+            curated.add(entity_id)
+
+    for rel in base_manifest_paths:
+        manifest = _git_json(base_ref, rel, "migration manifest")
+        rows = manifest.get("entities")
+        if not isinstance(rows, list):
+            raise RuntimeError(f"migration manifest {rel} at {base_ref} has invalid entities payload")
+        for row in rows:
+            entity_id = row.get("id") if isinstance(row, dict) else None
+            if isinstance(entity_id, str) and entity_id:
+                curated.add(entity_id)
+
+    # An immutable historical supersession manifest is itself curated identity history.
+    # Including both endpoints keeps pre-existing normalization history traceable while
+    # the direct-map validator continues to forbid duplicate sources and chains.
+    for rel in base_supersession_paths:
+        manifest = _git_json(base_ref, rel, "identity supersession manifest")
+        rows = manifest.get("supersessions")
+        if not isinstance(rows, list):
+            raise RuntimeError(f"identity supersession manifest {rel} at {base_ref} has invalid supersessions payload")
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            for key in ("from", "to"):
+                entity_id = row.get(key)
+                if isinstance(entity_id, str) and entity_id:
+                    curated.add(entity_id)
+    return curated
+
+
+def validate_new_supersession_sources(
+    *,
+    current_paths: list[Path],
+    base_paths: list[str],
+    curated_ids: set[str],
+) -> list[str]:
+    """Reject new aliases whose source identity has no history at the comparison base."""
+    errors: list[str] = []
+    base_versions = [int(rel[len(SUPERSESSION_PREFIX):-5]) for rel in base_paths]
+    max_base_version = max(base_versions, default=0)
+    for path in current_paths:
+        if version_from_path(path) <= max_base_version:
+            continue
+        manifest = load_json(path)
+        rows = manifest.get("supersessions")
+        if not isinstance(rows, list):
+            errors.append(f"{path.relative_to(ROOT)}: supersessions must be a list")
+            continue
+        for index, row in enumerate(rows):
+            source = row.get("from") if isinstance(row, dict) else None
+            if not isinstance(source, str) or not source:
+                continue
+            if source not in curated_ids:
+                errors.append(
+                    f"{path.relative_to(ROOT)}: supersession row {index} source {source!r} has no curated "
+                    "identity history in the PR base ABox, canonical migration ledger, or published supersession history"
+                )
+    return errors
 
 
 def validate_base_versioned_history(
@@ -251,6 +343,22 @@ def main() -> int:
                 label="identity supersession",
             )
         )
+        try:
+            curated_ids = git_curated_identity_ids(
+                args.base_ref,
+                base_paths,
+                base_supersession_paths,
+            )
+        except RuntimeError as exc:
+            errors.append(str(exc))
+        else:
+            errors.extend(
+                validate_new_supersession_sources(
+                    current_paths=supersession_paths,
+                    base_paths=base_supersession_paths,
+                    curated_ids=curated_ids,
+                )
+            )
 
     if errors:
         for error in errors:
@@ -259,7 +367,7 @@ def main() -> int:
 
     latest = versions[-1]
     base_note = (
-        f"; base-ref migration + identity-supersession immutability checked against {args.base_ref}"
+        f"; base-ref migration + identity-supersession immutability/source-history checked against {args.base_ref}"
         if args.base_ref
         else ""
     )
