@@ -1,0 +1,33 @@
+name: Temporary Codex P2 fix
+
+on:
+  push:
+    branches:
+      - agent/canonical-entity-dossiers
+    paths:
+      - .github/workflows/_codex-p2-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/canonical-entity-dossiers
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Apply exact P2 patches
+        run: python tools/_codex_p2_fix.py
+      - name: Commit product changes only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Close recursive identity and SVG clip gaps"
+          git push origin HEAD:agent/canonical-entity-dossiers
