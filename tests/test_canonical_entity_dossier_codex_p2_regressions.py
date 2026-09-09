@@ -2,9 +2,11 @@
 """Regressions for identity-history, State lifecycle and recursive resolver contracts."""
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -15,8 +17,28 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import check_canonical_entity_manifest_history as history  # noqa: E402
-import check_non_state_entity_identity_integrity as identity_integrity  # noqa: E402
 import entity_identity_resolution as resolver  # noqa: E402
+
+
+def load_identity_integrity_for_test():
+    """Load the real gate without importing its schedule-audit-only PyYAML dependency."""
+    stub = types.ModuleType("audit_schedule_reference_coverage")
+    stub.norm = lambda value: " ".join(value.casefold().split())
+    previous = sys.modules.get("audit_schedule_reference_coverage")
+    sys.modules["audit_schedule_reference_coverage"] = stub
+    try:
+        path = REPO_ROOT / "tools/check_non_state_entity_identity_integrity.py"
+        spec = importlib.util.spec_from_file_location("identity_integrity_under_test", path)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("cannot load non-State identity integrity gate")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    finally:
+        if previous is None:
+            sys.modules.pop("audit_schedule_reference_coverage", None)
+        else:
+            sys.modules["audit_schedule_reference_coverage"] = previous
 
 
 class CodexP2IdentityContractTests(unittest.TestCase):
@@ -127,6 +149,7 @@ class CodexP2IdentityContractTests(unittest.TestCase):
         self.assertEqual({record["id"] for record in entities}, entity_ids)
 
     def test_recursive_jsonld_identity_integrity_enforces_type_prefix(self) -> None:
+        identity_integrity = load_identity_integrity_for_test()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             entity_dir = root / "knowledge/entities/nested"
