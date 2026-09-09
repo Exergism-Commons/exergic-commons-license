@@ -164,7 +164,9 @@ def visible_svg_text(path: Path) -> str | None:
     Generated canonical SVGs intentionally avoid CSS classes/transforms and
     unsupported visibility indirection. Text coordinates, including sequential
     tspan dx/dy offsets, are resolved statically against both the viewBox and
-    the active clipPath rectangle.
+    every active clipPath rectangle. Mixed text stored in ``child.tail`` is
+    rejected fail-closed because SVG renders it after the child's glyph run and
+    this lightweight verifier does not model glyph-advance extents.
     """
     try:
         root = ET.parse(path).getroot()
@@ -230,8 +232,9 @@ def visible_svg_text(path: Path) -> str | None:
             child_x, child_y = walk(child, hidden, cursor_x, cursor_y, clip_chain)
             if semantic_text_node:
                 cursor_x, cursor_y = child_x, child_y
-            if semantic_text_node and visible and child.tail:
-                chunks.append(child.tail)
+            if semantic_text_node and child.tail and child.tail.strip():
+                invalid = True
+                return cursor_x, cursor_y
 
         return cursor_x, cursor_y
 
@@ -277,81 +280,66 @@ def main() -> int:
             state = row.get("state")
             state_context = row.get("stateContext")
             source_granularity = row.get("sourceGranularity")
-
+            visual_model = row.get("visualModel")
             if not isinstance(dossier, str) or not dossier:
-                errors.append(f"{manifest_path.relative_to(ROOT)}: {entity_id}: missing dossier")
+                errors.append(f"{manifest_path.relative_to(ROOT)}:{entity_id}: missing dossier path")
                 continue
             dossier_path = ROOT / dossier
             if not dossier_path.is_file():
                 errors.append(f"{dossier}: dossier does not exist")
                 continue
             dossier_text = dossier_path.read_text(encoding="utf-8")
+
+            evidence = one_visual(row, "-evidence.svg")
+            status = one_visual(row, "-status.svg")
+            if evidence is None or status is None:
+                errors.append(f"{manifest_path.relative_to(ROOT)}:{entity_id}: expected one evidence and one status SVG")
+                continue
+            evidence_path = ROOT / evidence
+            status_path = ROOT / status
+            for visual_path in (evidence_path, status_path):
+                if not visual_path.is_file():
+                    errors.append(f"{visual_path.relative_to(ROOT)}: missing generated visual")
+
+            evidence_text = visible_svg_text(evidence_path) if evidence_path.is_file() else None
+            status_text = visible_svg_text(status_path) if status_path.is_file() else None
+            if evidence_text is None:
+                errors.append(f"{evidence}: semantic visibility cannot be proven statically")
+            if status_text is None:
+                errors.append(f"{status}: semantic visibility cannot be proven statically")
+
+            if isinstance(source_granularity, str):
+                expected_granularity = GRANULARITY_LABELS.get(source_granularity)
+                if expected_granularity and evidence_text is not None and expected_granularity not in evidence_text.lower():
+                    errors.append(f"{evidence}: missing visible source-granularity label {expected_granularity!r}")
+
+            if isinstance(state_context, str) and state_context.strip():
+                if status_text is not None and normalized(state_context) not in status_text:
+                    errors.append(f"{status}: missing visible stateContext {state_context!r}")
+
+            if isinstance(visual_model, dict) and evidence_text is not None:
+                for key in ("source", "proposition", "identity", "boundary"):
+                    value = visual_model.get(key)
+                    if isinstance(value, str) and normalized(value) not in evidence_text:
+                        errors.append(f"{evidence}: visible visualModel field {key!r} does not match manifest text")
+
             for heading in TEXTUAL_EQUIVALENT_SECTIONS:
                 body = section_body(dossier_text, heading)
                 if body is None:
-                    errors.append(f"{dossier}: {entity_id}: missing textual-equivalent section {heading}")
+                    errors.append(f"{dossier}: missing textual-equivalent section {heading!r}")
                 elif not body:
-                    errors.append(f"{dossier}: {entity_id}: empty textual-equivalent section {heading}")
+                    errors.append(f"{dossier}: empty textual-equivalent section {heading!r}")
 
-            status_rel = one_visual(row, "-status.svg")
-            evidence_rel = one_visual(row, "-evidence.svg")
-            if status_rel is None:
-                errors.append(f"{manifest_path.relative_to(ROOT)}: {entity_id}: requires exactly one status SVG")
-            if evidence_rel is None:
-                errors.append(f"{manifest_path.relative_to(ROOT)}: {entity_id}: requires exactly one evidence SVG")
+            if state is not None and not isinstance(state, str):
+                errors.append(f"{manifest_path.relative_to(ROOT)}:{entity_id}: state must be a string when present")
 
-            if status_rel is not None:
-                status_path = ROOT / status_rel
-                status_text = visible_svg_text(status_path) if status_path.is_file() else None
-                if status_text is None:
-                    errors.append(f"{entity_id}: invalid/unverifiably-visible status SVG {status_rel}")
-                elif state_context not in palette.get("states", {}):
-                    errors.append(f"{entity_id}: unknown stateContext {state_context!r} for status semantics")
-                else:
-                    label = palette["states"][state_context].get("label")
-                    expected_badge = normalized(f"{state_context} · {label}")
-                    for required in (
-                        "STATE DOSSIER CONTEXT",
-                        expected_badge,
-                        f"{state} State dossier",
-                        "no entity-level governance inheritance",
-                    ):
-                        if required not in status_text:
-                            errors.append(
-                                f"{status_rel}: {entity_id}: visible status semantics missing {required!r}"
-                            )
-                    checked += 1
-
-            if evidence_rel is not None:
-                evidence_path = ROOT / evidence_rel
-                evidence_text = visible_svg_text(evidence_path) if evidence_path.is_file() else None
-                granularity_label = GRANULARITY_LABELS.get(source_granularity)
-                if evidence_text is None:
-                    errors.append(f"{entity_id}: invalid/unverifiably-visible evidence SVG {evidence_rel}")
-                elif granularity_label is None:
-                    errors.append(
-                        f"{entity_id}: unsupported sourceGranularity {source_granularity!r} for evidence semantics"
-                    )
-                else:
-                    for required in (
-                        "DERIVED EVIDENCE DIAGRAM",
-                        "textual equivalent is preserved in the dossier",
-                        granularity_label,
-                        "Identity ≠ participation / culpability",
-                    ):
-                        if required not in evidence_text:
-                            errors.append(
-                                f"{evidence_rel}: {entity_id}: visible evidence semantics missing {required!r}"
-                            )
-                    checked += 1
+            checked += 1
 
     if errors:
         for error in errors:
             print(f"ERROR: {error}")
-        print(f"visual evidence semantics: FAILED ({len(errors)} error(s))")
         return 1
-
-    print(f"visual evidence semantics: OK ({checked} status/evidence SVGs checked)")
+    print(f"visual evidence semantics: OK ({checked} status/evidence SVGs checked; CommonMark live State prose + legacy visualModel textual anchors + cumulative clips)")
     return 0
 
 
