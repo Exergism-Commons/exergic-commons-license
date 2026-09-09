@@ -136,6 +136,27 @@ class CanonicalPolicyHardeningTests(unittest.TestCase):
             visible = semantics.visible_svg_text(path) or ""
             self.assertNotIn("REQUIRED", visible)
 
+    def test_repositioned_child_tail_is_rejected_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            generated = root / "dossiers/assets/generated"
+            generated.mkdir(parents=True)
+            path = generated / "X-status.svg"
+            # SVG renders tail text after the child's glyph run. The child moves the
+            # cursor to the viewBox edge, so admitting the tail based on the parent's
+            # earlier visibility would let clipped semantic text satisfy the contract.
+            # The static verifier therefore rejects semantic child.tail content unless
+            # glyph-advance visibility can be proven by a future stronger model.
+            path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                '<defs><clipPath id="box"><rect x="0" y="0" width="100" height="100"/></clipPath></defs>'
+                '<text x="10" y="10" clip-path="url(#box)">'
+                '<tspan x="100" y="10">EDGE</tspan> REQUIRED'
+                '</text></svg>',
+                encoding="utf-8",
+            )
+            self.assertIsNone(semantics.visible_svg_text(path))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
