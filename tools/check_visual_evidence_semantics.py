@@ -194,7 +194,7 @@ def visible_svg_text(path: Path) -> str | None:
         hidden: bool,
         inherited_x: float | None,
         inherited_y: float | None,
-        inherited_clip: str | None,
+        inherited_clips: tuple[str, ...],
     ) -> tuple[float | None, float | None]:
         nonlocal invalid
         tag = element.tag.rsplit("}", 1)[-1]
@@ -208,27 +208,26 @@ def visible_svg_text(path: Path) -> str | None:
             return inherited_x, inherited_y
         x, y = position
 
+        clip_chain = inherited_clips
         own_clip_raw = element.get("clip-path")
         if own_clip_raw is not None:
             own_clip = _clip_id(own_clip_raw)
             if own_clip is None or own_clip not in clips:
                 invalid = True
                 return x, y
-            clip = own_clip
-        else:
-            clip = inherited_clip
+            clip_chain = (*inherited_clips, own_clip)
 
         semantic_text_node = tag in {"text", "tspan"}
         visible = not hidden and _inside(bounds, x, y)
-        if clip is not None:
-            visible = visible and _inside(clips.get(clip), x, y)
+        if visible:
+            visible = all(_inside(clips[clip_id], x, y) for clip_id in clip_chain)
 
         if semantic_text_node and visible and element.text:
             chunks.append(element.text)
 
         cursor_x, cursor_y = x, y
         for child in element:
-            child_x, child_y = walk(child, hidden, cursor_x, cursor_y, clip)
+            child_x, child_y = walk(child, hidden, cursor_x, cursor_y, clip_chain)
             if semantic_text_node:
                 cursor_x, cursor_y = child_x, child_y
             if semantic_text_node and visible and child.tail:
@@ -236,7 +235,7 @@ def visible_svg_text(path: Path) -> str | None:
 
         return cursor_x, cursor_y
 
-    walk(root, False, None, None, None)
+    walk(root, False, None, None, ())
     if invalid:
         return None
     return normalized(" ".join(chunks))

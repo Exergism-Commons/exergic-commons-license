@@ -15,6 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import check_canonical_entity_manifest_history as history  # noqa: E402
+import check_non_state_entity_identity_integrity as identity_integrity  # noqa: E402
 import entity_identity_resolution as resolver  # noqa: E402
 
 
@@ -124,6 +125,31 @@ class CodexP2IdentityContractTests(unittest.TestCase):
             entities, entity_ids = resolver.load_repository_entities(entity_dir)
         self.assertEqual(entity_ids, {"ORG-TOP", "ORG-NESTED"})
         self.assertEqual({record["id"] for record in entities}, entity_ids)
+
+    def test_recursive_jsonld_identity_integrity_enforces_type_prefix(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entity_dir = root / "knowledge/entities/nested"
+            entity_dir.mkdir(parents=True)
+            (root / "ontology").mkdir(parents=True)
+            (root / "ontology/ecl-context.jsonld").write_text("{}", encoding="utf-8")
+            dossier = root / "dossiers/organizations/PERSON-WRONG.md"
+            dossier.parent.mkdir(parents=True)
+            dossier.write_text("# Identity\n", encoding="utf-8")
+            record = {
+                "@context": "../../../ontology/ecl-context.jsonld",
+                "iri": "ecl:PERSON-WRONG",
+                "id": "PERSON-WRONG",
+                "type": "Organization",
+                "name": "Wrong Prefix Organization",
+                "dossier": "../../../dossiers/organizations/PERSON-WRONG.md",
+            }
+            (entity_dir / "PERSON-WRONG.jsonld").write_text(json.dumps(record), encoding="utf-8")
+            failures = identity_integrity.validate(root=root)
+        self.assertTrue(
+            any(item.get("reason") == "type/id-prefix mismatch" and item.get("id") == "PERSON-WRONG" for item in failures),
+            failures,
+        )
 
 
 if __name__ == "__main__":

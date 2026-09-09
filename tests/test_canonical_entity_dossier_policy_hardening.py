@@ -112,6 +112,28 @@ class CanonicalPolicyHardeningTests(unittest.TestCase):
             self.assertIn("SAFE", visible)
             self.assertNotIn("REQUIRED", visible)
 
+    def test_nested_tspan_clip_cannot_replace_narrower_ancestor_clip(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            generated = root / "dossiers/assets/generated"
+            generated.mkdir(parents=True)
+            path = generated / "X-status.svg"
+            path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                '<defs>'
+                '<clipPath id="outer"><rect x="0" y="0" width="20" height="20"/></clipPath>'
+                '<clipPath id="inner"><rect x="0" y="0" width="100" height="100"/></clipPath>'
+                '</defs>'
+                '<text x="10" y="10">'
+                '<tspan clip-path="url(#outer)">'
+                '<tspan x="50" y="50" clip-path="url(#inner)">REQUIRED</tspan>'
+                '</tspan>'
+                '</text></svg>',
+                encoding="utf-8",
+            )
+            visible = semantics.visible_svg_text(path) or ""
+            self.assertNotIn("REQUIRED", visible)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

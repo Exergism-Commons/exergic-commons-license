@@ -33,15 +33,22 @@ def inside(path: Path, parent: Path) -> bool:
         return False
 
 
-def validate() -> list[dict]:
+def validate(
+    root: Path = ROOT,
+    entity_dir: Path | None = None,
+    dossier_root: Path | None = None,
+) -> list[dict]:
     failures: list[dict] = []
     ids: dict[str, list[str]] = defaultdict(list)
+    entity_dir = root / "knowledge/entities" if entity_dir is None else entity_dir
+    dossier_root = (root / "dossiers").resolve() if dossier_root is None else dossier_root.resolve()
+    canonical_context = (root / "ontology/ecl-context.jsonld").resolve()
 
-    for path in sorted(ENTITY_DIR.glob("*.json")):
+    for path in identity.repository_entity_paths(entity_dir):
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("type") == "State":
             continue
-        rel = str(path.relative_to(ROOT))
+        rel = str(path.relative_to(root))
         entity_id = data.get("id")
         entity_type = data.get("type")
         if not isinstance(entity_id, str) or not entity_id or not ID_RE.fullmatch(entity_id):
@@ -60,8 +67,10 @@ def validate() -> list[dict]:
             })
         if data.get("iri") != f"ecl:{entity_id}":
             failures.append({"file": rel, "id": entity_id, "reason": "iri/id mismatch", "value": data.get("iri")})
-        if data.get("@context") != "../../ontology/ecl-context.jsonld":
-            failures.append({"file": rel, "id": entity_id, "reason": "unexpected JSON-LD context", "value": data.get("@context")})
+        context = data.get("@context")
+        context_target = (path.parent / context).resolve() if isinstance(context, str) and context else None
+        if context_target != canonical_context:
+            failures.append({"file": rel, "id": entity_id, "reason": "unexpected JSON-LD context", "value": context})
 
         name = data.get("name")
         aliases = data.get("aliases")
@@ -80,7 +89,7 @@ def validate() -> list[dict]:
             target = (path.parent / dossier).resolve()
             if not target.is_file():
                 failures.append({"file": rel, "id": entity_id, "reason": "dossier provenance target does not exist", "value": dossier})
-            elif not inside(target, DOSSIER_ROOT):
+            elif not inside(target, dossier_root):
                 failures.append({"file": rel, "id": entity_id, "reason": "dossier provenance escapes dossiers/", "value": dossier})
 
     for entity_id, files in sorted(ids.items()):
