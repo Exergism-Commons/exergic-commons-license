@@ -1,0 +1,212 @@
+#!/usr/bin/env python3
+"""Public canonical dossier contract with backward-compatible clipping diagnostics."""
+from __future__ import annotations
+
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+from markdown_it import MarkdownIt
+
+import canonical_dossier_contract_impl as _impl
+
+for _name, _value in vars(_impl).items():
+    if not _name.startswith("__"):
+        globals()[_name] = _value
+
+_original_validate_generated_svg_clipping = _impl.validate_generated_svg_clipping
+_original_embedded_resource_targets = _impl.embedded_resource_targets
+_original_validate_universe = _impl.validate_universe
+
+
+def commonmark_image_targets(text: str) -> list[str]:
+    """Return every image destination that CommonMark actually renders."""
+    targets: list[str] = []
+    for token in MarkdownIt("commonmark").parse(text):
+        if token.type != "inline":
+            continue
+        for child in token.children or []:
+            if child.type != "image":
+                continue
+            target = (child.attrGet("src") or "").strip()
+            if target:
+                targets.append(target)
+    return targets
+
+
+def commonmark_has_raw_html(text: str) -> bool:
+    """Return whether CommonMark exposes any raw HTML block or inline token."""
+    for token in MarkdownIt("commonmark").parse(text):
+        if token.type in {"html_block", "html_inline"}:
+            return True
+        if token.type == "inline" and any(
+            child.type == "html_inline" for child in (token.children or [])
+        ):
+            return True
+    return False
+
+
+def commonmark_h2_titles(text: str) -> list[str]:
+    """Return rendered H2 titles in document order."""
+    tokens = MarkdownIt("commonmark").parse(text)
+    result: list[str] = []
+    for index, token in enumerate(tokens[:-1]):
+        if token.type != "heading_open" or token.tag != "h2":
+            continue
+        inline = tokens[index + 1]
+        if inline.type != "inline":
+            continue
+        result.append(" ".join(inline.content.split()))
+    return result
+
+
+def embedded_resource_targets(text: str) -> list[str]:
+    """Union legacy raw-syntax discovery with rendered CommonMark image destinations."""
+    targets = list(_original_embedded_resource_targets(text))
+    targets.extend(commonmark_image_targets(text))
+    return list(dict.fromkeys(targets))
+
+
+# Functions defined in the implementation module resolve this global at call time.
+# Patch the implementation namespace as well as the public wrapper so every caller,
+# including validate_universe(), receives the rendered CommonMark surface.
+_impl.embedded_resource_targets = embedded_resource_targets
+
+
+def _fully_unquote_path(value: str) -> str | None:
+    """Decode nested percent-encoding to a stable local-path representation."""
+    current = value
+    for _ in range(8):
+        decoded = unquote(current)
+        if decoded == current:
+            return decoded
+        current = decoded
+    return None
+
+
+def _local_resource_repo_path(root: Path, dossier_rel: Path, target: str) -> tuple[Path | None, bool]:
+    """Resolve a local embedded resource; bool marks invalid/escaping local targets."""
+    parsed = urlsplit(target.strip())
+    if parsed.scheme or parsed.netloc:
+        return None, False
+    decoded = _fully_unquote_path(parsed.path.strip())
+    if decoded is None or not decoded or "\\" in decoded or "\x00" in decoded:
+        return None, True
+    reparsed = urlsplit(decoded)
+    if reparsed.scheme or reparsed.netloc or decoded.startswith("//"):
+        return None, True
+    try:
+        absolute = ((root / dossier_rel).parent / decoded).resolve()
+        return absolute.relative_to(root.resolve()), False
+    except (OSError, RuntimeError, ValueError):
+        return None, True
+
+
+def validate_dossier_local_resources(
+    text: str,
+    dossier_rel: Path,
+    entity_id: str,
+    root: Path,
+) -> list[str]:
+    """Require every local embedded resource to use a canonical provenance surface."""
+    errors: list[str] = []
+    allowed_generated = set(_impl.canonical_visuals(entity_id))
+    evidence_rel = Path("dossiers/evidence-images")
+
+    for target in embedded_resource_targets(text):
+        if _impl.nonlocal_resource_target(target):
+            continue
+        rel, invalid = _local_resource_repo_path(root, dossier_rel, target)
+        if invalid:
+            errors.append(
+                f"{dossier_rel}: local embedded resource {target!r} does not resolve to a valid repository-local file path; "
+                "use a canonical generated visual or provenance-controlled raster facsimile"
+            )
+            continue
+        if rel is None:
+            continue
+
+        rel_posix = rel.as_posix()
+        if rel_posix in allowed_generated:
+            if not (root / rel).is_file():
+                errors.append(
+                    f"{dossier_rel}: referenced canonical generated visual does not exist: {rel_posix!r}"
+                )
+            continue
+
+        try:
+            rel.relative_to(evidence_rel)
+        except ValueError:
+            errors.append(
+                f"{dossier_rel}: local embedded resource {target!r} resolves to uncontrolled asset "
+                f"{rel_posix!r}; use a canonical generated visual or dossiers/evidence-images"
+            )
+            continue
+
+        if not (root / rel).is_file():
+            errors.append(
+                f"{dossier_rel}: referenced evidence image does not exist: {rel_posix!r}"
+            )
+
+    return errors
+
+
+def validate_dossier_commonmark_surface(text: str, dossier_rel: Path) -> list[str]:
+    """Keep canonical prose structurally unambiguous and free of raw-HTML escape hatches."""
+    errors: list[str] = []
+    if commonmark_has_raw_html(text):
+        errors.append(
+            f"{dossier_rel}: raw HTML is forbidden on canonical dossiers; use CommonMark prose/resources"
+        )
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for title in commonmark_h2_titles(text):
+        if title in seen:
+            duplicates.add(title)
+        seen.add(title)
+    for title in sorted(duplicates):
+        errors.append(
+            f"{dossier_rel}: duplicate CommonMark H2 section {title!r} is forbidden on canonical dossiers"
+        )
+    return errors
+
+
+def validate_universe(root: Path) -> list[str]:
+    """Validate canonical identity bindings plus CommonMark/resource provenance for every dossier."""
+    errors = list(_original_validate_universe(root))
+    for path in _impl.entity_paths(root):
+        try:
+            record = _impl.load_json(path)
+        except (OSError, ValueError):
+            continue
+        entity_id = record.get("id")
+        entity_type = record.get("type")
+        if not isinstance(entity_id, str) or not entity_id or entity_type not in _impl.TYPE_DIR:
+            continue
+        rel = _impl.resolve_repo_ref(root, path, record.get("dossier"))
+        expected_dir = _impl.TYPE_DIR[entity_type]
+        if rel is None or len(rel.parts) < 3 or rel.parts[:2] != ("dossiers", expected_dir) or rel.suffix != ".md":
+            continue
+        dossier = root / rel
+        if not dossier.is_file():
+            continue
+        try:
+            text = dossier.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        errors.extend(validate_dossier_commonmark_surface(text, rel))
+        errors.extend(validate_dossier_local_resources(text, rel, entity_id, root))
+    return errors
+
+
+# The implementation's top-level validate() resolves validate_universe dynamically.
+_impl.validate_universe = validate_universe
+
+
+def validate_generated_svg_clipping(root):
+    return [
+        error.replace(
+            "outside active clipPath",
+            "outside clipPath; outside active clipPath",
+        )
+        for error in _original_validate_generated_svg_clipping(root)
+    ]

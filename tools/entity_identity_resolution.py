@@ -22,6 +22,7 @@ from typing import Callable, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge" / "entities"
 GENERATED_DIR = ROOT / "knowledge" / "generated"
+ENTITY_SUFFIXES = {".json", ".jsonld"}
 SUPERSESSION_GLOB = "entity-id-supersessions-v*.json"
 SUPERSESSION_RE = re.compile(r"^entity-id-supersessions-v([1-9][0-9]*)\.json$")
 
@@ -38,9 +39,11 @@ def infer_domestic_state(entity_id: str, state_codes: set[str]) -> str | None:
     return state if state in state_codes else None
 
 
-def supersession_manifests() -> list[tuple[int, Path]]:
+def supersession_manifests(generated_dir: Path | None = None) -> list[tuple[int, Path]]:
+    """Return the complete contiguous versioned supersession-manifest chain."""
+    generated_dir = GENERATED_DIR if generated_dir is None else generated_dir
     manifests: list[tuple[int, Path]] = []
-    for path in GENERATED_DIR.glob(SUPERSESSION_GLOB):
+    for path in generated_dir.glob(SUPERSESSION_GLOB):
         match = SUPERSESSION_RE.fullmatch(path.name)
         assert match, f"malformed identity supersession filename: {path.name}"
         manifests.append((int(match.group(1)), path))
@@ -52,31 +55,40 @@ def supersession_manifests() -> list[tuple[int, Path]]:
     return manifests
 
 
-def load_id_supersessions() -> dict[str, str]:
+def load_id_supersessions(
+    generated_dir: Path | None = None, root: Path | None = None
+) -> dict[str, str]:
+    """Load the authoritative direct supersession map from every versioned manifest."""
+    root = ROOT if root is None else root
     mapping: dict[str, str] = {}
     previous: Path | None = None
-    for version, path in supersession_manifests():
+    for version, path in supersession_manifests(generated_dir):
+        rel = path.relative_to(root)
         data = json.loads(path.read_text(encoding="utf-8"))
         assert data.get("version") == version, (
-            f"supersession version/file mismatch: {path.relative_to(ROOT)} -> {data.get('version')!r}"
+            f"supersession version/file mismatch: {rel} -> {data.get('version')!r}"
         )
         if previous is None:
-            assert not data.get("follows"), f"v1 supersessions must not follow another manifest: {path.relative_to(ROOT)}"
+            assert not data.get("follows"), f"v1 supersessions must not follow another manifest: {rel}"
         else:
-            expected = str(previous.relative_to(ROOT))
+            expected = str(previous.relative_to(root))
             assert data.get("follows") == expected, (
-                f"broken supersession follows chain at {path.relative_to(ROOT)}: "
+                f"broken supersession follows chain at {rel}: "
                 f"expected {expected!r}, got {data.get('follows')!r}"
             )
-        for row in data.get("supersessions", []):
+        rows = data.get("supersessions")
+        assert isinstance(rows, list), f"{rel}: supersessions must be a list"
+        for index, row in enumerate(rows):
+            assert isinstance(row, dict), f"{rel}: supersession row {index} must be an object"
             source = row.get("from")
             target = row.get("to")
             reason = row.get("reason")
-            assert isinstance(source, str) and source, (path, row)
-            assert isinstance(target, str) and target and target != source, (path, row)
-            assert isinstance(reason, str) and reason.strip(), (path, row)
+            assert isinstance(source, str) and source, f"{rel}: supersession row {index} requires non-empty from id"
+            assert isinstance(target, str) and target, f"{rel}: supersession row {index} requires non-empty to id"
+            assert target != source, f"{rel}: self-supersession is forbidden for {source}"
+            assert isinstance(reason, str) and reason.strip(), f"{rel}: supersession row {index} requires non-empty reason"
             assert source.split("-", 1)[0] == target.split("-", 1)[0], (
-                "supersession must preserve identity kind", path, row
+                f"{rel}: supersession must preserve identity kind: {source} -> {target}"
             )
             assert source not in mapping, f"duplicate identity supersession source: {source}"
             mapping[source] = target
@@ -142,10 +154,20 @@ def default_normalizer(value: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
 
-def load_repository_entities() -> tuple[list[dict], set[str]]:
+def repository_entity_paths(entity_dir: Path | None = None) -> list[Path]:
+    """Return the recursive canonical .json/.jsonld entity surface."""
+    entity_dir = ENTITY_DIR if entity_dir is None else entity_dir
+    return sorted(
+        path
+        for path in entity_dir.rglob("*")
+        if path.is_file() and path.suffix in ENTITY_SUFFIXES
+    )
+
+
+def load_repository_entities(entity_dir: Path | None = None) -> tuple[list[dict], set[str]]:
     entities: list[dict] = []
     entity_ids: set[str] = set()
-    for path in sorted(ENTITY_DIR.glob("*.json")):
+    for path in repository_entity_paths(entity_dir):
         data = json.loads(path.read_text(encoding="utf-8"))
         entities.append(data)
         entity_id = data.get("id")
