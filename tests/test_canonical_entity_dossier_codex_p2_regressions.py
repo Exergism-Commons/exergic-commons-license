@@ -219,5 +219,25 @@ class CodexP2SvgCursorTests(unittest.TestCase):
         )
 
 
+    def test_nbsp_text_invalidates_implicit_child_cursor(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="100" y="20">&#160;'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+    def test_unicode_space_tail_cannot_preserve_exact_cursor(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20">'
+                '<tspan x="100">EDGE</tspan>&#8195;'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
