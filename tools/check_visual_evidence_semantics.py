@@ -130,6 +130,11 @@ def _clip_id(raw: str | None) -> str | None:
     return match.group(1) if match else None
 
 
+def _has_non_formatting_text(value: str | None) -> bool:
+    """Whether text contains something beyond XML source-formatting whitespace."""
+    return bool(value) and any(char not in " \t\r\n" for char in value)
+
+
 def _apply_position(
     element: ET.Element,
     current_x: float | None,
@@ -237,8 +242,11 @@ def visible_svg_text(path: Path) -> str | None:
         if semantic_text_node and element.text:
             if visible:
                 chunks.append(element.text)
-            if element.text.strip():
-                cursor_x_exact = False
+            # Any text node can advance the SVG text cursor, including Unicode
+            # spacing glyphs such as NBSP/EM SPACE that Python's strip()
+            # classifies as whitespace. Do not carry an exact implicit x past
+            # text unless a descendant explicitly re-anchors with absolute x.
+            cursor_x_exact = False
 
         cursor_x, cursor_y = x, y
         for child in element:
@@ -252,9 +260,15 @@ def visible_svg_text(path: Path) -> str | None:
             )
             if semantic_text_node:
                 cursor_x, cursor_y, cursor_x_exact = child_x, child_y, child_x_exact
-            if semantic_text_node and child.tail and child.tail.strip():
-                invalid = True
-                return cursor_x, cursor_y, False
+            if semantic_text_node and child.tail:
+                # Tail content is not modeled as a positioned semantic node.
+                # Non-formatting content is therefore unverifiable. Even pure
+                # source-formatting whitespace makes the inherited post-glyph
+                # cursor inexact; a later sibling must explicitly re-anchor x.
+                cursor_x_exact = False
+                if _has_non_formatting_text(child.tail):
+                    invalid = True
+                    return cursor_x, cursor_y, False
 
         return cursor_x, cursor_y, cursor_x_exact
 
