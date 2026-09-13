@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-NLD-PROBATION-RISK-TOOLS",
+  "iri": "ex:PROJECT-NLD-PROBATION-RISK-TOOLS",
   "id": "PROJECT-NLD-PROBATION-RISK-TOOLS",
   "type": "Project",
   "name": "Netherlands probation risk tools",

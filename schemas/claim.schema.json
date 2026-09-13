@@ -6,7 +6,7 @@
   "required": ["@context", "iri", "id", "type", "subject", "predicate", "status", "provenance"],
   "properties": {
     "@context": {"type": "string", "minLength": 1},
-    "iri": {"type": "string", "pattern": "^ecl:CLAIM-[A-Z0-9-]+$"},
+    "iri": {"type": "string", "pattern": "^ex:CLAIM-[A-Z0-9-]+$"},
     "id": {"type": "string", "pattern": "^CLAIM-[A-Z0-9-]+$"},
     "type": {"const": "Claim"},
     "subject": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9_-]*$"},
@@ -21,8 +21,8 @@
     "validTo": {"type": "string", "format": "date"},
     "evidenceFor": {"type": "array", "items": {"type": "string", "pattern": "^ecl:EVIDENCE-[A-Z0-9-]+$"}, "uniqueItems": true},
     "evidenceAgainst": {"type": "array", "items": {"type": "string", "pattern": "^ecl:EVIDENCE-[A-Z0-9-]+$"}, "uniqueItems": true},
-    "supersedes": {"type": "string", "pattern": "^ecl:CLAIM-[A-Z0-9-]+$"},
-    "affectedVariables": {"type": "array", "items": {"enum": ["ecl:P", "ecl:A", "ecl:V_ep", "ecl:L", "ecl:O", "ecl:U", "ecl:C", "ecl:S", "ecl:R", "ecl:Ecol"]}, "uniqueItems": true},
+    "supersedes": {"type": "string", "pattern": "^ex:CLAIM-[A-Z0-9-]+$"},
+    "affectedVariables": {"type": "array", "items": {"enum": ["ex:P", "ex:A", "ex:V_ep", "ex:L", "ex:O", "ex:U", "ex:C", "ex:S", "ex:R", "ex:Ecol"]}, "uniqueItems": true},
     "affectedCriteria": {"type": "array", "items": {"enum": ["ecl:ECL5_1", "ecl:ECL5_2", "ecl:ECL5_3", "ecl:ECL5_4", "ecl:ECL5_5", "ecl:ECL5_6", "ecl:ECL5_7"]}, "uniqueItems": true},
     "provenance": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
     "notes": {"type": "string"}

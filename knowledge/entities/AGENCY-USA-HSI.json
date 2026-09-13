@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-USA-HSI",
+  "iri": "ex:AGENCY-USA-HSI",
   "id": "AGENCY-USA-HSI",
   "type": "Agency",
   "name": "Homeland Security Investigations",
@@ -10,5 +10,5 @@
   "lastSubstantiveReview": "2026-08-15",
   "reviewClass": "manual",
   "reviewReason": "Tranche 5 institutional identity/hierarchy; functional attribution remains Claim/Evidence data.",
-  "partOf": ["ecl:AGENCY-USA-ICE"]
+  "partOf": ["ex:AGENCY-USA-ICE"]
 }

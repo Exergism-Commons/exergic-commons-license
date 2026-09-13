@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SLB",
+  "iri": "ex:STATE-SLB",
   "id": "STATE-SLB",
   "type": "State",
   "name": "Solomon Islands",

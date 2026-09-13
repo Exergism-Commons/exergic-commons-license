@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-DZA",
+  "iri": "ex:STATE-DZA",
   "id": "STATE-DZA",
   "type": "State",
   "name": "Algeria",

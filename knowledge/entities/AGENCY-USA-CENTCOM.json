@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-USA-CENTCOM",
+  "iri": "ex:AGENCY-USA-CENTCOM",
   "id": "AGENCY-USA-CENTCOM",
   "type": "Agency",
   "name": "U.S. Central Command",
@@ -10,5 +10,5 @@
   "lastSubstantiveReview": "2026-08-15",
   "reviewClass": "manual",
   "reviewReason": "Tranche 5 institutional identity/hierarchy; exact operational attribution remains Claim/Evidence data.",
-  "partOf": ["ecl:AGENCY-USA-DOD"]
+  "partOf": ["ex:AGENCY-USA-DOD"]
 }

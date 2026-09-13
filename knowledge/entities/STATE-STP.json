@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-STP",
+  "iri": "ex:STATE-STP",
   "id": "STATE-STP",
   "type": "State",
   "name": "São Tomé and Príncipe",

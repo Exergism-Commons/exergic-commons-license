@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-NGA",
+  "iri": "ex:STATE-NGA",
   "id": "STATE-NGA",
   "type": "State",
   "name": "Nigeria",

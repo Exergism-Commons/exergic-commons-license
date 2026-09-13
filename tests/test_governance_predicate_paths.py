@@ -6,9 +6,11 @@ from rdflib import Graph, Literal, Namespace, RDF, URIRef
 from rdflib.namespace import XSD
 
 ROOT = Path(__file__).resolve().parents[1]
-ECL = Namespace("urn:ecl:")
+ECL = Namespace("https://id.exergism.org/ecl#")
 
 
+EX = Namespace("https://id.exergism.org/exergism#")
+EC = Namespace("https://id.exergism.org/commons#")
 class GovernancePredicatePathTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -22,21 +24,21 @@ class GovernancePredicatePathTests(unittest.TestCase):
     def claim_graph(predicate: URIRef, stable_id: str) -> Graph:
         graph = Graph()
         claim = ECL[stable_id]
-        graph.add((claim, RDF.type, ECL.Claim))
-        graph.add((claim, ECL.stableId, Literal(stable_id)))
+        graph.add((claim, RDF.type, EX.Claim))
+        graph.add((claim, EC.stableId, Literal(stable_id)))
         graph.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))
         graph.add((claim, ECL.predicate, predicate))
         graph.add((claim, ECL.literalValue, Literal("x")))
-        graph.add((claim, ECL.status, Literal("rejected")))
-        graph.add((claim, ECL.provenance, Literal("adversarial IRI-separator regression")))
+        graph.add((claim, EC.status, Literal("rejected")))
+        graph.add((claim, EC.provenance, Literal("adversarial IRI-separator regression")))
         return graph
 
     @staticmethod
     def state_graph(predicate: URIRef) -> Graph:
         graph = Graph()
         state = ECL["STATE-TST"]
-        graph.add((state, RDF.type, ECL.State))
-        graph.add((state, ECL.stableId, Literal("STATE-TST")))
+        graph.add((state, RDF.type, EX.State))
+        graph.add((state, EC.stableId, Literal("STATE-TST")))
         graph.add((state, ECL.name, Literal("Test State")))
         graph.add((state, ECL.iso3, Literal("TST")))
         graph.add((state, ECL.dossier, Literal("../../dossiers/states/TST.md")))

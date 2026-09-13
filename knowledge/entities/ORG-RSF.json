@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-RSF",
+  "iri": "ex:ORG-RSF",
   "id": "ORG-RSF",
   "type": "Organization",
   "name": "Rapid Support Forces (RSF)",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ecl:schema:legal-review-record",
+  "$id": "https://id.exergism.org/ecl#schema:legal-review-record",
   "title": "Immutable completed ECL legal-review gate record",
   "type": "object",
   "required": [

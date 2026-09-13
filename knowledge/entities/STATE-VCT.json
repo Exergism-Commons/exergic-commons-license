@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-VCT",
+  "iri": "ex:STATE-VCT",
   "id": "STATE-VCT",
   "type": "State",
   "name": "Saint Vincent and the Grenadines",

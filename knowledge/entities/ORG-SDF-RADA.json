@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-SDF-RADA",
+  "iri": "ex:ORG-SDF-RADA",
   "id": "ORG-SDF-RADA",
   "type": "Organization",
   "name": "Special Deterrence Forces / RADA",

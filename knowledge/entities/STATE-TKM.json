@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-TKM",
+  "iri": "ex:STATE-TKM",
   "id": "STATE-TKM",
   "type": "State",
   "name": "Turkmenistan",

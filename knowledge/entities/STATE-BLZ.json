@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BLZ",
+  "iri": "ex:STATE-BLZ",
   "id": "STATE-BLZ",
   "type": "State",
   "name": "Belize",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-TZA",
+  "iri": "ex:STATE-TZA",
   "id": "STATE-TZA",
   "type": "State",
   "name": "Tanzania",

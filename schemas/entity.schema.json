@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ecl:schema:entity",
+  "$id": "https://id.exergism.org/ecl#schema:entity",
   "title": "ECL JSON-LD ABox tracked-object record",
   "type": "object",
   "required": [
@@ -77,7 +77,7 @@
         "required": ["iso3", "publicReviewIssue", "aliases"],
         "properties": {
           "id": {"pattern": "^STATE-[A-Z]{3}$"},
-          "iri": {"pattern": "^ecl:STATE-[A-Z]{3}$"},
+          "iri": {"pattern": "^ex:STATE-[A-Z]{3}$"},
           "dossier": {"pattern": "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$"}
         },
         "not": {

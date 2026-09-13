@@ -1,10 +1,10 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED",
+  "iri": "ex:CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED",
   "id": "CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED",
   "type": "Claim",
-  "subject": "ecl:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
-  "predicate": "ecl:status",
+  "subject": "ex:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+  "predicate": "ec:status",
   "literalValue": "judicially-blocked-not-authorized",
   "status": "accepted",
   "claimConfidence": "established",

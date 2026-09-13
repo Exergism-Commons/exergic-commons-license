@@ -16,7 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 class UpdateTicketSweepTests(unittest.TestCase):
     def entity(self, review_due="2026-09-01", review_class="hot"):
         entity = {
-            "iri": "ecl:STATE-TEST",
+            "iri": "ex:STATE-TEST",
             "id": "STATE-TEST",
             "name": "Test State",
             "dossier": "../../dossiers/states/TST.md",
@@ -40,7 +40,7 @@ class UpdateTicketSweepTests(unittest.TestCase):
         self.assertEqual(first["fingerprint"], second["fingerprint"])
         self.assertEqual(first["priority"], "P1")
         self.assertEqual(first["type"], "review-due")
-        self.assertEqual(first["entityIri"], "ecl:STATE-TEST")
+        self.assertEqual(first["entityIri"], "ex:STATE-TEST")
 
     def test_stable_review_is_lower_priority(self):
         today = MODULE.dt.date(2026, 9, 1)
@@ -62,7 +62,7 @@ class UpdateTicketSweepTests(unittest.TestCase):
             (root / "b.json").write_text(json.dumps(self.entity()), encoding="utf-8")
             another = self.entity()
             another["id"] = "STATE-AAA"
-            another["iri"] = "ecl:STATE-AAA"
+            another["iri"] = "ex:STATE-AAA"
             (root / "a.jsonld").write_text(json.dumps(another), encoding="utf-8")
             loaded = MODULE.load_entities(root)
             self.assertEqual([Path(item["_path"]).name for item in loaded], ["a.jsonld", "b.json"])

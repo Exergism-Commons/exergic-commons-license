@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
+  "iri": "ex:PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
   "id": "PROJECT-FRA-NICE-ALGORITHMIC-CCTV",
   "type": "Project",
   "name": "Nice algorithmic public-street CCTV processing at school entrances",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-WSM",
+  "iri": "ex:STATE-WSM",
   "id": "STATE-WSM",
   "type": "State",
   "name": "Samoa",

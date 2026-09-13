@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MWI",
+  "iri": "ex:STATE-MWI",
   "id": "STATE-MWI",
   "type": "State",
   "name": "Malawi",

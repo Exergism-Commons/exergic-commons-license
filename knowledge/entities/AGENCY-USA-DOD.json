@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-USA-DOD",
+  "iri": "ex:AGENCY-USA-DOD",
   "id": "AGENCY-USA-DOD",
   "type": "Agency",
   "name": "U.S. Department of Defense",
@@ -10,5 +10,5 @@
   "lastSubstantiveReview": "2026-08-15",
   "reviewClass": "manual",
   "reviewReason": "Tranche 5 institutional identity/hierarchy; statutory identity retained while Department of War remains a secondary title.",
-  "partOf": ["ecl:STATE-USA"]
+  "partOf": ["ex:STATE-USA"]
 }

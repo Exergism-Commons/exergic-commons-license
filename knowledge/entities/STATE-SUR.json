@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SUR",
+  "iri": "ex:STATE-SUR",
   "id": "STATE-SUR",
   "type": "State",
   "name": "Suriname",

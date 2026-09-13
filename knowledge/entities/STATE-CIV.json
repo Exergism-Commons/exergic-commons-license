@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-CIV",
+  "iri": "ex:STATE-CIV",
   "id": "STATE-CIV",
   "type": "State",
   "name": "Côte d'Ivoire",

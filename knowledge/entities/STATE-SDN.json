@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SDN",
+  "iri": "ex:STATE-SDN",
   "id": "STATE-SDN",
   "type": "State",
   "name": "Sudan",

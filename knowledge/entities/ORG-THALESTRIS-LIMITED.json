@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-THALESTRIS-LIMITED",
+  "iri": "ex:ORG-THALESTRIS-LIMITED",
   "id": "ORG-THALESTRIS-LIMITED",
   "type": "Organization",
   "name": "Thalestris Limited",

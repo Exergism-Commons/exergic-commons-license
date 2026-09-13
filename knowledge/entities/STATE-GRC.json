@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-GRC",
+  "iri": "ex:STATE-GRC",
   "id": "STATE-GRC",
   "type": "State",
   "name": "Greece",

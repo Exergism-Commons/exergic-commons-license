@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-NIC",
+  "iri": "ex:STATE-NIC",
   "id": "STATE-NIC",
   "type": "State",
   "name": "Nicaragua",

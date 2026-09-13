@@ -1,13 +1,15 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?claim ?target
 WHERE {
-  ?claim a ecl:Claim .
+  ?claim a ex:Claim .
   {
     ?claim ecl:subject ?target .
   } UNION {
     ?claim ecl:object ?target .
   }
-  FILTER (STRSTARTS(STR(?target), "urn:ecl:"))
-  FILTER NOT EXISTS { ?target ecl:stableId ?targetId . }
+  FILTER (STRSTARTS(STR(?target), "https://id.exergism.org/ecl#"))
+  FILTER NOT EXISTS { ?target ec:stableId ?targetId . }
 }

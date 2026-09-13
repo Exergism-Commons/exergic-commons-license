@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-LCA",
+  "iri": "ex:STATE-LCA",
   "id": "STATE-LCA",
   "type": "State",
   "name": "Saint Lucia",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-USA-ARMY",
+  "iri": "ex:AGENCY-USA-ARMY",
   "id": "AGENCY-USA-ARMY",
   "type": "Agency",
   "name": "U.S. Army",
@@ -10,5 +10,5 @@
   "lastSubstantiveReview": "2026-08-15",
   "reviewClass": "manual",
   "reviewReason": "Tranche 5 institutional identity/hierarchy; functional attribution remains Claim/Evidence data.",
-  "partOf": ["ecl:AGENCY-USA-DOD"]
+  "partOf": ["ex:AGENCY-USA-DOD"]
 }

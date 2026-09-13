@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-CPV",
+  "iri": "ex:STATE-CPV",
   "id": "STATE-CPV",
   "type": "State",
   "name": "Cabo Verde",

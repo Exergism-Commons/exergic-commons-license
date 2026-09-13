@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-IZZ-AL-DIN-AL-QASSAM",
+  "iri": "ex:ORG-IZZ-AL-DIN-AL-QASSAM",
   "id": "ORG-IZZ-AL-DIN-AL-QASSAM",
   "type": "Organization",
   "name": "Izz al-Din al-Qassam Brigades",

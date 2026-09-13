@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
+  "iri": "ex:PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
   "id": "PROJECT-SRB-STATE-LINKED-DIGITAL-SURVEILLANCE",
   "type": "Project",
   "name": "Serbia State-linked digital-surveillance campaign",

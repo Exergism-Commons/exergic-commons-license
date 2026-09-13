@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-KHM",
+  "iri": "ex:STATE-KHM",
   "id": "STATE-KHM",
   "type": "State",
   "name": "Cambodia",

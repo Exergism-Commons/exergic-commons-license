@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MUS",
+  "iri": "ex:STATE-MUS",
   "id": "STATE-MUS",
   "type": "State",
   "name": "Mauritius",

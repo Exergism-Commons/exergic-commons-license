@@ -1,20 +1,22 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ex: <https://id.exergism.org/exergism#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?left ?right ?subject ?predicate
 WHERE {
   # Accepted-value conflicts are meaningful only for predicates whose values are
   # explicitly curated as mutually exclusive/single-valued. Relationship
   # predicates such as tracks/controls/deploys are intentionally multi-valued.
-  VALUES ?predicate { ecl:status }
+  VALUES ?predicate { ec:status }
 
-  ?left a ecl:Claim ;
+  ?left a ex:Claim ;
         ecl:subject ?subject ;
         ecl:predicate ?predicate ;
-        ecl:status "accepted" .
-  ?right a ecl:Claim ;
+        ec:status "accepted" .
+  ?right a ex:Claim ;
          ecl:subject ?subject ;
          ecl:predicate ?predicate ;
-         ecl:status "accepted" .
+         ec:status "accepted" .
   FILTER (STR(?left) < STR(?right))
 
   OPTIONAL { ?left ecl:object ?leftObject . }
@@ -32,6 +34,6 @@ WHERE {
   FILTER (!(BOUND(?leftTo) && BOUND(?rightFrom) && ?leftTo < ?rightFrom))
   FILTER (!(BOUND(?rightTo) && BOUND(?leftFrom) && ?rightTo < ?leftFrom))
 
-  FILTER NOT EXISTS { ?left ecl:supersedes ?right . }
-  FILTER NOT EXISTS { ?right ecl:supersedes ?left . }
+  FILTER NOT EXISTS { ?left ec:supersedes ?right . }
+  FILTER NOT EXISTS { ?right ec:supersedes ?left . }
 }

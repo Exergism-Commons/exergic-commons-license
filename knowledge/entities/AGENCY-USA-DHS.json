@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-USA-DHS",
+  "iri": "ex:AGENCY-USA-DHS",
   "id": "AGENCY-USA-DHS",
   "type": "Agency",
   "name": "U.S. Department of Homeland Security",
@@ -10,5 +10,5 @@
   "lastSubstantiveReview": "2026-08-15",
   "reviewClass": "manual",
   "reviewReason": "Tranche 5 institutional identity/hierarchy; no governance status is encoded.",
-  "partOf": ["ecl:STATE-USA"]
+  "partOf": ["ex:STATE-USA"]
 }

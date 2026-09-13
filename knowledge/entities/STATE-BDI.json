@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BDI",
+  "iri": "ex:STATE-BDI",
   "id": "STATE-BDI",
   "type": "State",
   "name": "Burundi",

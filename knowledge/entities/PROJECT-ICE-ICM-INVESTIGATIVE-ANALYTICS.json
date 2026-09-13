@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
+  "iri": "ex:PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
   "id": "PROJECT-ICE-ICM-INVESTIGATIVE-ANALYTICS",
   "type": "Project",
   "name": "ICE Investigative Case Management / Investigative Analytics",

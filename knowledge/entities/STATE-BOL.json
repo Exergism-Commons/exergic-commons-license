@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BOL",
+  "iri": "ex:STATE-BOL",
   "id": "STATE-BOL",
   "type": "State",
   "name": "Bolivia",
