@@ -196,17 +196,28 @@ def visible_svg_text(path: Path) -> str | None:
         inherited_x: float | None,
         inherited_y: float | None,
         inherited_clips: tuple[str, ...],
-    ) -> tuple[float | None, float | None]:
+        inherited_x_exact: bool,
+    ) -> tuple[float | None, float | None, bool]:
         nonlocal invalid
         tag = element.tag.rsplit("}", 1)[-1]
         if tag in {"defs", "title", "desc", "metadata"}:
-            return inherited_x, inherited_y
+            return inherited_x, inherited_y, inherited_x_exact
+
+        semantic_text_node = tag in {"text", "tspan"}
+        has_absolute_x = element.get("x") is not None
+        if semantic_text_node and not inherited_x_exact and not has_absolute_x:
+            # Text advances the SVG text cursor by glyph metrics that this
+            # static verifier deliberately does not approximate. Once that
+            # happens, following text must establish a new absolute x rather
+            # than inherit (or dx-adjust) an unknowable post-glyph cursor.
+            invalid = True
+            return inherited_x, inherited_y, False
 
         hidden = hidden or _element_hidden(element)
         position = _apply_position(element, inherited_x, inherited_y)
         if position is None:
             invalid = True
-            return inherited_x, inherited_y
+            return inherited_x, inherited_y, False
         x, y = position
 
         clip_chain = inherited_clips
@@ -215,29 +226,39 @@ def visible_svg_text(path: Path) -> str | None:
             own_clip = _clip_id(own_clip_raw)
             if own_clip is None or own_clip not in clips:
                 invalid = True
-                return x, y
+                return x, y, has_absolute_x or inherited_x_exact
             clip_chain = (*inherited_clips, own_clip)
 
-        semantic_text_node = tag in {"text", "tspan"}
+        cursor_x_exact = has_absolute_x or inherited_x_exact
         visible = not hidden and _inside(bounds, x, y)
         if visible:
             visible = all(_inside(clips[clip_id], x, y) for clip_id in clip_chain)
 
-        if semantic_text_node and visible and element.text:
-            chunks.append(element.text)
+        if semantic_text_node and element.text:
+            if visible:
+                chunks.append(element.text)
+            if element.text.strip():
+                cursor_x_exact = False
 
         cursor_x, cursor_y = x, y
         for child in element:
-            child_x, child_y = walk(child, hidden, cursor_x, cursor_y, clip_chain)
+            child_x, child_y, child_x_exact = walk(
+                child,
+                hidden,
+                cursor_x,
+                cursor_y,
+                clip_chain,
+                cursor_x_exact,
+            )
             if semantic_text_node:
-                cursor_x, cursor_y = child_x, child_y
+                cursor_x, cursor_y, cursor_x_exact = child_x, child_y, child_x_exact
             if semantic_text_node and child.tail and child.tail.strip():
                 invalid = True
-                return cursor_x, cursor_y
+                return cursor_x, cursor_y, False
 
-        return cursor_x, cursor_y
+        return cursor_x, cursor_y, cursor_x_exact
 
-    walk(root, False, None, None, ())
+    walk(root, False, None, None, (), True)
     if invalid:
         return None
     return normalized(" ".join(chunks))
