@@ -18,6 +18,7 @@ sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import check_canonical_entity_manifest_history as history  # noqa: E402
 import entity_identity_resolution as resolver  # noqa: E402
+import check_visual_evidence_semantics as visual_semantics  # noqa: E402
 
 
 def load_identity_integrity_for_test():
@@ -172,6 +173,49 @@ class CodexP2IdentityContractTests(unittest.TestCase):
         self.assertTrue(
             any(item.get("reason") == "type/id-prefix mismatch" and item.get("id") == "PERSON-WRONG" for item in failures),
             failures,
+        )
+
+
+class CodexP2SvgCursorTests(unittest.TestCase):
+    def _visible(self, body: str) -> str | None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "x.svg"
+            path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                + body
+                + "</svg>",
+                encoding="utf-8",
+            )
+            return visual_semantics.visible_svg_text(path)
+
+    def test_unpositioned_sibling_after_cursor_moving_tspan_is_rejected(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20">'
+                '<tspan x="100">EDGE</tspan>'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+    def test_unpositioned_tspan_after_parent_text_is_rejected(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20">EDGE'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+    def test_absolute_x_reanchors_cursor_after_prior_text(self) -> None:
+        self.assertEqual(
+            "EDGE REQUIRED",
+            self._visible(
+                '<text x="10" y="20">'
+                '<tspan x="10">EDGE</tspan>'
+                '<tspan x="50"> REQUIRED</tspan>'
+                "</text>"
+            ),
         )
 
 
