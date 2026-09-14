@@ -19,6 +19,8 @@ sys.path.insert(0, str(REPO_ROOT / "tools"))
 import check_canonical_entity_manifest_history as history  # noqa: E402
 import entity_identity_resolution as resolver  # noqa: E402
 import check_visual_evidence_semantics as visual_semantics  # noqa: E402
+import check_canonical_entity_contract_round6_impl as round6_impl  # noqa: E402
+import check_dossier_visual_layout as visual_layout  # noqa: E402
 
 
 def load_identity_integrity_for_test():
@@ -211,9 +213,9 @@ class CodexP2SvgCursorTests(unittest.TestCase):
         self.assertEqual(
             "EDGE REQUIRED",
             self._visible(
-                '<text x="10" y="20">'
+                '<text x="10" y="20" font-size="8">'
                 '<tspan x="10">EDGE</tspan>'
-                '<tspan x="50"> REQUIRED</tspan>'
+                '<tspan x="40"> REQUIRED</tspan>'
                 "</text>"
             ),
         )
@@ -237,6 +239,69 @@ class CodexP2SvgCursorTests(unittest.TestCase):
                 "</text>"
             )
         )
+
+
+    def test_same_node_em_space_prefix_cannot_hide_required_text(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20" font-size="12">'
+                + "&#8195;" * 8
+                + "REQUIRED</text>"
+            )
+        )
+
+    def test_full_text_extent_must_fit_active_clip(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<defs><clipPath id="box"><rect x="0" y="0" width="50" height="50"/></clipPath></defs>'
+                '<text x="48" y="20" font-size="12" clip-path="url(#box)">REQUIRED</text>'
+            )
+        )
+
+    def test_object_bounding_box_clip_is_rejected(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<defs><clipPath id="box" clipPathUnits="objectBoundingBox">'
+                '<rect x="0" y="0" width="1" height="1"/></clipPath></defs>'
+                '<text x="10" y="20" font-size="12" clip-path="url(#box)">REQUIRED</text>'
+            )
+        )
+
+    def test_symbol_text_cannot_supply_visible_semantics(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<symbol id="hidden"><text x="10" y="20" font-size="12">REQUIRED</text></symbol>'
+            )
+        )
+
+    def test_static_svg_contract_rejects_symbol_container(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            directory = root / "dossiers/assets/generated"
+            directory.mkdir(parents=True)
+            (directory / "X-status.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                '<symbol><text x="10" y="20">REQUIRED</text></symbol>'
+                "</svg>",
+                encoding="utf-8",
+            )
+            errors = round6_impl.validate_all_generated_svg_static(root)
+        self.assertTrue(any("unsupported SVG element <symbol>" in error for error in errors), errors)
+
+    def test_layout_combines_anchor_with_line_width(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "X-status.svg"
+            path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300">'
+                '<defs><clipPath id="status-name-clip">'
+                '<rect x="54" y="64" width="800" height="66"/></clipPath></defs>'
+                '<text font-size="26" clip-path="url(#status-name-clip)">'
+                '<tspan x="850" y="88">OK</tspan></text>'
+                "</svg>",
+                encoding="utf-8",
+            )
+            errors = visual_layout.validate_file(path)
+        self.assertTrue(any("escapes horizontal clip" in error for error in errors), errors)
 
 
 if __name__ == "__main__":
