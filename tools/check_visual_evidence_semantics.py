@@ -163,7 +163,7 @@ def _glyph_width(ch: str, font_size: float) -> float:
     if ch in "\r\n\t":
         return 0.0
     if ch in {" ", "\u00a0"}:
-        factor = 0.35
+        factor = 0.32
     elif ch in {"\u2002", "\u2007"}:
         factor = 0.50
     elif ch in {"\u2003", "\u3000"}:
@@ -172,12 +172,12 @@ def _glyph_width(ch: str, font_size: float) -> float:
         factor = 0.30
     elif unicodedata.east_asian_width(ch) in {"W", "F"}:
         factor = 1.00
-    elif ch in "il.,'\`|!:;":
+    elif ch in "il.,'`|!:;":
         factor = 0.32
     elif ch in "mwMW@#%&":
         factor = 0.90
     elif ch.isupper():
-        factor = 0.72
+        factor = 0.70
     elif ch.isdigit():
         factor = 0.62
     else:
@@ -343,10 +343,8 @@ def visible_svg_text(path: Path) -> str | None:
                         _text_box_inside(clips[clip_id], x, y, element.text, font_size)
                         for clip_id in clip_chain
                     )
-                if not text_visible:
-                    invalid = True
-                    return x, y, False
-                chunks.append(element.text)
+                if text_visible:
+                    chunks.append(element.text)
             # Any text node can advance the SVG text cursor, including Unicode
             # spacing glyphs such as NBSP/EM SPACE that Python's strip()
             # classifies as whitespace. Do not carry an exact implicit x past
