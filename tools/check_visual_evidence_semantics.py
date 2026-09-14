@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import unicodedata
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -12,6 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "knowledge/generated"
 PALETTE_PATH = ROOT / "knowledge/generated/dossier-visual-palette-v1.json"
 SVG_NS = "{http://www.w3.org/2000/svg}"
+SAFE_STATIC_SVG_TAGS = {
+    "svg", "title", "desc", "metadata", "defs", "clipPath",
+    "rect", "g", "line", "polygon", "text", "tspan",
+}
+DEFAULT_FONT_SIZE = 16.0
+TEXT_ASCENT_EM = 0.80
+TEXT_DESCENT_EM = 0.25
 TEXTUAL_EQUIVALENT_SECTIONS = ("## Evidence record", "## Evidence gaps", "## Sources")
 GRANULARITY_LABELS = {
     "direct": "direct locator",
@@ -135,6 +143,76 @@ def _has_non_formatting_text(value: str | None) -> bool:
     return bool(value) and any(char not in " \t\r\n" for char in value)
 
 
+def _font_size(element: ET.Element, inherited: float) -> float | None:
+    style = _style_map(element.get("style"))
+    raw = element.get("font-size") or style.get("font-size")
+    if raw is None:
+        return inherited
+    raw = raw.strip().lower()
+    if raw.endswith("px"):
+        raw = raw[:-2]
+    size = _number(raw)
+    return size if size is not None and size > 0 else None
+
+
+def _glyph_width(ch: str, font_size: float) -> float:
+    """Conservative deterministic width estimate for the canonical Arial-like surface."""
+    category = unicodedata.category(ch)
+    if unicodedata.combining(ch) or category in {"Cc", "Cf"}:
+        return 0.0
+    if ch in "\r\n\t":
+        return 0.0
+    if ch in {" ", "\u00a0"}:
+        factor = 0.35
+    elif ch in {"\u2002", "\u2007"}:
+        factor = 0.50
+    elif ch in {"\u2003", "\u3000"}:
+        factor = 1.00
+    elif ch in {"\u2009", "\u202f"}:
+        factor = 0.30
+    elif unicodedata.east_asian_width(ch) in {"W", "F"}:
+        factor = 1.00
+    elif ch in "il.,'\`|!:;":
+        factor = 0.32
+    elif ch in "mwMW@#%&":
+        factor = 0.90
+    elif ch.isupper():
+        factor = 0.72
+    elif ch.isdigit():
+        factor = 0.62
+    else:
+        factor = 0.60
+    return font_size * factor
+
+
+def _measured_width(text: str, font_size: float) -> float:
+    return sum(_glyph_width(ch, font_size) for ch in text)
+
+
+def _text_box_inside(
+    bounds: tuple[float, float, float, float] | None,
+    x: float | None,
+    y: float | None,
+    text: str,
+    font_size: float | None,
+) -> bool:
+    """Require the full conservative text box, not only its anchor, inside bounds."""
+    if bounds is None:
+        return True
+    if (
+        x is None
+        or y is None
+        or font_size is None
+        or not all(math.isfinite(value) for value in (x, y, font_size))
+    ):
+        return False
+    x0, y0, x1, y1 = bounds
+    width = _measured_width(text, font_size)
+    top = y - TEXT_ASCENT_EM * font_size
+    bottom = y + TEXT_DESCENT_EM * font_size
+    return x0 <= x and x + width <= x1 and y0 <= top and bottom <= y1
+
+
 def _apply_position(
     element: ET.Element,
     current_x: float | None,
@@ -178,7 +256,17 @@ def visible_svg_text(path: Path) -> str | None:
         return None
     if root.tag != f"{SVG_NS}svg":
         return None
+    for element in root.iter():
+        if not isinstance(element.tag, str) or not element.tag.startswith(SVG_NS):
+            return None
+        if element.tag.rsplit("}", 1)[-1] not in SAFE_STATIC_SVG_TAGS:
+            return None
     if root.find(f".//{SVG_NS}style") is not None:
+        return None
+    if any(
+        clip.get("clipPathUnits") not in {None, "userSpaceOnUse"}
+        for clip in root.findall(f".//{SVG_NS}clipPath")
+    ):
         return None
     if any("class" in element.attrib or "transform" in element.attrib for element in root.iter()):
         return None
@@ -202,11 +290,17 @@ def visible_svg_text(path: Path) -> str | None:
         inherited_y: float | None,
         inherited_clips: tuple[str, ...],
         inherited_x_exact: bool,
+        inherited_font_size: float,
     ) -> tuple[float | None, float | None, bool]:
         nonlocal invalid
         tag = element.tag.rsplit("}", 1)[-1]
         if tag in {"defs", "title", "desc", "metadata"}:
             return inherited_x, inherited_y, inherited_x_exact
+
+        font_size = _font_size(element, inherited_font_size)
+        if font_size is None:
+            invalid = True
+            return inherited_x, inherited_y, False
 
         semantic_text_node = tag in {"text", "tspan"}
         has_absolute_x = element.get("x") is not None
@@ -240,7 +334,18 @@ def visible_svg_text(path: Path) -> str | None:
             visible = all(_inside(clips[clip_id], x, y) for clip_id in clip_chain)
 
         if semantic_text_node and element.text:
-            if visible:
+            if _has_non_formatting_text(element.text):
+                text_visible = visible and _text_box_inside(
+                    bounds, x, y, element.text, font_size
+                )
+                if text_visible:
+                    text_visible = all(
+                        _text_box_inside(clips[clip_id], x, y, element.text, font_size)
+                        for clip_id in clip_chain
+                    )
+                if not text_visible:
+                    invalid = True
+                    return x, y, False
                 chunks.append(element.text)
             # Any text node can advance the SVG text cursor, including Unicode
             # spacing glyphs such as NBSP/EM SPACE that Python's strip()
@@ -257,6 +362,7 @@ def visible_svg_text(path: Path) -> str | None:
                 cursor_y,
                 clip_chain,
                 cursor_x_exact,
+                font_size,
             )
             if semantic_text_node:
                 cursor_x, cursor_y, cursor_x_exact = child_x, child_y, child_x_exact
@@ -272,7 +378,7 @@ def visible_svg_text(path: Path) -> str | None:
 
         return cursor_x, cursor_y, cursor_x_exact
 
-    walk(root, False, None, None, (), True)
+    walk(root, False, None, None, (), True, DEFAULT_FONT_SIZE)
     if invalid:
         return None
     return normalized(" ".join(chunks))
