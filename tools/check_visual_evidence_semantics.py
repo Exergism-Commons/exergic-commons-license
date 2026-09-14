@@ -208,9 +208,10 @@ def _text_box_inside(
         return False
     x0, y0, x1, y1 = bounds
     width = _measured_width(text, font_size)
-    top = y - TEXT_ASCENT_EM * font_size
-    bottom = y + TEXT_DESCENT_EM * font_size
-    return x0 <= x and x + width <= x1 and y0 <= top and bottom <= y1
+    # Horizontal containment must cover the complete text run because hidden
+    # suffixes/prefixes can otherwise satisfy normative semantics. Vertically,
+    # preserve the existing SVG contract: the baseline itself must be inside.
+    return x0 <= x and x + width <= x1 and y0 <= y <= y1
 
 
 def _apply_position(
