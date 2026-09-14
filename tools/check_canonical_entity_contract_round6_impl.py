@@ -23,6 +23,10 @@ ACTIVE_SVG_TAGS = {
     "a", "animate", "animateMotion", "animateTransform", "discard",
     "foreignObject", "image", "script", "set", "style", "textPath", "use",
 }
+SAFE_STATIC_SVG_TAGS = {
+    "svg", "title", "desc", "metadata", "defs", "clipPath",
+    "rect", "g", "line", "polygon", "text", "tspan",
+}
 REQUIRED_SECTIONS = {
     "Identity scope", "State governance context", "Evidence record",
     "Attribution and exclusions", "Visual evidence", "Evidence gaps",
@@ -271,6 +275,8 @@ def validate_all_generated_svg_static(root: Path) -> list[str]:
             namespace = element.tag[: element.tag.rfind("}") + 1] if "}" in element.tag else ""
             if namespace not in {"", SVG_NS}:
                 errors.append(f"{rel}: foreign XML namespace element {element.tag!r} is forbidden")
+            if tag not in SAFE_STATIC_SVG_TAGS:
+                errors.append(f"{rel}: unsupported SVG element <{tag}> is forbidden by the canonical static allowlist")
             if tag in ACTIVE_SVG_TAGS:
                 errors.append(f"{rel}: active/indirect SVG element <{tag}> is forbidden")
             if tag == "clipPath" and element.get("clipPathUnits") not in {None, "userSpaceOnUse"}:
