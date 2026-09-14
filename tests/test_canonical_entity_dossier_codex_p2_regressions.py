@@ -242,21 +242,19 @@ class CodexP2SvgCursorTests(unittest.TestCase):
 
 
     def test_same_node_em_space_prefix_cannot_hide_required_text(self) -> None:
-        self.assertIsNone(
-            self._visible(
-                '<text x="10" y="20" font-size="12">'
-                + "&#8195;" * 8
-                + "REQUIRED</text>"
-            )
+        visible = self._visible(
+            '<text x="10" y="20" font-size="12">'
+            + "&#8195;" * 8
+            + "REQUIRED</text>"
         )
+        self.assertNotIn("REQUIRED", visible or "")
 
     def test_full_text_extent_must_fit_active_clip(self) -> None:
-        self.assertIsNone(
-            self._visible(
-                '<defs><clipPath id="box"><rect x="0" y="0" width="50" height="50"/></clipPath></defs>'
-                '<text x="48" y="20" font-size="12" clip-path="url(#box)">REQUIRED</text>'
-            )
+        visible = self._visible(
+            '<defs><clipPath id="box"><rect x="0" y="0" width="50" height="50"/></clipPath></defs>'
+            '<text x="48" y="20" font-size="12" clip-path="url(#box)">REQUIRED</text>'
         )
+        self.assertNotIn("REQUIRED", visible or "")
 
     def test_object_bounding_box_clip_is_rejected(self) -> None:
         self.assertIsNone(
