@@ -394,6 +394,12 @@ def validate_generated_svg_clipping(root: Path) -> list[str]:
                 errors.append(f"{path.relative_to(root)}: unsupported SVG indirection element <{tag}>")
             if any(name in element.attrib for name in ("mask", "filter")):
                 errors.append(f"{path.relative_to(root)}: unsupported SVG visibility indirection on <{tag}>")
+        for clip in svg.findall(f".//{SVG_NS}clipPath"):
+            if clip.get("clipPathUnits") not in {None, "userSpaceOnUse"}:
+                errors.append(
+                    f"{path.relative_to(root)}: unsupported clipPathUnits "
+                    f"{clip.get('clipPathUnits')!r}; canonical clipping uses userSpaceOnUse"
+                )
         clips = _clip_rects(svg)
         parent_map = {child: parent for parent in svg.iter() for child in parent}
         for text in svg.findall(f".//{SVG_NS}text"):
