@@ -87,7 +87,14 @@ def clipped_groups(root: ET.Element, clip_id: str) -> list[ET.Element]:
     return [node for node in root.findall(f".//{NS}g") if node.get("clip-path") == token]
 
 
-def validate_wrapped_text(path: Path, clip_id: str, texts: list[ET.Element], text_budget: float, max_lines: int) -> list[str]:
+def validate_wrapped_text(
+    path: Path,
+    clip_id: str,
+    texts: list[ET.Element],
+    text_budget: float,
+    max_lines: int,
+    clip_rect: tuple[float, float, float, float],
+) -> list[str]:
     errors: list[str] = []
     for text in texts:
         lines = text.findall(f"{NS}tspan")
@@ -97,12 +104,37 @@ def validate_wrapped_text(path: Path, clip_id: str, texts: list[ET.Element], tex
         if len(lines) > max_lines:
             errors.append(f"{path}: {clip_id} uses {len(lines)} lines > allowed {max_lines}")
         font_size = number(text.get("font-size"))
+        clip_x, clip_y, clip_width, clip_height = clip_rect
+        cursor_y: float | None = None
         for line in lines:
             line_text = "".join(line.itertext())
             estimate = measured_width(line_text, font_size)
             if estimate > text_budget:
                 errors.append(
                     f"{path}: {clip_id} estimated line width {estimate:.1f} > safe text budget {text_budget:.1f}: {line_text!r}"
+                )
+            try:
+                line_x = number(line.get("x"))
+                if line.get("y") is not None:
+                    cursor_y = number(line.get("y"))
+                elif line.get("dy") is not None and cursor_y is not None:
+                    cursor_y += number(line.get("dy"))
+                else:
+                    raise ValueError("missing statically verifiable line y/dy")
+            except ValueError as exc:
+                errors.append(f"{path}: {clip_id} has unverifiable tspan geometry: {exc}")
+                continue
+            top = cursor_y - 0.80 * font_size
+            bottom = cursor_y + 0.25 * font_size
+            if line_x < clip_x or line_x + estimate > clip_x + clip_width:
+                errors.append(
+                    f"{path}: {clip_id} rendered line box [{line_x:.1f}, {line_x + estimate:.1f}] "
+                    f"escapes horizontal clip [{clip_x:.1f}, {clip_x + clip_width:.1f}]: {line_text!r}"
+                )
+            if top < clip_y or bottom > clip_y + clip_height:
+                errors.append(
+                    f"{path}: {clip_id} rendered line box [{top:.1f}, {bottom:.1f}] "
+                    f"escapes vertical clip [{clip_y:.1f}, {clip_y + clip_height:.1f}]: {line_text!r}"
                 )
     return errors
 
@@ -127,7 +159,21 @@ def validate_file(path: Path) -> list[str]:
             if len(texts) != 1:
                 errors.append(f"{path}: {clip_id} must bound exactly one label text")
                 continue
-            errors.extend(validate_wrapped_text(path, clip_id, texts, number(rect.get("width")), 2))
+            errors.extend(
+                validate_wrapped_text(
+                    path,
+                    clip_id,
+                    texts,
+                    number(rect.get("width")),
+                    2,
+                    (
+                        number(rect.get("x")),
+                        number(rect.get("y")),
+                        number(rect.get("width")),
+                        number(rect.get("height")),
+                    ),
+                )
+            )
         return errors
 
     kind = "evidence" if name.endswith("-evidence.svg") else "status" if name.endswith("-status.svg") else None
@@ -154,7 +200,7 @@ def validate_file(path: Path) -> list[str]:
         if budget > width:
             errors.append(f"{path}: {clip_id} safe text budget {budget} exceeds clip width {width}")
             continue
-        errors.extend(validate_wrapped_text(path, clip_id, texts, budget, max_lines))
+        errors.extend(validate_wrapped_text(path, clip_id, texts, budget, max_lines, actual))
 
     if kind == "evidence":
         for clip_id, expected in COLUMN_GUARDS.items():
