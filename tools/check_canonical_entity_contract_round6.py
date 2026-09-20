@@ -11,6 +11,8 @@ from urllib.parse import urlsplit
 from markdown_it import MarkdownIt
 
 import check_canonical_entity_contract_round6_impl as _impl
+import canonical_markdown as markdown
+import strict_json
 
 _original_commonmark_validation = _impl.validate_commonmark_identity_dossiers
 _original_abox_validation = _impl.validate_abox_dialect
@@ -21,24 +23,7 @@ _CANONICAL_JSONLD_CONTEXT_SHA256 = "ad85086227a65f2da2cfe1e26261fbbc74cef4a3607b
 
 
 def _sources_has_rendered_content(path: Path) -> bool:
-    """Repository paths rendered as code are valid structured source entries."""
-    source = path.read_text(encoding="utf-8")
-    tokens = MarkdownIt("commonmark").parse(_impl._body_without_frontmatter(source))
-    in_sources = False
-    i = 0
-    while i < len(tokens):
-        token = tokens[i]
-        if token.type == "heading_open" and token.tag == "h2" and i + 1 < len(tokens):
-            heading = " ".join(tokens[i + 1].content.split())
-            in_sources = heading == "Sources"
-            i += 3
-            continue
-        if in_sources and token.type == "inline":
-            for child in token.children or []:
-                if child.type in {"text", "code_inline", "image"} and child.content.strip():
-                    return True
-        i += 1
-    return False
+    return bool(markdown.section_visible_text(path.read_text(encoding="utf-8"), "Sources", include_code=True))
 
 
 def validate_commonmark_identity_dossiers(root: Path) -> list[str]:
@@ -65,7 +50,7 @@ def _canonical_entity_records(root: Path) -> dict[str, tuple[Path, dict]]:
     paths = sorted(set(entity_root.rglob("*.json")) | set(entity_root.rglob("*.jsonld")))
     for path in paths:
         try:
-            value = json.loads(path.read_text(encoding="utf-8"))
+            value = strict_json.load(path)
         except (OSError, json.JSONDecodeError):
             continue
         if not isinstance(value, dict):
@@ -133,8 +118,8 @@ def validate_canonical_context_semantics(root: Path) -> list[str]:
     path = root / "ontology/ecl-context.jsonld"
     rel = Path("ontology/ecl-context.jsonld")
     try:
-        document = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        document = strict_json.load(path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
         return [f"{rel}: cannot load canonical JSON-LD context: {exc}"]
     if not isinstance(document, dict) or set(document) != {"@context"}:
         return [f"{rel}: canonical JSON-LD document must contain exactly one top-level @context object"]
@@ -161,18 +146,7 @@ def validate_abox_dialect(root: Path) -> list[str]:
 
 
 def _commonmark_image_targets(source: str) -> list[str]:
-    """Return image destinations exactly as CommonMark renders them."""
-    tokens = MarkdownIt("commonmark").parse(_impl._body_without_frontmatter(source))
-    targets: list[str] = []
-    for token in tokens:
-        if token.type != "inline":
-            continue
-        for child in token.children or []:
-            if child.type == "image":
-                target = (child.attrGet("src") or "").strip()
-                if target:
-                    targets.append(target)
-    return targets
+    return markdown.image_targets(source)
 
 
 def _nonlocal_rendered_target(target: str) -> tuple[bool, str]:

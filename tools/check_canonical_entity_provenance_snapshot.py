@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import json
+
+import strict_json
 import re
 import subprocess
 import xml.etree.ElementTree as ET
@@ -23,7 +25,7 @@ SVG_NS = "{http://www.w3.org/2000/svg}"
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return strict_json.load(path)
 
 
 def frontmatter(text: str) -> dict[str, str]:
@@ -79,6 +81,15 @@ def validate(base_ref: str | None = None, root: Path = ROOT) -> list[str]:
     if not manifests:
         return ["no canonical entity dossier migration manifests found"]
 
+    current_names: dict[str, str] = {}
+    entity_root = root / "knowledge/entities"
+    for entity_path in sorted(set(entity_root.rglob("*.json")) | set(entity_root.rglob("*.jsonld"))):
+        record = load_json(entity_path)
+        entity_id = record.get("id")
+        name = record.get("name")
+        if isinstance(entity_id, str) and isinstance(name, str) and name:
+            current_names[entity_id] = name
+
     for path in manifests:
         rel = path.relative_to(root).as_posix()
         is_new_manifest = bool(base_ref) and rel not in historical
@@ -88,7 +99,7 @@ def validate(base_ref: str | None = None, root: Path = ROOT) -> list[str]:
                 errors.append(f"{rel}: non-object migration row")
                 continue
             entity_id = row.get("id", "<missing-id>")
-            entity_name = row.get("name")
+            entity_name = current_names.get(str(entity_id), row.get("name"))
             state = row.get("state")
             source = row.get("sourceDossier")
             state_context = row.get("stateContext")

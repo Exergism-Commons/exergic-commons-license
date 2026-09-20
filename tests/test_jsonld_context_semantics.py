@@ -6,11 +6,14 @@ import json
 import shutil
 import tempfile
 import unittest
+import sys
 from pathlib import Path
 
 from rdflib import Graph, Literal, Namespace, RDF, URIRef
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+import strict_json  # noqa: E402
 ECL = Namespace("urn:ecl:")
 
 
@@ -19,7 +22,7 @@ class JsonLdContextSemanticEquivalenceTests(unittest.TestCase):
         paths = sorted(set((ROOT / "knowledge/entities").rglob("*.json")) | set((ROOT / "knowledge/entities").rglob("*.jsonld")))
         self.assertTrue(paths)
         for path in paths:
-            record = json.loads(path.read_text(encoding="utf-8"))
+            record = strict_json.load(path)
             entity_id = record["id"]
             entity_type = record["type"]
             subject = URIRef(f"urn:ecl:{entity_id}")

@@ -10,6 +10,7 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 
 import canonical_dossier_contract as contract
+import canonical_markdown as markdown
 import check_visual_evidence_semantics_hardened as base
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,42 +71,32 @@ def current_state_outcome(state: str) -> str | None:
 
 
 def _visible_inline_text(token) -> str:
-    pieces: list[str] = []
-    for child in token.children or []:
-        if child.type in {"text", "code_inline"}:
-            pieces.append(child.content)
-        elif child.type in {"softbreak", "hardbreak"}:
-            pieces.append(" ")
-        elif child.type == "image":
-            pieces.append(child.content)
-    return base.normalized("".join(pieces))
+    return markdown.rendered_inline_text(token, include_images=False, include_code=True)
 
 
 def commonmark_section_visible_text(source: str, heading: str) -> str | None:
-    """Return rendered inline prose for one H2 section, ignoring fenced/indented code."""
-    tokens = MarkdownIt("commonmark").parse(source)
-    in_section = False
-    found = False
-    chunks: list[str] = []
-    i = 0
-    while i < len(tokens):
-        token = tokens[i]
-        if token.type == "heading_open" and token.tag == "h2" and i + 1 < len(tokens):
-            title = base.normalized(tokens[i + 1].content)
-            if in_section and title != heading:
-                break
-            in_section = title == heading
-            found = found or in_section
-            i += 3
-            continue
-        if in_section and token.type == "inline":
-            text = _visible_inline_text(token)
-            if text:
-                chunks.append(text)
-        i += 1
-    if not found:
-        return None
-    return base.normalized(" ".join(chunks))
+    return markdown.section_visible_text(source, heading, include_code=True)
+
+
+CANONICAL_STATE_LABELS = {
+    "R": "Restricted",
+    "S": "Scoped restriction",
+    "U": "Under review / unresolved",
+    "N": "No restriction",
+}
+CANONICAL_STATE_COLORS = {"R": "red", "S": "orange", "U": "amber", "N": "green"}
+_CANONICAL_LABEL_PATTERN = "|".join(
+    re.escape(value) for value in sorted(CANONICAL_STATE_LABELS.values(), key=len, reverse=True)
+)
+CANONICAL_CODE_LABEL_RE = re.compile(
+    rf"(?<![A-Z0-9])([RSUN])\s*(?:—|–|-|·)\s*({_CANONICAL_LABEL_PATTERN})(?![A-Za-z])",
+    flags=re.I,
+)
+COLOR_CODE_RE = re.compile(
+    r"\b(red|orange|amber|green)\b\s+(?:[`*_]+\s*)?([RSUN])\b"
+    r"|\b([RSUN])\b\s+(?:[`*_]+\s*)?(red|orange|amber|green)\b",
+    flags=re.I,
+)
 
 
 def validate_live_state_context_text(
@@ -116,21 +107,44 @@ def validate_live_state_context_text(
     live: str,
     label: str,
 ) -> list[str]:
-    """Reject stale visible State outcome codes regardless of Markdown formatting."""
     body = commonmark_section_visible_text(dossier_text, "State governance context")
     if body is None:
         return []
-
     errors: list[str] = []
+    for named_state in STATE_DOSSIER_RE.findall(body):
+        if named_state != state:
+            errors.append(
+                f"{dossier}: {entity_id}: State governance context names {named_state} State dossier, "
+                f"but authoritative migration provenance is {state}"
+            )
     for match in EXPLICIT_STATE_OUTCOME_RE.finditer(body):
         stated_code = match.group(1)
-        if stated_code == live:
-            continue
-        errors.append(
-            f"{dossier}: {entity_id}: State governance context text is stale: "
-            f"states {stated_code}, but current {state} State dossier is {live} · {label}; "
-            "update the prose or make it outcome-neutral"
-        )
+        if stated_code != live:
+            errors.append(
+                f"{dossier}: {entity_id}: State governance context text is stale: "
+                f"states {stated_code}, but current {state} State dossier is {live} · {label}; "
+                "update the prose or make it outcome-neutral"
+            )
+    label_to_code = {value.casefold(): code for code, value in CANONICAL_STATE_LABELS.items()}
+    for match in CANONICAL_CODE_LABEL_RE.finditer(body):
+        stated_code = match.group(1).upper()
+        label_code = label_to_code.get(base.normalized(match.group(2)).casefold())
+        if label_code != stated_code:
+            errors.append(
+                f"{dossier}: {entity_id}: State outcome code/label contradiction: "
+                f"{stated_code} is paired with {match.group(2)!r}"
+            )
+        elif stated_code == live and CANONICAL_STATE_LABELS[live] != label:
+            errors.append(
+                f"{dossier}: {entity_id}: live palette label drift for {live}: "
+                f"expected {CANONICAL_STATE_LABELS[live]!r}, got {label!r}"
+            )
+    for match in COLOR_CODE_RE.finditer(body):
+        color = (match.group(1) or match.group(4) or "").casefold()
+        code = (match.group(2) or match.group(3) or "").upper()
+        expected = CANONICAL_STATE_COLORS.get(code)
+        if expected is not None and color != expected:
+            errors.append(f"{dossier}: {entity_id}: palette prose contradiction: {code} is {expected}, not {color}")
     return errors
 
 
@@ -273,10 +287,25 @@ def _validate_preledger_state_prose(ledger_ids: set[str]) -> list[str]:
     return errors
 
 
+def _current_entity_names() -> dict[str, str]:
+    result: dict[str, str] = {}
+    for path in contract.entity_paths(ROOT):
+        try:
+            record = contract.load_json(path)
+        except Exception:
+            continue
+        entity_id = record.get("id")
+        name = record.get("name")
+        if isinstance(entity_id, str) and isinstance(name, str) and name:
+            result[entity_id] = name
+    return result
+
+
 def main() -> int:
     errors: list[str] = []
     errors.extend(contract.validate_generated_svg_clipping(ROOT))
     checked = 0
+    current_names = _current_entity_names()
     palette = base.load_json(base.PALETTE_PATH)
     ledger_ids: set[str] = set()
     manifests = sorted(
@@ -349,6 +378,9 @@ def main() -> int:
                             label,
                         )
                     )
+                    expected_name = current_names.get(str(entity_id), row.get("name"))
+                    if isinstance(expected_name, str) and expected_name not in status_text:
+                        errors.append(f"{status_rel}: {entity_id}: visible status surface does not identify current entity name {expected_name!r}")
                     for required in (
                         "STATE DOSSIER CONTEXT",
                         base.normalized(f"{live} · {label}"),
@@ -370,6 +402,9 @@ def main() -> int:
             if evidence_text is None or granularity_label is None:
                 errors.append(f"{entity_id}: invalid evidence SVG/sourceGranularity")
             else:
+                expected_name = current_names.get(str(entity_id), row.get("name"))
+                if isinstance(expected_name, str) and expected_name not in evidence_text:
+                    errors.append(f"{evidence_rel}: {entity_id}: visible evidence surface does not identify current entity name {expected_name!r}")
                 for required in (
                     "DERIVED EVIDENCE DIAGRAM",
                     "textual equivalent is preserved in the dossier",

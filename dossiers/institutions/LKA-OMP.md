@@ -18,7 +18,7 @@ Sri Lanka's Office on Missing Persons (OMP), represented as the accountability/r
 
 ## State governance context
 
-The canonical `LKA` State dossier records **S — Restricted with defined scope** for actual coercive PTA/counterterrorism use, detention/torture projects and specifically evidenced security/intelligence harassment. OMP, HRCSL/NPM, courts and independent reform/remedial work are excluded. The red `S` is **State context only** and is not inherited by OMP.
+The canonical `LKA` State dossier records **S — Scoped restriction** for actual coercive PTA/counterterrorism use, detention/torture projects and specifically evidenced security/intelligence harassment. OMP, HRCSL/NPM, courts and independent reform/remedial work are excluded. The orange `S` is **State context only** and is not inherited by OMP.
 
 ![State dossier context for the Office on Missing Persons](../assets/generated/INSTITUTION-LKA-OMP-status.svg)
 

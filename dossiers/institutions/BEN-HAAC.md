@@ -18,7 +18,7 @@ The High Authority for Audiovisual and Communication of Benin (HAAC), represente
 
 ## State governance context
 
-The canonical `BEN` State dossier records **S — Restricted with defined scope**, including specific HAAC/media-control actions when materially suppressing protected expression. It also records that suspensions of Le Patriote and Bénin Web TV were later lifted. The red `S` is **State context only** and is not inherited by HAAC.
+The canonical `BEN` State dossier records **S — Scoped restriction**, including specific HAAC/media-control actions when materially suppressing protected expression. It also records that suspensions of Le Patriote and Bénin Web TV were later lifted. The orange `S` is **State context only** and is not inherited by HAAC.
 
 ![State dossier context for HAAC](../assets/generated/INSTITUTION-BEN-HAAC-status.svg)
 

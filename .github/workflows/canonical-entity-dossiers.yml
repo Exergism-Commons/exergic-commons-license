@@ -14,6 +14,7 @@ on:
       - 'requirements-ontology.txt'
       - 'tools/**'
       - 'tests/test_canonical_entity_dossier_*.py'
+      - 'tests/test_jsonld_context_semantics.py'
       - '.github/workflows/canonical-entity-dossiers.yml'
   pull_request:
     paths:
@@ -28,6 +29,7 @@ on:
       - 'requirements-ontology.txt'
       - 'tools/**'
       - 'tests/test_canonical_entity_dossier_*.py'
+      - 'tests/test_jsonld_context_semantics.py'
       - '.github/workflows/canonical-entity-dossiers.yml'
   workflow_dispatch:
 
@@ -57,10 +59,16 @@ jobs:
           python-version: '3.12'
 
       - name: Install canonical validators
-        run: python -m pip install "jsonschema>=4.26.0,<5" "Pillow>=11.3.0,<12" "markdown-it-py>=4.0.0,<5"
+        run: python -m pip install "jsonschema>=4.26.0,<5" "Pillow>=11.3.0,<12" "markdown-it-py>=4.0.0,<5" "rdflib>=7.1.0,<8"
+
+      - name: Reject duplicate JSON members on canonical surfaces
+        run: python tools/check_canonical_json_strictness.py
 
       - name: Run adversarial canonical guard tests
         run: python -m unittest discover -s tests -p 'test_canonical_entity_dossier_*.py' -v
+
+      - name: Run JSON-LD context semantic equivalence tests
+        run: python -m unittest tests.test_jsonld_context_semantics -v
 
       - name: Validate canonical migration manifest schema
         run: python tools/check_canonical_entity_manifest_schema.py

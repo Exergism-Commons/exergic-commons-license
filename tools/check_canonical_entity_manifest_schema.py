@@ -8,6 +8,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 
 import canonical_dossier_contract as contract
+import strict_json
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "schemas/canonical-entity-dossier-migration.schema.json"
@@ -15,7 +16,7 @@ SCHEMA = ROOT / "schemas/canonical-entity-dossier-migration.schema.json"
 
 def validate(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    schema = json.loads((root / "schemas/canonical-entity-dossier-migration.schema.json").read_text(encoding="utf-8"))
+    schema = strict_json.load(root / "schemas/canonical-entity-dossier-migration.schema.json")
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     paths, naming_errors = contract.strict_manifest_paths(root)
@@ -25,7 +26,7 @@ def validate(root: Path = ROOT) -> list[str]:
         return errors
     for path in paths:
         try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload = strict_json.load(path)
         except json.JSONDecodeError as exc:
             errors.append(f"{path.relative_to(root)}: invalid JSON: {exc}")
             continue

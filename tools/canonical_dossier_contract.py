@@ -7,6 +7,8 @@ from urllib.parse import unquote, urlsplit
 
 from markdown_it import MarkdownIt
 
+import canonical_markdown as markdown
+
 import canonical_dossier_contract_impl as _impl
 
 for _name, _value in vars(_impl).items():
@@ -19,18 +21,7 @@ _original_validate_universe = _impl.validate_universe
 
 
 def commonmark_image_targets(text: str) -> list[str]:
-    """Return every image destination that CommonMark actually renders."""
-    targets: list[str] = []
-    for token in MarkdownIt("commonmark").parse(text):
-        if token.type != "inline":
-            continue
-        for child in token.children or []:
-            if child.type != "image":
-                continue
-            target = (child.attrGet("src") or "").strip()
-            if target:
-                targets.append(target)
-    return targets
+    return markdown.image_targets(text)
 
 
 def commonmark_has_raw_html(text: str) -> bool:
@@ -46,24 +37,11 @@ def commonmark_has_raw_html(text: str) -> bool:
 
 
 def commonmark_h2_titles(text: str) -> list[str]:
-    """Return rendered H2 titles in document order."""
-    tokens = MarkdownIt("commonmark").parse(text)
-    result: list[str] = []
-    for index, token in enumerate(tokens[:-1]):
-        if token.type != "heading_open" or token.tag != "h2":
-            continue
-        inline = tokens[index + 1]
-        if inline.type != "inline":
-            continue
-        result.append(" ".join(inline.content.split()))
-    return result
+    return markdown.top_level_h2_titles(text)
 
 
 def embedded_resource_targets(text: str) -> list[str]:
-    """Union legacy raw-syntax discovery with rendered CommonMark image destinations."""
-    targets = list(_original_embedded_resource_targets(text))
-    targets.extend(commonmark_image_targets(text))
-    return list(dict.fromkeys(targets))
+    return list(dict.fromkeys(commonmark_image_targets(text)))
 
 
 # Functions defined in the implementation module resolve this global at call time.

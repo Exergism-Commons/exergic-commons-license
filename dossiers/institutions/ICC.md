@@ -17,7 +17,7 @@ The International Criminal Court (ICC), represented as the international account
 
 ## State governance context
 
-The canonical `PHL` State dossier records **S — Restricted with an incident-specific subset**. Its historical review retains the 2025 ICC transfer of former President Rodrigo Duterte as counter-evidence/accountability context while the current Schedule freeze is limited to an unrelated January 2026 Malate Police Station 9 SDEU incident. The red `S` is **Philippines State context only** and is not inherited by the ICC.
+The canonical `PHL` State dossier records **S — Scoped restriction** with an incident-specific subset. Its historical review retains the 2025 ICC transfer of former President Rodrigo Duterte as counter-evidence/accountability context while the current Schedule freeze is limited to an unrelated January 2026 Malate Police Station 9 SDEU incident. The orange `S` is **Philippines State context only** and is not inherited by the ICC.
 
 ![Philippines State dossier context for the ICC](../assets/generated/INSTITUTION-ICC-status.svg)
 

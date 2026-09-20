@@ -258,14 +258,14 @@ The fixture is identity-only. State context is provenance and must not be inheri
                     base,
                 ),
                 ("tools/check_evidence_image_metadata.py",),
-                ("tools/check_canonical_entity_contract.py",),
+                ("tools/check_canonical_entity_contract_round6.py",),
                 (
                     "tools/check_canonical_entity_dossiers_extended.py",
                     "--json",
                     "build/e2e-coverage.json",
                 ),
                 ("tools/check_canonical_dossier_accessibility.py",),
-                ("tools/check_visual_evidence_semantics.py",),
+                ("tools/check_visual_evidence_semantics_live.py",),
                 (
                     "tools/check_canonical_entity_migration_preservation_extended.py",
                     "--base-ref",

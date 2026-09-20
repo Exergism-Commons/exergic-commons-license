@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 from jsonschema import Draft202012Validator, FormatChecker
 
 import canonical_dossier_contract as contract
+import strict_json
 
 ROOT = Path(__file__).resolve().parents[1]
 SVG_NS = "{http://www.w3.org/2000/svg}"
@@ -46,7 +47,7 @@ CANONICAL_BOUNDARY = (
 
 
 def _load_json(path: Path) -> dict:
-    value = json.loads(path.read_text(encoding="utf-8"))
+    value = strict_json.load(path)
     if not isinstance(value, dict):
         raise ValueError(f"{path}: expected JSON object")
     return value
@@ -90,7 +91,7 @@ def validate_abox_entity_surface(root: Path) -> list[str]:
     entity_paths = sorted(set(entity_root.rglob("*.json")) | set(entity_root.rglob("*.jsonld")))
     for path in entity_paths:
         try:
-            value = json.loads(path.read_text(encoding="utf-8"))
+            value = strict_json.load(path)
         except (OSError, json.JSONDecodeError) as exc:
             errors.append(f"{path.relative_to(root)}: invalid entity JSON: {exc}")
             continue
@@ -100,7 +101,7 @@ def validate_abox_entity_surface(root: Path) -> list[str]:
 
     for path in _builder_abox_paths(root):
         try:
-            value = json.loads(path.read_text(encoding="utf-8"))
+            value = strict_json.load(path)
         except (OSError, json.JSONDecodeError):
             continue
         if not _is_abox_candidate(value):

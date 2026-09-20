@@ -7,6 +7,9 @@ import math
 import re
 import unicodedata
 import xml.etree.ElementTree as ET
+
+import dossier_svg_metrics as metrics
+import strict_json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,11 +31,22 @@ GRANULARITY_LABELS = {
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return strict_json.load(path)
+
+
+BIDI_CONTROL_CODEPOINTS = frozenset({
+    0x061C, 0x200E, 0x200F,
+    *range(0x202A, 0x202F),
+    *range(0x2066, 0x2070),
+})
 
 
 def normalized(value: str) -> str:
     return " ".join(value.split())
+
+
+def _contains_bidi_control(value: str) -> bool:
+    return any(ord(char) in BIDI_CONTROL_CODEPOINTS for char in value)
 
 
 def _number(value: str | None) -> float | None:
@@ -125,9 +139,23 @@ def _clip_rects(root: ET.Element) -> dict[str, tuple[float, float, float, float]
             continue
         x, y, width, height = vals
         assert x is not None and y is not None and width is not None and height is not None
-        if width < 0 or height < 0:
+        if width <= 0 or height <= 0:
             continue
-        result[clip_id] = (x, y, x + width, y + height)
+        rx = _number(rect.get("rx"))
+        ry = _number(rect.get("ry"))
+        if rx is None and rect.get("rx") is not None:
+            continue
+        if ry is None and rect.get("ry") is not None:
+            continue
+        if rx is None and ry is not None:
+            rx = ry
+        if ry is None and rx is not None:
+            ry = rx
+        rx = 0.0 if rx is None else rx
+        ry = 0.0 if ry is None else ry
+        if rx < 0 or ry < 0 or rx > width / 2 or ry > height / 2:
+            continue
+        result[clip_id] = (x + rx, y + ry, x + width - rx, y + height - ry)
     return result
 
 
@@ -156,37 +184,11 @@ def _font_size(element: ET.Element, inherited: float) -> float | None:
 
 
 def _glyph_width(ch: str, font_size: float) -> float:
-    """Conservative deterministic width estimate for the canonical Arial-like surface."""
-    category = unicodedata.category(ch)
-    if unicodedata.combining(ch) or category in {"Cc", "Cf"}:
-        return 0.0
-    if ch in "\r\n\t":
-        return 0.0
-    if ch in {" ", "\u00a0"}:
-        factor = 0.32
-    elif ch in {"\u2002", "\u2007"}:
-        factor = 0.50
-    elif ch in {"\u2003", "\u3000"}:
-        factor = 1.00
-    elif ch in {"\u2009", "\u202f"}:
-        factor = 0.30
-    elif unicodedata.east_asian_width(ch) in {"W", "F"}:
-        factor = 1.00
-    elif ch in "il.,'`|!:;":
-        factor = 0.32
-    elif ch in "mwMW@#%&":
-        factor = 0.90
-    elif ch.isupper():
-        factor = 0.70
-    elif ch.isdigit():
-        factor = 0.62
-    else:
-        factor = 0.60
-    return font_size * factor
+    return metrics.glyph_width(ch, font_size)
 
 
 def _measured_width(text: str, font_size: float) -> float:
-    return sum(_glyph_width(ch, font_size) for ch in text)
+    return metrics.measured_width(text, font_size)
 
 
 def _text_box_inside(
@@ -208,10 +210,9 @@ def _text_box_inside(
         return False
     x0, y0, x1, y1 = bounds
     width = _measured_width(text, font_size)
-    # Horizontal containment must cover the complete text run because hidden
-    # suffixes/prefixes can otherwise satisfy normative semantics. Vertically,
-    # preserve the existing SVG contract: the baseline itself must be inside.
-    return x0 <= x and x + width <= x1 and y0 <= y <= y1
+    top = y - TEXT_ASCENT_EM * font_size
+    bottom = y + TEXT_DESCENT_EM * font_size
+    return x0 <= x and x + width <= x1 and y0 <= top and bottom <= y1
 
 
 def _apply_position(
@@ -257,6 +258,19 @@ def visible_svg_text(path: Path) -> str | None:
         return None
     if root.tag != f"{SVG_NS}svg":
         return None
+    ids: set[str] = set()
+    for element in root.iter():
+        tag = element.tag.rsplit("}", 1)[-1] if isinstance(element.tag, str) else ""
+        if element is not root and tag == "svg":
+            return None
+        identifier = element.get("id")
+        if identifier is not None:
+            if identifier in ids:
+                return None
+            ids.add(identifier)
+        for value in [*element.attrib.values(), element.text, element.tail]:
+            if isinstance(value, str) and _contains_bidi_control(value):
+                return None
     for element in root.iter():
         if not isinstance(element.tag, str) or not element.tag.startswith(SVG_NS):
             return None

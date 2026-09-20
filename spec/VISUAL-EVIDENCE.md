@@ -34,7 +34,7 @@ A chart generated from versioned repository data. It MUST identify its data sour
 
 ## State-context palette and migration snapshots
 
-The canonical palette is `../knowledge/generated/dossier-visual-palette-v1.json`. `R/S/U/N` colors are rendering vocabulary, not a culpability scale. Color MUST NOT be the sole signal; state letter and human-readable label accompany it.
+The canonical palette is `../knowledge/generated/dossier-visual-palette-v1.json`. `R/S/U/N` colors are rendering vocabulary, not a culpability scale. Color MUST NOT be the sole signal; state letter and the pinned human-readable label accompany it. The versioned palette also pins a human color name and foreground per state; every foreground/background pair must meet at least 4.5:1 contrast.
 
 For a non-State migration, manifest `stateContext` is historical provenance. The status card is a separate **live derived view**: each render reads the current referenced State dossier and displays its current `provisional_outcome` under **STATE DOSSIER CONTEXT**, together with the no-inheritance warning. A State outcome change updates the deterministic status card without rewriting the historical migration manifest.
 
@@ -52,7 +52,7 @@ Dynamic SVG text MUST remain inside every visual region that owns it. The render
 
 SVG clipping is cumulative: a child clip does not replace an ancestor clip. Static validation therefore resolves sequential `x`/`y` plus `dx`/`dy` positioning and requires every text anchor to remain inside the viewBox and **every active ancestor/self clip**. A token hidden by any active clip cannot satisfy normative semantics.
 
-Normative semantic visibility additionally fails closed for a missing/non-positive `viewBox`, zero-area clips, transparent inherited paint, explicitly tiny text (`< 8` user units), or effective opacity/fill-opacity below `0.05`. `tools/check_visual_evidence_semantics_hardened.py` applies these paint/geometry guards before delegating to the structural semantic extractor; `tools/check_visual_evidence_semantics_live.py` is the workflow entrypoint.
+Normative semantic visibility additionally fails closed for a missing/non-positive or noncanonical viewport, duplicate SVG IDs, nested SVG viewports, Unicode bidi controls, unsupported inherited text-layout attributes, ambiguous clipPath structure, transparent inherited paint, explicitly tiny text (`< 8` user units), effective opacity/fill-opacity below `0.05`, insufficient text/background contrast, or later opaque rectangles that occlude semantic text. Rounded clip rectangles are checked through a conservative inset wholly inside the rendered rounded region. `tools/check_visual_evidence_semantics_hardened.py` applies these paint/geometry guards before delegating to the structural semantic extractor; `tools/check_visual_evidence_semantics_live.py` is the workflow entrypoint.
 
 `tools/check_dossier_visual_layout.py`, the canonical dossier contract, and the hardened/live semantic checker independently constrain layout/visibility. Static-safety validation covers every file under `dossiers/assets/generated/*.svg`, including the palette legend.
 
@@ -75,3 +75,11 @@ Both canonical workflows use an unconditional `tools/**` path trigger on `push` 
 ## Canonical dossier boundary
 
 A State dossier may be provenance for an Agency, Institution, Organization, Person, Project or Deployment, but it is not that entity's canonical per-entity dossier. Coverage applies to `.json` and `.jsonld` entity records under `knowledge/entities/`, with the JSON-LD/identity/lifecycle rules defined in `CANONICAL-DOSSIER-MIGRATION.md`.
+
+## Parser equivalence and canonical data safety
+
+Canonical JSON/JSON-LD is parsed through a duplicate-member-rejecting loader before schema, digest, RDF or renderer processing. CommonMark section identity, visible prose and image references share one AST interpretation: canonical sections are top-level H2 headings, an intervening top-level H1 closes the preceding H2 section, formatted-equivalent headings have the same identity, and image alt text is accessibility metadata rather than positive visible prose.
+
+Source-facsimile metadata is bijective: an asset named `photo.png` is bound by `photo.png.json`, and every raster asset must be declared by exactly one such sidecar.
+
+Migration manifests retain historical name snapshots, but only `id`, `iri` and `type` are the immutable identity core. Current dossiers and generated visuals bind current materialized identities to the live ABox name; removed supersession sources retain their historical snapshot.

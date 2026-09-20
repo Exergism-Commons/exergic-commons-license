@@ -12,6 +12,9 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 import entity_identity_resolution as identity_resolution
+import canonical_markdown as markdown
+import dossier_svg_metrics as metrics
+import strict_json
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTITY_DIR = ROOT / "knowledge/entities"
@@ -21,7 +24,14 @@ EVIDENCE_IMAGE_DIR = ROOT / "dossiers/evidence-images"
 SUPERSESSIONS_DIR = ROOT / "knowledge/generated"
 SUPERSESSIONS_PATH = SUPERSESSIONS_DIR / identity_resolution.SUPERSESSION_GLOB
 TYPE_DIR = {"Agency":"agencies","Institution":"institutions","Organization":"organizations","Person":"persons","Project":"projects"}
-EXPECTED_PALETTE = {"R":"#B42318","S":"#E67E22","U":"#D4A017","N":"#2E7D32","UNKNOWN":"#667085"}
+EXPECTED_STATE_VOCABULARY = {
+    "R": {"label": "Restricted", "hex": "#B42318", "foreground": "#FFFFFF", "colorName": "red"},
+    "S": {"label": "Scoped restriction", "hex": "#E67E22", "foreground": "#101828", "colorName": "orange"},
+    "U": {"label": "Under review / unresolved", "hex": "#D4A017", "foreground": "#101828", "colorName": "amber"},
+    "N": {"label": "No restriction", "hex": "#2E7D32", "foreground": "#FFFFFF", "colorName": "green"},
+    "UNKNOWN": {"label": "Insufficient information", "hex": "#667085", "foreground": "#FFFFFF", "colorName": "gray"},
+}
+EXPECTED_PALETTE = {key: value["hex"] for key, value in EXPECTED_STATE_VOCABULARY.items()}
 VALID_ENTITY_STATE_CONTEXTS = {"R", "S", "U", "N"}
 REQUIRED_SECTIONS = ("## Identity scope","## State governance context","## Evidence record","## Attribution and exclusions","## Visual evidence","## Evidence gaps","## Sources","## Governance boundary")
 ENTITY_SUFFIXES = {".json", ".jsonld"}
@@ -38,7 +48,7 @@ HTML_IMAGE_RE = re.compile(
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return strict_json.load(path)
 
 
 
@@ -141,30 +151,7 @@ def _definition_targets(text: str) -> dict[str, str]:
 
 
 def image_targets(text: str) -> list[str]:
-    """Extract Markdown and raw-HTML image destinations, including references."""
-    targets: list[str] = []
-    for match in INLINE_IMAGE_RE.finditer(text):
-        targets.append(match.group(1) or match.group(2) or "")
-
-    definitions = _definition_targets(text)
-    for match in REFERENCE_IMAGE_RE.finditer(text):
-        alt, label = match.groups()
-        key = " ".join((label or alt).split()).casefold()
-        if key in definitions:
-            targets.append(definitions[key])
-    for match in SHORTCUT_IMAGE_RE.finditer(text):
-        key = " ".join(match.group(1).split()).casefold()
-        if key in definitions:
-            targets.append(definitions[key])
-
-    for match in HTML_IMAGE_RE.finditer(text):
-        raw = match.group(1) or match.group(2) or match.group(3) or ""
-        # srcset may contain comma-separated URL + density/width descriptors.
-        for candidate in raw.split(","):
-            candidate = candidate.strip()
-            if candidate:
-                targets.append(candidate.split()[0])
-    return targets
+    return markdown.image_targets(text)
 
 
 def nonlocal_image_target(target: str) -> bool:
@@ -236,7 +223,7 @@ def validate_source_images(root: Path = ROOT, evidence_image_dir: Path = EVIDENC
         p for p in evidence_image_dir.rglob("*")
         if p.is_file() and p.suffix.lower() in IMAGE_EXTENSIONS
     ):
-        sidecar = asset.with_suffix(".json")
+        sidecar = asset.with_name(asset.name + ".json")
         if not sidecar.is_file():
             errors.append(f"{asset.relative_to(root)}: missing source-image metadata sidecar {sidecar.name}")
             continue
@@ -276,10 +263,15 @@ def main() -> int:
     args = parser.parse_args()
     errors = validate_source_images()
     palette = load_json(args.palette)
-    for key, expected in EXPECTED_PALETTE.items():
-        got = palette.get("states", {}).get(key, {}).get("hex")
+    if palette.get("version") != 1:
+        errors.append(f"palette version: expected 1, got {palette.get('version')!r}")
+    for key, expected in EXPECTED_STATE_VOCABULARY.items():
+        got = palette.get("states", {}).get(key)
         if got != expected:
-            errors.append(f"palette {key}: expected {expected}, got {got}")
+            errors.append(f"palette {key}: expected exact semantic vocabulary {expected!r}, got {got!r}")
+            continue
+        if metrics.contrast_ratio(expected["foreground"], expected["hex"]) < 4.5:
+            errors.append(f"palette {key}: foreground/background contrast is below 4.5:1")
     paths = manifest_paths(args.manifest_dir)
     manifests = [load_json(path) for path in paths]
     if not paths:
@@ -374,8 +366,6 @@ def main() -> int:
                 entity, entity_file = entity_entry
                 if entity.get("type") != row["type"]:
                     errors.append(f"{entity_id}: type mismatch")
-                if entity.get("name") != row["name"]:
-                    errors.append(f"{entity_id}: name mismatch")
                 good, rel = is_dedicated(entity, entity_file)
                 if not good:
                     errors.append(f"{entity_id}: does not point to an existing dedicated dossier")
@@ -389,7 +379,8 @@ def main() -> int:
             text = dossier_path.read_text(encoding="utf-8")
             fm = frontmatter(text)
             if fm.get("id") != f"ECL-{entity_id}": errors.append(f"{expected_rel}: frontmatter id mismatch")
-            if fm.get("entity") != row["name"]: errors.append(f"{expected_rel}: frontmatter entity mismatch")
+            expected_live_name = entity_entry[0].get("name") if entity_entry is not None else row["name"]
+            if fm.get("entity") != expected_live_name: errors.append(f"{expected_rel}: frontmatter entity mismatch")
             if fm.get("entity_type") != row["type"].lower(): errors.append(f"{expected_rel}: frontmatter entity_type mismatch")
             if "provisional_outcome" in fm: errors.append(f"{expected_rel}: non-State canonical dossier must not inherit provisional_outcome")
             for section in REQUIRED_SECTIONS:

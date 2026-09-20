@@ -17,7 +17,7 @@ The International Court of Justice (ICJ), represented as the international judic
 
 ## State governance context
 
-The canonical `ISR` State dossier records **S — Restricted with defined scope** after narrowing a former whole-State `R`. The ICJ opinion contributes to the evidence preserving scoped restrictions, while independent judicial/audit/remedial functions constrain attribution. The red `S` is **Israel State context only** and is not inherited by the ICJ.
+The canonical `ISR` State dossier records **S — Scoped restriction** after narrowing a former whole-State `R`. The ICJ opinion contributes to the evidence preserving scoped restrictions, while independent judicial/audit/remedial functions constrain attribution. The orange `S` is **Israel State context only** and is not inherited by the ICJ.
 
 ![Israel State dossier context for the ICJ](../assets/generated/INSTITUTION-ICJ-status.svg)
 

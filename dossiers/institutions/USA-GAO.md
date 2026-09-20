@@ -18,7 +18,7 @@ The U.S. Government Accountability Office (GAO), represented as the independent,
 
 ## State governance context
 
-The canonical `USA` State dossier records **S — Restricted with defined scope** after narrowing a former whole-federal `R`. GAO and independent audit activity are expressly excluded from generic scope and materially support the narrowest-accurate-attribution correction. The red `S` is **State context only** and is not inherited by GAO.
+The canonical `USA` State dossier records **S — Scoped restriction** after narrowing a former whole-federal `R`. GAO and independent audit activity are expressly excluded from generic scope and materially support the narrowest-accurate-attribution correction. The orange `S` is **State context only** and is not inherited by GAO.
 
 ![State dossier context for GAO](../assets/generated/INSTITUTION-USA-GAO-status.svg)
 

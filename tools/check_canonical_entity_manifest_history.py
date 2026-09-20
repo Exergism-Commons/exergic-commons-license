@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+
+import strict_json
 import subprocess
 from pathlib import Path
 
@@ -19,7 +21,7 @@ PRE_MIGRATION_MISSING = 242
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return strict_json.load(path)
 
 
 def version_from_path(path: Path) -> int:
@@ -72,8 +74,8 @@ def _git_json(ref: str, rel: str, label: str) -> dict:
     if raw is None:
         raise RuntimeError(f"cannot read {label} {rel} at {ref}")
     try:
-        value = json.loads(raw)
-    except json.JSONDecodeError as exc:
+        value = strict_json.loads(raw, source=f"{label} {rel} at {ref}")
+    except (json.JSONDecodeError, ValueError) as exc:
         raise RuntimeError(f"cannot parse {label} {rel} at {ref}: {exc}") from exc
     if not isinstance(value, dict):
         raise RuntimeError(f"{label} {rel} at {ref} must be a JSON object")

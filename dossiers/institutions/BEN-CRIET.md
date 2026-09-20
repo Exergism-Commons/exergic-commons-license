@@ -18,7 +18,7 @@ CRIET, represented as the Benin court/institution named in the scoped review of 
 
 ## State governance context
 
-The canonical `BEN` State dossier records **S — Restricted with defined scope**. Its scope follows specific Digital Code, HAAC and CRIET/counterterrorism/detention projects only where materially used to suppress protected activity. The red `S` is **State context only** and is not inherited by CRIET as an institution.
+The canonical `BEN` State dossier records **S — Scoped restriction**. Its scope follows specific Digital Code, HAAC and CRIET/counterterrorism/detention projects only where materially used to suppress protected activity. The orange `S` is **State context only** and is not inherited by CRIET as an institution.
 
 ![State dossier context for CRIET](../assets/generated/INSTITUTION-BEN-CRIET-status.svg)
 

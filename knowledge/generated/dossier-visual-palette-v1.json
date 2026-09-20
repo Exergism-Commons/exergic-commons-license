@@ -5,28 +5,38 @@
   "states": {
     "R": {
       "label": "Restricted",
-      "hex": "#B42318"
+      "hex": "#B42318",
+      "foreground": "#FFFFFF",
+      "colorName": "red"
     },
     "S": {
       "label": "Scoped restriction",
-      "hex": "#E67E22"
+      "hex": "#E67E22",
+      "foreground": "#101828",
+      "colorName": "orange"
     },
     "U": {
       "label": "Under review / unresolved",
-      "hex": "#D4A017"
+      "hex": "#D4A017",
+      "foreground": "#101828",
+      "colorName": "amber"
     },
     "N": {
       "label": "No restriction",
-      "hex": "#2E7D32"
+      "hex": "#2E7D32",
+      "foreground": "#FFFFFF",
+      "colorName": "green"
     },
     "UNKNOWN": {
       "label": "Insufficient information",
-      "hex": "#667085"
+      "hex": "#667085",
+      "foreground": "#FFFFFF",
+      "colorName": "gray"
     }
   },
   "accessibility": {
     "rule": "Color MUST NOT be the sole carrier of meaning. Render the state letter and text label with every color.",
-    "contrast": "SVG status cards use dark text on light surfaces and include explicit letter/label text."
+    "contrast": "Each swatch declares a foreground with at least 4.5:1 contrast against its background; letter and label remain explicit."
   },
   "semanticBoundary": "Palette colors communicate the referenced governance state only. They never imply culpability, participation, hierarchy, or inheritance by a non-State entity."
 }

@@ -6,6 +6,9 @@ from __future__ import annotations
 import argparse
 import html
 import json
+
+import dossier_svg_metrics as metrics
+import strict_json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,7 +31,7 @@ def esc(value: str) -> str:
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return strict_json.load(path)
 
 
 def load_entities(manifest_dir: Path) -> list[dict]:
@@ -52,21 +55,11 @@ def load_entities(manifest_dir: Path) -> list[dict]:
 
 
 def glyph_width(ch: str, font_size: int) -> float:
-    if ch in " il.,'`|!:;":
-        factor = 0.32
-    elif ch in "mwMW@#%&":
-        factor = 0.90
-    elif ch.isupper():
-        factor = 0.72
-    elif ch.isdigit():
-        factor = 0.62
-    else:
-        factor = 0.60
-    return font_size * factor
+    return metrics.glyph_width(ch, font_size)
 
 
 def measured_width(text: str, font_size: int) -> float:
-    return sum(glyph_width(ch, font_size) for ch in text)
+    return metrics.measured_width(text, font_size)
 
 
 def _split_token(token: str, max_width: int, font_size: int) -> list[str]:
@@ -141,12 +134,13 @@ def status_svg(entity: dict, palette: dict) -> str:
     state_code = entity["state"]
     label = swatch["label"]
     color = swatch["hex"]
+    foreground = swatch["foreground"]
 
     name_block = text_block(name, x=54, y=88, max_width=780, font_size=26,
         max_lines=2, line_height=30, clip_id="status-name-clip")
     badge_block = text_block(f"{state} · {label}", x=76, y=177, max_width=250,
         font_size=18, max_lines=2, line_height=21, clip_id="status-badge-clip",
-        fill="#FFFFFF")
+        fill=foreground)
     context_title = text_block(f"{state_code} State dossier", x=382, y=177,
         max_width=500, font_size=18, max_lines=1, line_height=20,
         clip_id="status-context-clip", fill="#344054")
@@ -273,16 +267,17 @@ def legend_svg(palette: dict) -> str:
     blocks: list[str] = []
     for idx, key in enumerate(order):
         item = palette["states"][key]
+        foreground = item["foreground"]
         clip_id = f"legend-{idx}-clip"
         clip_defs.append(
             f'    <clipPath id="{clip_id}"><rect x="{x+12}" y="126" width="144" height="42"/></clipPath>'
         )
         label_block = text_block(item["label"], x=x + 18, y=146, max_width=132,
             font_size=12, max_lines=2, line_height=16, clip_id=clip_id,
-            weight="400", fill="#FFFFFF")
+            weight="400", fill=foreground)
         blocks.append(
             f'  <rect x="{x}" y="92" width="168" height="88" rx="12" fill="{esc(item["hex"])}"/>\n'
-            f'  <text x="{x+18}" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">{esc(key)}</text>\n'
+            f'  <text x="{x+18}" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="{esc(foreground)}">{esc(key)}</text>\n'
             f'{label_block}'
         )
         x += 184

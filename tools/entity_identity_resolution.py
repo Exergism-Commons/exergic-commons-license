@@ -13,6 +13,8 @@ control, participation, operation, attribution or governance in the ontology.
 from __future__ import annotations
 
 import json
+
+import strict_json
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -64,7 +66,7 @@ def load_id_supersessions(
     previous: Path | None = None
     for version, path in supersession_manifests(generated_dir):
         rel = path.relative_to(root)
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = strict_json.load(path)
         assert data.get("version") == version, (
             f"supersession version/file mismatch: {rel} -> {data.get('version')!r}"
         )
@@ -168,7 +170,7 @@ def load_repository_entities(entity_dir: Path | None = None) -> tuple[list[dict]
     entities: list[dict] = []
     entity_ids: set[str] = set()
     for path in repository_entity_paths(entity_dir):
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = strict_json.load(path)
         entities.append(data)
         entity_id = data.get("id")
         if isinstance(entity_id, str):

@@ -18,7 +18,7 @@ Jordan's National Centre for Human Rights (NCHR), represented as the human-right
 
 ## State governance context
 
-The canonical `JOR` State dossier records **S — Restricted with defined scope** for specific expression-punishment, administrative-detention, cybercrime and media-blocking projects. NCHR is expressly excluded from that scope. The red `S` is **State context only** and is not inherited by NCHR.
+The canonical `JOR` State dossier records **S — Scoped restriction** for specific expression-punishment, administrative-detention, cybercrime and media-blocking projects. NCHR is expressly excluded from that scope. The orange `S` is **State context only** and is not inherited by NCHR.
 
 ![State dossier context for Jordan's NCHR](../assets/generated/INSTITUTION-JOR-NCHR-status.svg)
 

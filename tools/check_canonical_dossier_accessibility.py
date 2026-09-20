@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import json
 import posixpath
-import re
 from pathlib import Path
+
+import canonical_markdown as markdown
+import strict_json
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "knowledge/generated"
-IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 GENERIC_ALT_TEXT = {
     "state context",
     "state dossier context",
@@ -22,7 +23,7 @@ GENERIC_ALT_TEXT = {
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return strict_json.load(path)
 
 
 def expected_relative_visual(dossier: str, visual: str) -> str:
@@ -73,7 +74,7 @@ def main() -> int:
                 errors.append(f"{dossier}: dossier does not exist")
                 continue
             text = dossier_path.read_text(encoding="utf-8")
-            images = [(alt.strip(), target.strip()) for alt, target in IMAGE_RE.findall(text)]
+            images = markdown.image_references(text)
 
             for visual in visuals:
                 if not isinstance(visual, str) or not visual:

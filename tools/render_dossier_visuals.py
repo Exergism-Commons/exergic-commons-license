@@ -59,6 +59,14 @@ def _current_state_context(entity: dict) -> str:
 
 def load_entities(manifest_dir: Path) -> list[dict]:
     rows = _original_load_entities(manifest_dir)
+    current_names: dict[str, str] = {}
+    entity_root = ROOT / "knowledge/entities"
+    for path in sorted(set(entity_root.rglob("*.json")) | set(entity_root.rglob("*.jsonld"))):
+        data = legacy.load_json(path)
+        entity_id = data.get("id")
+        name = data.get("name")
+        if isinstance(entity_id, str) and isinstance(name, str) and name:
+            current_names[entity_id] = name
     normalized_ids: set[str] = set()
     for path in manifest_dir.glob("canonical-entity-dossier-migration-v*.json"):
         version = int(path.stem.rsplit("v", 1)[1])
@@ -67,6 +75,8 @@ def load_entities(manifest_dir: Path) -> list[dict]:
         manifest = legacy.load_json(path)
         normalized_ids.update(row["id"] for row in manifest["entities"])
     for row in rows:
+        if row["id"] in current_names:
+            row["name"] = current_names[row["id"]]
         if row["id"] in normalized_ids:
             row["_normalized_visual_v40"] = True
     return rows
@@ -76,7 +86,6 @@ def normalized(entity: dict) -> dict:
     if not entity.get("_normalized_visual_v40"):
         return entity
     rendered = dict(entity)
-    rendered["name"] = _GENERIC_NAME
     rendered["visualModel"] = dict(_GENERIC_MODEL)
     return rendered
 
@@ -94,13 +103,13 @@ def status_svg(entity: dict, palette: dict) -> str:
     live["stateContext"] = _current_state_context(entity)
     if not entity.get("_normalized_visual_v40"):
         return _original_status_svg(live, palette)
-    return _restore_metadata_name(_original_status_svg(normalized(live), palette), entity)
+    return _original_status_svg(normalized(live), palette)
 
 
 def evidence_svg(entity: dict) -> str:
     if not entity.get("_normalized_visual_v40"):
         return _original_evidence_svg(entity)
-    return _restore_metadata_name(_original_evidence_svg(normalized(entity)), entity)
+    return _original_evidence_svg(normalized(entity))
 
 
 legacy.load_entities = load_entities

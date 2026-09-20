@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+
+import strict_json
 from pathlib import Path
 
 import canonical_dossier_contract as contract
@@ -29,7 +31,7 @@ def _supported_base_records(base_ref: str, root: Path) -> dict[str, dict]:
         content = checker.git_show(base_ref, rel, root)
         if content is None:
             raise RuntimeError(f"cannot read base entity {rel} at {base_ref}")
-        record = json.loads(content)
+        record = strict_json.loads(content, source=f"{rel}@{base_ref}")
         entity_id = record.get("id") if isinstance(record, dict) else None
         if record.get("type") in contract.TYPE_DIR and isinstance(entity_id, str) and entity_id:
             result[entity_id] = record

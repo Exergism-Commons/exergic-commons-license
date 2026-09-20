@@ -7,6 +7,9 @@ import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import dossier_svg_metrics as metrics
+import check_visual_evidence_semantics_hardened as semantic_surface
+
 NS = "{http://www.w3.org/2000/svg}"
 
 # clip_id -> (x, y, width, height, max_lines_per_text, expected_text_nodes)
@@ -50,21 +53,11 @@ def number(value: str | None) -> float:
 
 
 def glyph_width(ch: str, font_size: float) -> float:
-    if ch in " il.,'`|!:;":
-        factor = 0.32
-    elif ch in "mwMW@#%&":
-        factor = 0.90
-    elif ch.isupper():
-        factor = 0.72
-    elif ch.isdigit():
-        factor = 0.62
-    else:
-        factor = 0.60
-    return font_size * factor
+    return metrics.glyph_width(ch, font_size)
 
 
 def measured_width(text: str, font_size: float) -> float:
-    return sum(glyph_width(ch, font_size) for ch in text)
+    return metrics.measured_width(text, font_size)
 
 
 def clip_map(root: ET.Element) -> dict[str, ET.Element]:
@@ -147,6 +140,13 @@ def validate_file(path: Path) -> list[str]:
         return [f"{path}: invalid SVG/XML: {exc}"]
 
     name = path.name
+    if (
+        name == "state-outcome-legend.svg"
+        or name.endswith("-status.svg")
+        or name.endswith("-evidence.svg")
+    ) and semantic_surface.visible_svg_text(path) is None:
+        errors.append(f"{path}: canonical SVG surface is not statically demonstrable as visible/perceptible")
+        return errors
     if name == "state-outcome-legend.svg":
         clips = clip_map(root)
         for idx in range(5):

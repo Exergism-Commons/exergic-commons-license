@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 from jsonschema import Draft202012Validator, FormatChecker
 
 import canonical_dossier_contract as contract
+import strict_json
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas/evidence-image-metadata.schema.json"
@@ -18,7 +19,7 @@ IMAGE_EXTENSIONS = set(contract.RASTER_FACSIMILE_EXTENSIONS)
 
 
 def load_json(path: Path) -> dict:
-    value = json.loads(path.read_text(encoding="utf-8"))
+    value = strict_json.load(path)
     if not isinstance(value, dict):
         raise ValueError(f"{path}: expected JSON object")
     return value
@@ -57,6 +58,7 @@ def main() -> int:
     evidence_root = EVIDENCE_IMAGE_DIR.resolve()
 
     sidecars = sorted(EVIDENCE_IMAGE_DIR.rglob("*.json")) if EVIDENCE_IMAGE_DIR.exists() else []
+    declared_assets: dict[Path, list[Path]] = {}
     for sidecar in sidecars:
         rel = sidecar.relative_to(ROOT)
         if sidecar.is_symlink():
@@ -99,11 +101,10 @@ def main() -> int:
             errors.append(f"{rel}: referenced asset escapes dossiers/evidence-images: {asset_name}")
             continue
 
-        expected_sidecar = asset.with_suffix(".json")
+        expected_sidecar = asset.with_name(asset.name + ".json")
         if expected_sidecar != sidecar:
-            errors.append(
-                f"{rel}: sidecar/asset basename mismatch; expected metadata file {expected_sidecar.name!r}"
-            )
+            errors.append(f"{rel}: sidecar/asset binding mismatch; expected metadata file {expected_sidecar.name!r}")
+        declared_assets.setdefault(asset.resolve(), []).append(sidecar)
 
         if asset.suffix.lower() not in IMAGE_EXTENSIONS:
             errors.append(
@@ -141,9 +142,13 @@ def main() -> int:
                 continue
             if not valid_raster_bytes(path):
                 errors.append(f"{rel}: raster extension does not match PNG/JPEG/WebP binary bytes")
-            sidecar = path.with_suffix(".json")
-            if not sidecar.is_file():
-                errors.append(f"{rel}: missing source-image metadata sidecar {sidecar.name}")
+            bindings = declared_assets.get(path.resolve(), [])
+            expected_sidecar = path.with_name(path.name + ".json")
+            if len(bindings) != 1 or bindings[0] != expected_sidecar:
+                errors.append(
+                    f"{rel}: source-facsimile asset must have exactly one metadata binding at "
+                    f"{expected_sidecar.name}; found {[item.name for item in bindings]!r}"
+                )
 
     if errors:
         for error in errors:

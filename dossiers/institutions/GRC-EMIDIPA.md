@@ -18,7 +18,7 @@ EMIDIPA, represented only as the Greek oversight mechanism named in the Marios L
 
 ## State governance context
 
-The canonical `GRC` State dossier records **S — Restricted with defined scope** and freezes only the 26 January 2025 Athens Tempi-demonstration stun-grenade / Marios Lolos incident and accountability project. EMIDIPA and other remedial functions are expressly excluded from that frozen project. The red `S` is **State context only** and is not inherited by EMIDIPA.
+The canonical `GRC` State dossier records **S — Scoped restriction** and freezes only the 26 January 2025 Athens Tempi-demonstration stun-grenade / Marios Lolos incident and accountability project. EMIDIPA and other remedial functions are expressly excluded from that frozen project. The orange `S` is **State context only** and is not inherited by EMIDIPA.
 
 ![State dossier context for EMIDIPA](../assets/generated/INSTITUTION-GRC-EMIDIPA-status.svg)
 

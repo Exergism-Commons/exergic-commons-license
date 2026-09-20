@@ -18,7 +18,7 @@ CNIL, represented here only as the French data-protection regulator credited in 
 
 ## State governance context
 
-The canonical `FRA` State dossier records **S — Restricted with defined scope**, while expressly removing the judicially blocked Nice system from that scope. The red `S` is **State context only** and is not inherited by CNIL.
+The canonical `FRA` State dossier records **S — Scoped restriction**, while expressly removing the judicially blocked Nice system from that scope. The orange `S` is **State context only** and is not inherited by CNIL.
 
 ![State dossier context for CNIL](../assets/generated/INSTITUTION-FRA-CNIL-status.svg)
 

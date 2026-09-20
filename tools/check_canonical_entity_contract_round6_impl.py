@@ -14,6 +14,8 @@ from jsonschema import Draft202012Validator, FormatChecker
 from markdown_it import MarkdownIt
 
 import canonical_dossier_contract as contract
+import canonical_markdown as markdown
+import strict_json
 import check_canonical_entity_contract as prior
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,7 +41,7 @@ IDENTITY_ONLY_FORBIDDEN_FRONTMATTER = {
 
 
 def _load_json(path: Path) -> dict:
-    value = json.loads(path.read_text(encoding="utf-8"))
+    value = strict_json.load(path)
     if not isinstance(value, dict):
         raise ValueError(f"{path}: expected JSON object")
     return value
@@ -92,7 +94,7 @@ def validate_abox_dialect(root: Path) -> list[str]:
 
     for path in _builder_paths(root):
         try:
-            value = json.loads(path.read_text(encoding="utf-8"))
+            value = strict_json.load(path)
         except (OSError, json.JSONDecodeError):
             continue
         if not isinstance(value, dict) or "@context" not in value or not ("iri" in value or "@id" in value):
@@ -118,7 +120,7 @@ def validate_abox_dialect(root: Path) -> list[str]:
 
     for path in sorted(set(entity_root.rglob("*.json")) | set(entity_root.rglob("*.jsonld"))):
         try:
-            value = json.loads(path.read_text(encoding="utf-8"))
+            value = strict_json.load(path)
         except (OSError, json.JSONDecodeError) as exc:
             errors.append(f"{path.relative_to(root)}: invalid entity JSON: {exc}")
             continue
@@ -143,21 +145,11 @@ def _body_without_frontmatter(text: str) -> str:
 
 
 def _visible_inline_text(token) -> str:
-    if not token.children:
-        return token.content.strip()
-    pieces: list[str] = []
-    for child in token.children:
-        if child.type in {"text", "softbreak", "hardbreak"}:
-            pieces.append(child.content if child.type == "text" else " ")
-        elif child.type == "image":
-            pieces.append(child.content)
-        # code_inline deliberately cannot satisfy positive dossier prose.
-    return " ".join("".join(pieces).split())
+    return markdown.rendered_inline_text(token, include_images=False, include_code=False)
 
 
 def validate_commonmark_identity_dossiers(root: Path) -> list[str]:
     errors: list[str] = []
-    md = MarkdownIt("commonmark")
     for _version, _manifest_path, row in prior._manifest_rows(root):
         dossier_rel = row.get("dossier")
         entity_id = row.get("id", "<missing-id>")
@@ -172,45 +164,17 @@ def validate_commonmark_identity_dossiers(root: Path) -> list[str]:
         for key in sorted(IDENTITY_ONLY_FORBIDDEN_FRONTMATTER & set(fm)):
             errors.append(f"{dossier_rel}: {entity_id}: forbidden identity-only governance key {key!r}")
 
-        tokens = md.parse(_body_without_frontmatter(source))
-        if any(token.type in {"html_block", "html_inline"} for token in tokens):
+        surface = markdown.parse_surface(source)
+        if any(token.type in {"html_block", "html_inline"} for token in surface.tokens):
             errors.append(f"{dossier_rel}: {entity_id}: raw HTML is forbidden on identity-only canonical dossiers")
-
-        sections: dict[str, list] = {}
-        current: str | None = None
-        images: list[tuple[str, str]] = []
-        i = 0
-        while i < len(tokens):
-            token = tokens[i]
-            if token.type == "heading_open" and token.tag == "h2" and i + 1 < len(tokens):
-                inline = tokens[i + 1]
-                current = " ".join(inline.content.split())
-                sections.setdefault(current, [])
-                i += 3
-                continue
-            if token.type == "inline":
-                if current is not None:
-                    sections.setdefault(current, []).append(token)
-                for child in token.children or []:
-                    if child.type == "image":
-                        images.append((child.content.strip(), (child.attrGet("src") or "").strip()))
-            elif current is not None and token.type not in {"heading_close"}:
-                sections.setdefault(current, []).append(token)
-            i += 1
-
+        for title, count in sorted(surface.section_counts.items()):
+            if count > 1:
+                errors.append(f"{dossier_rel}: {entity_id}: duplicate rendered top-level H2 section {title!r}")
         for heading in sorted(REQUIRED_SECTIONS):
-            body_tokens = sections.get(heading)
-            if body_tokens is None:
-                errors.append(f"{dossier_rel}: {entity_id}: CommonMark is missing required section ## {heading}")
+            if surface.section_counts.get(heading, 0) != 1:
+                errors.append(f"{dossier_rel}: {entity_id}: CommonMark is missing/ambiguous required section ## {heading}")
                 continue
-            positive = []
-            for token in body_tokens:
-                if token.type == "inline":
-                    text = _visible_inline_text(token)
-                    if text:
-                        positive.append(text)
-                elif token.type in {"paragraph_open", "paragraph_close", "bullet_list_open", "bullet_list_close", "list_item_open", "list_item_close"}:
-                    continue
+            positive = markdown.section_text_from_surface(surface, heading, include_code=(heading == "Sources"))
             if not positive:
                 errors.append(f"{dossier_rel}: {entity_id}: CommonMark section ## {heading} has no positive rendered prose")
 
@@ -220,11 +184,9 @@ def validate_commonmark_identity_dossiers(root: Path) -> list[str]:
                 if not isinstance(visual, str):
                     continue
                 expected = prior._expected_relative_visual(dossier_rel, visual)
-                matches = [(alt, src) for alt, src in images if src == expected]
+                matches = [(alt, src) for alt, src in surface.images if src == expected]
                 if len(matches) != 1:
-                    errors.append(
-                        f"{dossier_rel}: {entity_id}: CommonMark must render exactly one image for {expected!r}; found {len(matches)}"
-                    )
+                    errors.append(f"{dossier_rel}: {entity_id}: CommonMark must render exactly one image for {expected!r}; found {len(matches)}")
                     continue
                 problem = prior._meaningful_alt_error(matches[0][0], visual)
                 if problem:
