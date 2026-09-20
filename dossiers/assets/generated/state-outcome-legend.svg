@@ -17,13 +17,13 @@
     <tspan x="58" y="146">Restricted</tspan>
   </text>
   <rect x="224" y="92" width="168" height="88" rx="12" fill="#E67E22"/>
-  <text x="242" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">S</text>
-  <text font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#FFFFFF" clip-path="url(#legend-1-clip)">
+  <text x="242" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#101828">S</text>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#101828" clip-path="url(#legend-1-clip)">
     <tspan x="242" y="146">Scoped restriction</tspan>
   </text>
   <rect x="408" y="92" width="168" height="88" rx="12" fill="#D4A017"/>
-  <text x="426" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">U</text>
-  <text font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#FFFFFF" clip-path="url(#legend-2-clip)">
+  <text x="426" y="121" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#101828">U</text>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="400" fill="#101828" clip-path="url(#legend-2-clip)">
     <tspan x="426" y="146">Under review /</tspan>
     <tspan x="426" dy="16">unresolved</tspan>
   </text>

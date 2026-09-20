@@ -14,7 +14,7 @@
     <tspan x="54" y="88">Hassan Bouras</tspan>
   </text>
   <rect x="54" y="150" width="300" height="66" rx="12" fill="#E67E22"/>
-  <text font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" clip-path="url(#status-badge-clip)">
+  <text font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#101828" clip-path="url(#status-badge-clip)">
     <tspan x="76" y="177">S · Scoped restriction</tspan>
   </text>
   <text font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#344054" clip-path="url(#status-context-clip)">
