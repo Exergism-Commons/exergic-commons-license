@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+
+import strict_json
 from pathlib import Path
 
 from rdflib import Graph
@@ -28,8 +30,8 @@ def iter_abox_files(root: Path) -> list[Path]:
     seen_ids: dict[str, Path] = {}
     for path in paths:
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
+            data = strict_json.load(path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
             raise ValueError(f"cannot parse JSON-LD candidate {path}: {exc}") from exc
         if isinstance(data, dict) and "@context" in data and ("iri" in data or "@id" in data):
             iri = data.get("iri", data.get("@id"))
@@ -60,7 +62,7 @@ def iter_abox_files(root: Path) -> list[Path]:
 def source_digest(files: list[Path], root: Path) -> str:
     digest = hashlib.sha256()
     for path in files:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = strict_json.load(path)
         canonical = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         digest.update(path.relative_to(root).as_posix().encode("utf-8"))
         digest.update(b"\0")

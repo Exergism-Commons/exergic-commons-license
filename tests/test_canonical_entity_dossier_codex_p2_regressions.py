@@ -1,0 +1,306 @@
+#!/usr/bin/env python3
+"""Regressions for identity-history, State lifecycle and recursive resolver contracts."""
+from __future__ import annotations
+
+import importlib.util
+import json
+import sys
+import tempfile
+import types
+import unittest
+from pathlib import Path
+from unittest import mock
+
+from jsonschema import Draft202012Validator
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "tools"))
+
+import check_canonical_entity_manifest_history as history  # noqa: E402
+import entity_identity_resolution as resolver  # noqa: E402
+import check_visual_evidence_semantics as visual_semantics  # noqa: E402
+import check_canonical_entity_contract_round6_impl as round6_impl  # noqa: E402
+import check_dossier_visual_layout as visual_layout  # noqa: E402
+
+
+def load_identity_integrity_for_test():
+    """Load the real gate without importing its schedule-audit-only PyYAML dependency."""
+    stub = types.ModuleType("audit_schedule_reference_coverage")
+    stub.norm = lambda value: " ".join(value.casefold().split())
+    previous = sys.modules.get("audit_schedule_reference_coverage")
+    sys.modules["audit_schedule_reference_coverage"] = stub
+    try:
+        path = REPO_ROOT / "tools/check_non_state_entity_identity_integrity.py"
+        spec = importlib.util.spec_from_file_location("identity_integrity_under_test", path)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("cannot load non-State identity integrity gate")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    finally:
+        if previous is None:
+            sys.modules.pop("audit_schedule_reference_coverage", None)
+        else:
+            sys.modules["audit_schedule_reference_coverage"] = previous
+
+
+class CodexP2IdentityContractTests(unittest.TestCase):
+    def _write_supersession_manifest(
+        self,
+        root: Path,
+        version: int,
+        rows: list[dict],
+        follows: str | None,
+    ) -> Path:
+        path = root / f"knowledge/generated/entity-id-supersessions-v{version}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"version": version, "follows": follows, "supersessions": rows}),
+            encoding="utf-8",
+        )
+        return path
+
+    def test_new_supersession_source_requires_curated_base_history(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            v1 = self._write_supersession_manifest(root, 1, [], None)
+            v2 = self._write_supersession_manifest(
+                root,
+                2,
+                [{"from": "ORG-TYPO", "to": "ORG-LIVE", "reason": "mistyped historical id"}],
+                str(v1.relative_to(root)),
+            )
+            with mock.patch.object(history, "ROOT", root):
+                errors = history.validate_new_supersession_sources(
+                    current_paths=[v1, v2],
+                    base_paths=["knowledge/generated/entity-id-supersessions-v1.json"],
+                    curated_ids={"ORG-LIVE", "ORG-KNOWN"},
+                )
+        self.assertTrue(any("ORG-TYPO" in error and "no curated identity history" in error for error in errors), errors)
+
+    def test_new_supersession_source_accepts_previously_curated_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            v1 = self._write_supersession_manifest(root, 1, [], None)
+            v2 = self._write_supersession_manifest(
+                root,
+                2,
+                [{"from": "ORG-KNOWN", "to": "ORG-LIVE", "reason": "canonical normalization"}],
+                str(v1.relative_to(root)),
+            )
+            with mock.patch.object(history, "ROOT", root):
+                errors = history.validate_new_supersession_sources(
+                    current_paths=[v1, v2],
+                    base_paths=["knowledge/generated/entity-id-supersessions-v1.json"],
+                    curated_ids={"ORG-KNOWN", "ORG-LIVE"},
+                )
+        self.assertEqual(errors, [])
+
+    def test_state_schema_rejects_identity_lifecycle_fields(self) -> None:
+        schema = json.loads((REPO_ROOT / "schemas/entity.schema.json").read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema)
+        state = {
+            "@context": "../../ontology/ecl-context.jsonld",
+            "iri": "ecl:STATE-USA",
+            "id": "STATE-USA",
+            "type": "State",
+            "name": "United States",
+            "iso3": "USA",
+            "aliases": ["United States of America"],
+            "dossier": "../../dossiers/states/USA.md",
+            "publicReviewIssue": "https://github.com/Papishushi/exergic-commons-license/issues/1",
+            "lastSubstantiveReview": "2026-09-08",
+            "reviewClass": "manual",
+        }
+        self.assertEqual(list(validator.iter_errors(state)), [])
+        for field, value in (
+            ("identityLifecycle", "active"),
+            ("supersededBy", "ecl:STATE-CAN"),
+        ):
+            with self.subTest(field=field):
+                mutated = dict(state)
+                mutated[field] = value
+                self.assertTrue(list(validator.iter_errors(mutated)))
+
+    def test_non_state_schema_keeps_identity_lifecycle_contract(self) -> None:
+        schema = json.loads((REPO_ROOT / "schemas/entity.schema.json").read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema)
+        organization = {
+            "@context": "../../ontology/ecl-context.jsonld",
+            "iri": "ecl:ORG-OLD",
+            "id": "ORG-OLD",
+            "type": "Organization",
+            "name": "Old Organization",
+            "dossier": "../../dossiers/organizations/ORG-OLD.md",
+            "lastSubstantiveReview": "2026-09-08",
+            "reviewClass": "manual",
+            "identityLifecycle": "superseded",
+            "supersededBy": "ecl:ORG-NEW",
+        }
+        self.assertEqual(list(validator.iter_errors(organization)), [])
+
+    def test_repository_entity_loader_recurses_and_accepts_jsonld(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            entity_dir = Path(tmp) / "knowledge/entities"
+            nested = entity_dir / "nested"
+            nested.mkdir(parents=True)
+            (entity_dir / "ORG-TOP.json").write_text(json.dumps({"id": "ORG-TOP"}), encoding="utf-8")
+            (nested / "ORG-NESTED.jsonld").write_text(json.dumps({"id": "ORG-NESTED"}), encoding="utf-8")
+            (nested / "ORG-IGNORED.JSON").write_text(json.dumps({"id": "ORG-IGNORED"}), encoding="utf-8")
+            entities, entity_ids = resolver.load_repository_entities(entity_dir)
+        self.assertEqual(entity_ids, {"ORG-TOP", "ORG-NESTED"})
+        self.assertEqual({record["id"] for record in entities}, entity_ids)
+
+    def test_recursive_jsonld_identity_integrity_enforces_type_prefix(self) -> None:
+        identity_integrity = load_identity_integrity_for_test()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entity_dir = root / "knowledge/entities/nested"
+            entity_dir.mkdir(parents=True)
+            (root / "ontology").mkdir(parents=True)
+            (root / "ontology/ecl-context.jsonld").write_text("{}", encoding="utf-8")
+            dossier = root / "dossiers/organizations/PERSON-WRONG.md"
+            dossier.parent.mkdir(parents=True)
+            dossier.write_text("# Identity\n", encoding="utf-8")
+            record = {
+                "@context": "../../../ontology/ecl-context.jsonld",
+                "iri": "ecl:PERSON-WRONG",
+                "id": "PERSON-WRONG",
+                "type": "Organization",
+                "name": "Wrong Prefix Organization",
+                "dossier": "../../../dossiers/organizations/PERSON-WRONG.md",
+            }
+            (entity_dir / "PERSON-WRONG.jsonld").write_text(json.dumps(record), encoding="utf-8")
+            failures = identity_integrity.validate(root=root)
+        self.assertTrue(
+            any(item.get("reason") == "type/id-prefix mismatch" and item.get("id") == "PERSON-WRONG" for item in failures),
+            failures,
+        )
+
+
+class CodexP2SvgCursorTests(unittest.TestCase):
+    def _visible(self, body: str) -> str | None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "x.svg"
+            path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                + body
+                + "</svg>",
+                encoding="utf-8",
+            )
+            return visual_semantics.visible_svg_text(path)
+
+    def test_unpositioned_sibling_after_cursor_moving_tspan_is_rejected(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20">'
+                '<tspan x="100">EDGE</tspan>'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+    def test_unpositioned_tspan_after_parent_text_is_rejected(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20">EDGE'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+    def test_absolute_x_reanchors_cursor_after_prior_text(self) -> None:
+        self.assertEqual(
+            "EDGE REQUIRED",
+            self._visible(
+                '<text x="10" y="20" font-size="8">'
+                '<tspan x="10">EDGE</tspan>'
+                '<tspan x="40"> REQUIRED</tspan>'
+                "</text>"
+            ),
+        )
+
+
+    def test_nbsp_text_invalidates_implicit_child_cursor(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="100" y="20">&#160;'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+    def test_unicode_space_tail_cannot_preserve_exact_cursor(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<text x="10" y="20">'
+                '<tspan x="100">EDGE</tspan>&#8195;'
+                '<tspan> REQUIRED</tspan>'
+                "</text>"
+            )
+        )
+
+
+    def test_same_node_em_space_prefix_cannot_hide_required_text(self) -> None:
+        visible = self._visible(
+            '<text x="10" y="20" font-size="12">'
+            + "&#8195;" * 8
+            + "REQUIRED</text>"
+        )
+        self.assertNotIn("REQUIRED", visible or "")
+
+    def test_full_text_extent_must_fit_active_clip(self) -> None:
+        visible = self._visible(
+            '<defs><clipPath id="box"><rect x="0" y="0" width="50" height="50"/></clipPath></defs>'
+            '<text x="48" y="20" font-size="12" clip-path="url(#box)">REQUIRED</text>'
+        )
+        self.assertNotIn("REQUIRED", visible or "")
+
+    def test_object_bounding_box_clip_is_rejected(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<defs><clipPath id="box" clipPathUnits="objectBoundingBox">'
+                '<rect x="0" y="0" width="1" height="1"/></clipPath></defs>'
+                '<text x="10" y="20" font-size="12" clip-path="url(#box)">REQUIRED</text>'
+            )
+        )
+
+    def test_symbol_text_cannot_supply_visible_semantics(self) -> None:
+        self.assertIsNone(
+            self._visible(
+                '<symbol id="hidden"><text x="10" y="20" font-size="12">REQUIRED</text></symbol>'
+            )
+        )
+
+    def test_static_svg_contract_rejects_symbol_container(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            directory = root / "dossiers/assets/generated"
+            directory.mkdir(parents=True)
+            (directory / "X-status.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                '<symbol><text x="10" y="20">REQUIRED</text></symbol>'
+                "</svg>",
+                encoding="utf-8",
+            )
+            errors = round6_impl.validate_all_generated_svg_static(root)
+        self.assertTrue(any("unsupported SVG element <symbol>" in error for error in errors), errors)
+
+    def test_layout_combines_anchor_with_line_width(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "X-status.svg"
+            path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300">'
+                '<defs><clipPath id="status-name-clip">'
+                '<rect x="54" y="64" width="800" height="66"/></clipPath></defs>'
+                '<text font-size="26" clip-path="url(#status-name-clip)">'
+                '<tspan x="850" y="88">OK</tspan></text>'
+                "</svg>",
+                encoding="utf-8",
+            )
+            errors = visual_layout.validate_file(path)
+        self.assertTrue(any("escapes horizontal clip" in error for error in errors), errors)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
