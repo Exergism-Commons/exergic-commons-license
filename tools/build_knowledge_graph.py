@@ -9,9 +9,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-
-import strict_json
 from pathlib import Path
+
+try:
+    import strict_json
+except ModuleNotFoundError:  # imported as tools.build_knowledge_graph, without tools/ on sys.path
+    from tools import strict_json
 
 from rdflib import Graph
 from rdflib.compare import to_canonical_graph
