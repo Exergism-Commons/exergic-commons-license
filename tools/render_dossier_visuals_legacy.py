@@ -127,6 +127,23 @@ def text_block(text: str, *, x: int, y: int, max_width: int, font_size: int,
     )
 
 
+# Foregrounds pinned by dossier-visual-palette-v1.json. A swatch that predates the
+# pinned foreground (label/hex only) gets the candidate with the higher contrast
+# against its own background, which reproduces every pinned palette choice.
+FOREGROUND_CANDIDATES = ("#FFFFFF", "#101828")
+
+
+def swatch_foreground(swatch: dict) -> str:
+    foreground = swatch.get("foreground")
+    if isinstance(foreground, str) and foreground:
+        return foreground
+    background = swatch["hex"]
+    return max(
+        FOREGROUND_CANDIDATES,
+        key=lambda candidate: metrics.contrast_ratio(candidate, background),
+    )
+
+
 def status_svg(entity: dict, palette: dict) -> str:
     state = entity["stateContext"]
     swatch = palette["states"][state]
@@ -134,7 +151,7 @@ def status_svg(entity: dict, palette: dict) -> str:
     state_code = entity["state"]
     label = swatch["label"]
     color = swatch["hex"]
-    foreground = swatch["foreground"]
+    foreground = swatch_foreground(swatch)
 
     name_block = text_block(name, x=54, y=88, max_width=780, font_size=26,
         max_lines=2, line_height=30, clip_id="status-name-clip")
@@ -267,7 +284,7 @@ def legend_svg(palette: dict) -> str:
     blocks: list[str] = []
     for idx, key in enumerate(order):
         item = palette["states"][key]
-        foreground = item["foreground"]
+        foreground = swatch_foreground(item)
         clip_id = f"legend-{idx}-clip"
         clip_defs.append(
             f'    <clipPath id="{clip_id}"><rect x="{x+12}" y="126" width="144" height="42"/></clipPath>'
