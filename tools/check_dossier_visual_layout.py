@@ -145,8 +145,9 @@ def validate_file(path: Path) -> list[str]:
         or name.endswith("-status.svg")
         or name.endswith("-evidence.svg")
     ) and semantic_surface.visible_svg_text(path) is None:
+        # Keep validating geometry: a non-perceptible surface must not mask the
+        # concrete clip/budget violations that the layout contract reports.
         errors.append(f"{path}: canonical SVG surface is not statically demonstrable as visible/perceptible")
-        return errors
     if name == "state-outcome-legend.svg":
         clips = clip_map(root)
         for idx in range(5):
