@@ -1,0 +1,77 @@
+name: ECL redistribution identity integrity
+
+on:
+  push:
+    paths:
+      - "LICENSE"
+      - "versions/licenses/**"
+      - "schedules/**"
+      - "releases/bundles/**"
+      - "schemas/bundle.schema.json"
+      - "schemas/distribution.schema.json"
+      - "spec/VERSIONING.md"
+      - "spec/REDISTRIBUTION.md"
+      - "tools/ecl_resolve.py"
+      - "tools/ecl_distribution.py"
+      - "tests/test_ecl_resolve.py"
+      - "tests/test_ecl_distribution.py"
+      - "tests/test_bundle_release_identity.py"
+      - "tests/test_distribution_contract.py"
+      - "tests/test_resolver_selector_boundary.py"
+      - ".github/workflows/distribution-integrity.yml"
+  pull_request:
+    paths:
+      - "LICENSE"
+      - "versions/licenses/**"
+      - "schedules/**"
+      - "releases/bundles/**"
+      - "schemas/bundle.schema.json"
+      - "schemas/distribution.schema.json"
+      - "spec/VERSIONING.md"
+      - "spec/REDISTRIBUTION.md"
+      - "tools/ecl_resolve.py"
+      - "tools/ecl_distribution.py"
+      - "tests/test_ecl_resolve.py"
+      - "tests/test_ecl_distribution.py"
+      - "tests/test_bundle_release_identity.py"
+      - "tests/test_distribution_contract.py"
+      - "tests/test_resolver_selector_boundary.py"
+      - ".github/workflows/distribution-integrity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install JSON Schema validator
+        run: python -m pip install "jsonschema>=4.23,<5"
+
+      - name: Run resolver and redistribution regressions
+        run: |
+          python -m unittest \
+            tests.test_ecl_resolve \
+            tests.test_ecl_distribution \
+            tests.test_bundle_release_identity \
+            tests.test_distribution_contract \
+            tests.test_resolver_selector_boundary
+
+      - name: Build canonical draft self-contained envelope
+        run: |
+          mkdir -p "$RUNNER_TEMP/ecl"
+          python tools/ecl_distribution.py build \
+            --repo-root . \
+            --bundle ECL-0.3-DRAFT@RP-EMPTY-1 \
+            --output "$RUNNER_TEMP/ecl/ECL-0.3-DRAFT@RP-EMPTY-1" \
+            --allow-draft
+
+      - name: Verify canonical draft self-contained envelope
+        run: |
+          python tools/ecl_distribution.py verify \
+            --root "$RUNNER_TEMP/ecl/ECL-0.3-DRAFT@RP-EMPTY-1"
