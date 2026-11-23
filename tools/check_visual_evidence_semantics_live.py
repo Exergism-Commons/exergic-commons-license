@@ -12,6 +12,7 @@ from markdown_it import MarkdownIt
 import canonical_dossier_contract as contract
 import canonical_markdown as markdown
 import check_visual_evidence_semantics_hardened as base
+import render_dossier_visuals_legacy as rendering
 
 ROOT = Path(__file__).resolve().parents[1]
 VALID = {"R", "S", "U", "N"}
@@ -384,7 +385,9 @@ def main() -> int:
                         )
                     )
                     expected_name = current_names.get(str(entity_id), row.get("name"))
-                    if isinstance(expected_name, str) and expected_name not in status_text:
+                    if isinstance(expected_name, str) and rendering.rendered_name_text(
+                        expected_name, rendering.STATUS_NAME_LAYOUT
+                    ) not in status_text:
                         errors.append(f"{status_rel}: {entity_id}: visible status surface does not identify current entity name {expected_name!r}")
                     for required in (
                         "STATE DOSSIER CONTEXT",
@@ -408,7 +411,11 @@ def main() -> int:
                 errors.append(f"{entity_id}: invalid evidence SVG/sourceGranularity")
             else:
                 expected_name = current_names.get(str(entity_id), row.get("name"))
-                if isinstance(expected_name, str) and expected_name not in evidence_text:
+                # The identity box wraps to three lines and truncates longer names
+                # with an ellipsis; require exactly that rendering of the live name.
+                if isinstance(expected_name, str) and rendering.rendered_name_text(
+                    expected_name, rendering.EVIDENCE_IDENTITY_LAYOUT
+                ) not in evidence_text:
                     errors.append(f"{evidence_rel}: {entity_id}: visible evidence surface does not identify current entity name {expected_name!r}")
                 for required in (
                     "DERIVED EVIDENCE DIAGRAM",

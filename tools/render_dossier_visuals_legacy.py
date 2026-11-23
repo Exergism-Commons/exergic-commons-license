@@ -25,6 +25,15 @@ EVIDENCE_TEXT_BUDGETS = {
     "identity": 240,
 }
 
+# Wrapping of the entity-name blocks. Long names are deterministically truncated
+# with an ellipsis, so semantic checks compare against rendered_name_text().
+STATUS_NAME_LAYOUT = {"max_width": 780, "font_size": 26, "max_lines": 2}
+EVIDENCE_IDENTITY_LAYOUT = {
+    "max_width": EVIDENCE_TEXT_BUDGETS["identity"],
+    "font_size": 14,
+    "max_lines": 3,
+}
+
 
 def esc(value: str) -> str:
     return html.escape(str(value), quote=True)
@@ -127,6 +136,13 @@ def text_block(text: str, *, x: int, y: int, max_width: int, font_size: int,
     )
 
 
+def rendered_name_text(name: str, layout: dict) -> str:
+    """Visible text of a name block: its wrapped (possibly truncated) lines joined by spaces."""
+    return " ".join(
+        wrap_lines(name, layout["max_width"], layout["font_size"], layout["max_lines"])
+    )
+
+
 # Foregrounds pinned by dossier-visual-palette-v1.json. A swatch that predates the
 # pinned foreground (label/hex only) gets the candidate with the higher contrast
 # against its own background, which reproduces every pinned palette choice.
@@ -153,8 +169,8 @@ def status_svg(entity: dict, palette: dict) -> str:
     color = swatch["hex"]
     foreground = swatch_foreground(swatch)
 
-    name_block = text_block(name, x=54, y=88, max_width=780, font_size=26,
-        max_lines=2, line_height=30, clip_id="status-name-clip")
+    name_block = text_block(name, x=54, y=88, **STATUS_NAME_LAYOUT,
+        line_height=30, clip_id="status-name-clip")
     badge_block = text_block(f"{state} · {label}", x=76, y=177, max_width=250,
         font_size=18, max_lines=2, line_height=21, clip_id="status-badge-clip",
         fill=foreground)
@@ -206,9 +222,8 @@ def evidence_svg(entity: dict) -> str:
     proposition_block = text_block(proposition, x=412, y=180,
         max_width=EVIDENCE_TEXT_BUDGETS["proposition"], font_size=14,
         max_lines=3, line_height=19, clip_id="proposition-box-clip")
-    identity_block = text_block(name, x=762, y=180,
-        max_width=EVIDENCE_TEXT_BUDGETS["identity"], font_size=14,
-        max_lines=3, line_height=19, clip_id="identity-box-clip")
+    identity_block = text_block(name, x=762, y=180, **EVIDENCE_IDENTITY_LAYOUT,
+        line_height=19, clip_id="identity-box-clip")
     source_footer = text_block(granularity_label, x=62, y=252, max_width=240,
         font_size=14, max_lines=1, line_height=16, clip_id="source-footer-clip",
         weight="400", fill="#667085")
