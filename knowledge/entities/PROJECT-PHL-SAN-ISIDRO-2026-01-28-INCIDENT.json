@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-PHL-SAN-ISIDRO-2026-01-28-INCIDENT",
+  "iri": "urn:ecl:PROJECT-PHL-SAN-ISIDRO-2026-01-28-INCIDENT",
   "id": "PROJECT-PHL-SAN-ISIDRO-2026-01-28-INCIDENT",
   "type": "Project",
   "name": "28 January 2026 Barangay San Isidro incident project",

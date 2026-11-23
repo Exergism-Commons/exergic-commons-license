@@ -1,4 +1,5 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?claim ?target
 WHERE {
@@ -9,5 +10,5 @@ WHERE {
     ?claim ecl:object ?target .
   }
   FILTER (STRSTARTS(STR(?target), "urn:ecl:"))
-  FILTER NOT EXISTS { ?target ecl:stableId ?targetId . }
+  FILTER NOT EXISTS { ?target ec:stableId ?targetId . }
 }

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-BFA-MINISTRY-JUSTICE",
+  "iri": "urn:ecl:AGENCY-BFA-MINISTRY-JUSTICE",
   "id": "AGENCY-BFA-MINISTRY-JUSTICE",
   "type": "Agency",
   "name": "Ministry of Justice (Burkina Faso)",

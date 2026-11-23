@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11",
+  "iri": "urn:ecl:EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11",
   "id": "EVIDENCE-FRA-NICE-PROJECT-DOSSIER-2026-08-11",
   "type": "EvidenceItem",
   "publisher": "Exergic Commons License project",

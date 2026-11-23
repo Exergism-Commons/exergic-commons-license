@@ -8,7 +8,8 @@ from rdflib import Graph, Namespace, RDF, URIRef
 from rdflib.namespace import OWL
 
 ROOT = Path(__file__).resolve().parents[1]
-ECL = Namespace("urn:ecl:")
+ECL = Namespace("https://id.exergism.org/ecl#")
+EC = Namespace("https://id.exergism.org/commons#")
 
 BUILD_SPEC = importlib.util.spec_from_file_location("build_knowledge_graph", ROOT / "tools" / "build_knowledge_graph.py")
 BUILD = importlib.util.module_from_spec(BUILD_SPEC)
@@ -35,7 +36,7 @@ class StateSemanticGuardrailTests(unittest.TestCase):
     def test_each_state_has_exactly_one_iso_and_mapping(self):
         for state in self.abox.subjects(RDF.type, ECL.State):
             iso = list(self.abox.objects(state, ECL.iso3))
-            ids = list(self.abox.objects(state, ECL.stableId))
+            ids = list(self.abox.objects(state, EC.stableId))
             dossiers = list(self.abox.objects(state, ECL.dossier))
             issues = list(self.abox.objects(state, ECL.publicReviewIssue))
             self.assertEqual(len(iso), 1, state)
@@ -86,7 +87,7 @@ class StateSemanticGuardrailTests(unittest.TestCase):
             for subject, obj in self.abox.subject_objects(predicate):
                 if isinstance(obj, URIRef) and str(obj).startswith("urn:ecl:"):
                     self.assertTrue(
-                        any(self.abox.objects(obj, ECL.stableId)),
+                        any(self.abox.objects(obj, EC.stableId)),
                         (subject, predicate, obj),
                     )
 

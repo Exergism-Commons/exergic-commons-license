@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-SVK-CONSTITUTIONAL-COURT",
+  "iri": "urn:ecl:INSTITUTION-SVK-CONSTITUTIONAL-COURT",
   "id": "INSTITUTION-SVK-CONSTITUTIONAL-COURT",
   "type": "Institution",
   "name": "Constitutional Court of the Slovak Republic",

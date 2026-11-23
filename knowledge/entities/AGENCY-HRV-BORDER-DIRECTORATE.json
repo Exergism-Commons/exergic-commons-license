@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-HRV-BORDER-DIRECTORATE",
+  "iri": "urn:ecl:AGENCY-HRV-BORDER-DIRECTORATE",
   "id": "AGENCY-HRV-BORDER-DIRECTORATE",
   "type": "Agency",
   "name": "Border Directorate (Uprava za granicu)",

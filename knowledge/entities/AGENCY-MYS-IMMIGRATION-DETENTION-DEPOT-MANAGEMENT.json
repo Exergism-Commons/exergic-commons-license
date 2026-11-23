@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MYS-IMMIGRATION-DETENTION-DEPOT-MANAGEMENT",
+  "iri": "urn:ecl:AGENCY-MYS-IMMIGRATION-DETENTION-DEPOT-MANAGEMENT",
   "id": "AGENCY-MYS-IMMIGRATION-DETENTION-DEPOT-MANAGEMENT",
   "type": "Agency",
   "name": "Immigration Department of Malaysia — Detention and Depot Management Division",

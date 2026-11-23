@@ -15,7 +15,8 @@ ENTITIES = KNOWLEDGE / "entities"
 EVIDENCE = KNOWLEDGE / "evidence"
 MANIFEST = KNOWLEDGE / "generated" / "state-project-relation-normalization-v4.json"
 ACTIVE_STATUSES = {"candidate", "accepted", "disputed"}
-ECL = Namespace("urn:ecl:")
+ECL = Namespace("https://id.exergism.org/ecl#")
+EC = Namespace("https://id.exergism.org/commons#")
 FORBIDDEN_GOVERNANCE_PREDICATES = {
     URIRef(f"urn:ecl:{name}")
     for name in {
@@ -58,7 +59,7 @@ def build_union_graph(root: Path):
 
 
 def stable_ids(graph: Graph, node) -> list[str]:
-    return sorted(str(value) for value in graph.objects(node, ECL.stableId))
+    return sorted(str(value) for value in graph.objects(node, EC.stableId))
 
 
 def one_stable_id(graph: Graph, node, source_label: str) -> str:
@@ -78,7 +79,7 @@ def sources_for(node_sources, node) -> str:
 def active_track_claim_pairs(graph: Graph):
     pairs = defaultdict(list)
     for claim_node in set(graph.subjects(RDF.type, ECL.Claim)):
-        statuses = {str(value) for value in graph.objects(claim_node, ECL.status)}
+        statuses = {str(value) for value in graph.objects(claim_node, EC.status)}
         if not statuses.intersection(ACTIVE_STATUSES):
             continue
         if (claim_node, ECL.predicate, ECL.tracks) not in graph:
@@ -197,45 +198,45 @@ class StateProjectTrackClaimCompletenessTests(unittest.TestCase):
     def test_expanded_jsonld_property_keys_have_the_same_rdf_semantics(self):
         expanded = {
             "@id": "urn:ecl:CLAIM-EXPANDED-TEST",
-            "@type": ["urn:ecl:Claim"],
-            "urn:ecl:stableId": [{"@value": "CLAIM-EXPANDED-TEST"}],
-            "urn:ecl:subject": [{"@id": "urn:ecl:STATE-USA"}],
-            "urn:ecl:predicate": [{"@id": "urn:ecl:tracks"}],
-            "urn:ecl:object": [
+            "@type": ["https://id.exergism.org/ecl#Claim"],
+            "https://id.exergism.org/commons#stableId": [{"@value": "CLAIM-EXPANDED-TEST"}],
+            "https://id.exergism.org/ecl#subject": [{"@id": "urn:ecl:STATE-USA"}],
+            "https://id.exergism.org/ecl#predicate": [{"@id": "https://id.exergism.org/ecl#tracks"}],
+            "https://id.exergism.org/ecl#object": [
                 {"@id": "urn:ecl:PROJECT-MAVEN-SMART-SYSTEM"}
             ],
-            "urn:ecl:status": [{"@value": "accepted"}],
+            "https://id.exergism.org/commons#status": [{"@value": "accepted"}],
         }
         graph = Graph().parse(data=json.dumps(expanded), format="json-ld")
         claim = URIRef("urn:ecl:CLAIM-EXPANDED-TEST")
         self.assertIn((claim, RDF.type, ECL.Claim), graph)
-        self.assertIn((claim, ECL.subject, ECL["STATE-USA"]), graph)
+        self.assertIn((claim, ECL.subject, URIRef("urn:ecl:STATE-USA")), graph)
         self.assertIn((claim, ECL.predicate, ECL.tracks), graph)
         self.assertIn(
-            (claim, ECL.object, ECL["PROJECT-MAVEN-SMART-SYSTEM"]), graph
+            (claim, ECL.object, URIRef("urn:ecl:PROJECT-MAVEN-SMART-SYSTEM")), graph
         )
         self.assertIn(
-            "accepted", {str(value) for value in graph.objects(claim, ECL.status)}
+            "accepted", {str(value) for value in graph.objects(claim, EC.status)}
         )
 
     def test_split_claim_descriptions_are_classified_after_rdf_union(self):
         claim = URIRef("urn:ecl:CLAIM-SPLIT-TEST")
         first = {
             "@id": str(claim),
-            "@type": ["urn:ecl:Claim"],
-            "urn:ecl:stableId": [{"@value": "CLAIM-SPLIT-TEST"}],
-            "urn:ecl:subject": [{"@id": "urn:ecl:STATE-USA"}],
-            "urn:ecl:predicate": [{"@id": "urn:ecl:tracks"}],
-            "urn:ecl:object": [
+            "@type": ["https://id.exergism.org/ecl#Claim"],
+            "https://id.exergism.org/commons#stableId": [{"@value": "CLAIM-SPLIT-TEST"}],
+            "https://id.exergism.org/ecl#subject": [{"@id": "urn:ecl:STATE-USA"}],
+            "https://id.exergism.org/ecl#predicate": [{"@id": "https://id.exergism.org/ecl#tracks"}],
+            "https://id.exergism.org/ecl#object": [
                 {"@id": "urn:ecl:PROJECT-MAVEN-SMART-SYSTEM"}
             ],
         }
         second = {
             "@id": "urn:ecl:SUPPORT-DOC-SPLIT-TEST",
-            "urn:ecl:reviews": [
+            "https://id.exergism.org/ecl#reviews": [
                 {
                     "@id": str(claim),
-                    "urn:ecl:status": [{"@value": "accepted"}],
+                    "https://id.exergism.org/commons#status": [{"@value": "accepted"}],
                 }
             ],
         }
@@ -300,11 +301,11 @@ class StateProjectTrackClaimCompletenessTests(unittest.TestCase):
             )
             self.assertEqual(
                 {str(value) for value in self.graph.objects(claim_node, ECL.predicate)},
-                {"urn:ecl:tracks"},
+                {"https://id.exergism.org/ecl#tracks"},
                 claim_label,
             )
             self.assertEqual(
-                {str(value) for value in self.graph.objects(claim_node, ECL.status)},
+                {str(value) for value in self.graph.objects(claim_node, EC.status)},
                 {"accepted"},
                 claim_label,
             )

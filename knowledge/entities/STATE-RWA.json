@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-RWA",
+  "iri": "urn:ecl:STATE-RWA",
   "id": "STATE-RWA",
   "type": "State",
   "name": "Rwanda",

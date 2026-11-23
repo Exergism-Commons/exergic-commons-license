@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-EUROPEAN-COURT-HUMAN-RIGHTS",
+  "iri": "urn:ecl:INSTITUTION-EUROPEAN-COURT-HUMAN-RIGHTS",
   "id": "INSTITUTION-EUROPEAN-COURT-HUMAN-RIGHTS",
   "type": "Institution",
   "name": "European Court of Human Rights",

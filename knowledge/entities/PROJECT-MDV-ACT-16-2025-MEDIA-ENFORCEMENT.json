@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-MDV-ACT-16-2025-MEDIA-ENFORCEMENT",
+  "iri": "urn:ecl:PROJECT-MDV-ACT-16-2025-MEDIA-ENFORCEMENT",
   "id": "PROJECT-MDV-ACT-16-2025-MEDIA-ENFORCEMENT",
   "type": "Project",
   "name": "Maldives Media and Broadcasting Regulation Act No. 16/2025 enforcement project",

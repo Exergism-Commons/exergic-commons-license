@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-SSD-NATIONAL-SECURITY-SERVICE",
+  "iri": "urn:ecl:AGENCY-SSD-NATIONAL-SECURITY-SERVICE",
   "id": "AGENCY-SSD-NATIONAL-SECURITY-SERVICE",
   "type": "Agency",
   "name": "South Sudan National Security Service",

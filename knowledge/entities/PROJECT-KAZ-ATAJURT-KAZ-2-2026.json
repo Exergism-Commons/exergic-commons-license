@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-KAZ-ATAJURT-KAZ-2-2026",
+  "iri": "urn:ecl:PROJECT-KAZ-ATAJURT-KAZ-2-2026",
   "id": "PROJECT-KAZ-ATAJURT-KAZ-2-2026",
   "type": "Project",
   "name": "Atajurt KAZ 2/2026 arrest/detention/prosecution case project",

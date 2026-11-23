@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BTN",
+  "iri": "urn:ecl:STATE-BTN",
   "id": "STATE-BTN",
   "type": "State",
   "name": "Bhutan",

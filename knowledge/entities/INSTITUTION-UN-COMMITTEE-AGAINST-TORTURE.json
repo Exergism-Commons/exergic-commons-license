@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-UN-COMMITTEE-AGAINST-TORTURE",
+  "iri": "urn:ecl:INSTITUTION-UN-COMMITTEE-AGAINST-TORTURE",
   "id": "INSTITUTION-UN-COMMITTEE-AGAINST-TORTURE",
   "type": "Institution",
   "name": "United Nations Committee against Torture",

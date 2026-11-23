@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-ZMB-XAVIER-CHUNGU-DETENTION",
+  "iri": "urn:ecl:PROJECT-ZMB-XAVIER-CHUNGU-DETENTION",
   "id": "PROJECT-ZMB-XAVIER-CHUNGU-DETENTION",
   "type": "Project",
   "name": "Xavier Chungu State-security/sedition detention case",

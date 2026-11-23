@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-SOM-NISA",
+  "iri": "urn:ecl:AGENCY-SOM-NISA",
   "id": "AGENCY-SOM-NISA",
   "type": "Agency",
   "name": "National Intelligence and Security Agency",

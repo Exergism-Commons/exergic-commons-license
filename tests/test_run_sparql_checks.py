@@ -19,14 +19,14 @@ class RunSparqlChecksTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "input.nq"
             path.write_text(
-                '<urn:ecl:CLAIM-X> <urn:ecl:status> "accepted" <urn:ecl:graph:claims> .\n',
+                '<urn:ecl:CLAIM-X> <https://id.exergism.org/commons#status> "accepted" <urn:ecl:graph:claims> .\n',
                 encoding="utf-8",
             )
 
             graph = MODULE.load_query_graph(path)
             rows = list(
                 graph.query(
-                    "SELECT ?claim WHERE { ?claim <urn:ecl:status> \"accepted\" . }"
+                    "SELECT ?claim WHERE { ?claim <https://id.exergism.org/commons#status> \"accepted\" . }"
                 )
             )
 
@@ -36,14 +36,14 @@ class RunSparqlChecksTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "input.trig"
             path.write_text(
-                "<urn:ecl:graph:claims> { <urn:ecl:CLAIM-X> <urn:ecl:status> \"accepted\" . }\n",
+                "<urn:ecl:graph:claims> { <urn:ecl:CLAIM-X> <https://id.exergism.org/commons#status> \"accepted\" . }\n",
                 encoding="utf-8",
             )
 
             graph = MODULE.load_query_graph(path)
             rows = list(
                 graph.query(
-                    "SELECT ?claim WHERE { ?claim <urn:ecl:status> \"accepted\" . }"
+                    "SELECT ?claim WHERE { ?claim <https://id.exergism.org/commons#status> \"accepted\" . }"
                 )
             )
 

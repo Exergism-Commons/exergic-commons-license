@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-MEX-CNDH",
+  "iri": "urn:ecl:INSTITUTION-MEX-CNDH",
   "id": "INSTITUTION-MEX-CNDH",
   "type": "Institution",
   "name": "National Human Rights Commission of Mexico",

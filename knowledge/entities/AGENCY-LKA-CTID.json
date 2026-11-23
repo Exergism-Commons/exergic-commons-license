@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-LKA-CTID",
+  "iri": "urn:ecl:AGENCY-LKA-CTID",
   "id": "AGENCY-LKA-CTID",
   "type": "Agency",
   "name": "Sri Lanka Police — Counter Terrorist Investigation Division",

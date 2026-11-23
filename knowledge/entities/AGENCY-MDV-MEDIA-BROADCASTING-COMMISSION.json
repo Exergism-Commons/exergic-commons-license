@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MDV-MEDIA-BROADCASTING-COMMISSION",
+  "iri": "urn:ecl:AGENCY-MDV-MEDIA-BROADCASTING-COMMISSION",
   "id": "AGENCY-MDV-MEDIA-BROADCASTING-COMMISSION",
   "type": "Agency",
   "name": "Maldives Media and Broadcasting Commission",

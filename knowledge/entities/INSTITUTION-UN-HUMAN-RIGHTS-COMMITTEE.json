@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-UN-HUMAN-RIGHTS-COMMITTEE",
+  "iri": "urn:ecl:INSTITUTION-UN-HUMAN-RIGHTS-COMMITTEE",
   "id": "INSTITUTION-UN-HUMAN-RIGHTS-COMMITTEE",
   "type": "Institution",
   "name": "United Nations Human Rights Committee",

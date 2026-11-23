@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-PAK-NCCIA",
+  "iri": "urn:ecl:AGENCY-PAK-NCCIA",
   "id": "AGENCY-PAK-NCCIA",
   "type": "Agency",
   "name": "National Cyber Crime Investigation Agency",

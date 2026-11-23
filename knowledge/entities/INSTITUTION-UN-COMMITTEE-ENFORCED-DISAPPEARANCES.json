@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-UN-COMMITTEE-ENFORCED-DISAPPEARANCES",
+  "iri": "urn:ecl:INSTITUTION-UN-COMMITTEE-ENFORCED-DISAPPEARANCES",
   "id": "INSTITUTION-UN-COMMITTEE-ENFORCED-DISAPPEARANCES",
   "type": "Institution",
   "name": "United Nations Committee on Enforced Disappearances",

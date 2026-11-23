@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-FRA-MINISTRY-INTERIOR",
+  "iri": "urn:ecl:AGENCY-FRA-MINISTRY-INTERIOR",
   "id": "AGENCY-FRA-MINISTRY-INTERIOR",
   "type": "Agency",
   "name": "Ministry of the Interior (France)",

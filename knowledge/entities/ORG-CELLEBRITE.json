@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-CELLEBRITE",
+  "iri": "urn:ecl:ORG-CELLEBRITE",
   "id": "ORG-CELLEBRITE",
   "type": "Organization",
   "name": "Cellebrite",

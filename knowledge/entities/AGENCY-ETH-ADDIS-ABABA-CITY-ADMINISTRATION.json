@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-ETH-ADDIS-ABABA-CITY-ADMINISTRATION",
+  "iri": "urn:ecl:AGENCY-ETH-ADDIS-ABABA-CITY-ADMINISTRATION",
   "id": "AGENCY-ETH-ADDIS-ABABA-CITY-ADMINISTRATION",
   "type": "Agency",
   "name": "Addis Ababa City Administration",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-HAMAS-QASSAM-UN-COI-A-HRC-56-26",
+  "iri": "urn:ecl:EVIDENCE-HAMAS-QASSAM-UN-COI-A-HRC-56-26",
   "id": "EVIDENCE-HAMAS-QASSAM-UN-COI-A-HRC-56-26",
   "type": "EvidenceItem",
   "publisher": "United Nations Independent International Commission of Inquiry",

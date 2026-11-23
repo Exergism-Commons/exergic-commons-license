@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28",
+  "iri": "urn:ecl:PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28",
   "id": "PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28",
   "type": "Project",
   "name": "Operação Contenção — 28 October 2025 Alemão/Penha phase",

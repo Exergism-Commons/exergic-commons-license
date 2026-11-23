@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SAU",
+  "iri": "urn:ecl:STATE-SAU",
   "id": "STATE-SAU",
   "type": "State",
   "name": "Saudi Arabia",

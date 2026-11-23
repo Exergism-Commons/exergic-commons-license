@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-DNK-UDBETALING-DANMARK",
+  "iri": "urn:ecl:INSTITUTION-DNK-UDBETALING-DANMARK",
   "id": "INSTITUTION-DNK-UDBETALING-DANMARK",
   "type": "Institution",
   "name": "Udbetaling Danmark",

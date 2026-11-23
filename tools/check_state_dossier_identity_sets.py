@@ -289,7 +289,7 @@ def main() -> int:
         if data.get("iso3") != iso:
             print(f"State identity iso3/id mismatch: {path.relative_to(ROOT)} -> {data.get('iso3')!r} vs {iso}")
             return 5
-        if data.get("iri") != f"ecl:{entity_id}":
+        if data.get("iri") != f"urn:ecl:{entity_id}":
             print(f"State identity iri/id mismatch: {path.relative_to(ROOT)} -> {data.get('iri')!r}")
             return 6
         name = data.get("name")

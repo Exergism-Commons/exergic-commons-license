@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-HUN-ALIENS-POLICING",
+  "iri": "urn:ecl:AGENCY-HUN-ALIENS-POLICING",
   "id": "AGENCY-HUN-ALIENS-POLICING",
   "type": "Agency",
   "name": "National Directorate-General for Aliens Policing",

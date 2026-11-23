@@ -1,4 +1,5 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?kind ?value ?count WHERE {
   {
@@ -19,7 +20,7 @@ SELECT ?kind ?value ?count WHERE {
   UNION
   {
     SELECT ("stableId" AS ?kind) ?value (COUNT(DISTINCT ?state) AS ?count) WHERE {
-      ?state a ecl:State ; ecl:stableId ?value .
+      ?state a ecl:State ; ec:stableId ?value .
     }
     GROUP BY ?value
     HAVING (COUNT(DISTINCT ?state) != 1)

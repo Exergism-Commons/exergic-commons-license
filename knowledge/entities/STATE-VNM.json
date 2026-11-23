@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-VNM",
+  "iri": "urn:ecl:STATE-VNM",
   "id": "STATE-VNM",
   "type": "State",
   "name": "Viet Nam",

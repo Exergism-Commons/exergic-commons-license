@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-PHL",
+  "iri": "urn:ecl:STATE-PHL",
   "id": "STATE-PHL",
   "type": "State",
   "name": "Philippines",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-COE-CPT",
+  "iri": "urn:ecl:INSTITUTION-COE-CPT",
   "id": "INSTITUTION-COE-CPT",
   "type": "Institution",
   "name": "European Committee for the Prevention of Torture and Inhuman or Degrading Treatment or Punishment",

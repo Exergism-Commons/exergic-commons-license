@@ -1,10 +1,11 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?state ?predicate ?value WHERE {
   ?state a ecl:State ; ?predicate ?value .
   FILTER (
     ?predicate = ecl:outcome ||
-    ?predicate = ecl:status ||
+    ?predicate = ec:status ||
     REGEX(
       STR(?predicate),
       "(current.?governance|governance.?(status|outcome)|restriction.?status|restricted.?status|tier|provisional.?outcome)$",

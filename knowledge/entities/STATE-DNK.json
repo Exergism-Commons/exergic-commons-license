@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-DNK",
+  "iri": "urn:ecl:STATE-DNK",
   "id": "STATE-DNK",
   "type": "State",
   "name": "Denmark",

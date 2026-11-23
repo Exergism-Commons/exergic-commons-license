@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-DNK-ATP",
+  "iri": "urn:ecl:INSTITUTION-DNK-ATP",
   "id": "INSTITUTION-DNK-ATP",
   "type": "Institution",
   "name": "ATP",

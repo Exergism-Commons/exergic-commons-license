@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-GBR-CROWN-PROSECUTION-SERVICE",
+  "iri": "urn:ecl:AGENCY-GBR-CROWN-PROSECUTION-SERVICE",
   "id": "AGENCY-GBR-CROWN-PROSECUTION-SERVICE",
   "type": "Agency",
   "name": "Crown Prosecution Service",

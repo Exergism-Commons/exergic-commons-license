@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-COE-COMMISSIONER-HUMAN-RIGHTS",
+  "iri": "urn:ecl:INSTITUTION-COE-COMMISSIONER-HUMAN-RIGHTS",
   "id": "INSTITUTION-COE-COMMISSIONER-HUMAN-RIGHTS",
   "type": "Institution",
   "name": "Council of Europe Commissioner for Human Rights",

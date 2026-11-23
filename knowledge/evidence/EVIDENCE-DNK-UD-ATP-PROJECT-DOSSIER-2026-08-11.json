@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-DNK-UD-ATP-PROJECT-DOSSIER-2026-08-11",
+  "iri": "urn:ecl:EVIDENCE-DNK-UD-ATP-PROJECT-DOSSIER-2026-08-11",
   "id": "EVIDENCE-DNK-UD-ATP-PROJECT-DOSSIER-2026-08-11",
   "type": "EvidenceItem",
   "publisher": "Exergic Commons License project",

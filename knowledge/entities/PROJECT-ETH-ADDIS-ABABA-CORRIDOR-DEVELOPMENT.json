@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT",
+  "iri": "urn:ecl:PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT",
   "id": "PROJECT-ETH-ADDIS-ABABA-CORRIDOR-DEVELOPMENT",
   "type": "Project",
   "name": "Addis Ababa Corridor Development Project",

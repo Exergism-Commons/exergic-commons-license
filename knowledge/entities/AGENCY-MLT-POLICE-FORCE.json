@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MLT-POLICE-FORCE",
+  "iri": "urn:ecl:AGENCY-MLT-POLICE-FORCE",
   "id": "AGENCY-MLT-POLICE-FORCE",
   "type": "Agency",
   "name": "Malta Police Force",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-LAO",
+  "iri": "urn:ecl:STATE-LAO",
   "id": "STATE-LAO",
   "type": "State",
   "name": "Laos",

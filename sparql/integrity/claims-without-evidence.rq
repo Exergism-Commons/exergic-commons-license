@@ -1,8 +1,9 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?claim ?status
 WHERE {
-  ?claim a ecl:Claim ; ecl:status ?status .
+  ?claim a ecl:Claim ; ec:status ?status .
   FILTER (?status IN ("candidate", "accepted", "disputed"))
   FILTER NOT EXISTS { ?claim ecl:evidenceFor ?evidence . }
   FILTER NOT EXISTS { ?claim ecl:evidenceAgainst ?counterEvidence . }

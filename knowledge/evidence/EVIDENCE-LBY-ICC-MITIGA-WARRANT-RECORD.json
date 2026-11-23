@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD",
+  "iri": "urn:ecl:EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD",
   "id": "EVIDENCE-LBY-ICC-MITIGA-WARRANT-RECORD",
   "type": "EvidenceItem",
   "publisher": "International Criminal Court",

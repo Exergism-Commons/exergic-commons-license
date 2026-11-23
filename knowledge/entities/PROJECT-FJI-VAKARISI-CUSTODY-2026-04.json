@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-FJI-VAKARISI-CUSTODY-2026-04",
+  "iri": "urn:ecl:PROJECT-FJI-VAKARISI-CUSTODY-2026-04",
   "id": "PROJECT-FJI-VAKARISI-CUSTODY-2026-04",
   "type": "Project",
   "name": "16-17 April 2026 Jone Vakarisi military-custody incident",

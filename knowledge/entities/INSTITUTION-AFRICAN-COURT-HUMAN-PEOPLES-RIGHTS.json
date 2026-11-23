@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-AFRICAN-COURT-HUMAN-PEOPLES-RIGHTS",
+  "iri": "urn:ecl:INSTITUTION-AFRICAN-COURT-HUMAN-PEOPLES-RIGHTS",
   "id": "INSTITUTION-AFRICAN-COURT-HUMAN-PEOPLES-RIGHTS",
   "type": "Institution",
   "name": "African Court on Human and Peoples' Rights",

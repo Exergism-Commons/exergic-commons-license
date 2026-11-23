@@ -77,7 +77,7 @@
         "required": ["iso3", "publicReviewIssue", "aliases"],
         "properties": {
           "id": {"pattern": "^STATE-[A-Z]{3}$"},
-          "iri": {"pattern": "^ecl:STATE-[A-Z]{3}$"},
+          "iri": {"pattern": "^urn:ecl:STATE-[A-Z]{3}$"},
           "dossier": {"pattern": "^\\.\\./\\.\\./dossiers/states/[A-Z]{3}\\.md$"}
         },
         "not": {
