@@ -15,7 +15,7 @@
   ],
   "properties": {
     "@context": {"type": "string"},
-    "iri": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+    "iri": {"type": "string", "pattern": "^urn:ecl:[A-Z][A-Z0-9-]+$"},
     "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+$"},
     "type": {"enum": ["State", "Organization", "Person", "Agency", "Project", "Deployment", "Institution"]},
     "name": {"type": "string", "minLength": 1},
@@ -38,7 +38,7 @@
     "reviewReason": {"type": "string"},
     "trackedObjects": {
       "type": "array",
-      "items": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+      "items": {"type": "string", "pattern": "^urn:ecl:[A-Z][A-Z0-9-]+$"},
       "uniqueItems": true
     },
     "monitorIds": {
@@ -59,7 +59,7 @@
   "$defs": {
     "iriList": {
       "type": "array",
-      "items": {"type": "string", "pattern": "^ecl:[A-Z][A-Z0-9-]+$"},
+      "items": {"type": "string", "pattern": "^urn:ecl:[A-Z][A-Z0-9-]+$"},
       "uniqueItems": true
     }
   },

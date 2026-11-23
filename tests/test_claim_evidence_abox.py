@@ -263,6 +263,19 @@ class ClaimEvidenceABoxTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "duplicate ABox stable id"):
                 BUILD.iter_abox_files(root)
 
+    def test_builder_rejects_identity_outside_urn_ecl(self):
+        # The compact form is split so the namespace migration leaves this
+        # unmigrated fixture alone; ecl: now expands to the vocabulary namespace.
+        for iri in ("ecl" + ":STATE-TEST", BUILD.ECL_VOCABULARY_NAMESPACE + "STATE-TEST"):
+            with self.subTest(iri=iri), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "a.json").write_text(
+                    json.dumps({"@context": {}, "iri": iri, "id": "STATE-TEST"}),
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(ValueError, "must use a urn:ecl: instance IRI"):
+                    BUILD.iter_abox_files(root)
+
 
 if __name__ == "__main__":
     unittest.main()

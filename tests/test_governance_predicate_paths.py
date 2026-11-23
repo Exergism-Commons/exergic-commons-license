@@ -22,7 +22,7 @@ class GovernancePredicatePathTests(unittest.TestCase):
     @staticmethod
     def claim_graph(predicate: URIRef, stable_id: str) -> Graph:
         graph = Graph()
-        claim = ECL[stable_id]
+        claim = URIRef(f"urn:ecl:{stable_id}")
         graph.add((claim, RDF.type, ECL.Claim))
         graph.add((claim, EC.stableId, Literal(stable_id)))
         graph.add((claim, ECL.subject, URIRef("https://example.invalid/subject")))

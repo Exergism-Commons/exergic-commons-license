@@ -15,9 +15,14 @@ from rdflib import Graph
 from rdflib.compare import to_canonical_graph
 
 
+ECL_VOCABULARY_NAMESPACE = "https://id.exergism.org/ecl#"
+ECL_INSTANCE_NAMESPACE = "urn:ecl:"
+
+
 def _canonical_source_iri(value: str) -> str:
+    # Same expansion as ontology/ecl-context.jsonld: ecl: is the vocabulary prefix.
     if value.startswith("ecl:"):
-        return "urn:ecl:" + value.removeprefix("ecl:")
+        return ECL_VOCABULARY_NAMESPACE + value.removeprefix("ecl:")
     return value
 
 
@@ -36,6 +41,10 @@ def iter_abox_files(root: Path) -> list[Path]:
             if not isinstance(iri, str) or not iri:
                 raise ValueError(f"ABox source {path} has an invalid iri/@id")
             canonical_iri = _canonical_source_iri(iri)
+            if not canonical_iri.startswith(ECL_INSTANCE_NAMESPACE):
+                raise ValueError(
+                    f"ABox source {path} must use a {ECL_INSTANCE_NAMESPACE} instance IRI, got {iri}"
+                )
             previous_iri = seen_iris.get(canonical_iri)
             if previous_iri is not None:
                 raise ValueError(

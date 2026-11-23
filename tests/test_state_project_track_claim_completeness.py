@@ -18,7 +18,7 @@ ACTIVE_STATUSES = {"candidate", "accepted", "disputed"}
 ECL = Namespace("https://id.exergism.org/ecl#")
 EC = Namespace("https://id.exergism.org/commons#")
 FORBIDDEN_GOVERNANCE_PREDICATES = {
-    URIRef(f"urn:ecl:{name}")
+    ECL[name]
     for name in {
         "outcome",
         "governanceOutcome",

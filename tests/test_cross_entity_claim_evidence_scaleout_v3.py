@@ -112,7 +112,7 @@ class CrossEntityClaimEvidenceScaleoutV3Tests(unittest.TestCase):
                 self.assertIn(item["object"], self.entity_records)
 
                 evidence_for = {
-                    iri.removeprefix("ecl:") for iri in record.get("evidenceFor", [])
+                    iri.removeprefix("urn:ecl:") for iri in record.get("evidenceFor", [])
                 }
                 self.assertTrue(evidence_for)
                 self.assertTrue(evidence_for <= curation_evidence_ids)

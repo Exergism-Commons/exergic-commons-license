@@ -80,7 +80,7 @@ class CrossEntityClaimEvidenceScaleoutTests(unittest.TestCase):
                 self.assertTrue(record.get("evidenceFor"))
                 for evidence_iri in record["evidenceFor"]:
                     self.assertTrue(evidence_iri.startswith("urn:ecl:EVIDENCE-"))
-                    self.assertIn(evidence_iri.removeprefix("ecl:"), all_evidence_ids)
+                    self.assertIn(evidence_iri.removeprefix("urn:ecl:"), all_evidence_ids)
                 self.assertNotEqual(record["predicate"], "ecl:outcome")
 
     def test_new_dossier_evidence_does_not_invent_grade_or_dates(self):
