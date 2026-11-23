@@ -42,7 +42,6 @@ UNSUPPORTED_TEXT_LAYOUT_ATTRIBUTES = {
 }
 CANONICAL_FONT_FAMILY = "Arial, Helvetica, sans-serif"
 CANONICAL_VIEWPORTS = {"status": (960.0, 300.0), "evidence": (1100.0, 390.0), "legend": (1000.0, 245.0)}
-_original_visible_svg_text = _base.visible_svg_text
 
 
 def _style_map(value: str | None) -> dict[str, str]:
@@ -416,11 +415,12 @@ def visible_svg_text(path: Path) -> str | None:
 
     if not _canonical_scene_is_perceptible(path, root):
         return None
-    return _original_visible_svg_text(path)
-
-
-_base.visible_svg_text = visible_svg_text
+    return _base.visible_svg_text_with_glyph_ascent(path)
 
 
 if __name__ == "__main__":
+    # Run the structural checker's report through the hardened extractor. This is
+    # done only for the CLI so that importing this module never changes what
+    # check_visual_evidence_semantics.visible_svg_text means for other callers.
+    _base.visible_svg_text = visible_svg_text
     raise SystemExit(_base.main())

@@ -184,11 +184,17 @@ def _font_size(element: ET.Element, inherited: float) -> float | None:
 
 
 def _glyph_width(ch: str, font_size: float) -> float:
+    # Arial/Helvetica capital I advances 0.278 em. The shared renderer table keeps
+    # it in the generic uppercase class so committed wrapping stays byte-stable;
+    # the visibility verifier uses the narrow-glyph factor, which still
+    # over-estimates the real advance.
+    if ch == "I":
+        return metrics.glyph_width("l", font_size)
     return metrics.glyph_width(ch, font_size)
 
 
 def _measured_width(text: str, font_size: float) -> float:
-    return metrics.measured_width(text, font_size)
+    return sum(_glyph_width(ch, font_size) for ch in text)
 
 
 def _text_box_inside(
@@ -198,7 +204,7 @@ def _text_box_inside(
     text: str,
     font_size: float | None,
 ) -> bool:
-    """Require the full conservative text box, not only its anchor, inside bounds."""
+    """Require the full horizontal text run and its baseline inside bounds."""
     if bounds is None:
         return True
     if (
@@ -210,9 +216,23 @@ def _text_box_inside(
         return False
     x0, y0, x1, y1 = bounds
     width = _measured_width(text, font_size)
-    top = y - TEXT_ASCENT_EM * font_size
-    bottom = y + TEXT_DESCENT_EM * font_size
-    return x0 <= x and x + width <= x1 and y0 <= top and bottom <= y1
+    # Horizontal containment must cover the complete text run because hidden
+    # suffixes/prefixes can otherwise satisfy normative semantics. Vertically,
+    # preserve the existing SVG contract: the baseline itself must be inside.
+    return x0 <= x and x + width <= x1 and y0 <= y <= y1
+
+
+def _glyph_ascent_inside(
+    bounds: tuple[float, float, float, float] | None,
+    y: float | None,
+    font_size: float | None,
+) -> bool:
+    """Whether the glyph body above an inside baseline also stays inside bounds."""
+    if bounds is None:
+        return True
+    if y is None or font_size is None:
+        return False
+    return bounds[1] <= y - TEXT_ASCENT_EM * font_size
 
 
 def _apply_position(
@@ -252,6 +272,21 @@ def visible_svg_text(path: Path) -> str | None:
     every active clipPath rectangle. Non-whitespace ``child.tail`` content is
     rejected fail-closed because its post-glyph position/extent is not modeled.
     """
+    return _visible_svg_text(path, require_glyph_ascent=False)
+
+
+def visible_svg_text_with_glyph_ascent(path: Path) -> str | None:
+    """Like visible_svg_text, but fail closed on vertically cut glyph bodies.
+
+    A run whose baseline is inside the viewBox and every active clip, but whose
+    conservative ascent box crosses the top edge of one of them, is neither
+    demonstrably visible nor demonstrably hidden, so the whole surface is
+    rejected instead of silently counting or dropping it.
+    """
+    return _visible_svg_text(path, require_glyph_ascent=True)
+
+
+def _visible_svg_text(path: Path, *, require_glyph_ascent: bool) -> str | None:
     try:
         root = ET.parse(path).getroot()
     except Exception:
@@ -358,6 +393,12 @@ def visible_svg_text(path: Path) -> str | None:
                         _text_box_inside(clips[clip_id], x, y, element.text, font_size)
                         for clip_id in clip_chain
                     )
+                if text_visible and require_glyph_ascent and not all(
+                    _glyph_ascent_inside(region, y, font_size)
+                    for region in (bounds, *(clips[clip_id] for clip_id in clip_chain))
+                ):
+                    invalid = True
+                    return x, y, False
                 if text_visible:
                     chunks.append(element.text)
             # Any text node can advance the SVG text cursor, including Unicode
