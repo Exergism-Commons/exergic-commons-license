@@ -88,8 +88,13 @@ CANONICAL_STATE_COLORS = {"R": "red", "S": "orange", "U": "amber", "N": "green"}
 _CANONICAL_LABEL_PATTERN = "|".join(
     re.escape(value) for value in sorted(CANONICAL_STATE_LABELS.values(), key=len, reverse=True)
 )
+# A code is paired with a canonical label only when that label is the whole phrase
+# (end of text, punctuation or markup boundary). A longer contextual description
+# that merely starts with a label word, such as "S — Restricted with defined
+# scope", is not a label assertion; the live code itself is still pinned by
+# EXPLICIT_STATE_OUTCOME_RE.
 CANONICAL_CODE_LABEL_RE = re.compile(
-    rf"(?<![A-Z0-9])([RSUN])\s*(?:—|–|-|·)\s*({_CANONICAL_LABEL_PATTERN})(?![A-Za-z])",
+    rf"(?<![A-Z0-9])([RSUN])\s*(?:—|–|-|·)\s*({_CANONICAL_LABEL_PATTERN})(?!\s*[A-Za-z0-9])",
     flags=re.I,
 )
 COLOR_CODE_RE = re.compile(
