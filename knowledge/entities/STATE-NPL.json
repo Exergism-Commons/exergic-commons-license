@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-NPL",
+  "iri": "urn:ecl:STATE-NPL",
   "id": "STATE-NPL",
   "type": "State",
   "name": "Nepal",

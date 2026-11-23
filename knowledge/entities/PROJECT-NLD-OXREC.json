@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-NLD-OXREC",
+  "iri": "urn:ecl:PROJECT-NLD-OXREC",
   "id": "PROJECT-NLD-OXREC",
   "type": "Project",
   "name": "OXREC recidivism-risk algorithm",

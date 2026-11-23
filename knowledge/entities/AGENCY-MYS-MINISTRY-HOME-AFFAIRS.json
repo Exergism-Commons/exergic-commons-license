@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MYS-MINISTRY-HOME-AFFAIRS",
+  "iri": "urn:ecl:AGENCY-MYS-MINISTRY-HOME-AFFAIRS",
   "id": "AGENCY-MYS-MINISTRY-HOME-AFFAIRS",
   "type": "Agency",
   "name": "Ministry of Home Affairs (Malaysia)",

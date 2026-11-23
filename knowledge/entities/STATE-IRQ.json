@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-IRQ",
+  "iri": "urn:ecl:STATE-IRQ",
   "id": "STATE-IRQ",
   "type": "State",
   "name": "Iraq",

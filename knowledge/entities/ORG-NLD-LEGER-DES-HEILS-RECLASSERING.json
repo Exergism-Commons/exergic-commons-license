@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-NLD-LEGER-DES-HEILS-RECLASSERING",
+  "iri": "urn:ecl:ORG-NLD-LEGER-DES-HEILS-RECLASSERING",
   "id": "ORG-NLD-LEGER-DES-HEILS-RECLASSERING",
   "type": "Organization",
   "name": "Leger des Heils Jeugdbescherming & Reclassering",

@@ -80,7 +80,7 @@ class CrossEntityClaimEvidenceScaleoutV3Tests(unittest.TestCase):
         for item in self.manifest["identities"]:
             with self.subTest(identity=item["id"]):
                 record = self.entity_records[item["id"]]
-                self.assertEqual(record["iri"], f"ecl:{item['id']}")
+                self.assertEqual(record["iri"], f"urn:ecl:{item['id']}")
                 self.assertEqual(record["type"], "Organization")
                 self.assertEqual(record["name"], item["name"])
                 self.assertEqual(record["dossier"], f"../../{item['dossier']}")
@@ -101,18 +101,18 @@ class CrossEntityClaimEvidenceScaleoutV3Tests(unittest.TestCase):
                 path = ROOT / "knowledge" / "claims" / f"{item['id']}.json"
                 record = load_json(path)
 
-                self.assertEqual(record["iri"], f"ecl:{item['id']}")
+                self.assertEqual(record["iri"], f"urn:ecl:{item['id']}")
                 self.assertEqual(record["status"], "accepted")
                 self.assertEqual(record["predicate"], "ecl:tracks")
                 self.assertEqual(record["predicate"], item["predicate"])
                 self.assertNotIn(record["predicate"], FORBIDDEN_RELATION_PREDICATES)
-                self.assertEqual(record["subject"], f"ecl:{item['subject']}")
-                self.assertEqual(record["object"], f"ecl:{item['object']}")
+                self.assertEqual(record["subject"], f"urn:ecl:{item['subject']}")
+                self.assertEqual(record["object"], f"urn:ecl:{item['object']}")
                 self.assertIn(item["subject"], self.entity_records)
                 self.assertIn(item["object"], self.entity_records)
 
                 evidence_for = {
-                    iri.removeprefix("ecl:") for iri in record.get("evidenceFor", [])
+                    iri.removeprefix("urn:ecl:") for iri in record.get("evidenceFor", [])
                 }
                 self.assertTrue(evidence_for)
                 self.assertTrue(evidence_for <= curation_evidence_ids)

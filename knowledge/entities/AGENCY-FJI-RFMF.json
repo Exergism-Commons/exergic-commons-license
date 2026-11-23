@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-FJI-RFMF",
+  "iri": "urn:ecl:AGENCY-FJI-RFMF",
   "id": "AGENCY-FJI-RFMF",
   "type": "Agency",
   "name": "Republic of Fiji Military Forces",

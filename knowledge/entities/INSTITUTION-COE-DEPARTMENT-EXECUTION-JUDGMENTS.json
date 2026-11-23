@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-COE-DEPARTMENT-EXECUTION-JUDGMENTS",
+  "iri": "urn:ecl:INSTITUTION-COE-DEPARTMENT-EXECUTION-JUDGMENTS",
   "id": "INSTITUTION-COE-DEPARTMENT-EXECUTION-JUDGMENTS",
   "type": "Institution",
   "name": "Council of Europe Department for the Execution of Judgments",

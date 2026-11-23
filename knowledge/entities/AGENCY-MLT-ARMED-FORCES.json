@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MLT-ARMED-FORCES",
+  "iri": "urn:ecl:AGENCY-MLT-ARMED-FORCES",
   "id": "AGENCY-MLT-ARMED-FORCES",
   "type": "Agency",
   "name": "Armed Forces of Malta",

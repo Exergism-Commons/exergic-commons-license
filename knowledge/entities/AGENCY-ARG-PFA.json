@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-ARG-PFA",
+  "iri": "urn:ecl:AGENCY-ARG-PFA",
   "id": "AGENCY-ARG-PFA",
   "type": "Agency",
   "name": "Policía Federal Argentina",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-THA-OFFICE-ATTORNEY-GENERAL",
+  "iri": "urn:ecl:AGENCY-THA-OFFICE-ATTORNEY-GENERAL",
   "id": "AGENCY-THA-OFFICE-ATTORNEY-GENERAL",
   "type": "Agency",
   "name": "Office of the Attorney General",

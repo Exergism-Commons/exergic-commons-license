@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-GEO-CONSTITUTIONAL-COURT",
+  "iri": "urn:ecl:INSTITUTION-GEO-CONSTITUTIONAL-COURT",
   "id": "INSTITUTION-GEO-CONSTITUTIONAL-COURT",
   "type": "Institution",
   "name": "Constitutional Court of Georgia",

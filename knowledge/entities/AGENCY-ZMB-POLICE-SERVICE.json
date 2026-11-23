@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-ZMB-POLICE-SERVICE",
+  "iri": "urn:ecl:AGENCY-ZMB-POLICE-SERVICE",
   "id": "AGENCY-ZMB-POLICE-SERVICE",
   "type": "Agency",
   "name": "Zambia Police Service",

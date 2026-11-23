@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SLV",
+  "iri": "urn:ecl:STATE-SLV",
   "id": "STATE-SLV",
   "type": "State",
   "name": "El Salvador",

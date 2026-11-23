@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-UN-WG-ARBITRARY-DETENTION",
+  "iri": "urn:ecl:INSTITUTION-UN-WG-ARBITRARY-DETENTION",
   "id": "INSTITUTION-UN-WG-ARBITRARY-DETENTION",
   "type": "Institution",
   "name": "United Nations Working Group on Arbitrary Detention",

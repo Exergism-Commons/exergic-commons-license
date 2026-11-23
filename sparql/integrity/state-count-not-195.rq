@@ -1,4 +1,4 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?count WHERE {
   {

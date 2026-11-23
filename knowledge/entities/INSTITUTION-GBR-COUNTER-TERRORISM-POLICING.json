@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-GBR-COUNTER-TERRORISM-POLICING",
+  "iri": "urn:ecl:INSTITUTION-GBR-COUNTER-TERRORISM-POLICING",
   "id": "INSTITUTION-GBR-COUNTER-TERRORISM-POLICING",
   "type": "Institution",
   "name": "Counter Terrorism Policing",

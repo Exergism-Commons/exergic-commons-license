@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-LSO",
+  "iri": "urn:ecl:STATE-LSO",
   "id": "STATE-LSO",
   "type": "State",
   "name": "Lesotho",

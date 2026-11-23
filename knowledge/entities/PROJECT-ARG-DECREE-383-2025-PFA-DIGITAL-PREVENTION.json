@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-ARG-DECREE-383-2025-PFA-DIGITAL-PREVENTION",
+  "iri": "urn:ecl:PROJECT-ARG-DECREE-383-2025-PFA-DIGITAL-PREVENTION",
   "id": "PROJECT-ARG-DECREE-383-2025-PFA-DIGITAL-PREVENTION",
   "type": "Project",
   "name": "Decreto 383/2025 PFA digital-prevention deployment",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-THA-AOR-498-2567",
+  "iri": "urn:ecl:PROJECT-THA-AOR-498-2567",
   "id": "PROJECT-THA-AOR-498-2567",
   "type": "Project",
   "name": "Bangkok Criminal Court black case Aor.498/2567 project",

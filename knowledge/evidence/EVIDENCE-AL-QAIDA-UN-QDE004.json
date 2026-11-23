@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-AL-QAIDA-UN-QDE004",
+  "iri": "urn:ecl:EVIDENCE-AL-QAIDA-UN-QDE004",
   "id": "EVIDENCE-AL-QAIDA-UN-QDE004",
   "type": "EvidenceItem",
   "publisher": "United Nations Security Council",

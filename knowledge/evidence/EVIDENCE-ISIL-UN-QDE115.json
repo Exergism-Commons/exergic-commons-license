@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-ISIL-UN-QDE115",
+  "iri": "urn:ecl:EVIDENCE-ISIL-UN-QDE115",
   "id": "EVIDENCE-ISIL-UN-QDE115",
   "type": "EvidenceItem",
   "publisher": "United Nations Security Council",

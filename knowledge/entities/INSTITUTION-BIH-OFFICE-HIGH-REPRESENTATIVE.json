@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-BIH-OFFICE-HIGH-REPRESENTATIVE",
+  "iri": "urn:ecl:INSTITUTION-BIH-OFFICE-HIGH-REPRESENTATIVE",
   "id": "INSTITUTION-BIH-OFFICE-HIGH-REPRESENTATIVE",
   "type": "Institution",
   "name": "Office of the High Representative",

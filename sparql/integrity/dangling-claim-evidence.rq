@@ -1,8 +1,9 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?claim ?predicate ?evidence
 WHERE {
   ?claim a ecl:Claim ; ?predicate ?evidence .
   VALUES ?predicate { ecl:evidenceFor ecl:evidenceAgainst }
-  FILTER NOT EXISTS { ?evidence a ecl:EvidenceItem ; ecl:stableId ?evidenceId . }
+  FILTER NOT EXISTS { ?evidence a ecl:EvidenceItem ; ec:stableId ?evidenceId . }
 }

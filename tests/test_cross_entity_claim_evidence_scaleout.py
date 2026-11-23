@@ -49,7 +49,7 @@ class CrossEntityClaimEvidenceScaleoutTests(unittest.TestCase):
         for item in self.manifest["identities"]:
             with self.subTest(identity=item["id"]):
                 record = self.entity_records[item["id"]]
-                self.assertEqual(record["iri"], f"ecl:{item['id']}")
+                self.assertEqual(record["iri"], f"urn:ecl:{item['id']}")
                 self.assertEqual(record["type"], item["type"])
                 self.assertEqual(record["dossier"], f"../../{item['dossier']}")
                 self.assertTrue(FORBIDDEN_IDENTITY_KEYS.isdisjoint(record))
@@ -69,18 +69,18 @@ class CrossEntityClaimEvidenceScaleoutTests(unittest.TestCase):
             with self.subTest(claim=item["id"]):
                 path = ROOT / "knowledge" / "claims" / f"{item['id']}.json"
                 record = load_json(path)
-                self.assertEqual(record["iri"], f"ecl:{item['id']}")
+                self.assertEqual(record["iri"], f"urn:ecl:{item['id']}")
                 self.assertEqual(record["status"], "accepted")
                 self.assertEqual(record["predicate"], item["predicate"])
                 self.assertIn(record["predicate"], ALLOWED_RELATION_PREDICATES)
-                self.assertEqual(record["subject"], f"ecl:{item['subject']}")
-                self.assertEqual(record["object"], f"ecl:{item['object']}")
+                self.assertEqual(record["subject"], f"urn:ecl:{item['subject']}")
+                self.assertEqual(record["object"], f"urn:ecl:{item['object']}")
                 self.assertIn(item["subject"], self.entity_records)
                 self.assertIn(item["object"], self.entity_records)
                 self.assertTrue(record.get("evidenceFor"))
                 for evidence_iri in record["evidenceFor"]:
-                    self.assertTrue(evidence_iri.startswith("ecl:EVIDENCE-"))
-                    self.assertIn(evidence_iri.removeprefix("ecl:"), all_evidence_ids)
+                    self.assertTrue(evidence_iri.startswith("urn:ecl:EVIDENCE-"))
+                    self.assertIn(evidence_iri.removeprefix("urn:ecl:"), all_evidence_ids)
                 self.assertNotEqual(record["predicate"], "ecl:outcome")
 
     def test_new_dossier_evidence_does_not_invent_grade_or_dates(self):

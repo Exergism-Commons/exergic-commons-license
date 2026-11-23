@@ -48,6 +48,8 @@ knowledge/
 
 State actors use `STATE-ISO3` stable IDs and `urn:ecl:STATE-ISO3` RDF IRIs. The dossier keeps the governance identifier `ECL-STATE-ISO3`; these roles are intentionally distinct and deterministic.
 
+Every record writes its own IRI and the identities it points to in full (`urn:ecl:<stable ID>`). In the shared JSON-LD context `ecl:` expands to the vocabulary namespace `https://id.exergism.org/ecl#`, so a compact `ecl:STATE-USA` would name a vocabulary term, not the State.
+
 ## 195-State identity migration
 
 `knowledge/entities/STATE-*.json` contains one State Actor for every canonical `dossiers/states/ISO3.md` dossier. Generated identity/provenance fields are deliberately narrow:

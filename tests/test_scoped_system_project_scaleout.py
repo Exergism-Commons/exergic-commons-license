@@ -1,9 +1,19 @@
+import importlib.util
 import json
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "knowledge" / "generated" / "scoped-system-project-scaleout-v2.json"
+
+MIGRATION_SPEC = importlib.util.spec_from_file_location(
+    "migrate_semantic_namespace_v02", ROOT / "tools" / "migrate_semantic_namespace_v02.py"
+)
+MIGRATION = importlib.util.module_from_spec(MIGRATION_SPEC)
+assert MIGRATION_SPEC.loader is not None
+sys.modules.setdefault(MIGRATION_SPEC.name, MIGRATION)
+MIGRATION_SPEC.loader.exec_module(MIGRATION)
 
 FORBIDDEN_IDENTITY_KEYS = {
     "outcome",
@@ -20,6 +30,11 @@ FORBIDDEN_IDENTITY_KEYS = {
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def current_term(compact: str) -> str:
+    """Read a v0.1 compact term from the frozen manifest in the v0.2 vocabulary."""
+    return MIGRATION.migrate_compact(compact, ".json")
 
 
 class ScopedSystemProjectScaleoutTests(unittest.TestCase):
@@ -57,7 +72,7 @@ class ScopedSystemProjectScaleoutTests(unittest.TestCase):
         for item in self.manifest["identities"]:
             with self.subTest(identity=item["id"]):
                 record = self.entities[item["id"]]
-                self.assertEqual(record["iri"], f"ecl:{item['id']}")
+                self.assertEqual(record["iri"], f"urn:ecl:{item['id']}")
                 self.assertEqual(record["type"], "Project")
                 self.assertEqual(record["dossier"], f"../../{item['dossier']}")
                 self.assertEqual(record["reviewClass"], "manual")
@@ -75,21 +90,22 @@ class ScopedSystemProjectScaleoutTests(unittest.TestCase):
         for item in self.manifest["claims"]:
             with self.subTest(claim=item["id"]):
                 record = load_json(ROOT / "knowledge" / "claims" / f"{item['id']}.json")
-                self.assertEqual(record["iri"], f"ecl:{item['id']}")
+                predicate = current_term(item["predicate"])
+                self.assertEqual(record["iri"], f"urn:ecl:{item['id']}")
                 self.assertEqual(record["status"], "accepted")
-                self.assertEqual(record["predicate"], item["predicate"])
-                self.assertEqual(record["subject"], f"ecl:{item['subject']}")
+                self.assertEqual(record["predicate"], predicate)
+                self.assertEqual(record["subject"], f"urn:ecl:{item['subject']}")
                 self.assertIn(item["subject"], self.entities)
                 self.assertTrue(record.get("evidenceFor"))
                 for evidence_iri in record["evidenceFor"]:
-                    self.assertIn(evidence_iri.removeprefix("ecl:"), self.evidence)
+                    self.assertIn(evidence_iri.removeprefix("urn:ecl:"), self.evidence)
 
-                if item["predicate"] == "ecl:tracks":
-                    self.assertEqual(record["object"], f"ecl:{item['object']}")
+                if predicate == "ecl:tracks":
+                    self.assertEqual(record["object"], f"urn:ecl:{item['object']}")
                     self.assertIn(item["object"], self.entities)
                     self.assertNotIn("literalValue", record)
                 else:
-                    self.assertEqual(item["predicate"], "ecl:status")
+                    self.assertEqual(predicate, "ec:status")
                     self.assertNotIn("object", record)
                     self.assertEqual(record["literalValue"], item["literalValue"])
 
@@ -102,7 +118,7 @@ class ScopedSystemProjectScaleoutTests(unittest.TestCase):
             / "claims"
             / "CLAIM-FRA-NICE-ALGORITHMIC-CCTV-JUDICIALLY-BLOCKED.json"
         )
-        self.assertEqual(claim["predicate"], "ecl:status")
+        self.assertEqual(claim["predicate"], "ec:status")
         self.assertEqual(claim["literalValue"], "judicially-blocked-not-authorized")
         self.assertEqual(claim["claimConfidence"], "established")
         self.assertEqual(claim["asOf"], "2026-01-30")

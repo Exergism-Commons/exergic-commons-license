@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MAR",
+  "iri": "urn:ecl:STATE-MAR",
   "id": "STATE-MAR",
   "type": "State",
   "name": "Morocco",

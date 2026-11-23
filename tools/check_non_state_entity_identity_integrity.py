@@ -58,7 +58,7 @@ def validate() -> list[dict]:
                 "file": rel, "id": entity_id, "reason": "type/id-prefix mismatch",
                 "type": entity_type, "expected_prefix": expected_prefix,
             })
-        if data.get("iri") != f"ecl:{entity_id}":
+        if data.get("iri") != f"urn:ecl:{entity_id}":
             failures.append({"file": rel, "id": entity_id, "reason": "iri/id mismatch", "value": data.get("iri")})
         if data.get("@context") != "../../ontology/ecl-context.jsonld":
             failures.append({"file": rel, "id": entity_id, "reason": "unexpected JSON-LD context", "value": data.get("@context")})

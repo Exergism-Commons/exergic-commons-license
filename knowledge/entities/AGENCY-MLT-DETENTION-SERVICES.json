@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MLT-DETENTION-SERVICES",
+  "iri": "urn:ecl:AGENCY-MLT-DETENTION-SERVICES",
   "id": "AGENCY-MLT-DETENTION-SERVICES",
   "type": "Agency",
   "name": "Detention Services Agency",

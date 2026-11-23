@@ -24,6 +24,8 @@ The canonical editable semantic records remain in Git. Any RDF database/triplest
 
 `ontology/ecl.owl.ttl` defines classes and properties for actors, projects, deployments, evidence, claims, formal assessments, governance decisions, update cases and release/versioning artifacts.
 
+ECL vocabulary terms live in `https://id.exergism.org/ecl#` (prefix `ecl:`). Generic actor, identity and provenance terms such as `Actor`, `Organization`, `Person`, `stableId`, `status` and `provenance` are reused from Commons (`ec:`, `https://id.exergism.org/commons#`) rather than redefined; ECL decisions are `ecl:ECLGovernanceDecision`, a specialization of the Governance class (`ecg:`), and the formal exergic variables are the canonical Exergism terms (`ex:`). Only vocabulary uses these namespaces: ABox identities keep their `urn:ecl:` IRIs (section 3).
+
 OWL axioms may express genuine domain semantics such as:
 
 - `State subClassOf Actor`;
@@ -52,6 +54,8 @@ Each record separates:
 - a human/tooling stable ID such as `STATE-USA`.
 
 The State dossier's governance identifier remains `ECL-STATE-USA`. That dossier ID, the semantic stable ID and the RDF IRI are deterministic but serve different layers.
+
+Instance IRIs are always `urn:ecl:` plus the stable ID, never a term of the vocabulary namespaces in section 2. Because the JSON-LD context expands `ecl:` to the vocabulary namespace, records write instance references in full (`"iri": "urn:ecl:STATE-USA"`, `"trackedObjects": ["urn:ecl:PROJECT-..."]`) and use compact `ecl:`/`ec:` names only for vocabulary such as a Claim `predicate`. The RDF build rejects ABox sources whose IRI is outside `urn:ecl:`.
 
 ABox records SHOULD remain small and reviewable in ordinary Git diffs. A State Actor may contain semantic identity, provenance, review-clock metadata and explicitly curated relations; it MUST NOT contain `R/S/U/N`, tier, restriction status or an equivalent direct governance classification.
 

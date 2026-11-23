@@ -16,7 +16,8 @@ ENTITIES = KNOWLEDGE / "entities"
 MANIFEST = KNOWLEDGE / "generated" / "agency-hierarchy-scaleout-v5.json"
 ONTOLOGY = ROOT / "ontology" / "ecl.owl.ttl"
 ENTITY_SCHEMA = ROOT / "schemas" / "entity.schema.json"
-ECL = Namespace("urn:ecl:")
+ECL = Namespace("https://id.exergism.org/ecl#")
+EC = Namespace("https://id.exergism.org/commons#")
 
 EXPECTED_AGENCIES = {
     "AGENCY-USA-DHS": "STATE-USA",
@@ -50,8 +51,8 @@ EXPECTED_CLAIMS = {
 
 ACTOR_IDENTITY_TYPES = {
     ECL.State,
-    ECL.Organization,
-    ECL.Person,
+    EC.Organization,
+    EC.Person,
     ECL.Agency,
     ECL.Institution,
 }
@@ -129,9 +130,9 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
             record = load_json(path)
             with self.subTest(agency=agency_id):
                 self.assertEqual(record["type"], "Agency")
-                self.assertEqual(record["iri"], f"ecl:{agency_id}")
+                self.assertEqual(record["iri"], f"urn:ecl:{agency_id}")
                 self.assertEqual(record["id"], agency_id)
-                self.assertEqual(record["partOf"], [f"ecl:{parent_id}"])
+                self.assertEqual(record["partOf"], [f"urn:ecl:{parent_id}"])
                 self.assertFalse(
                     FORBIDDEN_GOVERNANCE_KEYS.intersection(record),
                     f"{path}: Agency identity must not carry governance fields",
@@ -144,7 +145,7 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
                 self.assertIn((agency, RDF.type, ECL.Agency), self.abox)
                 self.assertIn((agency, ECL.partOf, parent), self.abox)
                 self.assertTrue(
-                    any(self.abox.objects(parent, ECL.stableId)),
+                    any(self.abox.objects(parent, EC.stableId)),
                     f"{agency_id}: unresolved direct parent {parent_id}",
                 )
 
@@ -156,17 +157,17 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
             "dossier": "../../dossiers/synthetic.md",
             "lastSubstantiveReview": "2026-08-15",
             "reviewClass": "manual",
-            "partOf": ["ecl:STATE-USA"],
+            "partOf": ["urn:ecl:STATE-USA"],
         }
         agency = {
             **common,
-            "iri": "ecl:AGENCY-SYNTHETIC",
+            "iri": "urn:ecl:AGENCY-SYNTHETIC",
             "id": "AGENCY-SYNTHETIC",
             "type": "Agency",
         }
         project = {
             **common,
-            "iri": "ecl:PROJECT-SYNTHETIC",
+            "iri": "urn:ecl:PROJECT-SYNTHETIC",
             "id": "PROJECT-SYNTHETIC",
             "type": "Project",
         }
@@ -176,8 +177,8 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
     def test_every_partof_endpoint_is_a_resolved_actor_identity_in_raw_abox(self):
         for child, parent in self.abox.subject_objects(ECL.partOf):
             with self.subTest(child=str(child), parent=str(parent)):
-                self.assertTrue(list(self.abox.objects(child, ECL.stableId)), child)
-                self.assertTrue(list(self.abox.objects(parent, ECL.stableId)), parent)
+                self.assertTrue(list(self.abox.objects(child, EC.stableId)), child)
+                self.assertTrue(list(self.abox.objects(parent, EC.stableId)), parent)
                 child_types = set(self.abox.objects(child, RDF.type))
                 parent_types = set(self.abox.objects(parent, RDF.type))
                 self.assertTrue(child_types.intersection(ACTOR_IDENTITY_TYPES), child_types)
@@ -238,7 +239,7 @@ class AgencyHierarchyScaleoutV5Tests(unittest.TestCase):
                 self.assertIn((claim, ECL.predicate, predicate), self.abox)
                 self.assertIn((claim, ECL.object, iri(object_id)), self.abox)
                 self.assertEqual(
-                    {str(value) for value in self.abox.objects(claim, ECL.status)},
+                    {str(value) for value in self.abox.objects(claim, EC.status)},
                     {"accepted"},
                 )
                 self.assertIn((claim, ECL.evidenceFor, iri(evidence_id)), self.abox)

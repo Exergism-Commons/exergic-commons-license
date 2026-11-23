@@ -185,7 +185,7 @@ def main() -> int:
             assert path.exists(), f"missing promoted/canonical identity: {path} (historical {historical_id})"
             data = json.loads(path.read_text(encoding="utf-8"))
             assert data["id"] == entity_id
-            assert data["iri"] == f"ecl:{entity_id}"
+            assert data["iri"] == f"urn:ecl:{entity_id}"
             assert data["type"] == row["type"] in ALLOWED_TYPES
             assert isinstance(data.get("name"), str) and data["name"].strip()
 

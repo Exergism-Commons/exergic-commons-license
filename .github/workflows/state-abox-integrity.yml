@@ -73,7 +73,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           from rdflib import Graph, Namespace, RDF
-          ecl = Namespace('urn:ecl:')
+          ecl = Namespace('https://id.exergism.org/ecl#')
           graph = Graph()
           paths = sorted(Path('knowledge/entities').glob('STATE-*.json'))
           assert len(paths) == 195, len(paths)

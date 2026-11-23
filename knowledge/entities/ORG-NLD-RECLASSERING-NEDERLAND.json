@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-NLD-RECLASSERING-NEDERLAND",
+  "iri": "urn:ecl:ORG-NLD-RECLASSERING-NEDERLAND",
   "id": "ORG-NLD-RECLASSERING-NEDERLAND",
   "type": "Organization",
   "name": "Reclassering Nederland",

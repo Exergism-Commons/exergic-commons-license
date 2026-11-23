@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT",
+  "iri": "urn:ecl:PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT",
   "id": "PROJECT-GBR-PALESTINE-ACTION-PROSCRIPTION-ENFORCEMENT",
   "type": "Project",
   "name": "Palestine Action proscription enforcement project",

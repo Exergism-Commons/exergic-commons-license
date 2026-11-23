@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SMR",
+  "iri": "urn:ecl:STATE-SMR",
   "id": "STATE-SMR",
   "type": "State",
   "name": "San Marino",

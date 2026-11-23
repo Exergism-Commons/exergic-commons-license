@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-COUNCIL-OF-EUROPE",
+  "iri": "urn:ecl:ORG-COUNCIL-OF-EUROPE",
   "id": "ORG-COUNCIL-OF-EUROPE",
   "type": "Organization",
   "name": "Council of Europe",

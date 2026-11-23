@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-NSO-CANDIRU-COMMERCE-SPYWARE-ENTITY-LIST",
+  "iri": "urn:ecl:EVIDENCE-NSO-CANDIRU-COMMERCE-SPYWARE-ENTITY-LIST",
   "id": "EVIDENCE-NSO-CANDIRU-COMMERCE-SPYWARE-ENTITY-LIST",
   "type": "EvidenceItem",
   "publisher": "U.S. Department of Commerce",

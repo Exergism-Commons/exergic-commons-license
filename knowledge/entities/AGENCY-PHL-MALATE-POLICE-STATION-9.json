@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-PHL-MALATE-POLICE-STATION-9",
+  "iri": "urn:ecl:AGENCY-PHL-MALATE-POLICE-STATION-9",
   "id": "AGENCY-PHL-MALATE-POLICE-STATION-9",
   "type": "Agency",
   "name": "Malate Police Station 9",

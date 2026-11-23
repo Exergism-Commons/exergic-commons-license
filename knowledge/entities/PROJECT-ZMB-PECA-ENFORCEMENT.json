@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-ZMB-PECA-ENFORCEMENT",
+  "iri": "urn:ecl:PROJECT-ZMB-PECA-ENFORCEMENT",
   "id": "PROJECT-ZMB-PECA-ENFORCEMENT",
   "type": "Project",
   "name": "Zambia Cyber Crimes Act No. 4 of 2025 enforcement project",

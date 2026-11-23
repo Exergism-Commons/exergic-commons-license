@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-SOM",
+  "iri": "urn:ecl:STATE-SOM",
   "id": "STATE-SOM",
   "type": "State",
   "name": "Somalia",

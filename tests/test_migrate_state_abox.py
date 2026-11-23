@@ -71,14 +71,14 @@ last_reviewed: {last}
                 "reviewDue": "2026-08-20",
                 "reviewClass": "hot",
                 "reviewReason": "human-reviewed reason",
-                "trackedObjects": ["ecl:PROJECT-EXAMPLE"],
-                "participatesIn": ["ecl:PROJECT-EXAMPLE"],
+                "trackedObjects": ["urn:ecl:PROJECT-EXAMPLE"],
+                "participatesIn": ["urn:ecl:PROJECT-EXAMPLE"],
                 "monitorIds": ["MONITOR-EXAMPLE"],
             }
             merged = MODULE.merge(dossier, existing, None)
             self.assertEqual(merged["reviewReason"], "human-reviewed reason")
-            self.assertEqual(merged["trackedObjects"], ["ecl:PROJECT-EXAMPLE"])
-            self.assertEqual(merged["participatesIn"], ["ecl:PROJECT-EXAMPLE"])
+            self.assertEqual(merged["trackedObjects"], ["urn:ecl:PROJECT-EXAMPLE"])
+            self.assertEqual(merged["participatesIn"], ["urn:ecl:PROJECT-EXAMPLE"])
             self.assertEqual(merged["monitorIds"], ["MONITOR-EXAMPLE"])
             self.assertEqual(merged["reviewClass"], "hot")
             self.assertEqual(merged["reviewDue"], "2026-08-20")
@@ -293,7 +293,7 @@ class StateABoxRepositoryTests(unittest.TestCase):
             iso = path.stem.removeprefix("STATE-")
             self.assertEqual(record["iso3"], iso)
             self.assertEqual(record["id"], f"STATE-{iso}")
-            self.assertEqual(record["iri"], f"ecl:STATE-{iso}")
+            self.assertEqual(record["iri"], f"urn:ecl:STATE-{iso}")
             self.assertEqual(record["dossier"], f"../../dossiers/states/{iso}.md")
             MODULE.guard(record, str(path))
             if record.get("reviewClass") == "manual" and "reviewReason" not in record:

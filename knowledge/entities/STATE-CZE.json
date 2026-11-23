@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-CZE",
+  "iri": "urn:ecl:STATE-CZE",
   "id": "STATE-CZE",
   "type": "State",
   "name": "Czechia",

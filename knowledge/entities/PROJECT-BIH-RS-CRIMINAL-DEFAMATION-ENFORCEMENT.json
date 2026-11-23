@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT",
+  "iri": "urn:ecl:PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT",
   "id": "PROJECT-BIH-RS-CRIMINAL-DEFAMATION-ENFORCEMENT",
   "type": "Project",
   "name": "Republika Srpska criminal-defamation enforcement project",

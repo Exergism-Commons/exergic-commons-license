@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-HUN-MASS-MIGRATION-STATE-OF-CRISIS-WORKFLOW",
+  "iri": "urn:ecl:PROJECT-HUN-MASS-MIGRATION-STATE-OF-CRISIS-WORKFLOW",
   "id": "PROJECT-HUN-MASS-MIGRATION-STATE-OF-CRISIS-WORKFLOW",
   "type": "Project",
   "name": "Hungary mass-migration state-of-crisis asylum/border workflow",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-MEX",
+  "iri": "urn:ecl:STATE-MEX",
   "id": "STATE-MEX",
   "type": "State",
   "name": "Mexico",

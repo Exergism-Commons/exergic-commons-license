@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-NLD-INSPECTIE-JENV-RISK-ALGORITHMS-2026-02-12",
+  "iri": "urn:ecl:EVIDENCE-NLD-INSPECTIE-JENV-RISK-ALGORITHMS-2026-02-12",
   "id": "EVIDENCE-NLD-INSPECTIE-JENV-RISK-ALGORITHMS-2026-02-12",
   "type": "EvidenceItem",
   "publisher": "Inspectie Justitie en Veiligheid",

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MKD-BORDER-AFFAIRS-SOUTH",
+  "iri": "urn:ecl:AGENCY-MKD-BORDER-AFFAIRS-SOUTH",
   "id": "AGENCY-MKD-BORDER-AFFAIRS-SOUTH",
   "type": "Agency",
   "name": "Bureau for Public Security — Regional Center for Border Affairs South",

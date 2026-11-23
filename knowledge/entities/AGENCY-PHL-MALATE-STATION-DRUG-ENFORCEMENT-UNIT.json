@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-PHL-MALATE-STATION-DRUG-ENFORCEMENT-UNIT",
+  "iri": "urn:ecl:AGENCY-PHL-MALATE-STATION-DRUG-ENFORCEMENT-UNIT",
   "id": "AGENCY-PHL-MALATE-STATION-DRUG-ENFORCEMENT-UNIT",
   "type": "Agency",
   "name": "Malate Police Station 9 Station Drug Enforcement Unit",

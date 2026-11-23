@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-TCD",
+  "iri": "urn:ecl:STATE-TCD",
   "id": "STATE-TCD",
   "type": "State",
   "name": "Chad",

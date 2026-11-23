@@ -1,8 +1,9 @@
-PREFIX ecl: <urn:ecl:>
+PREFIX ec: <https://id.exergism.org/commons#>
+PREFIX ecl: <https://id.exergism.org/ecl#>
 
 SELECT ?state ?id ?iso ?dossier WHERE {
   ?state a ecl:State ;
-         ecl:stableId ?id ;
+         ec:stableId ?id ;
          ecl:iso3 ?iso ;
          ecl:dossier ?dossier .
   FILTER (

@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26",
+  "iri": "urn:ecl:PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26",
   "id": "PROJECT-GAB-PLATFORM-SUSPENSION-2026-02-26",
   "type": "Project",
   "name": "Gabon 26 February 2026 digital-platform suspension project",

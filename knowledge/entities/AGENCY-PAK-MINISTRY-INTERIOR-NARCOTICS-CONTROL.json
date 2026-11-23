@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-PAK-MINISTRY-INTERIOR-NARCOTICS-CONTROL",
+  "iri": "urn:ecl:AGENCY-PAK-MINISTRY-INTERIOR-NARCOTICS-CONTROL",
   "id": "AGENCY-PAK-MINISTRY-INTERIOR-NARCOTICS-CONTROL",
   "type": "Agency",
   "name": "Ministry of Interior and Narcotics Control",

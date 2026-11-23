@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-ZMB",
+  "iri": "urn:ecl:STATE-ZMB",
   "id": "STATE-ZMB",
   "type": "State",
   "name": "Zambia",

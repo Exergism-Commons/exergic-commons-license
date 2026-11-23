@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:ORG-NLD-STICHTING-VERSLAVINGSRECLASSERING-GGZ",
+  "iri": "urn:ecl:ORG-NLD-STICHTING-VERSLAVINGSRECLASSERING-GGZ",
   "id": "ORG-NLD-STICHTING-VERSLAVINGSRECLASSERING-GGZ",
   "type": "Organization",
   "name": "Stichting Verslavingsreclassering GGZ",

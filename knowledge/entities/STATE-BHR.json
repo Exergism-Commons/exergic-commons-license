@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:STATE-BHR",
+  "iri": "urn:ecl:STATE-BHR",
   "id": "STATE-BHR",
   "type": "State",
   "name": "Bahrain",

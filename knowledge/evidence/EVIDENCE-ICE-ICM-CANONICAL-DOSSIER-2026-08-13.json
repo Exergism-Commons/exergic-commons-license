@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13",
+  "iri": "urn:ecl:EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13",
   "id": "EVIDENCE-ICE-ICM-CANONICAL-DOSSIER-2026-08-13",
   "type": "EvidenceItem",
   "publisher": "Exergic Commons License project",

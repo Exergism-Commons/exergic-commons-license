@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:INSTITUTION-POL-COUNCIL-MINISTERS",
+  "iri": "urn:ecl:INSTITUTION-POL-COUNCIL-MINISTERS",
   "id": "INSTITUTION-POL-COUNCIL-MINISTERS",
   "type": "Institution",
   "name": "Council of Ministers of Poland",

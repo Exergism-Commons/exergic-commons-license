@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:AGENCY-MAR-MINISTRY-JUSTICE",
+  "iri": "urn:ecl:AGENCY-MAR-MINISTRY-JUSTICE",
   "id": "AGENCY-MAR-MINISTRY-JUSTICE",
   "type": "Agency",
   "name": "Ministry of Justice (Morocco)",

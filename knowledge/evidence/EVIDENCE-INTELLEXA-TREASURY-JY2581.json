@@ -1,6 +1,6 @@
 {
   "@context": "../../ontology/ecl-context.jsonld",
-  "iri": "ecl:EVIDENCE-INTELLEXA-TREASURY-JY2581",
+  "iri": "urn:ecl:EVIDENCE-INTELLEXA-TREASURY-JY2581",
   "id": "EVIDENCE-INTELLEXA-TREASURY-JY2581",
   "type": "EvidenceItem",
   "publisher": "U.S. Department of the Treasury",
