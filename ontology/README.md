@@ -6,6 +6,8 @@
 
 The canonical data architecture is described in `../spec/KNOWLEDGE-MODEL.md`.
 
+The ontology is `https://id.exergism.org/ontology/ecl` and its terms live in `https://id.exergism.org/ecl#`; it reuses Commons (`ec:`), Governance (`ecg:`) and Exergism (`ex:`) terms. ABox individuals keep `urn:ecl:` IRIs.
+
 The ontology deliberately does **not** infer ECL restriction from association, control-chain reachability or formal Exergism scores. Those facts may trigger review only through explicit governance procedure.
 
 RDF datasets/triplestores are derived indexes. They must remain rebuildable from the versioned TBox and ABox in Git.
