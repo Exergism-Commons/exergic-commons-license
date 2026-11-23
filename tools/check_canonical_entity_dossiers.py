@@ -150,8 +150,38 @@ def _definition_targets(text: str) -> dict[str, str]:
     return result
 
 
+def _raw_image_targets(text: str) -> list[str]:
+    """Extract Markdown and raw-HTML image destinations, including references."""
+    targets: list[str] = []
+    for match in INLINE_IMAGE_RE.finditer(text):
+        targets.append(match.group(1) or match.group(2) or "")
+
+    definitions = _definition_targets(text)
+    for match in REFERENCE_IMAGE_RE.finditer(text):
+        alt, label = match.groups()
+        key = " ".join((label or alt).split()).casefold()
+        if key in definitions:
+            targets.append(definitions[key])
+    for match in SHORTCUT_IMAGE_RE.finditer(text):
+        key = " ".join(match.group(1).split()).casefold()
+        if key in definitions:
+            targets.append(definitions[key])
+
+    for match in HTML_IMAGE_RE.finditer(text):
+        raw = match.group(1) or match.group(2) or match.group(3) or ""
+        # srcset may contain comma-separated URL + density/width descriptors.
+        for candidate in raw.split(","):
+            candidate = candidate.strip()
+            if candidate:
+                targets.append(candidate.split()[0])
+    return targets
+
+
 def image_targets(text: str) -> list[str]:
-    return markdown.image_targets(text)
+    """Union CommonMark-rendered images with the raw Markdown/HTML discovery surface."""
+    targets = list(markdown.image_targets(text))
+    targets.extend(_raw_image_targets(text))
+    return [target for target in dict.fromkeys(targets) if target]
 
 
 def nonlocal_image_target(target: str) -> bool:

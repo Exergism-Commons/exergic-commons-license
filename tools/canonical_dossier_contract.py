@@ -41,7 +41,16 @@ def commonmark_h2_titles(text: str) -> list[str]:
 
 
 def embedded_resource_targets(text: str) -> list[str]:
-    return list(dict.fromkeys(commonmark_image_targets(text)))
+    """Union legacy raw-syntax discovery with rendered CommonMark image destinations.
+
+    CommonMark decides what renders as an image, but raw HTML/SVG/CSS resources and
+    reference definitions that CommonMark does not bind (for example a definition
+    that cannot interrupt a paragraph) must still be exposed, so both surfaces fail
+    closed together.
+    """
+    targets = list(_original_embedded_resource_targets(text))
+    targets.extend(commonmark_image_targets(text))
+    return list(dict.fromkeys(targets))
 
 
 # Functions defined in the implementation module resolve this global at call time.
