@@ -1,0 +1,561 @@
+{
+  "version": 50,
+  "date": "2026-09-08",
+  "purpose": "Post-#255 canonical dossier migration for identities added by the final State-dossier completeness scale-out.",
+  "migrationRule": "Existing non-State identities retain their immutable ABox semantics; this tranche changes only dossier placement from the comparison-base State dossier to a dedicated type-appropriate canonical dossier.",
+  "visualRule": "Derived visuals expose live State context and an identity-boundary evidence flow; State context never becomes entity-level governance.",
+  "maxMissingDedicatedDossiers": 0,
+  "entities": [
+    {
+      "id": "PERSON-AZE-ANAR-MAMMADLI",
+      "name": "Anar Mammadli",
+      "type": "Person",
+      "state": "AZE",
+      "stateContext": "R",
+      "dossier": "dossiers/persons/AZE-ANAR-MAMMADLI.md",
+      "sourceDossier": "dossiers/states/AZE.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "AZE State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Anar Mammadli as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-AZE-ANAR-MAMMADLI-status.svg",
+        "dossiers/assets/generated/PERSON-AZE-ANAR-MAMMADLI-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-BEN-HUGUES-COMLAN-SOSSOUKPE",
+      "name": "Hugues Comlan Sossoukpè",
+      "type": "Person",
+      "state": "BEN",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/BEN-HUGUES-COMLAN-SOSSOUKPE.md",
+      "sourceDossier": "dossiers/states/BEN.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "BEN State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Hugues Comlan Sossoukpè as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-BEN-HUGUES-COMLAN-SOSSOUKPE-status.svg",
+        "dossiers/assets/generated/PERSON-BEN-HUGUES-COMLAN-SOSSOUKPE-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-BEN-JULIEN-KANDE-KANSOU",
+      "name": "Julien Kandé Kansou",
+      "type": "Person",
+      "state": "BEN",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/BEN-JULIEN-KANDE-KANSOU.md",
+      "sourceDossier": "dossiers/states/BEN.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "BEN State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Julien Kandé Kansou as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-BEN-JULIEN-KANDE-KANSOU-status.svg",
+        "dossiers/assets/generated/PERSON-BEN-JULIEN-KANDE-KANSOU-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-BTN-CHATUR-MAN-TAMANG",
+      "name": "Chatur Man Tamang",
+      "type": "Person",
+      "state": "BTN",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/BTN-CHATUR-MAN-TAMANG.md",
+      "sourceDossier": "dossiers/states/BTN.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "BTN State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Chatur Man Tamang as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-BTN-CHATUR-MAN-TAMANG-status.svg",
+        "dossiers/assets/generated/PERSON-BTN-CHATUR-MAN-TAMANG-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-BTN-HASTA-BAHADUR-RAI",
+      "name": "Hasta Bahadur Rai",
+      "type": "Person",
+      "state": "BTN",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/BTN-HASTA-BAHADUR-RAI.md",
+      "sourceDossier": "dossiers/states/BTN.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "BTN State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Hasta Bahadur Rai as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-BTN-HASTA-BAHADUR-RAI-status.svg",
+        "dossiers/assets/generated/PERSON-BTN-HASTA-BAHADUR-RAI-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-CMR-DORGELESSE-NGUESSAN",
+      "name": "Dorgelesse Nguessan",
+      "type": "Person",
+      "state": "CMR",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/CMR-DORGELESSE-NGUESSAN.md",
+      "sourceDossier": "dossiers/states/CMR.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "CMR State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Dorgelesse Nguessan as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-CMR-DORGELESSE-NGUESSAN-status.svg",
+        "dossiers/assets/generated/PERSON-CMR-DORGELESSE-NGUESSAN-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-CMR-MARTINEZ-ZOGO",
+      "name": "Martinez Zogo",
+      "type": "Person",
+      "state": "CMR",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/CMR-MARTINEZ-ZOGO.md",
+      "sourceDossier": "dossiers/states/CMR.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "CMR State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Martinez Zogo as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-CMR-MARTINEZ-ZOGO-status.svg",
+        "dossiers/assets/generated/PERSON-CMR-MARTINEZ-ZOGO-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-DZA-BOUALEM-SANSAL",
+      "name": "Boualem Sansal",
+      "type": "Person",
+      "state": "DZA",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/DZA-BOUALEM-SANSAL.md",
+      "sourceDossier": "dossiers/states/DZA.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "DZA State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Boualem Sansal as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-DZA-BOUALEM-SANSAL-status.svg",
+        "dossiers/assets/generated/PERSON-DZA-BOUALEM-SANSAL-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-ETH-MILLION-BEYENE",
+      "name": "Million Beyene",
+      "type": "Person",
+      "state": "ETH",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/ETH-MILLION-BEYENE.md",
+      "sourceDossier": "dossiers/states/ETH.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "ETH State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Million Beyene as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-ETH-MILLION-BEYENE-status.svg",
+        "dossiers/assets/generated/PERSON-ETH-MILLION-BEYENE-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-GNQ-ANACLETO-MICHA-NDONG-NLANG",
+      "name": "Anacleto Micha Ndong Nlang",
+      "type": "Person",
+      "state": "GNQ",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/GNQ-ANACLETO-MICHA-NDONG-NLANG.md",
+      "sourceDossier": "dossiers/states/GNQ.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "GNQ State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Anacleto Micha Ndong Nlang as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-GNQ-ANACLETO-MICHA-NDONG-NLANG-status.svg",
+        "dossiers/assets/generated/PERSON-GNQ-ANACLETO-MICHA-NDONG-NLANG-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-GNQ-JOAQUIN-ELO-AYETO",
+      "name": "Joaquín Elo Ayeto",
+      "type": "Person",
+      "state": "GNQ",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/GNQ-JOAQUIN-ELO-AYETO.md",
+      "sourceDossier": "dossiers/states/GNQ.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "GNQ State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Joaquín Elo Ayeto as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-GNQ-JOAQUIN-ELO-AYETO-status.svg",
+        "dossiers/assets/generated/PERSON-GNQ-JOAQUIN-ELO-AYETO-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-GTM-HECTOR-CHACLAN",
+      "name": "Héctor Chaclán",
+      "type": "Person",
+      "state": "GTM",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/GTM-HECTOR-CHACLAN.md",
+      "sourceDossier": "dossiers/states/GTM.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "GTM State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Héctor Chaclán as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-GTM-HECTOR-CHACLAN-status.svg",
+        "dossiers/assets/generated/PERSON-GTM-HECTOR-CHACLAN-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-GTM-LUIS-PACHECO",
+      "name": "Luis Pacheco",
+      "type": "Person",
+      "state": "GTM",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/GTM-LUIS-PACHECO.md",
+      "sourceDossier": "dossiers/states/GTM.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "GTM State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Luis Pacheco as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-GTM-LUIS-PACHECO-status.svg",
+        "dossiers/assets/generated/PERSON-GTM-LUIS-PACHECO-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-JOR-AYMAN-SANDUKA",
+      "name": "Ayman Sanduka",
+      "type": "Person",
+      "state": "JOR",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/JOR-AYMAN-SANDUKA.md",
+      "sourceDossier": "dossiers/states/JOR.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "JOR State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Ayman Sanduka as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-JOR-AYMAN-SANDUKA-status.svg",
+        "dossiers/assets/generated/PERSON-JOR-AYMAN-SANDUKA-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-LAO-SISAY-LUANGMONDA",
+      "name": "Sisay Luangmonda",
+      "type": "Person",
+      "state": "LAO",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/LAO-SISAY-LUANGMONDA.md",
+      "sourceDossier": "dossiers/states/LAO.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "LAO State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Sisay Luangmonda as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-LAO-SISAY-LUANGMONDA-status.svg",
+        "dossiers/assets/generated/PERSON-LAO-SISAY-LUANGMONDA-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-LSO-TSOLO-THAKELI",
+      "name": "Tšolo Thakeli",
+      "type": "Person",
+      "state": "LSO",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/LSO-TSOLO-THAKELI.md",
+      "sourceDossier": "dossiers/states/LSO.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "LSO State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Tšolo Thakeli as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-LSO-TSOLO-THAKELI-status.svg",
+        "dossiers/assets/generated/PERSON-LSO-TSOLO-THAKELI-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-MLI-MOUSSA-MARA",
+      "name": "Moussa Mara",
+      "type": "Person",
+      "state": "MLI",
+      "stateContext": "R",
+      "dossier": "dossiers/persons/MLI-MOUSSA-MARA.md",
+      "sourceDossier": "dossiers/states/MLI.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "MLI State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Moussa Mara as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-MLI-MOUSSA-MARA-status.svg",
+        "dossiers/assets/generated/PERSON-MLI-MOUSSA-MARA-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-MMR-AUNG-SAN-SUU-KYI",
+      "name": "Aung San Suu Kyi",
+      "type": "Person",
+      "state": "MMR",
+      "stateContext": "R",
+      "dossier": "dossiers/persons/MMR-AUNG-SAN-SUU-KYI.md",
+      "sourceDossier": "dossiers/states/MMR.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "MMR State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Aung San Suu Kyi as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-MMR-AUNG-SAN-SUU-KYI-status.svg",
+        "dossiers/assets/generated/PERSON-MMR-AUNG-SAN-SUU-KYI-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-PHL-RODRIGO-DUTERTE",
+      "name": "Rodrigo Duterte",
+      "type": "Person",
+      "state": "PHL",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/PHL-RODRIGO-DUTERTE.md",
+      "sourceDossier": "dossiers/states/PHL.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "PHL State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Rodrigo Duterte as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-PHL-RODRIGO-DUTERTE-status.svg",
+        "dossiers/assets/generated/PERSON-PHL-RODRIGO-DUTERTE-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-RWA-VICTOIRE-INGABIRE",
+      "name": "Victoire Ingabire",
+      "type": "Person",
+      "state": "RWA",
+      "stateContext": "R",
+      "dossier": "dossiers/persons/RWA-VICTOIRE-INGABIRE.md",
+      "sourceDossier": "dossiers/states/RWA.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "RWA State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Victoire Ingabire as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-RWA-VICTOIRE-INGABIRE-status.svg",
+        "dossiers/assets/generated/PERSON-RWA-VICTOIRE-INGABIRE-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-SGP-JAY-ISH-HAQ-RAJOO",
+      "name": "Jay Ish'haq Rajoo",
+      "type": "Person",
+      "state": "SGP",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/SGP-JAY-ISH-HAQ-RAJOO.md",
+      "sourceDossier": "dossiers/states/SGP.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "SGP State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Jay Ish'haq Rajoo as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-SGP-JAY-ISH-HAQ-RAJOO-status.svg",
+        "dossiers/assets/generated/PERSON-SGP-JAY-ISH-HAQ-RAJOO-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-SGP-KOKILA-ANNAMALAI",
+      "name": "Kokila Annamalai",
+      "type": "Person",
+      "state": "SGP",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/SGP-KOKILA-ANNAMALAI.md",
+      "sourceDossier": "dossiers/states/SGP.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "SGP State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Kokila Annamalai as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-SGP-KOKILA-ANNAMALAI-status.svg",
+        "dossiers/assets/generated/PERSON-SGP-KOKILA-ANNAMALAI-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-SOM-SADIA-MOALIM-ALI",
+      "name": "Sadia Moalim Ali",
+      "type": "Person",
+      "state": "SOM",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/SOM-SADIA-MOALIM-ALI.md",
+      "sourceDossier": "dossiers/states/SOM.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "SOM State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Sadia Moalim Ali as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-SOM-SADIA-MOALIM-ALI-status.svg",
+        "dossiers/assets/generated/PERSON-SOM-SADIA-MOALIM-ALI-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-THA-PAUL-CHAMBERS",
+      "name": "Paul Chambers",
+      "type": "Person",
+      "state": "THA",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/THA-PAUL-CHAMBERS.md",
+      "sourceDossier": "dossiers/states/THA.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "THA State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Paul Chambers as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-THA-PAUL-CHAMBERS-status.svg",
+        "dossiers/assets/generated/PERSON-THA-PAUL-CHAMBERS-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-TJK-BUZURGHMEHR-YOROV",
+      "name": "Buzurghmehr Yorov",
+      "type": "Person",
+      "state": "TJK",
+      "stateContext": "R",
+      "dossier": "dossiers/persons/TJK-BUZURGHMEHR-YOROV.md",
+      "sourceDossier": "dossiers/states/TJK.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "TJK State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Buzurghmehr Yorov as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-TJK-BUZURGHMEHR-YOROV-status.svg",
+        "dossiers/assets/generated/PERSON-TJK-BUZURGHMEHR-YOROV-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-TUR-ESRA-ISIK",
+      "name": "Esra Işık",
+      "type": "Person",
+      "state": "TUR",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/TUR-ESRA-ISIK.md",
+      "sourceDossier": "dossiers/states/TUR.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "TUR State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Esra Işık as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-TUR-ESRA-ISIK-status.svg",
+        "dossiers/assets/generated/PERSON-TUR-ESRA-ISIK-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-TUR-HALIME-SAMAN",
+      "name": "Halime Şaman",
+      "type": "Person",
+      "state": "TUR",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/TUR-HALIME-SAMAN.md",
+      "sourceDossier": "dossiers/states/TUR.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "TUR State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Halime Şaman as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-TUR-HALIME-SAMAN-status.svg",
+        "dossiers/assets/generated/PERSON-TUR-HALIME-SAMAN-evidence.svg"
+      ]
+    },
+    {
+      "id": "PERSON-UGA-SARAH-BIREETE",
+      "name": "Sarah Bireete",
+      "type": "Person",
+      "state": "UGA",
+      "stateContext": "S",
+      "dossier": "dossiers/persons/UGA-SARAH-BIREETE.md",
+      "sourceDossier": "dossiers/states/UGA.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "UGA State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Sarah Bireete as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PERSON-UGA-SARAH-BIREETE-status.svg",
+        "dossiers/assets/generated/PERSON-UGA-SARAH-BIREETE-evidence.svg"
+      ]
+    },
+    {
+      "id": "PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28",
+      "name": "Operação Contenção — 28 October 2025 Alemão/Penha phase",
+      "type": "Project",
+      "state": "BRA",
+      "stateContext": "S",
+      "dossier": "dossiers/projects/BRA-OPERACAO-CONTENCAO-2025-10-28.md",
+      "sourceDossier": "dossiers/states/BRA.md",
+      "sourceGranularity": "partial",
+      "visualModel": {
+        "source": "BRA State dossier + existing ABox identity/review record",
+        "proposition": "Dedicated dossier migration preserves Operação Contenção — 28 October 2025 Alemão/Penha phase as an identity-only non-State record",
+        "boundary": "Identity and State-context adjacency do not establish participation, control, culpability or governance"
+      },
+      "visuals": [
+        "dossiers/assets/generated/PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28-status.svg",
+        "dossiers/assets/generated/PROJECT-BRA-OPERACAO-CONTENCAO-2025-10-28-evidence.svg"
+      ]
+    }
+  ]
+}
